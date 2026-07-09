@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+<nav th:fragment="navbar" class="navbar navbar-expand-lg app-topbar mb-4">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script th:src="@{/js/table-resize.js}" defer></script>
+    <div class="container app-nav-container">
+        <a class="navbar-brand app-brand" th:href="@{/}">
+            <span class="app-brand-mark"><i class="bi bi-building-check"></i></span>
+            <span>ObraControl</span>
+        </a>
+        <div class="navbar-nav app-nav-links">
+            <a class="nav-link" th:href="@{/}"><i class="bi bi-house"></i><span>Inicio</span></a>
+            <a class="nav-link" th:if="${configuracion.activo('modulo.dashboard')}" th:href="@{/dashboard}"><i class="bi bi-speedometer2"></i><span>Dashboard</span></a>
+            <a class="nav-link" th:if="${configuracion.activo('modulo.oc')}" th:href="@{/oc}"><i class="bi bi-receipt"></i><span>OC</span></a>
+            <a class="nav-link" th:if="${configuracion.activo('modulo.importarOc')}" th:href="@{/oc/importar}"><i class="bi bi-file-earmark-arrow-up"></i><span>Importar OC</span></a>
+            <a class="nav-link" th:if="${configuracion.activo('modulo.items')}" th:href="@{/items}"><i class="bi bi-list-task"></i><span>Items</span></a>
+            <a class="nav-link" th:if="${configuracion.activo('modulo.importarCertificados')}" th:href="@{/certificaciones/importar}"><i class="bi bi-clipboard-check"></i><span>Importar certificados</span></a>
+            <a class="nav-link" th:if="${configuracion.activo('modulo.itemizado')}" th:href="@{/itemizado}"><i class="bi bi-diagram-3"></i><span>Itemizado</span></a>
+            <a class="nav-link" th:if="${configuracion.activo('modulo.proveedores')}" th:href="@{/proveedores}"><i class="bi bi-person-lines-fill"></i><span>Proveedores</span></a>
+            <a class="nav-link" th:if="${configuracion.activo('modulo.categorias')}" th:href="@{/categorias}"><i class="bi bi-tags"></i><span>Categorias</span></a>
+            <a class="nav-link" th:if="${configuracion.activo('modulo.rubros')}" th:href="@{/rubros}"><i class="bi bi-folder2-open"></i><span>Rubros</span></a>
+            <a class="nav-link" th:if="${configuracion.activo('modulo.materiales')}" th:href="@{/materiales}"><i class="bi bi-box-seam"></i><span>Materiales</span></a>
+            <a class="nav-link" th:if="${configuracion.activo('modulo.catalogo')}" th:href="@{/catalogo-materiales}"><i class="bi bi-archive"></i><span>Catalogo</span></a>
+            <a class="nav-link" th:if="${configuracion.activo('modulo.reportes')}" th:href="@{/reportes}"><i class="bi bi-graph-up-arrow"></i><span>Reportes</span></a>
+            <a class="nav-link" th:href="@{/configuracion}"><i class="bi bi-sliders"></i><span>Config.</span></a>
+        </div>
+        <div class="app-nav-actions">
+            <button class="nav-back-button" type="button" onclick="history.back()" title="Volver"><i class="bi bi-arrow-left"></i><span>Volver</span></button>
+        </div>
+    </div>
+</nav>
+</body>
+</html>

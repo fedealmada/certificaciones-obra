@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Items</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link th:href="@{/css/app.css}" rel="stylesheet">
+</head>
+<body>
+<div th:replace="~{fragments/layout :: navbar}"></div>
+<main class="container">
+    <div class="page-hero mb-3">
+        <div>
+            <div class="document-kicker">Buscador general</div>
+            <h1>Items de OC</h1>
+            <div class="text-muted">Todos los items ordenados por numero, detalle y orden de compra</div>
+        </div>
+        <a class="btn btn-outline-secondary" th:href="@{/oc}"><i class="bi bi-receipt"></i> Ver OC</a>
+    </div>
+
+    <section class="panel-section mb-3">
+        <div class="row g-2 align-items-end">
+            <div class="col-lg-7">
+                <label class="form-label">Buscar por detalle, OC, fecha, proveedor, rubro o categoria</label>
+                <input class="form-control" id="item-search" placeholder="Ej: ladrillos, revoque, 327, Miguel Muriel">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Categoria</label>
+                <select class="form-select" id="item-category-filter">
+                    <option value="">Todas</option>
+                    <option value="MANO_OBRA">Mano de obra</option>
+                    <option value="MATERIAL">Material</option>
+                    <option value="OTRO">Otros</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-outline-secondary w-100" type="button" onclick="limpiarBusquedaItems()"><i class="bi bi-x-lg"></i> Limpiar</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="panel-section oc-list-panel">
+        <div class="section-title-row">
+            <h2 class="h5 mb-0"><i class="bi bi-list-task"></i> Items cargados</h2>
+            <span class="section-total-pill"><span id="item-visible-count" th:text="${items.size()}">0</span> visibles</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0 interactive-table items-master-table" id="items-table-master">
+                <thead>
+                <tr>
+                    <th><button class="table-sort-button" type="button" data-sort="item" data-type="code">Item <i class="bi bi-arrow-down-up"></i></button></th>
+                    <th><button class="table-sort-button" type="button" data-sort="oc" data-type="number">OC <i class="bi bi-arrow-down-up"></i></button></th>
+                    <th><button class="table-sort-button" type="button" data-sort="fecha" data-type="date">Fecha <i class="bi bi-arrow-down-up"></i></button></th>
+                    <th><button class="table-sort-button" type="button" data-sort="proveedor" data-type="text">Proveedor <i class="bi bi-arrow-down-up"></i></button></th>
+                    <th><button class="table-sort-button" type="button" data-sort="detalle" data-type="text">Detalle <i class="bi bi-arrow-down-up"></i></button></th>
+                    <th><button class="table-sort-button" type="button" data-sort="categoria" data-type="text">Categoria <i class="bi bi-arrow-down-up"></i></button></th>
+                    <th><button class="table-sort-button" type="button" data-sort="rubro" data-type="text">Rubro <i class="bi bi-arrow-down-up"></i></button></th>
+                    <th class="text-end"><button class="table-sort-button justify-content-end" type="button" data-sort="importe" data-type="number">Importe <i class="bi bi-arrow-down-up"></i></button></th>
+                    <th class="text-end">Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="item : ${items}"
+                    th:data-item="${item.item}"
+                    th:data-oc="${item.ordenCompra.numero}"
+                    th:data-fecha="${item.ordenCompra.fecha}"
+                    th:data-fecha-texto="${#temporals.format(item.ordenCompra.fecha, 'dd/MM/yyyy')}"
+                    th:data-proveedor="${item.ordenCompra.proveedorEntidad?.nombre ?: '-'}"
+                    th:data-detalle="${item.detalle}"
+                    th:data-categoria="${item.categoria}"
+                    th:data-rubro="${item.rubroEntidad != null ? item.rubroEntidad.nombreCompleto : item.rubro}"
+                    th:data-importe="${item.importe}"
+                    th:data-search="${item.item + ' ' + item.ordenCompra.numero + ' ' + #temporals.format(item.ordenCompra.fecha, 'dd/MM/yyyy') + ' ' + (item.ordenCompra.proveedorEntidad?.nombre ?: '') + ' ' + item.detalle + ' ' + (item.rubroEntidad != null ? item.rubroEntidad.nombreCompleto : item.rubro) + ' ' + item.categoria}">
+                    <td><span class="item-code-pill" th:text="${item.item ?: '-'}"></span></td>
+                    <td><a class="link-dark fw-semibold" th:href="@{/oc/{id}(id=${item.ordenCompra.id})}" th:text="${item.ordenCompra.numero}"></a></td>
+                    <td th:text="${#temporals.format(item.ordenCompra.fecha, 'dd/MM/yyyy')}"></td>
+                    <td th:text="${item.ordenCompra.proveedorEntidad?.nombre ?: '-'}"></td>
+                    <td class="items-master-detail" th:text="${item.detalle}"></td>
+                    <td><span class="category-chip" th:text="${item.categoriaEntidad != null ? item.categoriaEntidad.nombre : item.categoria.descripcion}"></span></td>
+                    <td class="oc-list-rubros" th:text="${item.rubroEntidad != null ? item.rubroEntidad.nombreCompleto : item.rubro}"></td>
+                    <td class="text-end" th:text="${#numbers.formatDecimal(item.importe, 1, 'POINT', 2, 'COMMA')}"></td>
+                    <td class="text-end action-cell">
+                        <a class="btn btn-sm btn-outline-primary table-icon-action" th:href="@{/oc/{id}(id=${item.ordenCompra.id})}" title="Abrir OC" aria-label="Abrir OC"><i class="bi bi-receipt"></i></a>
+                        <a class="btn btn-sm btn-outline-secondary table-icon-action" th:href="@{/oc/{ocId}/items/{itemId}(ocId=${item.ordenCompra.id}, itemId=${item.id})}" title="Historial" aria-label="Historial"><i class="bi bi-clock-history"></i></a>
+                    </td>
+                </tr>
+                <tr th:if="${items.isEmpty()}"><td colspan="9" class="text-center text-muted py-4">No hay items cargados.</td></tr>
+                <tr class="items-empty-filter-row d-none"><td colspan="9" class="text-center text-muted py-4">No hay items que coincidan con la busqueda.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+<script>
+const itemsTable = document.querySelector('#items-table-master');
+const itemRows = Array.from(itemsTable.querySelectorAll('tbody tr[data-item]'));
+const itemVisibleCount = document.querySelector('#item-visible-count');
+const itemEmptyFilterRow = document.querySelector('.items-empty-filter-row');
+let itemCurrentSort = { key: 'item', direction: 'asc', type: 'code' };
+
+function normalizeItemText(value) {
+    return (value || '').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+}
+
+function itemNumberValue(value) {
+    const normalized = (value || '').toString().replace(/[^\d.,-]/g, '').replace(',', '.');
+    const parsed = Number.parseFloat(normalized);
+    return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function itemCodeParts(value) {
+    const matches = (value || '').toString().match(/\d+|\D+/g);
+    return matches || [''];
+}
+
+function compareItemCode(left, right) {
+    const leftParts = itemCodeParts(left);
+    const rightParts = itemCodeParts(right);
+    const max = Math.max(leftParts.length, rightParts.length);
+    for (let i = 0; i < max; i++) {
+        const l = leftParts[i] || '';
+        const r = rightParts[i] || '';
+        const lNumber = /^\d+$/.test(l);
+        const rNumber = /^\d+$/.test(r);
+        if (lNumber && rNumber) {
+            const diff = Number(l) - Number(r);
+            if (diff !== 0) return diff;
+        } else {
+            const diff = normalizeItemText(l).localeCompare(normalizeItemText(r), 'es');
+            if (diff !== 0) return diff;
+        }
+    }
+    return 0;
+}
+
+function itemSortValue(row, key, type) {
+    const value = row.dataset[key] || '';
+    if (type === 'number') return itemNumberValue(value);
+    if (type === 'code') return value;
+    if (type === 'date') return value;
+    return normalizeItemText(value);
+}
+
+function aplicarFiltroItems() {
+    const query = normalizeItemText(document.querySelector('#item-search').value);
+    const categoria = document.querySelector('#item-category-filter').value;
+    let visibles = 0;
+
+    itemRows.forEach(row => {
+        const coincideTexto = normalizeItemText(row.dataset.search).includes(query);
+        const coincideCategoria = !categoria || row.dataset.categoria === categoria;
+        const visible = coincideTexto && coincideCategoria;
+        row.classList.toggle('d-none', !visible);
+        if (visible) visibles++;
+    });
+
+    itemVisibleCount.textContent = visibles;
+    itemEmptyFilterRow.classList.toggle('d-none', visibles !== 0);
+}
+
+function ordenarItems(key, type, toggleDirection) {
+    const direction = toggleDirection && itemCurrentSort.key === key && itemCurrentSort.direction === 'asc' ? 'desc' : 'asc';
+    itemCurrentSort = { key, direction, type };
+    const body = itemsTable.querySelector('tbody');
+    const sortedRows = [...itemRows].sort((a, b) => {
+        const left = itemSortValue(a, key, type);
+        const right = itemSortValue(b, key, type);
+        let comparison;
+        if (type === 'code') {
+            comparison = compareItemCode(left, right);
+        } else {
+            comparison = type === 'text' ? left.localeCompare(right, 'es') : (left > right ? 1 : (left < right ? -1 : 0));
+        }
+        return direction === 'asc' ? comparison : -comparison;
+    });
+    sortedRows.forEach(row => body.appendChild(row));
+    body.appendChild(itemEmptyFilterRow);
+
+    document.querySelectorAll('#items-table-master .table-sort-button').forEach(button => {
+        const active = button.dataset.sort === key;
+        button.classList.toggle('is-active', active);
+        const icon = button.querySelector('i');
+        icon.className = active
+            ? (direction === 'asc' ? 'bi bi-sort-up' : 'bi bi-sort-down')
+            : 'bi bi-arrow-down-up';
+    });
+}
+
+function limpiarBusquedaItems() {
+    document.querySelector('#item-search').value = '';
+    document.querySelector('#item-category-filter').value = '';
+    aplicarFiltroItems();
+}
+
+document.querySelector('#item-search').addEventListener('input', aplicarFiltroItems);
+document.querySelector('#item-category-filter').addEventListener('change', aplicarFiltroItems);
+document.querySelectorAll('#items-table-master .table-sort-button').forEach(button => {
+    button.addEventListener('click', () => ordenarItems(button.dataset.sort, button.dataset.type, true));
+});
+
+ordenarItems(itemCurrentSort.key, itemCurrentSort.type, false);
+aplicarFiltroItems();
+</script>
+</body>
+</html>
