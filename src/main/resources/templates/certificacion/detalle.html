@@ -85,91 +85,81 @@
         <span th:text="${#lists.size(itemsCalculados)} + ' items'">0 items</span>
     </div>
 
-    <div class="table-responsive cert-detail-table-wrap">
-        <table class="table align-middle cert-table">
-            <colgroup>
-                <col class="cert-col-item">
-                <col class="cert-col-detail">
-                <col class="cert-col-contract">
-                <col class="cert-col-progress">
-                <col class="cert-col-progress">
-            </colgroup>
-            <thead>
-            <tr>
-                <th>Item</th>
-                <th>Detalle</th>
-                <th>Contratado</th>
-                <th>Avance %</th>
-                <th>Avance $</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="item : ${itemsCalculados}">
-                <td class="cert-item-code" th:text="${item.itemOrdenCompra.item}"></td>
-                <td class="cert-item-detail">
+    <section class="cert-detail-table-wrap cert-items-panel">
+        <div class="cert-items-grid cert-items-head">
+            <div>Item</div>
+            <div>Detalle</div>
+            <div>Contratado</div>
+            <div>Avance %</div>
+            <div>Avance $</div>
+        </div>
+
+        <article class="cert-items-grid cert-item-row" th:each="item : ${itemsCalculados}">
+            <div class="cert-item-code" th:text="${item.itemOrdenCompra.item}"></div>
+            <div class="cert-item-detail">
+                <div>
                     <strong th:text="${item.itemOrdenCompra.detalle}">Detalle</strong>
                     <small th:if="${item.itemOrdenCompra.rubro != null}" th:text="${item.itemOrdenCompra.rubro}">Rubro</small>
-                </td>
-                <td>
-                    <div class="cert-value-stack">
-                        <div>
-                            <span>Cantidad</span>
-                            <strong th:text="${#numbers.formatDecimal(item.itemOrdenCompra.cantidad, 1, 'POINT', 2, 'COMMA') + ' ' + (item.itemOrdenCompra.unidad ?: '')}">0,00</strong>
-                        </div>
-                        <div>
-                            <span>Unitario</span>
-                            <strong th:text="${#numbers.formatDecimal(item.itemOrdenCompra.precioUnitario, 1, 'POINT', 2, 'COMMA')}">0,00</strong>
-                        </div>
-                        <div class="is-total">
-                            <span>Total</span>
-                            <strong th:text="${#numbers.formatDecimal(item.itemOrdenCompra.importe, 1, 'POINT', 2, 'COMMA')}">0,00</strong>
-                        </div>
+                </div>
+            </div>
+            <div>
+                <div class="cert-value-stack">
+                    <div>
+                        <span>Cantidad</span>
+                        <strong th:text="${#numbers.formatDecimal(item.itemOrdenCompra.cantidad, 1, 'POINT', 2, 'COMMA') + ' ' + (item.itemOrdenCompra.unidad ?: '')}">0,00</strong>
                     </div>
-                </td>
-                <td>
-                    <div class="cert-value-stack cert-progress-stack">
-                        <div>
-                            <span>Anterior</span>
-                            <strong th:text="${item.porcentajeAnterior} + ' %'">0 %</strong>
-                        </div>
-                        <div class="is-current">
-                            <span>Actual</span>
-                            <strong th:text="${item.porcentajeActual} + ' %'">0 %</strong>
-                        </div>
-                        <div class="is-total">
-                            <span>Acumulado</span>
-                            <strong th:text="${item.porcentajeAcumulado} + ' %'">0 %</strong>
-                        </div>
+                    <div>
+                        <span>Unitario</span>
+                        <strong th:text="${#numbers.formatDecimal(item.itemOrdenCompra.precioUnitario, 1, 'POINT', 2, 'COMMA')}">0,00</strong>
                     </div>
-                </td>
-                <td>
-                    <div class="cert-value-stack cert-progress-stack">
-                        <div>
-                            <span>Anterior</span>
-                            <strong th:text="${#numbers.formatDecimal(item.montoAnterior, 1, 'POINT', 2, 'COMMA')}">0,00</strong>
-                        </div>
-                        <div class="is-current">
-                            <span>Actual</span>
-                            <strong th:text="${#numbers.formatDecimal(item.montoActual, 1, 'POINT', 2, 'COMMA')}">0,00</strong>
-                        </div>
-                        <div class="is-total">
-                            <span>Acumulado</span>
-                            <strong th:text="${#numbers.formatDecimal(item.montoAcumulado, 1, 'POINT', 2, 'COMMA')}">0,00</strong>
-                        </div>
+                    <div class="is-total">
+                        <span>Total</span>
+                        <strong th:text="${#numbers.formatDecimal(item.itemOrdenCompra.importe, 1, 'POINT', 2, 'COMMA')}">0,00</strong>
                     </div>
-                </td>
-            </tr>
-            </tbody>
-            <tfoot>
-            <tr>
-                <td colspan="2">Totales del certificado</td>
-                <td class="text-end" th:text="${#numbers.formatDecimal(resumen.totalContratado, 1, 'POINT', 2, 'COMMA')}">0,00</td>
-                <td class="text-end" th:text="${#numbers.formatDecimal(resumen.porcentajeActual, 1, 'POINT', 2, 'COMMA') + ' % actual / ' + #numbers.formatDecimal(resumen.porcentajeAcumulado, 1, 'POINT', 2, 'COMMA') + ' % acum.'}">0,00 %</td>
-                <td class="text-end" th:text="${#numbers.formatDecimal(resumen.totalActual, 1, 'POINT', 2, 'COMMA') + ' actual / ' + #numbers.formatDecimal(resumen.totalAcumulado, 1, 'POINT', 2, 'COMMA') + ' acum.'}">0,00</td>
-            </tr>
-            </tfoot>
-        </table>
-    </div>
+                </div>
+            </div>
+            <div>
+                <div class="cert-value-stack cert-progress-stack">
+                    <div>
+                        <span>Anterior</span>
+                        <strong th:text="${item.porcentajeAnterior} + ' %'">0 %</strong>
+                    </div>
+                    <div class="is-current">
+                        <span>Actual</span>
+                        <strong th:text="${item.porcentajeActual} + ' %'">0 %</strong>
+                    </div>
+                    <div class="is-total">
+                        <span>Acumulado</span>
+                        <strong th:text="${item.porcentajeAcumulado} + ' %'">0 %</strong>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="cert-value-stack cert-progress-stack">
+                    <div>
+                        <span>Anterior</span>
+                        <strong th:text="${#numbers.formatDecimal(item.montoAnterior, 1, 'POINT', 2, 'COMMA')}">0,00</strong>
+                    </div>
+                    <div class="is-current">
+                        <span>Actual</span>
+                        <strong th:text="${#numbers.formatDecimal(item.montoActual, 1, 'POINT', 2, 'COMMA')}">0,00</strong>
+                    </div>
+                    <div class="is-total">
+                        <span>Acumulado</span>
+                        <strong th:text="${#numbers.formatDecimal(item.montoAcumulado, 1, 'POINT', 2, 'COMMA')}">0,00</strong>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <div class="cert-items-grid cert-items-total">
+            <div>Totales del certificado</div>
+            <div></div>
+            <div th:text="${#numbers.formatDecimal(resumen.totalContratado, 1, 'POINT', 2, 'COMMA')}">0,00</div>
+            <div th:text="${#numbers.formatDecimal(resumen.porcentajeActual, 1, 'POINT', 2, 'COMMA') + ' % actual / ' + #numbers.formatDecimal(resumen.porcentajeAcumulado, 1, 'POINT', 2, 'COMMA') + ' % acum.'}">0,00 %</div>
+            <div th:text="${#numbers.formatDecimal(resumen.totalActual, 1, 'POINT', 2, 'COMMA') + ' actual / ' + #numbers.formatDecimal(resumen.totalAcumulado, 1, 'POINT', 2, 'COMMA') + ' acum.'}">0,00</div>
+        </div>
+    </section>
 </main>
 </body>
 </html>
