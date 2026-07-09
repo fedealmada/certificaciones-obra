@@ -355,6 +355,21 @@ h5 {
 .oc-list-table .oc-col-rubros { width: 26%; }
 .oc-list-table .oc-col-items { width: 7%; }
 
+.item-rubro-form {
+    margin: 0;
+}
+
+.item-rubro-select {
+    min-height: 1.85rem;
+    padding: 0.22rem 1.75rem 0.22rem 0.45rem;
+    font-size: 0.76rem;
+}
+
+#items-table-master th:nth-child(5),
+#items-table-master td:nth-child(5) { width: 27%; }
+#items-table-master th:nth-child(7),
+#items-table-master td:nth-child(7) { width: 15%; }
+
 .table-hover tbody tr:hover td,
 .cert-table tbody tr:hover td,
 .cert-edit-table tbody tr:hover td,

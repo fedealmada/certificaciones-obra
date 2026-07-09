@@ -45,6 +45,8 @@
         </div>
     </section>
 
+    <div class="alert alert-success" th:if="${mensaje}" th:text="${mensaje}"></div>
+
     <section class="panel-section oc-list-panel">
         <div class="section-title-row">
             <h2 class="h5 mb-0"><i class="bi bi-list-task"></i> Items cargados</h2>
@@ -83,7 +85,14 @@
                     <td th:text="${item.ordenCompra.proveedorEntidad?.nombre ?: '-'}"></td>
                     <td class="items-master-detail" th:text="${item.detalle}"></td>
                     <td><span class="category-chip" th:text="${item.categoriaEntidad != null ? item.categoriaEntidad.nombre : item.categoria.descripcion}"></span></td>
-                    <td class="oc-list-rubros" th:text="${item.rubroEntidad != null ? item.rubroEntidad.nombreCompleto : item.rubro}"></td>
+                    <td class="oc-list-rubros">
+                        <form class="item-rubro-form" method="post" th:action="@{/items/{id}/rubro(id=${item.id})}">
+                            <select class="form-select item-rubro-select" name="rubroId" onchange="this.form.submit()" th:aria-label="${'Cambiar rubro del item ' + (item.item ?: '')}">
+                                <option value="" th:selected="${item.rubroEntidad == null}">Sin rubro</option>
+                                <option th:each="rubro : ${rubros}" th:value="${rubro.id}" th:text="${rubro.nombreCompleto}" th:selected="${item.rubroEntidad != null && rubro.id == item.rubroEntidad.id}"></option>
+                            </select>
+                        </form>
+                    </td>
                     <td class="text-end" th:text="${#numbers.formatDecimal(item.importe, 1, 'POINT', 2, 'COMMA')}"></td>
                     <td class="text-end action-cell">
                         <a class="btn btn-sm btn-outline-primary table-icon-action" th:href="@{/oc/{id}(id=${item.ordenCompra.id})}" title="Abrir OC" aria-label="Abrir OC"><i class="bi bi-receipt"></i></a>
