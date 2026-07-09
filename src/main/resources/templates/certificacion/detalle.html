@@ -90,36 +90,17 @@
             <colgroup>
                 <col class="cert-col-item">
                 <col class="cert-col-detail">
-                <col class="cert-col-unit">
-                <col class="cert-col-qty">
-                <col class="cert-col-money">
-                <col class="cert-col-money">
-                <col class="cert-col-percent">
-                <col class="cert-col-percent">
-                <col class="cert-col-percent">
-                <col class="cert-col-money">
-                <col class="cert-col-money">
-                <col class="cert-col-money">
+                <col class="cert-col-contract">
+                <col class="cert-col-progress">
+                <col class="cert-col-progress">
             </colgroup>
             <thead>
-            <tr class="cert-group-row">
-                <th colspan="6">Detalle contratado</th>
-                <th colspan="3">Avance %</th>
-                <th colspan="3">Avance $</th>
-            </tr>
             <tr>
                 <th>Item</th>
                 <th>Detalle</th>
-                <th>Unidad</th>
-                <th class="text-end">Cantidad</th>
-                <th class="text-end">$ Unitario</th>
-                <th class="text-end">$ Total</th>
-                <th class="text-end">Anterior</th>
-                <th class="text-end">Actual</th>
-                <th class="text-end">Acum.</th>
-                <th class="text-end">Anterior</th>
-                <th class="text-end">Actual</th>
-                <th class="text-end">Acum.</th>
+                <th>Contratado</th>
+                <th>Avance %</th>
+                <th>Avance $</th>
             </tr>
             </thead>
             <tbody>
@@ -129,28 +110,62 @@
                     <strong th:text="${item.itemOrdenCompra.detalle}">Detalle</strong>
                     <small th:if="${item.itemOrdenCompra.rubro != null}" th:text="${item.itemOrdenCompra.rubro}">Rubro</small>
                 </td>
-                <td class="cert-unit" th:text="${item.itemOrdenCompra.unidad}"></td>
-                <td class="text-end cert-number" th:text="${#numbers.formatDecimal(item.itemOrdenCompra.cantidad, 1, 'POINT', 2, 'COMMA')}"></td>
-                <td class="text-end cert-number" th:text="${#numbers.formatDecimal(item.itemOrdenCompra.precioUnitario, 1, 'POINT', 2, 'COMMA')}"></td>
-                <td class="text-end cert-number cert-money-strong" th:text="${#numbers.formatDecimal(item.itemOrdenCompra.importe, 1, 'POINT', 2, 'COMMA')}"></td>
-                <td class="text-end cert-number" th:text="${item.porcentajeAnterior} + ' %'"></td>
-                <td class="text-end cert-number cert-current" th:text="${item.porcentajeActual} + ' %'"></td>
-                <td class="text-end cert-number cert-current" th:text="${item.porcentajeAcumulado} + ' %'"></td>
-                <td class="text-end cert-number" th:text="${#numbers.formatDecimal(item.montoAnterior, 1, 'POINT', 2, 'COMMA')}"></td>
-                <td class="text-end cert-number cert-current" th:text="${#numbers.formatDecimal(item.montoActual, 1, 'POINT', 2, 'COMMA')}"></td>
-                <td class="text-end cert-number cert-current" th:text="${#numbers.formatDecimal(item.montoAcumulado, 1, 'POINT', 2, 'COMMA')}"></td>
+                <td>
+                    <div class="cert-value-stack">
+                        <div>
+                            <span>Cantidad</span>
+                            <strong th:text="${#numbers.formatDecimal(item.itemOrdenCompra.cantidad, 1, 'POINT', 2, 'COMMA') + ' ' + (item.itemOrdenCompra.unidad ?: '')}">0,00</strong>
+                        </div>
+                        <div>
+                            <span>Unitario</span>
+                            <strong th:text="${#numbers.formatDecimal(item.itemOrdenCompra.precioUnitario, 1, 'POINT', 2, 'COMMA')}">0,00</strong>
+                        </div>
+                        <div class="is-total">
+                            <span>Total</span>
+                            <strong th:text="${#numbers.formatDecimal(item.itemOrdenCompra.importe, 1, 'POINT', 2, 'COMMA')}">0,00</strong>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="cert-value-stack cert-progress-stack">
+                        <div>
+                            <span>Anterior</span>
+                            <strong th:text="${item.porcentajeAnterior} + ' %'">0 %</strong>
+                        </div>
+                        <div class="is-current">
+                            <span>Actual</span>
+                            <strong th:text="${item.porcentajeActual} + ' %'">0 %</strong>
+                        </div>
+                        <div class="is-total">
+                            <span>Acumulado</span>
+                            <strong th:text="${item.porcentajeAcumulado} + ' %'">0 %</strong>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="cert-value-stack cert-progress-stack">
+                        <div>
+                            <span>Anterior</span>
+                            <strong th:text="${#numbers.formatDecimal(item.montoAnterior, 1, 'POINT', 2, 'COMMA')}">0,00</strong>
+                        </div>
+                        <div class="is-current">
+                            <span>Actual</span>
+                            <strong th:text="${#numbers.formatDecimal(item.montoActual, 1, 'POINT', 2, 'COMMA')}">0,00</strong>
+                        </div>
+                        <div class="is-total">
+                            <span>Acumulado</span>
+                            <strong th:text="${#numbers.formatDecimal(item.montoAcumulado, 1, 'POINT', 2, 'COMMA')}">0,00</strong>
+                        </div>
+                    </div>
+                </td>
             </tr>
             </tbody>
             <tfoot>
             <tr>
-                <td colspan="5" class="text-end">Totales</td>
+                <td colspan="2">Totales del certificado</td>
                 <td class="text-end" th:text="${#numbers.formatDecimal(resumen.totalContratado, 1, 'POINT', 2, 'COMMA')}">0,00</td>
-                <td></td>
-                <td class="text-end" th:text="${#numbers.formatDecimal(resumen.porcentajeActual, 1, 'POINT', 2, 'COMMA')} + ' %'">0,00 %</td>
-                <td class="text-end" th:text="${#numbers.formatDecimal(resumen.porcentajeAcumulado, 1, 'POINT', 2, 'COMMA')} + ' %'">0,00 %</td>
-                <td></td>
-                <td class="text-end" th:text="${#numbers.formatDecimal(resumen.totalActual, 1, 'POINT', 2, 'COMMA')}">0,00</td>
-                <td class="text-end" th:text="${#numbers.formatDecimal(resumen.totalAcumulado, 1, 'POINT', 2, 'COMMA')}">0,00</td>
+                <td class="text-end" th:text="${#numbers.formatDecimal(resumen.porcentajeActual, 1, 'POINT', 2, 'COMMA') + ' % actual / ' + #numbers.formatDecimal(resumen.porcentajeAcumulado, 1, 'POINT', 2, 'COMMA') + ' % acum.'}">0,00 %</td>
+                <td class="text-end" th:text="${#numbers.formatDecimal(resumen.totalActual, 1, 'POINT', 2, 'COMMA') + ' actual / ' + #numbers.formatDecimal(resumen.totalAcumulado, 1, 'POINT', 2, 'COMMA') + ' acum.'}">0,00</td>
             </tr>
             </tfoot>
         </table>

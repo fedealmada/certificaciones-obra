@@ -2260,7 +2260,7 @@ body.is-resizing-table-column {
 
 .cert-table {
     width: 100%;
-    min-width: 78rem;
+    min-width: 0;
     margin: 0;
     table-layout: fixed;
     border: 0;
@@ -2269,23 +2269,23 @@ body.is-resizing-table-column {
 .cert-table th,
 .cert-table td {
     border-color: #dde3ea;
-    font-size: 0.78rem;
+    font-size: 0.86rem;
     vertical-align: top;
     overflow-wrap: anywhere;
 }
 
 .cert-table thead th {
-    padding: 0.58rem 0.5rem;
+    padding: 0.72rem 0.85rem;
     background: #eef2f6;
     color: #24303d;
     border-color: #d5dce4;
-    font-size: 0.72rem;
+    font-size: 0.76rem;
     line-height: 1.15;
     text-transform: uppercase;
 }
 
 .cert-table tbody td {
-    padding: 0.68rem 0.5rem;
+    padding: 0.85rem;
     background: #ffffff;
 }
 
@@ -2298,11 +2298,11 @@ body.is-resizing-table-column {
 }
 
 .cert-table tfoot td {
-    padding: 0.65rem 0.5rem;
+    padding: 0.78rem 0.85rem;
     background: #18202a;
     border-color: #18202a;
     color: #ffffff;
-    font-size: 0.8rem;
+    font-size: 0.88rem;
     font-weight: 850;
 }
 
@@ -2316,12 +2316,10 @@ body.is-resizing-table-column {
     text-transform: uppercase;
 }
 
-.cert-col-item { width: 5.5%; }
-.cert-col-detail { width: 30%; }
-.cert-col-unit { width: 5.5%; }
-.cert-col-qty { width: 7%; }
-.cert-col-money { width: 7.2%; }
-.cert-col-percent { width: 5.8%; }
+.cert-col-item { width: 7%; }
+.cert-col-detail { width: 41%; }
+.cert-col-contract { width: 18%; }
+.cert-col-progress { width: 17%; }
 
 .cert-item-code {
     color: var(--app-muted);
@@ -2331,7 +2329,7 @@ body.is-resizing-table-column {
 .cert-item-detail strong {
     display: block;
     color: var(--app-ink);
-    font-size: 0.86rem;
+    font-size: 0.92rem;
     font-weight: 700;
     line-height: 1.35;
     white-space: normal;
@@ -2345,11 +2343,6 @@ body.is-resizing-table-column {
     line-height: 1.25;
 }
 
-.cert-unit {
-    color: var(--app-muted);
-    font-weight: 750;
-}
-
 .cert-number {
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
@@ -2359,6 +2352,50 @@ body.is-resizing-table-column {
 .cert-current {
     color: var(--app-ink);
     font-weight: 850;
+}
+
+.cert-value-stack {
+    display: grid;
+    gap: 0.42rem;
+}
+
+.cert-value-stack div {
+    display: grid;
+    grid-template-columns: minmax(4.7rem, 0.8fr) minmax(0, 1fr);
+    gap: 0.55rem;
+    align-items: baseline;
+}
+
+.cert-value-stack span {
+    color: var(--app-muted);
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.cert-value-stack strong {
+    color: var(--app-ink);
+    font-size: 0.86rem;
+    font-weight: 750;
+    line-height: 1.15;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
+}
+
+.cert-value-stack .is-current strong {
+    color: #1f69c7;
+    font-weight: 850;
+}
+
+.cert-value-stack .is-total {
+    padding-top: 0.38rem;
+    border-top: 1px solid #e3e8ee;
+}
+
+.cert-value-stack .is-total strong {
+    color: var(--app-ink);
+    font-weight: 900;
 }
 
 .action-cell {
