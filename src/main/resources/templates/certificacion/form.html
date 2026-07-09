@@ -8,17 +8,68 @@
 </head>
 <body>
 <div th:replace="~{fragments/layout :: navbar}"></div>
-<main class="container">
-    <h1 th:text="${modoEdicion ? 'Editar Certificado - OC ' + orden.numero : 'Nuevo Certificado - OC ' + orden.numero}">Certificado</h1>
+<main class="container cert-detail-page">
+    <div class="page-navigation mb-3">
+        <a th:href="@{/}"><i class="bi bi-house"></i> Dashboard</a>
+        <i class="bi bi-chevron-right"></i>
+        <a th:href="@{/oc}">Ordenes</a>
+        <i class="bi bi-chevron-right"></i>
+        <a th:href="@{/oc/{id}(id=${orden.id})}" th:text="'OC ' + ${orden.numero}">OC</a>
+        <i class="bi bi-chevron-right"></i>
+        <span th:text="${modoEdicion ? 'Editar certificado' : 'Nuevo certificado'}">Certificado</span>
+    </div>
+
+    <div class="document-header cert-document-header mb-4">
+        <div class="document-title-block">
+            <div class="document-kicker">Certificacion de tareas</div>
+            <h1 th:text="${modoEdicion ? 'Editar Certificado' : 'Nuevo Certificado'}">Certificado</h1>
+            <div class="document-subtitle">
+                <span th:text="'OC ' + ${orden.numero}">OC</span>
+                <span class="cert-title-separator">/</span>
+                <span th:text="${orden.proveedorEntidad?.nombre ?: '-'}">Proveedor</span>
+            </div>
+        </div>
+        <div class="document-actions">
+            <a class="btn btn-outline-secondary" th:href="@{/oc/{id}(id=${orden.id})}"><i class="bi bi-arrow-left"></i> Volver a OC</a>
+        </div>
+    </div>
+
     <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
     <form method="post" th:action="${modoEdicion ? ('/oc/' + orden.id + '/certificaciones/' + certificacionId) : ('/oc/' + orden.id + '/certificaciones')}" th:object="${form}">
         <input type="hidden" th:field="*{id}">
-        <div class="row g-3 mb-4">
-            <div class="col-md-3"><label class="form-label">Numero</label><input class="form-control" type="number" th:field="*{numero}" required></div>
-            <div class="col-md-3"><label class="form-label">Fecha</label><input class="form-control" type="date" th:field="*{fecha}" required></div>
-            <div class="col-md-6"><label class="form-label">Observacion</label><input class="form-control" th:field="*{observacion}"></div>
+        <section class="cert-sheet cert-detail-sheet mb-4">
+            <div class="cert-sheet-title">
+                <div>
+                    <span th:text="${modoEdicion ? 'Edicion de certificado' : 'Alta de certificado'}">Alta de certificado</span>
+                    <small th:text="'OC ' + ${orden.numero}">OC</small>
+                </div>
+                <strong th:text="${modoEdicion ? 'Editar' : 'Nuevo'}">Nuevo</strong>
+            </div>
+            <div class="cert-form-meta-grid">
+                <div>
+                    <label class="form-label">Numero</label>
+                    <input class="form-control" type="number" th:field="*{numero}" required>
+                </div>
+                <div>
+                    <label class="form-label">Fecha</label>
+                    <input class="form-control" type="date" th:field="*{fecha}" required>
+                </div>
+                <div>
+                    <label class="form-label">Observacion</label>
+                    <input class="form-control" th:field="*{observacion}">
+                </div>
+            </div>
+        </section>
+
+        <div class="cert-table-title-row">
+            <div>
+                <div class="document-kicker">Carga de avance</div>
+                <h2>Items certificables</h2>
+            </div>
+            <span th:text="${#lists.size(itemsCertificables)} + ' items'">0 items</span>
         </div>
-        <div class="table-responsive mb-3"><table class="table align-middle" id="certificacion-table">
+
+        <div class="table-responsive cert-detail-table-wrap mb-3"><table class="table align-middle cert-edit-table" id="certificacion-table">
             <thead>
             <tr>
                 <th>Item</th>

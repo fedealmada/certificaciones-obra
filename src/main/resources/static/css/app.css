@@ -2484,6 +2484,89 @@ body.is-resizing-table-column {
     word-break: normal;
 }
 
+.cert-form-meta-grid {
+    display: grid;
+    grid-template-columns: minmax(9rem, 0.75fr) minmax(11rem, 0.75fr) minmax(18rem, 1.7fr);
+    gap: 1rem;
+    padding: 1rem;
+}
+
+.cert-edit-table {
+    min-width: 74rem;
+    margin: 0;
+    table-layout: fixed;
+}
+
+.cert-edit-table th,
+.cert-edit-table td {
+    padding: 0.68rem 0.72rem;
+    vertical-align: top;
+}
+
+.cert-edit-table thead th {
+    background: #eef2f6;
+    color: #24303d;
+    border-color: #d5dce4;
+    font-size: 0.74rem;
+    line-height: 1.15;
+    text-transform: uppercase;
+}
+
+.cert-edit-table tbody td {
+    border-color: #e4e9ef;
+}
+
+.cert-edit-table tbody tr:nth-child(even) td {
+    background: #fbfcfd;
+}
+
+.cert-edit-table tbody tr:hover td {
+    background: #fff8d4;
+}
+
+.cert-edit-table th:nth-child(1),
+.cert-edit-table td:nth-child(1) {
+    width: 7%;
+}
+
+.cert-edit-table th:nth-child(2),
+.cert-edit-table td:nth-child(2) {
+    width: 34%;
+}
+
+.cert-edit-table th:nth-child(3),
+.cert-edit-table th:nth-child(4),
+.cert-edit-table th:nth-child(6),
+.cert-edit-table th:nth-child(7),
+.cert-edit-table td:nth-child(3),
+.cert-edit-table td:nth-child(4),
+.cert-edit-table td:nth-child(6),
+.cert-edit-table td:nth-child(7) {
+    width: 11%;
+}
+
+.cert-edit-table th:nth-child(5),
+.cert-edit-table td:nth-child(5) {
+    width: 15%;
+}
+
+.cert-edit-table .porcentaje-input {
+    min-width: 7rem;
+}
+
+.cert-import-body {
+    padding: 1rem;
+}
+
+.cert-import-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    padding: 0.85rem 1rem 1rem;
+    border-top: 1px solid var(--app-line);
+    background: #f8fafc;
+}
+
 .action-cell {
     white-space: nowrap;
 }

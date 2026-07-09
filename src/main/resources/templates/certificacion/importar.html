@@ -8,21 +8,40 @@
 </head>
 <body>
 <div th:replace="~{fragments/layout :: navbar}"></div>
-<main class="container">
-    <div class="page-hero mb-3">
-        <div>
-            <div class="document-kicker">Automatizacion de certificaciones</div>
-            <h1>Importar certificados</h1>
-            <div class="text-muted">Pega el bloque copiado desde Excel y revisa la previsualizacion antes de guardar.</div>
-        </div>
-        <a class="btn btn-outline-secondary" th:href="@{/oc}"><i class="bi bi-receipt"></i> Ver OC</a>
+<main class="container cert-detail-page">
+    <div class="page-navigation mb-3">
+        <a th:href="@{/}"><i class="bi bi-house"></i> Dashboard</a>
+        <i class="bi bi-chevron-right"></i>
+        <a th:href="@{/oc}">Ordenes</a>
+        <i class="bi bi-chevron-right"></i>
+        <span>Importar certificados</span>
     </div>
 
-    <section class="panel-section mb-3">
+    <div class="document-header cert-document-header mb-4">
+        <div class="document-title-block">
+            <div class="document-kicker">Automatizacion de certificaciones</div>
+            <h1>Importar certificados</h1>
+            <div class="document-subtitle">Pega el bloque copiado desde Excel y revisa la previsualizacion antes de guardar.</div>
+        </div>
+        <div class="document-actions">
+            <a class="btn btn-outline-secondary" th:href="@{/oc}"><i class="bi bi-receipt"></i> Ver OC</a>
+        </div>
+    </div>
+
+    <section class="cert-sheet cert-detail-sheet mb-3">
+        <div class="cert-sheet-title">
+            <div>
+                <span>Entrada de certificados</span>
+                <small>Planilla copiada desde Excel</small>
+            </div>
+            <strong>Importar</strong>
+        </div>
         <form method="post" th:action="@{/certificaciones/importar/previsualizar}" th:object="${form}">
-            <label class="form-label fw-semibold" for="contenido">Datos copiados desde la planilla</label>
-            <textarea class="form-control import-textarea" id="contenido" th:field="*{contenido}" placeholder="Pega aca el bloque completo de certificados..."></textarea>
-            <div class="d-flex gap-2 mt-3">
+            <div class="cert-import-body">
+                <label class="form-label fw-semibold" for="contenido">Datos copiados desde la planilla</label>
+                <textarea class="form-control import-textarea" id="contenido" th:field="*{contenido}" placeholder="Pega aca el bloque completo de certificados..."></textarea>
+            </div>
+            <div class="cert-import-actions">
                 <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i> Previsualizar</button>
                 <a class="btn btn-outline-secondary" th:href="@{/certificaciones/importar}"><i class="bi bi-x-lg"></i> Limpiar</a>
             </div>
