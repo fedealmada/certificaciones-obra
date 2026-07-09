@@ -30,7 +30,10 @@
             <div class="col-md-3"><label class="form-label">Fecha vigencia</label><input class="form-control" type="date" th:field="*{fechaVigencia}"></div>
             <div class="col-md-3">
                 <label class="form-label">Proveedor</label>
-                <input class="form-control proveedor-search-input" list="proveedores-list" autocomplete="off" required>
+                <div class="provider-autocomplete" data-provider-autocomplete>
+                    <input class="form-control proveedor-search-input" autocomplete="off" placeholder="Escribi al menos 2 letras" required data-provider-input>
+                    <div class="provider-results" data-provider-results></div>
+                </div>
                 <select class="d-none proveedor-id-select" th:field="*{proveedorId}" data-provider-select>
                     <option value="">Seleccionar proveedor</option>
                     <option th:each="proveedor : ${proveedores}" th:value="${proveedor.id}" th:text="${proveedor.nombre}"></option>
@@ -38,9 +41,6 @@
             </div>
             <div class="col-12"><label class="form-label">Observacion</label><textarea class="form-control" rows="2" th:field="*{observacion}"></textarea></div>
         </div>
-        <datalist id="proveedores-list">
-            <option th:each="proveedor : ${proveedores}" th:value="${proveedor.nombre}"></option>
-        </datalist>
         <div class="d-flex justify-content-between align-items-center mb-2"><h2 class="h4">Items</h2><button class="btn btn-outline-primary" type="button" onclick="agregarItem()">Agregar item</button></div>
         <select class="d-none" id="rubros-template">
             <option value="">Seleccionar</option>
@@ -216,25 +216,81 @@ function mostrarGuardandoOc() {
 }
 
 function inicializarBuscadoresProveedor() {
-    const proveedores = Array.from(document.querySelectorAll('#proveedores-list option'))
-        .map(option => option.value);
     document.querySelectorAll('[data-provider-select]').forEach(select => {
-        const input = select.closest('.col-md-3').querySelector('.proveedor-search-input');
-        const actualizarInput = () => {
-            const selected = select.selectedOptions[0];
-            input.value = selected && selected.value ? selected.textContent : '';
+        const picker = select.closest('.col-md-3');
+        const input = picker.querySelector('[data-provider-input]');
+        const results = picker.querySelector('[data-provider-results]');
+        const proveedores = Array.from(select.options)
+            .filter(option => option.value)
+            .map(option => ({ id: option.value, nombre: option.textContent.trim() }));
+
+        const normalizar = valor => valor.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+        const elegirProveedor = proveedor => {
+            select.value = proveedor.id;
+            input.value = proveedor.nombre;
+            input.setCustomValidity('');
+            results.classList.remove('is-open');
+            results.innerHTML = '';
         };
-        const actualizarSelect = () => {
-            const escrito = input.value.trim().toLowerCase();
-            const option = Array.from(select.options)
-                .find(opcion => opcion.textContent.trim().toLowerCase() === escrito);
-            select.value = option ? option.value : '';
-            input.setCustomValidity(select.value ? '' : 'Selecciona un proveedor de la lista.');
+        const renderizarResultados = () => {
+            const busqueda = normalizar(input.value);
+            select.value = '';
+            input.setCustomValidity('Selecciona un proveedor de la lista.');
+            if (busqueda.length < 2) {
+                results.classList.remove('is-open');
+                results.innerHTML = '';
+                return;
+            }
+
+            const coincidencias = proveedores
+                .filter(proveedor => normalizar(proveedor.nombre).includes(busqueda))
+                .slice(0, 8);
+            const exacta = coincidencias.find(proveedor => normalizar(proveedor.nombre) === busqueda);
+            if (exacta) {
+                elegirProveedor(exacta);
+                return;
+            }
+
+            results.innerHTML = '';
+            if (coincidencias.length) {
+                coincidencias.forEach(proveedor => {
+                    const button = document.createElement('button');
+                    button.type = 'button';
+                    button.className = 'provider-result';
+                    button.dataset.providerId = proveedor.id;
+                    button.textContent = proveedor.nombre;
+                    results.appendChild(button);
+                });
+            } else {
+                const empty = document.createElement('div');
+                empty.className = 'provider-empty';
+                empty.textContent = 'No hay coincidencias';
+                results.appendChild(empty);
+            }
+            results.classList.add('is-open');
         };
-        actualizarInput();
-        input.setAttribute('placeholder', proveedores.length ? 'Escribi para buscar' : 'No hay proveedores');
-        input.addEventListener('input', actualizarSelect);
-        input.addEventListener('change', actualizarSelect);
+
+        const selected = select.selectedOptions[0];
+        input.value = selected && selected.value ? selected.textContent.trim() : '';
+        input.setAttribute('placeholder', proveedores.length ? 'Escribi al menos 2 letras' : 'No hay proveedores');
+        input.setCustomValidity(select.value ? '' : 'Selecciona un proveedor de la lista.');
+        input.addEventListener('input', renderizarResultados);
+        input.addEventListener('focus', renderizarResultados);
+        results.addEventListener('mousedown', event => {
+            const button = event.target.closest('[data-provider-id]');
+            if (!button) {
+                return;
+            }
+            const proveedor = proveedores.find(item => item.id === button.dataset.providerId);
+            if (proveedor) {
+                elegirProveedor(proveedor);
+            }
+        });
+        document.addEventListener('click', event => {
+            if (!picker.contains(event.target)) {
+                results.classList.remove('is-open');
+            }
+        });
     });
 }
 

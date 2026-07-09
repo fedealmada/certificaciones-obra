@@ -99,13 +99,16 @@
                     </div>
                     <div class="col-lg-3 col-md-6 provider-picker">
                         <label class="form-label">Proveedor existente</label>
-                        <input class="form-control proveedor-search-input" list="proveedores-list" autocomplete="off" placeholder="Escribi para buscar">
+                        <div class="provider-autocomplete" data-provider-autocomplete>
+                            <input class="form-control proveedor-search-input" autocomplete="off" placeholder="Escribi al menos 2 letras" data-provider-input>
+                            <div class="provider-results" data-provider-results></div>
+                        </div>
                         <select class="d-none proveedor-id-select" th:field="*{ordenes[__${ocSt.index}__].proveedorId}" data-provider-select>
                             <option value="">Crear/usar nuevo proveedor</option>
                             <option th:each="proveedor : ${proveedores}" th:value="${proveedor.id}" th:text="${proveedor.nombre}"></option>
                         </select>
                     </div>
-                    <div class="col-lg-3 col-md-6">
+                    <div class="col-lg-3 col-md-6 provider-new-field">
                         <label class="form-label">Proveedor nuevo</label>
                         <input class="form-control" th:field="*{ordenes[__${ocSt.index}__].proveedorNuevo}" th:placeholder="${oc.proveedorSugerido ?: 'Nombre del proveedor'}">
                     </div>
@@ -175,9 +178,6 @@
             <button class="btn btn-primary" type="submit"><i class="bi bi-check2-circle"></i> Importar seleccionadas</button>
             <a class="btn btn-outline-secondary" th:href="@{/oc/importar}"><i class="bi bi-arrow-counterclockwise"></i> Limpiar</a>
         </div>
-        <datalist id="proveedores-list">
-            <option th:each="proveedor : ${proveedores}" th:value="${proveedor.nombre}"></option>
-        </datalist>
     </form>
 </main>
 <script>
@@ -209,24 +209,98 @@ document.querySelectorAll('.import-order-card').forEach(card => actualizarTotalI
 
 function inicializarBuscadoresProveedor() {
     document.querySelectorAll('[data-provider-select]').forEach(select => {
-        const input = select.closest('.provider-picker').querySelector('.proveedor-search-input');
-        const nuevoProveedorInput = select.closest('.row').querySelector('[name$=".proveedorNuevo"]');
-        const actualizarInput = () => {
-            const selected = select.selectedOptions[0];
-            input.value = selected && selected.value ? selected.textContent : '';
-        };
-        const actualizarSelect = () => {
-            const escrito = input.value.trim().toLowerCase();
-            const option = Array.from(select.options)
-                .find(opcion => opcion.textContent.trim().toLowerCase() === escrito);
-            select.value = option ? option.value : '';
-            if (select.value && nuevoProveedorInput) {
+        const picker = select.closest('.provider-picker');
+        const input = picker.querySelector('[data-provider-input]');
+        const results = picker.querySelector('[data-provider-results]');
+        const nuevoProveedorGroup = select.closest('.row').querySelector('.provider-new-field');
+        const nuevoProveedorInput = nuevoProveedorGroup ? nuevoProveedorGroup.querySelector('[name$=".proveedorNuevo"]') : null;
+        const proveedores = Array.from(select.options)
+            .filter(option => option.value)
+            .map(option => ({ id: option.value, nombre: option.textContent.trim() }));
+
+        const normalizar = valor => valor.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+        const elegirProveedor = proveedor => {
+            select.value = proveedor.id;
+            input.value = proveedor.nombre;
+            results.classList.remove('is-open');
+            results.innerHTML = '';
+            if (nuevoProveedorInput) {
                 nuevoProveedorInput.value = '';
+                nuevoProveedorInput.disabled = true;
+            }
+            if (nuevoProveedorGroup) {
+                nuevoProveedorGroup.classList.add('d-none');
             }
         };
-        actualizarInput();
-        input.addEventListener('input', actualizarSelect);
-        input.addEventListener('change', actualizarSelect);
+        const actualizarProveedorNuevo = tieneResultados => {
+            if (!nuevoProveedorGroup) {
+                return;
+            }
+            const mostrarNuevo = !select.value && !tieneResultados;
+            nuevoProveedorGroup.classList.toggle('d-none', !mostrarNuevo);
+            if (nuevoProveedorInput) {
+                nuevoProveedorInput.disabled = !mostrarNuevo;
+            }
+        };
+        const renderizarResultados = () => {
+            const busqueda = normalizar(input.value);
+            select.value = '';
+            if (busqueda.length < 2) {
+                results.classList.remove('is-open');
+                results.innerHTML = '';
+                actualizarProveedorNuevo(false);
+                return;
+            }
+
+            const coincidencias = proveedores
+                .filter(proveedor => normalizar(proveedor.nombre).includes(busqueda))
+                .slice(0, 8);
+            const exacta = coincidencias.find(proveedor => normalizar(proveedor.nombre) === busqueda);
+            if (exacta) {
+                elegirProveedor(exacta);
+                return;
+            }
+
+            results.innerHTML = '';
+            if (coincidencias.length) {
+                coincidencias.forEach(proveedor => {
+                    const button = document.createElement('button');
+                    button.type = 'button';
+                    button.className = 'provider-result';
+                    button.dataset.providerId = proveedor.id;
+                    button.textContent = proveedor.nombre;
+                    results.appendChild(button);
+                });
+            } else {
+                const empty = document.createElement('div');
+                empty.className = 'provider-empty';
+                empty.textContent = 'No hay coincidencias';
+                results.appendChild(empty);
+            }
+            results.classList.add('is-open');
+            actualizarProveedorNuevo(coincidencias.length > 0);
+        };
+
+        const selected = select.selectedOptions[0];
+        input.value = selected && selected.value ? selected.textContent.trim() : '';
+        actualizarProveedorNuevo(Boolean(select.value));
+        input.addEventListener('input', renderizarResultados);
+        input.addEventListener('focus', renderizarResultados);
+        results.addEventListener('mousedown', event => {
+            const button = event.target.closest('[data-provider-id]');
+            if (!button) {
+                return;
+            }
+            const proveedor = proveedores.find(item => item.id === button.dataset.providerId);
+            if (proveedor) {
+                elegirProveedor(proveedor);
+            }
+        });
+        document.addEventListener('click', event => {
+            if (!picker.contains(event.target)) {
+                results.classList.remove('is-open');
+            }
+        });
     });
 }
 
