@@ -58,7 +58,7 @@
         </div>
         <div class="d-flex justify-content-between align-items-center mb-2"><h2 class="h4">Items</h2><button class="btn btn-outline-primary" type="button" onclick="agregarItem()">Agregar item</button></div>
         <select class="d-none" id="rubros-template">
-            <option value="">Seleccionar</option>
+            <option value="">Sin rubro</option>
             <option th:each="rubro : ${rubros}" th:value="${rubro.id}" th:text="${rubro.nombreCompleto}"></option>
         </select>
         <select class="d-none" id="mano-obra-template">
@@ -81,7 +81,7 @@
                 <td><input class="form-control unidad-input" th:field="*{items[__${st.index}__].unidad}"></td>
                 <td><div class="categoria-cell"><span class="categoria-badge"></span><select class="form-select categoria-select" th:field="*{items[__${st.index}__].categoriaId}" onchange="actualizarTipoItem(this)"><option th:each="cat : ${categorias}" th:value="${cat.id}" th:data-tipo="${cat.tipo}" th:text="${cat.nombre}"></option></select></div></td>
                 <td class="material-only-column"><div class="material-catalogo-cell"><select class="form-select material-catalogo-select" th:field="*{items[__${st.index}__].materialCatalogoId}" onchange="aplicarMaterialCatalogo(this)"><option value="">Seleccionar material</option><option th:each="material : ${catalogoMateriales}" th:value="${material.id}" th:data-unidad="${material.unidad}" th:text="${material.nombre}"></option></select><span class="material-no-aplica">No aplica</span></div></td>
-                <td><select class="form-select rubro-select" th:field="*{items[__${st.index}__].rubroId}" required><option value="">Seleccionar</option><option th:each="rubro : ${rubros}" th:value="${rubro.id}" th:text="${rubro.nombreCompleto}"></option></select></td>
+                <td><select class="form-select rubro-select" th:field="*{items[__${st.index}__].rubroId}"><option value="">Sin rubro</option><option th:each="rubro : ${rubros}" th:value="${rubro.id}" th:text="${rubro.nombreCompleto}"></option></select></td>
                 <td class="material-only-column"><div class="vinculo-material-cell"><select class="form-select mano-obra-select" th:field="*{items[__${st.index}__].itemManoObraVinculadoId}"><option value="">Sin vincular</option><option th:each="mo : ${itemsManoObra}" th:value="${mo.id}" th:text="${'OC ' + mo.ordenCompra.numero + ' - ' + mo.detalle}"></option></select><span class="mano-obra-sin-vinculo">No aplica para mano de obra</span></div></td>
                 <td><input class="form-control cantidad-input" type="number" step="0.01" th:field="*{items[__${st.index}__].cantidad}" oninput="recalcularImporte(this)"></td>
                 <td><input class="form-control precio-input" type="number" step="0.01" th:field="*{items[__${st.index}__].precioUnitario}" oninput="recalcularImporte(this)"></td>
@@ -108,7 +108,7 @@ function agregarItem() {
         <td><input class="form-control unidad-input" name="items[${index}].unidad"></td>
         <td><div class="categoria-cell"><span class="categoria-badge"></span><select class="form-select categoria-select" name="items[${index}].categoriaId" onchange="actualizarTipoItem(this)">${document.querySelector('#categorias-template').innerHTML}</select></div></td>
         <td class="material-only-column"><div class="material-catalogo-cell"><select class="form-select material-catalogo-select" name="items[${index}].materialCatalogoId" onchange="aplicarMaterialCatalogo(this)">${document.querySelector('#materiales-template').innerHTML}</select><span class="material-no-aplica">No aplica</span></div></td>
-        <td><select class="form-select rubro-select" name="items[${index}].rubroId" required>${document.querySelector('#rubros-template').innerHTML}</select></td>
+        <td><select class="form-select rubro-select" name="items[${index}].rubroId">${document.querySelector('#rubros-template').innerHTML}</select></td>
         <td class="material-only-column"><div class="vinculo-material-cell"><select class="form-select mano-obra-select" name="items[${index}].itemManoObraVinculadoId">${document.querySelector('#mano-obra-template').innerHTML}</select><span class="mano-obra-sin-vinculo">No aplica para mano de obra</span></div></td>
         <td><input class="form-control cantidad-input" type="number" step="0.01" name="items[${index}].cantidad" value="0" oninput="recalcularImporte(this)"></td>
         <td><input class="form-control precio-input" type="number" step="0.01" name="items[${index}].precioUnitario" value="0" oninput="recalcularImporte(this)"></td>
