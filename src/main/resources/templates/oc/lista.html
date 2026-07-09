@@ -201,7 +201,7 @@ document.querySelectorAll('.table-sort-button').forEach(button => {
 
 ocRows.forEach(row => {
     row.addEventListener('click', event => {
-        if (event.target.closest('a, button, input, select, textarea, form, .column-resize-handle')) {
+        if (event.target.closest('a, button, input, select, textarea, form')) {
             return;
         }
         window.location.href = row.dataset.href;
