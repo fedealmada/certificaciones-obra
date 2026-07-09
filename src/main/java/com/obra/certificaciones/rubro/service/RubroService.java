@@ -52,6 +52,20 @@ public class RubroService {
         return armarMensajeEliminacion(itemsDesvinculados, subrubrosReubicados);
     }
 
+    @Transactional
+    public String eliminarTodos() {
+        long rubrosEliminados = rubroRepository.count();
+        if (rubrosEliminados == 0) {
+            return "No hay rubros para eliminar.";
+        }
+        long itemsDesvinculados = itemOrdenCompraRepository.countByRubroEntidadIsNotNull();
+        itemOrdenCompraRepository.desvincularTodosLosRubros();
+        rubroRepository.desvincularTodosLosPadres();
+        rubroRepository.deleteAllInBatch();
+        return "Se eliminaron " + rubrosEliminados + " rubros. Se conservaron "
+                + itemsDesvinculados + " items de OC sin rubro vinculado.";
+    }
+
     private int desvincularItems(Rubro rubro) {
         List<ItemOrdenCompra> items = itemOrdenCompraRepository.findByRubroEntidadId(rubro.getId());
         items.forEach(item -> item.setRubroEntidad(null));

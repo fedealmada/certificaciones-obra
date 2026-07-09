@@ -4,6 +4,8 @@ import com.obra.certificaciones.oc.entity.CategoriaItem;
 import com.obra.certificaciones.oc.entity.ItemOrdenCompra;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
@@ -18,6 +20,12 @@ public interface ItemOrdenCompraRepository extends JpaRepository<ItemOrdenCompra
     List<ItemOrdenCompra> findByOrdenCompraIdAndCategoriaOrderById(Long ordenCompraId, CategoriaItem categoria);
 
     List<ItemOrdenCompra> findByRubroEntidadId(Long rubroId);
+
+    long countByRubroEntidadIsNotNull();
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("update ItemOrdenCompra item set item.rubroEntidad = null where item.rubroEntidad is not null")
+    int desvincularTodosLosRubros();
 
     boolean existsByRubroEntidadId(Long rubroId);
 

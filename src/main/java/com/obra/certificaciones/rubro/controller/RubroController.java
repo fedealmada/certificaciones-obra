@@ -66,4 +66,14 @@ public class RubroController {
         }
         return "redirect:/rubros";
     }
+
+    @PostMapping("/eliminar-todos")
+    public String eliminarTodos(RedirectAttributes redirectAttributes) {
+        try {
+            redirectAttributes.addFlashAttribute("mensaje", rubroService.eliminarTodos());
+        } catch (DataIntegrityViolationException ex) {
+            redirectAttributes.addFlashAttribute("error", "No se pudieron eliminar todos los rubros porque hay datos vinculados que deben revisarse.");
+        }
+        return "redirect:/rubros";
+    }
 }

@@ -15,7 +15,12 @@
             <h1>Rubros</h1>
             <div class="text-muted">Estructura de rubros y subrubros para ordenar los items</div>
         </div>
-        <a class="btn btn-primary" th:href="@{/rubros/nuevo}"><i class="bi bi-plus-lg"></i> Nuevo rubro</a>
+        <div class="d-flex flex-wrap gap-2">
+            <a class="btn btn-primary" th:href="@{/rubros/nuevo}"><i class="bi bi-plus-lg"></i> Nuevo rubro</a>
+            <form method="post" th:if="${!rubros.isEmpty()}" th:action="@{/rubros/eliminar-todos}" onsubmit="return confirm('Eliminar todos los rubros? Las OC, items, importes y certificaciones se conservaran; los items quedaran sin rubro vinculado.');">
+                <button class="btn btn-outline-danger" type="submit"><i class="bi bi-trash"></i> Eliminar todos</button>
+            </form>
+        </div>
     </div>
 
     <div class="alert alert-success" th:if="${mensaje}" th:text="${mensaje}"></div>
