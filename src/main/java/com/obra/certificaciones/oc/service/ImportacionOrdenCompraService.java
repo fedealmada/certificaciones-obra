@@ -92,7 +92,7 @@ public class ImportacionOrdenCompraService {
         form.setTextoExtraido(texto);
         form.setNumero(buscar(OC_PATTERN, texto).or(() -> buscar(OC_COMPACTA_PATTERN, texto)).map(this::normalizarNumeroOc).orElse(""));
         form.setFecha(buscar(FECHA_PATTERN, texto).or(() -> buscar(FECHA_COMPACTA_PATTERN, texto)).flatMap(this::parsearFecha).orElse(LocalDate.now()));
-        form.setFechaVigencia(buscar(VIGENCIA_PATTERN, texto).flatMap(this::parsearFecha).orElse(null));
+        form.setFechaVigencia(buscar(VIGENCIA_PATTERN, texto).flatMap(this::parsearFecha).orElse(form.getFecha()));
         form.setProveedorSugerido(limpiarProveedor(buscar(PROVEEDOR_PATTERN, texto).or(() -> buscarProveedorCompacto(texto)).orElse("")));
         form.setProveedorId(buscarProveedorExistente(form.getProveedorSugerido()).map(Proveedor::getId).orElse(null));
         if (form.getProveedorId() == null && StringUtils.hasText(form.getProveedorSugerido())) {
@@ -101,7 +101,7 @@ public class ImportacionOrdenCompraService {
         form.setCategoriaId(buscarCategoriaExistente(CategoriaItem.MANO_OBRA, "Mano de obra")
                 .map(CategoriaOrden::getId)
                 .orElseGet(() -> categoriaOrdenRepository.findByActivoTrueOrderByNombreAsc().stream().findFirst().map(CategoriaOrden::getId).orElse(null)));
-        form.setRubroId(rubroRepository.findByActivoTrueOrderByCodigoAscNombreAsc().stream().findFirst().map(Rubro::getId).orElse(null));
+        form.setRubroId(null);
         form.setObservacion("Importado desde " + archivo.getOriginalFilename());
         form.setItems(parsearItems(texto, form.getNumero()));
         detectarOrdenExistente(form);

@@ -97,9 +97,10 @@
                         <label class="form-label">Vigencia</label>
                         <input class="form-control" type="date" th:field="*{ordenes[__${ocSt.index}__].fechaVigencia}">
                     </div>
-                    <div class="col-lg-3 col-md-6">
+                    <div class="col-lg-3 col-md-6 provider-picker">
                         <label class="form-label">Proveedor existente</label>
-                        <select class="form-select" th:field="*{ordenes[__${ocSt.index}__].proveedorId}">
+                        <input class="form-control proveedor-search-input" list="proveedores-list" autocomplete="off" placeholder="Escribi para buscar">
+                        <select class="d-none proveedor-id-select" th:field="*{ordenes[__${ocSt.index}__].proveedorId}" data-provider-select>
                             <option value="">Crear/usar nuevo proveedor</option>
                             <option th:each="proveedor : ${proveedores}" th:value="${proveedor.id}" th:text="${proveedor.nombre}"></option>
                         </select>
@@ -174,6 +175,9 @@
             <button class="btn btn-primary" type="submit"><i class="bi bi-check2-circle"></i> Importar seleccionadas</button>
             <a class="btn btn-outline-secondary" th:href="@{/oc/importar}"><i class="bi bi-arrow-counterclockwise"></i> Limpiar</a>
         </div>
+        <datalist id="proveedores-list">
+            <option th:each="proveedor : ${proveedores}" th:value="${proveedor.nombre}"></option>
+        </datalist>
     </form>
 </main>
 <script>
@@ -202,6 +206,31 @@ function actualizarTotalImportado(input) {
 }
 
 document.querySelectorAll('.import-order-card').forEach(card => actualizarTotalImportado(card.querySelector('.import-importe')));
+
+function inicializarBuscadoresProveedor() {
+    document.querySelectorAll('[data-provider-select]').forEach(select => {
+        const input = select.closest('.provider-picker').querySelector('.proveedor-search-input');
+        const nuevoProveedorInput = select.closest('.row').querySelector('[name$=".proveedorNuevo"]');
+        const actualizarInput = () => {
+            const selected = select.selectedOptions[0];
+            input.value = selected && selected.value ? selected.textContent : '';
+        };
+        const actualizarSelect = () => {
+            const escrito = input.value.trim().toLowerCase();
+            const option = Array.from(select.options)
+                .find(opcion => opcion.textContent.trim().toLowerCase() === escrito);
+            select.value = option ? option.value : '';
+            if (select.value && nuevoProveedorInput) {
+                nuevoProveedorInput.value = '';
+            }
+        };
+        actualizarInput();
+        input.addEventListener('input', actualizarSelect);
+        input.addEventListener('change', actualizarSelect);
+    });
+}
+
+inicializarBuscadoresProveedor();
 </script>
 </body>
 </html>

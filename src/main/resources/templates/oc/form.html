@@ -28,9 +28,19 @@
             <div class="col-md-3"><label class="form-label">Numero</label><input class="form-control" th:field="*{numero}" required></div>
             <div class="col-md-3"><label class="form-label">Fecha</label><input class="form-control" type="date" th:field="*{fecha}" required></div>
             <div class="col-md-3"><label class="form-label">Fecha vigencia</label><input class="form-control" type="date" th:field="*{fechaVigencia}"></div>
-            <div class="col-md-3"><label class="form-label">Proveedor</label><select class="form-select" th:field="*{proveedorId}" required><option value="">Seleccionar proveedor</option><option th:each="proveedor : ${proveedores}" th:value="${proveedor.id}" th:text="${proveedor.nombre}"></option></select></div>
+            <div class="col-md-3">
+                <label class="form-label">Proveedor</label>
+                <input class="form-control proveedor-search-input" list="proveedores-list" autocomplete="off" required>
+                <select class="d-none proveedor-id-select" th:field="*{proveedorId}" data-provider-select>
+                    <option value="">Seleccionar proveedor</option>
+                    <option th:each="proveedor : ${proveedores}" th:value="${proveedor.id}" th:text="${proveedor.nombre}"></option>
+                </select>
+            </div>
             <div class="col-12"><label class="form-label">Observacion</label><textarea class="form-control" rows="2" th:field="*{observacion}"></textarea></div>
         </div>
+        <datalist id="proveedores-list">
+            <option th:each="proveedor : ${proveedores}" th:value="${proveedor.nombre}"></option>
+        </datalist>
         <div class="d-flex justify-content-between align-items-center mb-2"><h2 class="h4">Items</h2><button class="btn btn-outline-primary" type="button" onclick="agregarItem()">Agregar item</button></div>
         <select class="d-none" id="rubros-template">
             <option value="">Seleccionar</option>
@@ -205,6 +215,29 @@ function mostrarGuardandoOc() {
     }
 }
 
+function inicializarBuscadoresProveedor() {
+    const proveedores = Array.from(document.querySelectorAll('#proveedores-list option'))
+        .map(option => option.value);
+    document.querySelectorAll('[data-provider-select]').forEach(select => {
+        const input = select.closest('.col-md-3').querySelector('.proveedor-search-input');
+        const actualizarInput = () => {
+            const selected = select.selectedOptions[0];
+            input.value = selected && selected.value ? selected.textContent : '';
+        };
+        const actualizarSelect = () => {
+            const escrito = input.value.trim().toLowerCase();
+            const option = Array.from(select.options)
+                .find(opcion => opcion.textContent.trim().toLowerCase() === escrito);
+            select.value = option ? option.value : '';
+            input.setCustomValidity(select.value ? '' : 'Selecciona un proveedor de la lista.');
+        };
+        actualizarInput();
+        input.setAttribute('placeholder', proveedores.length ? 'Escribi para buscar' : 'No hay proveedores');
+        input.addEventListener('input', actualizarSelect);
+        input.addEventListener('change', actualizarSelect);
+    });
+}
+
 document.querySelectorAll('.categoria-select').forEach(actualizarTipoItem);
 document.querySelectorAll('.material-catalogo-select').forEach(select => {
     if (select.value) {
@@ -214,6 +247,7 @@ document.querySelectorAll('.material-catalogo-select').forEach(select => {
 document.querySelectorAll('.cantidad-input, .precio-input').forEach(input => recalcularImporte(input));
 actualizarColumnasMateriales();
 recalcularTotalOc();
+inicializarBuscadoresProveedor();
 
 </script>
 </body>
