@@ -2060,8 +2060,25 @@ body.is-resizing-table-column {
     font-weight: 700;
 }
 
+.cert-detail-page {
+    max-width: min(1900px, calc(100vw - 1.5rem));
+}
+
+.cert-document-header {
+    padding: 1.1rem 1.2rem;
+    border: 1px solid var(--app-line);
+    border-left: 6px solid var(--app-green);
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 0 10px 24px rgba(24, 32, 42, 0.07);
+}
+
+.cert-title-separator {
+    color: #9aa3af;
+    margin: 0 0.35rem;
+}
+
 .cert-sheet {
-    border: 2px solid #1f2933;
     background: #ffffff;
     overflow: hidden;
 }
@@ -2071,30 +2088,49 @@ body.is-resizing-table-column {
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    padding: 0.75rem 1rem;
-    background: #6fac43;
-    border-bottom: 2px solid #1f2933;
-    color: #0f1a0c;
-    font-size: 1.25rem;
-    font-weight: 800;
-    text-align: right;
+    padding: 1rem 1.15rem;
+    border-bottom: 1px solid var(--app-line);
+    background: #18202a;
+    color: #ffffff;
+}
+
+.cert-sheet-title span,
+.cert-sheet-title small {
+    display: block;
+}
+
+.cert-sheet-title span {
+    font-size: 1.08rem;
+    font-weight: 850;
     text-transform: uppercase;
 }
 
+.cert-sheet-title small {
+    margin-top: 0.15rem;
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
 .cert-sheet-title strong {
+    flex: 0 0 auto;
+    padding: 0.38rem 0.65rem;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.08);
     font-size: 0.95rem;
-    font-weight: 800;
+    font-weight: 850;
 }
 
 .cert-detail-sheet {
-    border-color: var(--app-line);
+    border: 1px solid var(--app-line);
     border-radius: 8px;
     box-shadow: 0 10px 22px rgba(24, 32, 42, 0.07);
 }
 
 .cert-detail-summary {
     display: grid;
-    grid-template-columns: 1.5fr repeat(4, minmax(0, 1fr));
+    grid-template-columns: minmax(17rem, 1.55fr) repeat(4, minmax(9rem, 1fr));
     border: 1px solid var(--app-line);
     border-radius: 8px;
     overflow: hidden;
@@ -2103,7 +2139,8 @@ body.is-resizing-table-column {
 }
 
 .cert-detail-summary > div {
-    padding: 0.9rem;
+    min-height: 6rem;
+    padding: 0.95rem;
     border-right: 1px solid var(--app-line);
 }
 
@@ -2122,8 +2159,9 @@ body.is-resizing-table-column {
 
 .cert-detail-summary strong {
     display: block;
+    margin-top: 0.24rem;
     color: var(--app-ink);
-    font-size: 1rem;
+    font-size: 1.08rem;
     font-weight: 850;
     line-height: 1.15;
     overflow-wrap: anywhere;
@@ -2134,13 +2172,14 @@ body.is-resizing-table-column {
 }
 
 .cert-detail-summary-main strong {
-    margin: 0.1rem 0 0.55rem;
-    font-size: 1.8rem;
+    margin: 0.15rem 0 0.65rem;
+    font-size: 2rem;
 }
 
 .cert-detail-progress-track {
-    height: 0.8rem;
+    height: 0.85rem;
     overflow: hidden;
+    border: 1px solid #cbd5df;
     border-radius: 999px;
     background: #e5e9ee;
 }
@@ -2158,46 +2197,168 @@ body.is-resizing-table-column {
     box-shadow: 0 8px 18px rgba(24, 32, 42, 0.05);
 }
 
+.cert-table-title-row {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.65rem;
+}
+
+.cert-table-title-row h2 {
+    margin: 0;
+    font-size: 1.15rem;
+}
+
+.cert-table-title-row span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2rem;
+    padding: 0.28rem 0.6rem;
+    border: 1px solid var(--app-line);
+    border-radius: 999px;
+    background: #ffffff;
+    color: var(--app-muted);
+    font-size: 0.82rem;
+    font-weight: 800;
+}
+
 .cert-meta-grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: 1.3fr 1.9fr repeat(2, minmax(0, 0.9fr));
 }
 
 .cert-meta-grid div {
-    min-height: 3.2rem;
-    padding: 0.55rem 0.75rem;
-    border-right: 1px solid #1f2933;
-    border-bottom: 1px solid #1f2933;
+    min-height: 4.1rem;
+    padding: 0.72rem 0.85rem;
+    border-right: 1px solid var(--app-line);
+    border-bottom: 1px solid var(--app-line);
+    background: #ffffff;
 }
 
 .cert-meta-grid div:nth-child(4n) {
     border-right: 0;
 }
 
+.cert-observation {
+    display: grid;
+    gap: 0.15rem;
+}
+
+.cert-observation span {
+    color: var(--app-muted);
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.cert-observation strong {
+    color: var(--app-ink);
+    font-weight: 650;
+    line-height: 1.35;
+}
+
 .cert-table {
     width: 100%;
-    min-width: 0;
+    min-width: 78rem;
+    margin: 0;
     table-layout: fixed;
-    border: 1px solid #1f2933;
+    border: 0;
 }
 
 .cert-table th,
 .cert-table td {
-    border: 1px solid #1f2933;
-    font-size: 0.68rem;
-    vertical-align: middle;
+    border-color: #dde3ea;
+    font-size: 0.78rem;
+    vertical-align: top;
     overflow-wrap: anywhere;
 }
 
-.cert-table td:nth-child(2) {
-    min-width: 0;
+.cert-table thead th {
+    padding: 0.58rem 0.5rem;
+    background: #eef2f6;
+    color: #24303d;
+    border-color: #d5dce4;
+    font-size: 0.72rem;
+    line-height: 1.15;
+    text-transform: uppercase;
+}
+
+.cert-table tbody td {
+    padding: 0.68rem 0.5rem;
+    background: #ffffff;
+}
+
+.cert-table tbody tr:nth-child(even) td {
+    background: #fbfcfd;
+}
+
+.cert-table tbody tr:hover td {
+    background: #fff8d4;
+}
+
+.cert-table tfoot td {
+    padding: 0.65rem 0.5rem;
+    background: #18202a;
+    border-color: #18202a;
+    color: #ffffff;
+    font-size: 0.8rem;
+    font-weight: 850;
 }
 
 .cert-group-row th {
-    background: #d9d9d9;
-    color: #111827;
+    background: #18202a;
+    color: #ffffff;
+    border-color: #18202a;
+    font-size: 0.74rem;
+    letter-spacing: 0;
     text-align: center;
     text-transform: uppercase;
+}
+
+.cert-col-item { width: 5.5%; }
+.cert-col-detail { width: 30%; }
+.cert-col-unit { width: 5.5%; }
+.cert-col-qty { width: 7%; }
+.cert-col-money { width: 7.2%; }
+.cert-col-percent { width: 5.8%; }
+
+.cert-item-code {
+    color: var(--app-muted);
+    font-weight: 800;
+}
+
+.cert-item-detail strong {
+    display: block;
+    color: var(--app-ink);
+    font-size: 0.86rem;
+    font-weight: 700;
+    line-height: 1.35;
+    white-space: normal;
+}
+
+.cert-item-detail small {
+    display: block;
+    margin-top: 0.24rem;
+    color: var(--app-muted);
+    font-size: 0.72rem;
+    line-height: 1.25;
+}
+
+.cert-unit {
+    color: var(--app-muted);
+    font-weight: 750;
+}
+
+.cert-number {
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.cert-money-strong,
+.cert-current {
+    color: var(--app-ink);
+    font-weight: 850;
 }
 
 .action-cell {

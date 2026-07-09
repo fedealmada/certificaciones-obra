@@ -8,7 +8,7 @@
 </head>
 <body>
 <div th:replace="~{fragments/layout :: navbar}"></div>
-<main class="container">
+<main class="container cert-detail-page">
     <div class="page-navigation mb-3">
         <a th:href="@{/}"><i class="bi bi-house"></i> Dashboard</a>
         <i class="bi bi-chevron-right"></i>
@@ -19,11 +19,15 @@
         <span th:text="'Certificado ' + ${certificacion.numero}">Certificado</span>
     </div>
 
-    <div class="document-header mb-4">
+    <div class="document-header cert-document-header mb-4">
         <div class="document-title-block">
             <div class="document-kicker">Certificacion de tareas</div>
             <h1 th:text="'Certificado Nro ' + ${certificacion.numero}">Certificado</h1>
-            <div class="document-subtitle" th:text="'OC ' + ${orden.numero} + ' - ' + ${orden.proveedorEntidad?.nombre ?: '-'}">OC</div>
+            <div class="document-subtitle">
+                <span th:text="'OC ' + ${orden.numero}">OC</span>
+                <span class="cert-title-separator">/</span>
+                <span th:text="${orden.proveedorEntidad?.nombre ?: '-'}">Proveedor</span>
+            </div>
         </div>
         <div class="document-actions">
             <a class="btn btn-outline-secondary" th:href="@{/oc/{id}(id=${orden.id})}"><i class="bi bi-arrow-left"></i> Volver a OC</a>
@@ -37,7 +41,10 @@
 
     <section class="cert-sheet cert-detail-sheet mb-4">
         <div class="cert-sheet-title">
-            <span>CERTIFICACION DE TAREAS</span>
+            <div>
+                <span>Certificado de avance</span>
+                <small th:text="'OC ' + ${orden.numero} + ' / Certificado ' + ${certificacion.numero}">OC / Certificado</small>
+            </div>
             <strong th:text="${#temporals.format(certificacion.fecha, 'dd/MM/yyyy')}">01/01/2026</strong>
         </div>
         <div class="cert-meta-grid">
@@ -50,7 +57,10 @@
             <div><span>Monto contratado</span><strong th:text="${#numbers.formatDecimal(resumen.totalContratado, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
             <div><span>Monto certificado</span><strong th:text="${#numbers.formatDecimal(resumen.totalActual, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
         </div>
-        <div class="ticket-note" th:if="${certificacion.observacion}" th:text="${certificacion.observacion}">Observacion</div>
+        <div class="ticket-note cert-observation" th:if="${certificacion.observacion}">
+            <span>Observacion</span>
+            <strong th:text="${certificacion.observacion}">Observacion</strong>
+        </div>
     </section>
 
     <section class="cert-detail-summary mb-4">
@@ -67,8 +77,30 @@
         <div><span>Saldo pendiente</span><strong th:text="${#numbers.formatDecimal(resumen.saldoPendiente, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
     </section>
 
+    <div class="cert-table-title-row">
+        <div>
+            <div class="document-kicker">Detalle certificado</div>
+            <h2>Items y avances</h2>
+        </div>
+        <span th:text="${#lists.size(itemsCalculados)} + ' items'">0 items</span>
+    </div>
+
     <div class="table-responsive cert-detail-table-wrap">
         <table class="table align-middle cert-table">
+            <colgroup>
+                <col class="cert-col-item">
+                <col class="cert-col-detail">
+                <col class="cert-col-unit">
+                <col class="cert-col-qty">
+                <col class="cert-col-money">
+                <col class="cert-col-money">
+                <col class="cert-col-percent">
+                <col class="cert-col-percent">
+                <col class="cert-col-percent">
+                <col class="cert-col-money">
+                <col class="cert-col-money">
+                <col class="cert-col-money">
+            </colgroup>
             <thead>
             <tr class="cert-group-row">
                 <th colspan="6">Detalle contratado</th>
@@ -92,18 +124,21 @@
             </thead>
             <tbody>
             <tr th:each="item : ${itemsCalculados}">
-                <td th:text="${item.itemOrdenCompra.item}"></td>
-                <td th:text="${item.itemOrdenCompra.detalle}"></td>
-                <td th:text="${item.itemOrdenCompra.unidad}"></td>
-                <td class="text-end" th:text="${#numbers.formatDecimal(item.itemOrdenCompra.cantidad, 1, 'POINT', 2, 'COMMA')}"></td>
-                <td class="text-end" th:text="${#numbers.formatDecimal(item.itemOrdenCompra.precioUnitario, 1, 'POINT', 2, 'COMMA')}"></td>
-                <td class="text-end" th:text="${#numbers.formatDecimal(item.itemOrdenCompra.importe, 1, 'POINT', 2, 'COMMA')}"></td>
-                <td class="text-end" th:text="${item.porcentajeAnterior} + ' %'"></td>
-                <td class="text-end fw-semibold" th:text="${item.porcentajeActual} + ' %'"></td>
-                <td class="text-end fw-semibold" th:text="${item.porcentajeAcumulado} + ' %'"></td>
-                <td class="text-end" th:text="${#numbers.formatDecimal(item.montoAnterior, 1, 'POINT', 2, 'COMMA')}"></td>
-                <td class="text-end fw-semibold" th:text="${#numbers.formatDecimal(item.montoActual, 1, 'POINT', 2, 'COMMA')}"></td>
-                <td class="text-end fw-semibold" th:text="${#numbers.formatDecimal(item.montoAcumulado, 1, 'POINT', 2, 'COMMA')}"></td>
+                <td class="cert-item-code" th:text="${item.itemOrdenCompra.item}"></td>
+                <td class="cert-item-detail">
+                    <strong th:text="${item.itemOrdenCompra.detalle}">Detalle</strong>
+                    <small th:if="${item.itemOrdenCompra.rubro != null}" th:text="${item.itemOrdenCompra.rubro}">Rubro</small>
+                </td>
+                <td class="cert-unit" th:text="${item.itemOrdenCompra.unidad}"></td>
+                <td class="text-end cert-number" th:text="${#numbers.formatDecimal(item.itemOrdenCompra.cantidad, 1, 'POINT', 2, 'COMMA')}"></td>
+                <td class="text-end cert-number" th:text="${#numbers.formatDecimal(item.itemOrdenCompra.precioUnitario, 1, 'POINT', 2, 'COMMA')}"></td>
+                <td class="text-end cert-number cert-money-strong" th:text="${#numbers.formatDecimal(item.itemOrdenCompra.importe, 1, 'POINT', 2, 'COMMA')}"></td>
+                <td class="text-end cert-number" th:text="${item.porcentajeAnterior} + ' %'"></td>
+                <td class="text-end cert-number cert-current" th:text="${item.porcentajeActual} + ' %'"></td>
+                <td class="text-end cert-number cert-current" th:text="${item.porcentajeAcumulado} + ' %'"></td>
+                <td class="text-end cert-number" th:text="${#numbers.formatDecimal(item.montoAnterior, 1, 'POINT', 2, 'COMMA')}"></td>
+                <td class="text-end cert-number cert-current" th:text="${#numbers.formatDecimal(item.montoActual, 1, 'POINT', 2, 'COMMA')}"></td>
+                <td class="text-end cert-number cert-current" th:text="${#numbers.formatDecimal(item.montoAcumulado, 1, 'POINT', 2, 'COMMA')}"></td>
             </tr>
             </tbody>
             <tfoot>
