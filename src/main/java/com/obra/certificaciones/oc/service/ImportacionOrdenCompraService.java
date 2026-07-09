@@ -540,9 +540,6 @@ public class ImportacionOrdenCompraService {
         if (form.getCategoriaId() == null) {
             throw new IllegalArgumentException("Selecciona la categoria para los items importados.");
         }
-        if (form.getRubroId() == null) {
-            throw new IllegalArgumentException("Selecciona el rubro para los items importados.");
-        }
     }
 
     private Long resolverProveedor(ImportacionOrdenCompraForm form) {

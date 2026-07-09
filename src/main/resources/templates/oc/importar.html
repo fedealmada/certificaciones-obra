@@ -119,13 +119,7 @@
                             <option th:each="categoria : ${categorias}" th:value="${categoria.id}" th:text="${categoria.nombre}"></option>
                         </select>
                     </div>
-                    <div class="col-lg-4 col-md-6">
-                        <label class="form-label">Rubro para items</label>
-                        <select class="form-select" th:field="*{ordenes[__${ocSt.index}__].rubroId}" required>
-                            <option value="">Seleccionar rubro</option>
-                            <option th:each="rubro : ${rubros}" th:value="${rubro.id}" th:text="${rubro.nombreCompleto}"></option>
-                        </select>
-                    </div>
+                    <input type="hidden" th:field="*{ordenes[__${ocSt.index}__].rubroId}">
                     <div class="col-lg-4">
                         <label class="form-label">Observacion</label>
                         <input class="form-control" th:field="*{ordenes[__${ocSt.index}__].observacion}">

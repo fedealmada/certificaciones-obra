@@ -163,9 +163,6 @@ public class OrdenCompraService {
             if (item.getCategoriaId() == null && item.getCategoriaEntidad() == null) {
                 throw new IllegalArgumentException("Todos los items deben tener categoria.");
             }
-            if (item.getRubroId() == null) {
-                throw new IllegalArgumentException("Todos los items deben tener rubro.");
-            }
             if (esNegativo(item.getCantidad())) {
                 throw new IllegalArgumentException("La cantidad no puede ser negativa.");
             }
@@ -186,6 +183,11 @@ public class OrdenCompraService {
     }
 
     private void aplicarRubro(ItemOrdenCompra item) {
+        if (item.getRubroId() == null) {
+            item.setRubroEntidad(null);
+            item.setRubro(null);
+            return;
+        }
         Rubro rubro = rubroRepository.findById(item.getRubroId())
                 .orElseThrow(() -> new EntityNotFoundException("No existe el rubro " + item.getRubroId()));
         item.setRubroEntidad(rubro);
