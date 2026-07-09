@@ -191,7 +191,7 @@ public class OrdenCompraService {
         Rubro rubro = rubroRepository.findById(item.getRubroId())
                 .orElseThrow(() -> new EntityNotFoundException("No existe el rubro " + item.getRubroId()));
         item.setRubroEntidad(rubro);
-        item.setRubro(rubro.getNombreCompleto());
+        item.setRubro(null);
     }
 
     private void aplicarCategoria(ItemOrdenCompra item) {

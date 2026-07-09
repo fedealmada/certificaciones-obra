@@ -1,6 +1,5 @@
 package com.obra.certificaciones.migracion;
 
-import com.obra.certificaciones.rubro.entity.Rubro;
 import com.obra.certificaciones.rubro.repository.RubroRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -28,13 +27,9 @@ public class RubroTextoMigration {
             if (!StringUtils.hasText(item.rubro())) {
                 continue;
             }
-            Rubro rubro = obtenerOCrearRubro(item.rubro().trim());
-            jdbcTemplate.update(
-                    "update item_orden_compra set rubro_entidad_id = ? where id = ?",
-                    rubro.getId(),
-                    item.id()
-            );
+            vincularRubroExistente(item);
         }
+        limpiarRubrosTexto();
     }
 
     private List<ItemRubroTexto> buscarItemsPendientes() {
@@ -57,14 +52,21 @@ public class RubroTextoMigration {
         }
     }
 
-    private Rubro obtenerOCrearRubro(String nombre) {
-        return rubroRepository.findByNombreIgnoreCaseOrderByActivoDescIdAsc(nombre).stream().findFirst()
-                .orElseGet(() -> {
-                    Rubro rubro = new Rubro();
-                    rubro.setNombre(nombre);
-                    rubro.setActivo(true);
-                    return rubroRepository.save(rubro);
-                });
+    private void vincularRubroExistente(ItemRubroTexto item) {
+        rubroRepository.findByNombreIgnoreCaseOrderByActivoDescIdAsc(item.rubro().trim()).stream().findFirst()
+                .ifPresent(rubro -> jdbcTemplate.update(
+                        "update item_orden_compra set rubro_entidad_id = ? where id = ?",
+                        rubro.getId(),
+                        item.id()
+                ));
+    }
+
+    private void limpiarRubrosTexto() {
+        try {
+            jdbcTemplate.update("update item_orden_compra set rubro = null where rubro is not null");
+        } catch (BadSqlGrammarException ignored) {
+            // La columna puede no existir en bases nuevas.
+        }
     }
 
     private record ItemRubroTexto(Long id, String rubro) {

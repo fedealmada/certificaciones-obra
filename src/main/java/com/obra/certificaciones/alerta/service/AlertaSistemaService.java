@@ -64,7 +64,7 @@ public class AlertaSistemaService {
 
         long manoObraSinRubro = orden.getItems().stream()
                 .filter(item -> item.getCategoria() == CategoriaItem.MANO_OBRA)
-                .filter(item -> item.getRubroEntidad() == null && (item.getRubro() == null || item.getRubro().isBlank()))
+                .filter(item -> item.getRubroEntidad() == null)
                 .count();
         if (manoObraSinRubro > 0) {
             alertas.add(alerta("media", "Mano de obra sin rubro", manoObraSinRubro + " items de mano de obra no estan vinculados a rubro.", enlace, "bi-diagram-3"));

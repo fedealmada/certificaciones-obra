@@ -76,9 +76,9 @@
                     th:data-proveedor="${item.ordenCompra.proveedorEntidad?.nombre ?: '-'}"
                     th:data-detalle="${item.detalle}"
                     th:data-categoria="${item.categoria}"
-                    th:data-rubro="${item.rubroEntidad != null ? item.rubroEntidad.nombreCompleto : item.rubro}"
+                    th:data-rubro="${item.rubroEntidad != null ? item.rubroEntidad.nombreCompleto : ''}"
                     th:data-importe="${item.importe}"
-                    th:data-search="${item.item + ' ' + item.ordenCompra.numero + ' ' + #temporals.format(item.ordenCompra.fecha, 'dd/MM/yyyy') + ' ' + (item.ordenCompra.proveedorEntidad?.nombre ?: '') + ' ' + item.detalle + ' ' + (item.rubroEntidad != null ? item.rubroEntidad.nombreCompleto : item.rubro) + ' ' + item.categoria}">
+                    th:data-search="${item.item + ' ' + item.ordenCompra.numero + ' ' + #temporals.format(item.ordenCompra.fecha, 'dd/MM/yyyy') + ' ' + (item.ordenCompra.proveedorEntidad?.nombre ?: '') + ' ' + item.detalle + ' ' + (item.rubroEntidad != null ? item.rubroEntidad.nombreCompleto : '') + ' ' + item.categoria}">
                     <td><span class="item-code-pill" th:text="${item.item ?: '-'}"></span></td>
                     <td><a class="link-dark fw-semibold" th:href="@{/oc/{id}(id=${item.ordenCompra.id})}" th:text="${item.ordenCompra.numero}"></a></td>
                     <td th:text="${#temporals.format(item.ordenCompra.fecha, 'dd/MM/yyyy')}"></td>

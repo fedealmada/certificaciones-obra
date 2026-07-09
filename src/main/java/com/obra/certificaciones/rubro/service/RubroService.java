@@ -68,7 +68,10 @@ public class RubroService {
 
     private int desvincularItems(Rubro rubro) {
         List<ItemOrdenCompra> items = itemOrdenCompraRepository.findByRubroEntidadId(rubro.getId());
-        items.forEach(item -> item.setRubroEntidad(null));
+        items.forEach(item -> {
+            item.setRubroEntidad(null);
+            item.setRubro(null);
+        });
         itemOrdenCompraRepository.saveAll(items);
         return items.size();
     }

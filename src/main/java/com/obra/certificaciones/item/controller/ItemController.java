@@ -53,7 +53,7 @@ public class ItemController {
         } else {
             Rubro rubro = rubroService.obtener(Long.valueOf(rubroId));
             item.setRubroEntidad(rubro);
-            item.setRubro(rubro.getNombreCompleto());
+            item.setRubro(null);
         }
         itemOrdenCompraRepository.save(item);
         redirectAttributes.addFlashAttribute("mensaje", "Rubro actualizado.");

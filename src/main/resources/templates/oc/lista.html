@@ -89,14 +89,14 @@
                     th:data-fecha="${orden.fecha}"
                     th:data-proveedor="${orden.proveedorEntidad?.nombre ?: '-'}"
                     th:data-categorias="${#strings.listJoin(orden.items.![categoriaEntidad != null ? categoriaEntidad.nombre : categoria.descripcion], ' ')}"
-                    th:data-rubros="${#strings.listJoin(orden.items.![rubro ?: ''], ' ')}"
+                    th:data-rubros="${#strings.listJoin(orden.items.![rubroEntidad != null ? rubroEntidad.nombreCompleto : ''], ' ')}"
                     th:data-items="${orden.items.size()}"
                     th:data-certificados="${certificadosPorOrden.getOrDefault(orden.id, 0)}">
                     <td><span class="item-code-pill" th:text="${orden.numero}"></span></td>
                     <td th:text="${#temporals.format(orden.fecha, 'dd/MM/yyyy')}"></td>
                     <td th:text="${orden.proveedorEntidad?.nombre ?: '-'}"></td>
                     <td><span class="category-chip" th:text="${orden.items.isEmpty() ? '-' : #strings.listJoin(#sets.toSet(orden.items.![categoriaEntidad != null ? categoriaEntidad.nombre : categoria.descripcion]), ', ')}"></span></td>
-                    <td class="oc-list-rubros" th:text="${orden.items.isEmpty() ? '-' : #strings.listJoin(#sets.toSet(orden.items.![rubro ?: '']), ', ')}"></td>
+                    <td class="oc-list-rubros" th:text="${orden.items.isEmpty() ? '-' : #strings.listJoin(#sets.toSet(orden.items.![rubroEntidad != null ? rubroEntidad.nombreCompleto : '']), ', ')}"></td>
                     <td class="text-end" th:text="${orden.items.size()}"></td>
                     <td class="text-end">
                         <a class="cert-count-pill" th:classappend="${certificadosPorOrden.getOrDefault(orden.id, 0) == 0 ? ' is-empty' : ''}" th:href="@{/oc/{id}(id=${orden.id})} + '#certificados'" th:text="${certificadosPorOrden.getOrDefault(orden.id, 0) == 1 ? '1 certificado' : certificadosPorOrden.getOrDefault(orden.id, 0) + ' certificados'}">0 certificados</a>

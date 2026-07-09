@@ -201,7 +201,7 @@ public class CargaInicialOrdenesRunner implements CommandLineRunner {
 
             Rubro rubro = rubros.get(fila.categoria());
             item.setRubroEntidad(rubro);
-            item.setRubro(rubro.getNombreCompleto());
+            item.setRubro(null);
 
             if (fila.categoria() == CategoriaItem.MATERIAL) {
                 item.setMaterialCatalogo(catalogo.get(clave(fila.detalle()) + "|" + clave(fila.unidad())));

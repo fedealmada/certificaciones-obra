@@ -24,7 +24,7 @@ public interface ItemOrdenCompraRepository extends JpaRepository<ItemOrdenCompra
     long countByRubroEntidadIsNotNull();
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query("update ItemOrdenCompra item set item.rubroEntidad = null where item.rubroEntidad is not null")
+    @Query("update ItemOrdenCompra item set item.rubroEntidad = null, item.rubro = null where item.rubroEntidad is not null or item.rubro is not null")
     int desvincularTodosLosRubros();
 
     boolean existsByRubroEntidadId(Long rubroId);

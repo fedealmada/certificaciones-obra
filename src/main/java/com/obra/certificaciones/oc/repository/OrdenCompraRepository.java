@@ -23,10 +23,13 @@ public interface OrdenCompraRepository extends JpaRepository<OrdenCompra, Long> 
     @Query("""
             select distinct oc from OrdenCompra oc
             left join oc.items item
+            left join item.rubroEntidad rubroEntidad
             left join oc.proveedorEntidad proveedorEntidad
             where (:proveedor is null or lower(proveedorEntidad.nombre) like lower(concat('%', :proveedor, '%')))
               and (:categoriaId is null or item.categoriaEntidad.id = :categoriaId)
-              and (:rubro is null or lower(item.rubro) like lower(concat('%', :rubro, '%')))
+              and (:rubro is null
+                   or lower(rubroEntidad.nombre) like lower(concat('%', :rubro, '%'))
+                   or lower(rubroEntidad.codigo) like lower(concat('%', :rubro, '%')))
             order by oc.fecha desc, oc.numero desc
             """)
     List<OrdenCompra> buscarConFiltros(@Param("proveedor") String proveedor,

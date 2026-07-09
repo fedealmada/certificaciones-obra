@@ -169,7 +169,7 @@ public class ReporteService {
                         categoriaNombre,
                         item.getItem(),
                         item.getDetalle(),
-                        item.getRubro(),
+                        item.getRubroEntidad() == null ? null : item.getRubroEntidad().getNombreCompleto(),
                         importe
                 ));
             }
