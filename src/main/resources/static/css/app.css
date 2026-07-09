@@ -44,6 +44,580 @@ h5 {
     box-shadow: 0 8px 26px rgba(24, 32, 42, 0.08);
 }
 
+/* Minimal professional skin */
+:root {
+    --app-yellow: #f5c94a;
+    --app-yellow-dark: #c59a17;
+    --app-ink: #1f2933;
+    --app-muted: #66717d;
+    --app-line: #d8dde3;
+    --app-soft-line: #eceff2;
+    --app-workspace: #f4f5f6;
+    --app-panel: #ffffff;
+    --app-blue: #006b64;
+    --app-green: #2f7d68;
+    --app-red: #b94a42;
+}
+
+body {
+    background: var(--app-workspace);
+    color: var(--app-ink);
+    font-family: "Inter", "Segoe UI", Roboto, Arial, sans-serif;
+    font-size: 0.875rem;
+    font-weight: 400;
+    line-height: 1.45;
+}
+
+main.container,
+.cert-detail-page {
+    max-width: min(1660px, calc(100vw - 1.5rem));
+}
+
+h1 {
+    margin-bottom: 0.18rem;
+    font-size: 1.45rem;
+    font-weight: 500;
+    line-height: 1.2;
+}
+
+h2,
+h3,
+h4,
+h5 {
+    font-weight: 550;
+}
+
+.text-muted,
+.document-subtitle,
+.home-hero p {
+    color: var(--app-muted) !important;
+}
+
+.app-topbar {
+    margin-bottom: 1rem !important;
+    background: #00645f;
+    border-bottom: 0;
+    box-shadow: none;
+}
+
+.app-nav-container {
+    max-width: none;
+    min-height: 2.75rem;
+    gap: 0.75rem;
+}
+
+.app-brand {
+    gap: 0.45rem;
+    color: #ffffff;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.app-brand:hover {
+    color: #ffffff;
+}
+
+.app-brand-mark {
+    width: 1.45rem;
+    height: 1.45rem;
+    border: 1px solid rgba(255, 255, 255, 0.72);
+    background: transparent;
+    color: #ffffff;
+    font-size: 0.82rem;
+}
+
+.app-nav-links {
+    gap: 0.05rem;
+}
+
+.app-topbar .nav-link {
+    min-height: 2.1rem;
+    padding: 0.36rem 0.55rem;
+    border-radius: 0;
+    color: rgba(255, 255, 255, 0.86);
+    font-size: 0.78rem;
+    font-weight: 500;
+}
+
+.app-topbar .nav-link:hover,
+.app-topbar .nav-link:focus {
+    background: rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+}
+
+.page-navigation {
+    margin-top: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: #7a8490;
+    font-size: 0.76rem;
+    font-weight: 400;
+}
+
+.page-navigation a {
+    color: #00645f;
+}
+
+.page-hero,
+.oc-detail-header,
+.cert-document-header,
+.document-header {
+    padding: 0.95rem 1rem;
+    border: 1px solid var(--app-line);
+    border-left: 0;
+    border-radius: 0;
+    background: #ffffff;
+    box-shadow: none;
+}
+
+.document-header:not(.oc-detail-header):not(.cert-document-header) {
+    border: 1px solid var(--app-line);
+}
+
+.document-kicker {
+    color: #00645f;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0;
+    text-transform: none;
+}
+
+.document-actions {
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    gap: 0.4rem;
+}
+
+.btn {
+    min-height: 2rem;
+    padding: 0.34rem 0.65rem;
+    border-radius: 0;
+    font-size: 0.78rem;
+    font-weight: 500;
+    box-shadow: none !important;
+}
+
+.btn-sm {
+    min-height: 1.75rem;
+    padding: 0.24rem 0.48rem;
+    font-size: 0.72rem;
+}
+
+.btn-primary {
+    background: #2f3136;
+    border-color: #2f3136;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    background: #111827;
+    border-color: #111827;
+}
+
+.btn-outline-primary,
+.btn-outline-secondary,
+.btn-outline-success,
+.btn-outline-danger {
+    background: #ffffff;
+}
+
+.btn-outline-primary {
+    border-color: #00645f;
+    color: #00645f;
+}
+
+.btn-outline-secondary {
+    border-color: #c8ced5;
+    color: #3f4752;
+}
+
+.btn-outline-danger {
+    border-color: #c98e89;
+    color: #9f352f;
+}
+
+.metric-card,
+.panel-section,
+.ticket-shell,
+.oc-ticket,
+.cert-detail-sheet,
+.cert-detail-summary,
+.cert-detail-table-wrap,
+.setting-toggle,
+.table,
+.table-responsive,
+.provider-results,
+.import-drop,
+.cert-summary div,
+.home-hero,
+.home-module-card {
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.panel-section,
+.metric-card {
+    padding: 0.85rem;
+}
+
+.metric-card {
+    min-height: 6.5rem;
+    border-top: 1px solid var(--app-line);
+}
+
+.metric-label,
+.ticket-top span,
+.ticket-summary-grid span,
+.cert-meta-grid span,
+.cert-detail-summary span,
+.cert-detail-summary small,
+.cert-observation span,
+.cert-value-stack span,
+.section-total-pill,
+.status-pill {
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: none;
+}
+
+.metric-value {
+    margin-top: 0.35rem;
+    font-size: 1.55rem;
+    font-weight: 500;
+}
+
+.metric-value-sm {
+    font-size: 1.05rem;
+}
+
+.metric-head i,
+.setting-toggle-icon {
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 0;
+    background: #f4f5f6;
+    color: #00645f;
+}
+
+.table {
+    margin-bottom: 0;
+    font-size: 0.8rem;
+}
+
+.table th,
+.table td,
+.oc-items-table th,
+.oc-items-table td,
+.cert-table th,
+.cert-table td,
+.cert-edit-table th,
+.cert-edit-table td,
+.oc-form-table th,
+.oc-form-table td,
+.import-preview-table th,
+.import-preview-table td {
+    padding: 0.48rem 0.58rem;
+    font-size: 0.78rem;
+    line-height: 1.25;
+}
+
+.table thead th,
+.document-table thead th,
+.cert-table thead th,
+.cert-edit-table thead th,
+.oc-items-table thead th,
+.oc-form-table thead th,
+.import-preview-table thead th,
+.cert-items-head {
+    background: #dedede;
+    color: #26313d;
+    border-color: #cfcfcf;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: none;
+}
+
+.table-sort-button {
+    white-space: nowrap;
+}
+
+.section-total-pill {
+    gap: 0.2rem;
+}
+
+.oc-list-table .oc-col-proveedor { width: 19%; }
+.oc-list-table .oc-col-rubros { width: 26%; }
+.oc-list-table .oc-col-items { width: 7%; }
+
+.table-hover tbody tr:hover td,
+.cert-table tbody tr:hover td,
+.cert-edit-table tbody tr:hover td,
+.oc-items-table tbody tr:hover td,
+.cert-click-row:hover td,
+.cert-item-row:hover {
+    background: #f1f7f6;
+}
+
+.form-control,
+.form-select {
+    min-height: 2.05rem;
+    border-color: #cfd4da;
+    border-radius: 0;
+    font-size: 0.8rem;
+    box-shadow: none !important;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #00645f;
+    box-shadow: 0 0 0 1px #00645f !important;
+}
+
+.form-label {
+    margin-bottom: 0.25rem;
+    color: #3f4752;
+    font-size: 0.76rem;
+    font-weight: 500;
+}
+
+.status-pill,
+.category-chip,
+.item-code-pill,
+.cert-count-pill,
+.section-total-pill {
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.status-pill {
+    padding: 0.18rem 0.42rem;
+    border: 1px solid #cfd4da;
+    background: #ffffff;
+    color: #3f4752;
+}
+
+.status-done {
+    border-color: #9dc1b6;
+    background: #eef7f4;
+    color: #23634f;
+}
+
+.status-progress {
+    border-color: #9fbfbd;
+    background: #edf7f6;
+    color: #00645f;
+}
+
+.status-pending {
+    border-color: #d9d0a5;
+    background: #fbf8e8;
+    color: #6f5700;
+}
+
+.home-hero {
+    grid-template-columns: minmax(0, 1fr) minmax(16rem, 0.45fr);
+    padding: 1rem;
+}
+
+.home-hero::before {
+    display: none;
+}
+
+.home-hero h1 {
+    font-size: 1.8rem;
+    font-weight: 500;
+}
+
+.home-status-pill {
+    padding: 0.22rem 0.45rem;
+    border-color: #b9d8d3;
+    border-radius: 0;
+    background: #eef7f6;
+    color: #00645f;
+    font-size: 0.7rem;
+    font-weight: 500;
+}
+
+.home-hero-stats div {
+    min-height: 4.6rem;
+    padding: 0.65rem;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.home-hero-stats span {
+    font-size: 0.68rem;
+    font-weight: 500;
+    text-transform: none;
+}
+
+.home-hero-stats strong {
+    font-size: 1.12rem;
+    font-weight: 500;
+}
+
+.home-module-grid {
+    gap: 0.75rem;
+}
+
+.home-module-card {
+    min-height: 9.5rem;
+    padding: 0.9rem;
+    transform: none;
+    opacity: 1;
+    animation: none;
+}
+
+.home-module-card::before,
+.home-module-card::after,
+.home-module-orbit::before,
+.home-module-orbit::after {
+    display: none;
+}
+
+.home-module-card:hover {
+    transform: none;
+    border-color: #9fbfbd;
+    background: #fbfdfd;
+    box-shadow: none;
+}
+
+.home-module-orbit {
+    width: 2.4rem;
+    height: 2.4rem;
+}
+
+.home-module-icon,
+.home-module-card:hover .home-module-icon {
+    width: 2.4rem;
+    height: 2.4rem;
+    border-radius: 0;
+    background: #eef7f6;
+    color: #00645f;
+    font-size: 1.25rem;
+    box-shadow: none;
+    transform: none;
+}
+
+.home-module-content strong {
+    font-size: 0.98rem;
+    font-weight: 500;
+}
+
+.home-module-content small {
+    font-size: 0.78rem;
+}
+
+.home-module-arrow {
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 1.65rem;
+    height: 1.65rem;
+    border-radius: 0;
+    background: transparent;
+}
+
+.cert-sheet-title,
+.cert-table tfoot td,
+.cert-group-row th,
+.cert-items-total,
+.ticket-total-main {
+    background: #2f3136;
+    border-color: #2f3136;
+}
+
+.cert-sheet-title {
+    padding: 0.75rem 0.9rem;
+}
+
+.cert-sheet-title span {
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-transform: none;
+}
+
+.cert-sheet-title strong {
+    border-radius: 0;
+    font-size: 0.82rem;
+    font-weight: 500;
+}
+
+.cert-detail-summary > div,
+.cert-meta-grid div,
+.ticket-top div,
+.ticket-summary-grid div {
+    min-height: auto;
+    padding: 0.62rem 0.72rem;
+}
+
+.cert-detail-summary strong,
+.ticket-top strong,
+.ticket-summary-grid strong,
+.cert-meta-grid strong {
+    font-size: 0.86rem;
+    font-weight: 500;
+}
+
+.cert-detail-summary-main strong,
+.oc-total-progress-head strong {
+    font-size: 1.35rem;
+    font-weight: 500;
+}
+
+.cert-detail-progress-track,
+.oc-total-progress-track,
+.progress-thin {
+    height: 0.45rem;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.cert-detail-progress-fill,
+.oc-total-progress-fill,
+.progress-bar {
+    border-radius: 0;
+    background: #00645f;
+    box-shadow: none;
+}
+
+.action-cell .btn,
+.table-icon-action {
+    min-width: 1.75rem;
+    min-height: 1.75rem;
+    padding: 0.22rem 0.35rem;
+}
+
+.table-icon-action i {
+    font-size: 0.82rem;
+}
+
+@media (max-width: 768px) {
+    main.container,
+    .cert-detail-page {
+        max-width: calc(100vw - 1rem);
+    }
+
+    .app-nav-container {
+        align-items: flex-start;
+        padding-top: 0.4rem;
+        padding-bottom: 0.4rem;
+    }
+
+    .home-hero h1 {
+        font-size: 1.55rem;
+    }
+
+    .home-module-card {
+        min-height: 8rem;
+    }
+}
+
 .app-nav-container {
     gap: 1.15rem;
 }
@@ -3460,5 +4034,478 @@ body.is-resizing-table-column {
 
     .import-drop {
         grid-template-columns: 1fr;
+    }
+}
+
+/* Final minimal overrides */
+body {
+    background: #f4f5f6;
+    color: #1f2933;
+    font-family: "Inter", "Segoe UI", Roboto, Arial, sans-serif;
+    font-size: 0.875rem;
+    font-weight: 400;
+}
+
+h1 {
+    font-size: 1.45rem;
+    font-weight: 500;
+    line-height: 1.18;
+}
+
+h2,
+h3,
+h4,
+h5 {
+    font-weight: 550;
+}
+
+main.container,
+.cert-detail-page {
+    max-width: min(1660px, calc(100vw - 1.5rem));
+}
+
+.app-topbar {
+    margin-bottom: 1rem !important;
+    background: #00645f;
+    border: 0;
+    box-shadow: none;
+}
+
+.app-nav-container {
+    max-width: none;
+    min-height: 2.75rem;
+    gap: 0.7rem;
+}
+
+.app-brand,
+.app-brand:hover {
+    color: #ffffff;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.app-brand-mark {
+    width: 1.45rem;
+    height: 1.45rem;
+    border: 1px solid rgba(255, 255, 255, 0.72);
+    background: transparent;
+    color: #ffffff;
+    font-size: 0.8rem;
+}
+
+.app-nav-links {
+    gap: 0;
+}
+
+.app-topbar .nav-link {
+    min-height: 2.1rem;
+    padding: 0.34rem 0.52rem;
+    border-radius: 0;
+    color: rgba(255, 255, 255, 0.84);
+    font-size: 0.78rem;
+    font-weight: 500;
+}
+
+.app-topbar .nav-link:hover,
+.app-topbar .nav-link:focus {
+    background: rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+}
+
+.page-navigation {
+    margin-top: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: #7a8490;
+    font-size: 0.76rem;
+    font-weight: 400;
+}
+
+.page-navigation a {
+    color: #00645f;
+}
+
+.page-hero,
+.home-hero,
+.oc-detail-header,
+.cert-document-header,
+.document-header,
+.metric-card,
+.panel-section,
+.ticket-shell,
+.oc-ticket,
+.cert-detail-sheet,
+.cert-detail-summary,
+.cert-detail-table-wrap,
+.setting-toggle,
+.table,
+.provider-results,
+.import-drop,
+.cert-summary div,
+.home-module-card {
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.page-hero,
+.home-hero,
+.oc-detail-header,
+.cert-document-header,
+.document-header {
+    padding: 0.9rem 1rem;
+    border: 1px solid #d8dde3;
+    border-left: 0;
+    background: #ffffff;
+}
+
+.document-kicker {
+    color: #00645f;
+    font-size: 0.72rem;
+    font-weight: 500;
+    text-transform: none;
+}
+
+.document-actions {
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+}
+
+.btn {
+    min-height: 2rem;
+    padding: 0.34rem 0.65rem;
+    border-radius: 0;
+    font-size: 0.78rem;
+    font-weight: 500;
+    box-shadow: none !important;
+}
+
+.btn-sm,
+.action-cell .btn,
+.table-icon-action {
+    min-width: 1.75rem;
+    min-height: 1.75rem;
+    padding: 0.22rem 0.42rem;
+    font-size: 0.72rem;
+}
+
+.btn-primary {
+    background: #2f3136;
+    border-color: #2f3136;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    background: #111827;
+    border-color: #111827;
+}
+
+.btn-outline-primary {
+    border-color: #00645f;
+    color: #00645f;
+}
+
+.btn-outline-secondary {
+    border-color: #c8ced5;
+    color: #3f4752;
+}
+
+.metric-card,
+.panel-section {
+    padding: 0.82rem;
+}
+
+.metric-card {
+    min-height: 6.2rem;
+    border-top: 1px solid #d8dde3;
+}
+
+.metric-label,
+.ticket-top span,
+.ticket-summary-grid span,
+.cert-meta-grid span,
+.cert-detail-summary span,
+.cert-detail-summary small,
+.cert-observation span,
+.cert-value-stack span,
+.section-total-pill,
+.status-pill {
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: none;
+}
+
+.metric-value {
+    margin-top: 0.35rem;
+    font-size: 1.5rem;
+    font-weight: 500;
+}
+
+.metric-value-sm {
+    font-size: 1.05rem;
+}
+
+.metric-head i,
+.setting-toggle-icon {
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 0;
+    background: #f4f5f6;
+    color: #00645f;
+}
+
+.table {
+    margin-bottom: 0;
+    font-size: 0.8rem;
+}
+
+.table th,
+.table td,
+.oc-items-table th,
+.oc-items-table td,
+.cert-table th,
+.cert-table td,
+.cert-edit-table th,
+.cert-edit-table td,
+.oc-form-table th,
+.oc-form-table td,
+.import-preview-table th,
+.import-preview-table td {
+    padding: 0.48rem 0.58rem;
+    font-size: 0.78rem;
+    line-height: 1.25;
+}
+
+.table thead th,
+.document-table thead th,
+.cert-table thead th,
+.cert-edit-table thead th,
+.oc-items-table thead th,
+.oc-form-table thead th,
+.import-preview-table thead th,
+.cert-items-head {
+    background: #dedede;
+    color: #26313d;
+    border-color: #cfcfcf;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: none;
+}
+
+.table-hover tbody tr:hover td,
+.cert-table tbody tr:hover td,
+.cert-edit-table tbody tr:hover td,
+.oc-items-table tbody tr:hover td,
+.cert-click-row:hover td,
+.cert-item-row:hover {
+    background: #f1f7f6;
+}
+
+.form-control,
+.form-select {
+    min-height: 2.05rem;
+    border-color: #cfd4da;
+    border-radius: 0;
+    font-size: 0.8rem;
+    box-shadow: none !important;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #00645f;
+    box-shadow: 0 0 0 1px #00645f !important;
+}
+
+.form-label {
+    margin-bottom: 0.25rem;
+    color: #3f4752;
+    font-size: 0.76rem;
+    font-weight: 500;
+}
+
+.status-pill,
+.category-chip,
+.item-code-pill,
+.cert-count-pill,
+.section-total-pill,
+.home-status-pill {
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.home-hero {
+    grid-template-columns: minmax(0, 1fr) minmax(16rem, 0.45fr);
+    padding: 1rem;
+}
+
+.home-hero::before,
+.home-module-card::before,
+.home-module-card::after,
+.home-module-orbit::before,
+.home-module-orbit::after {
+    display: none;
+}
+
+.home-hero h1 {
+    font-size: 1.8rem;
+    font-weight: 500;
+}
+
+.home-status-pill {
+    padding: 0.22rem 0.45rem;
+    border-color: #b9d8d3;
+    background: #eef7f6;
+    color: #00645f;
+    font-size: 0.7rem;
+    font-weight: 500;
+}
+
+.home-hero-stats div {
+    min-height: 4.6rem;
+    padding: 0.65rem;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.home-hero-stats span,
+.home-module-content small {
+    font-size: 0.72rem;
+}
+
+.home-hero-stats strong {
+    font-size: 1.12rem;
+    font-weight: 500;
+}
+
+.home-module-grid {
+    gap: 0.75rem;
+}
+
+.home-module-card {
+    min-height: 9.5rem;
+    padding: 0.85rem;
+    transform: none;
+    opacity: 1;
+    animation: none;
+}
+
+.home-module-card:hover {
+    transform: none;
+    border-color: #9fbfbd;
+    background: #fbfdfd;
+    box-shadow: none;
+}
+
+.home-module-orbit,
+.home-module-icon,
+.home-module-card:hover .home-module-icon {
+    width: 2.35rem;
+    height: 2.35rem;
+}
+
+.home-module-icon,
+.home-module-card:hover .home-module-icon {
+    border-radius: 0;
+    background: #eef7f6;
+    color: #00645f;
+    font-size: 1.22rem;
+    box-shadow: none;
+    transform: none;
+}
+
+.home-module-content strong {
+    font-size: 0.98rem;
+    font-weight: 500;
+}
+
+.home-module-arrow {
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 1.65rem;
+    height: 1.65rem;
+    border-radius: 0;
+    background: transparent;
+}
+
+.cert-sheet-title,
+.cert-table tfoot td,
+.cert-group-row th,
+.cert-items-total,
+.ticket-total-main {
+    background: #2f3136;
+    border-color: #2f3136;
+}
+
+.cert-sheet-title {
+    padding: 0.72rem 0.9rem;
+}
+
+.cert-sheet-title span {
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-transform: none;
+}
+
+.cert-sheet-title strong {
+    border-radius: 0;
+    font-size: 0.82rem;
+    font-weight: 500;
+}
+
+.cert-detail-summary > div,
+.cert-meta-grid div,
+.ticket-top div,
+.ticket-summary-grid div {
+    min-height: auto;
+    padding: 0.62rem 0.72rem;
+}
+
+.cert-detail-summary strong,
+.ticket-top strong,
+.ticket-summary-grid strong,
+.cert-meta-grid strong {
+    font-size: 0.86rem;
+    font-weight: 500;
+}
+
+.cert-detail-summary-main strong,
+.oc-total-progress-head strong {
+    font-size: 1.35rem;
+    font-weight: 500;
+}
+
+.cert-detail-progress-track,
+.oc-total-progress-track,
+.progress-thin {
+    height: 0.45rem;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.cert-detail-progress-fill,
+.oc-total-progress-fill,
+.progress-bar {
+    border-radius: 0;
+    background: #00645f;
+    box-shadow: none;
+}
+
+@media (max-width: 768px) {
+    main.container,
+    .cert-detail-page {
+        max-width: calc(100vw - 1rem);
+    }
+
+    .home-hero h1 {
+        font-size: 1.55rem;
+    }
+
+    .home-module-card {
+        min-height: 8rem;
     }
 }
