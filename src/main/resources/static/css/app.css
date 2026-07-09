@@ -2567,6 +2567,29 @@ body.is-resizing-table-column {
     background: #f8fafc;
 }
 
+.cert-click-row {
+    cursor: pointer;
+}
+
+.cert-click-row:hover td {
+    background: #fff8d4;
+}
+
+.cert-click-row:focus {
+    outline: 2px solid #8fb7e8;
+    outline-offset: -2px;
+}
+
+.cert-row-link {
+    color: #1f69c7;
+    font-weight: 850;
+    text-decoration: none;
+}
+
+.cert-row-link:hover {
+    text-decoration: underline;
+}
+
 .action-cell {
     white-space: nowrap;
 }
