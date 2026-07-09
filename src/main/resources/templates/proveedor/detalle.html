@@ -9,9 +9,23 @@
 <body>
 <div th:replace="~{fragments/layout :: navbar}"></div>
 <main class="container">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <div><h1 th:text="${proveedor.nombre}">Proveedor</h1><div class="text-muted" th:text="${proveedor.cuit}"></div></div>
-        <a class="btn btn-outline-secondary" th:href="@{/proveedores/{id}/editar(id=${proveedor.id})}">Editar</a>
+    <div class="page-navigation mb-3">
+        <a th:href="@{/}"><i class="bi bi-house"></i> Inicio</a>
+        <i class="bi bi-chevron-right"></i>
+        <a th:href="@{/proveedores}">Proveedores</a>
+        <i class="bi bi-chevron-right"></i>
+        <span th:text="${proveedor.nombre}">Proveedor</span>
+    </div>
+
+    <div class="document-header mb-4">
+        <div>
+            <div class="document-kicker">Ficha de proveedor</div>
+            <h1 th:text="${proveedor.nombre}">Proveedor</h1>
+            <div class="text-muted" th:text="${proveedor.cuit ?: 'Sin CUIT cargado'}"></div>
+        </div>
+        <div class="document-actions">
+            <a class="btn btn-outline-secondary" th:href="@{/proveedores/{id}/editar(id=${proveedor.id})}"><i class="bi bi-pencil-square"></i> Editar</a>
+        </div>
     </div>
     <div class="row g-3 mb-4">
         <div class="col-md-3"><div class="metric-card"><div class="metric-label">Contacto</div><div class="metric-value metric-value-sm" th:text="${proveedor.contacto ?: '-'}">-</div></div></div>

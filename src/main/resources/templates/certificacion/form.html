@@ -29,9 +29,6 @@
                 <span th:text="${orden.proveedorEntidad?.nombre ?: '-'}">Proveedor</span>
             </div>
         </div>
-        <div class="document-actions">
-            <a class="btn btn-outline-secondary" th:href="@{/oc/{id}(id=${orden.id})}"><i class="bi bi-arrow-left"></i> Volver a OC</a>
-        </div>
     </div>
 
     <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>

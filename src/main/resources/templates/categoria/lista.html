@@ -9,12 +9,19 @@
 <body>
 <div th:replace="~{fragments/layout :: navbar}"></div>
 <main class="container">
-    <div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="page-navigation mb-3">
+        <a th:href="@{/}"><i class="bi bi-house"></i> Inicio</a>
+        <i class="bi bi-chevron-right"></i>
+        <span>Categorias</span>
+    </div>
+
+    <div class="page-hero mb-3">
         <div>
+            <div class="document-kicker">Clasificacion</div>
             <h1>Categorias</h1>
             <div class="text-muted">Definen como se clasifican los items de una orden de compra.</div>
         </div>
-        <a class="btn btn-primary" th:href="@{/categorias/nueva}">Nueva categoria</a>
+        <a class="btn btn-primary" th:href="@{/categorias/nueva}"><i class="bi bi-plus-lg"></i> Nueva categoria</a>
     </div>
     <div class="table-responsive">
         <table class="table table-hover align-middle">

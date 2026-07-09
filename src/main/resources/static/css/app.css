@@ -39,13 +39,13 @@ h5 {
 }
 
 .app-topbar {
-    background: var(--app-yellow);
-    border-bottom: 1px solid var(--app-yellow-dark);
-    box-shadow: 0 2px 12px rgba(24, 32, 42, 0.12);
+    background: #ffffff;
+    border-bottom: 1px solid #d9dde3;
+    box-shadow: 0 8px 26px rgba(24, 32, 42, 0.08);
 }
 
 .app-nav-container {
-    gap: 1rem;
+    gap: 1.15rem;
 }
 
 .app-brand {
@@ -66,9 +66,9 @@ h5 {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border: 2px solid var(--app-ink);
+    border: 2px solid var(--app-yellow-dark);
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.5);
+    background: var(--app-yellow);
     font-size: 1rem;
 }
 
@@ -77,14 +77,14 @@ h5 {
     flex-direction: row;
     flex-wrap: wrap;
     flex: 1;
-    gap: 0.15rem;
+    gap: 0.25rem;
 }
 
 .app-topbar .nav-link {
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
-    padding: 0.45rem 0.6rem;
+    padding: 0.5rem 0.65rem;
     border-radius: 6px;
     color: #26313d;
     font-size: 0.88rem;
@@ -93,7 +93,7 @@ h5 {
 
 .app-topbar .nav-link:hover,
 .app-topbar .nav-link:focus {
-    background: rgba(255, 255, 255, 0.48);
+    background: #fff7cf;
     color: #111827;
 }
 
@@ -102,28 +102,16 @@ h5 {
     align-items: center;
 }
 
-.nav-back-button {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    padding: 0.42rem 0.62rem;
-    border: 1px solid rgba(24, 32, 42, 0.25);
-    border-radius: 6px;
-    background: rgba(255, 255, 255, 0.45);
-    color: var(--app-ink);
-    font-size: 0.84rem;
-    font-weight: 750;
-}
-
-.nav-back-button:hover {
-    background: #ffffff;
-}
-
 .page-navigation {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
     gap: 0.45rem;
+    margin-top: 0.65rem;
+    padding: 0.55rem 0.7rem;
+    border: 1px solid #dfe3e8;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.72);
     color: var(--app-muted);
     font-size: 0.84rem;
     font-weight: 650;
@@ -1554,9 +1542,9 @@ body.is-resizing-table-column {
 }
 
 .document-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
     gap: 1rem;
 }
 
@@ -1590,6 +1578,10 @@ body.is-resizing-table-column {
     flex-wrap: wrap;
     justify-content: flex-end;
     gap: 0.5rem;
+    padding: 0.35rem;
+    border: 1px solid #e4e9ef;
+    border-radius: 8px;
+    background: #f8fafc;
 }
 
 .document-actions form {
@@ -3443,16 +3435,13 @@ body.is-resizing-table-column {
         width: 100%;
     }
 
-    .nav-back-button {
-        width: 100%;
-        justify-content: center;
-    }
-
     .document-header {
-        flex-direction: column;
+        grid-template-columns: 1fr;
+        align-items: flex-start;
     }
 
     .document-actions {
+        width: 100%;
         justify-content: flex-start;
     }
 

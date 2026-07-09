@@ -9,7 +9,19 @@
 <body>
 <div th:replace="~{fragments/layout :: navbar}"></div>
 <main class="container">
-    <h1 class="mb-3">Materiales</h1>
+    <div class="page-navigation mb-3">
+        <a th:href="@{/}"><i class="bi bi-house"></i> Inicio</a>
+        <i class="bi bi-chevron-right"></i>
+        <span>Materiales</span>
+    </div>
+
+    <div class="page-hero mb-3">
+        <div>
+            <div class="document-kicker">Recepciones</div>
+            <h1>Materiales</h1>
+            <div class="text-muted">Ordenes con items de materiales y control de recepcion.</div>
+        </div>
+    </div>
     <div class="table-responsive"><table class="table table-hover align-middle">
         <thead><tr><th>Numero OC</th><th>Fecha</th><th>Proveedor</th><th>Items</th><th class="text-end">Acciones</th></tr></thead>
         <tbody>

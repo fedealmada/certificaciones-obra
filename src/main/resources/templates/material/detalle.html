@@ -9,9 +9,23 @@
 <body>
 <div th:replace="~{fragments/layout :: navbar}"></div>
 <main class="container">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <div><h1 th:text="'Materiales OC ' + ${orden.numero}">Materiales</h1><div class="text-muted" th:text="${orden.proveedorEntidad?.nombre ?: '-'}"></div></div>
-        <a class="btn btn-primary" th:href="@{/materiales/oc/{id}/recepciones/nueva(id=${orden.id})}">Nueva recepcion</a>
+    <div class="page-navigation mb-3">
+        <a th:href="@{/}"><i class="bi bi-house"></i> Inicio</a>
+        <i class="bi bi-chevron-right"></i>
+        <a th:href="@{/materiales}">Materiales</a>
+        <i class="bi bi-chevron-right"></i>
+        <span th:text="'OC ' + ${orden.numero}">OC</span>
+    </div>
+
+    <div class="document-header mb-4">
+        <div>
+            <div class="document-kicker">Recepciones de materiales</div>
+            <h1 th:text="'Materiales OC ' + ${orden.numero}">Materiales</h1>
+            <div class="text-muted" th:text="${orden.proveedorEntidad?.nombre ?: '-'}"></div>
+        </div>
+        <div class="document-actions">
+            <a class="btn btn-primary" th:href="@{/materiales/oc/{id}/recepciones/nueva(id=${orden.id})}"><i class="bi bi-plus-lg"></i> Nueva recepcion</a>
+        </div>
     </div>
 
     <div class="row g-3 mb-4">

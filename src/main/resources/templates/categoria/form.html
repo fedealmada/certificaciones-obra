@@ -9,7 +9,21 @@
 <body>
 <div th:replace="~{fragments/layout :: navbar}"></div>
 <main class="container">
-    <h1 th:text="${categoria.id == null ? 'Nueva categoria' : 'Editar categoria'}">Categoria</h1>
+    <div class="page-navigation mb-3">
+        <a th:href="@{/}"><i class="bi bi-house"></i> Inicio</a>
+        <i class="bi bi-chevron-right"></i>
+        <a th:href="@{/categorias}">Categorias</a>
+        <i class="bi bi-chevron-right"></i>
+        <span th:text="${categoria.id == null ? 'Nueva categoria' : 'Editar categoria'}">Categoria</span>
+    </div>
+
+    <div class="document-header mb-4">
+        <div>
+            <div class="document-kicker">Clasificacion</div>
+            <h1 th:text="${categoria.id == null ? 'Nueva categoria' : 'Editar categoria'}">Categoria</h1>
+            <div class="text-muted">Configura como se agrupan los items dentro de las OC.</div>
+        </div>
+    </div>
     <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
     <form method="post" th:action="@{/categorias}" th:object="${categoria}">
         <input type="hidden" th:field="*{id}">

@@ -20,7 +20,22 @@
     </div>
 </div>
 <main class="container oc-form-page">
-    <h1 th:text="${form.id == null ? 'Nueva OC' : 'Editar OC'}">Orden de Compra</h1>
+    <div class="page-navigation mb-3">
+        <a th:href="@{/}"><i class="bi bi-house"></i> Inicio</a>
+        <i class="bi bi-chevron-right"></i>
+        <a th:href="@{/oc}">Ordenes</a>
+        <i class="bi bi-chevron-right"></i>
+        <span th:text="${form.id == null ? 'Nueva OC' : 'Editar OC'}">Orden de Compra</span>
+    </div>
+
+    <div class="document-header oc-detail-header mb-4">
+        <div class="document-title-block">
+            <div class="document-kicker">Orden de compra</div>
+            <h1 th:text="${form.id == null ? 'Nueva OC' : 'Editar OC'}">Orden de Compra</h1>
+            <div class="document-subtitle">Carga y edicion de datos contractuales</div>
+        </div>
+    </div>
+
     <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
     <form method="post" th:action="@{/oc}" th:object="${form}" onsubmit="mostrarGuardandoOc()">
         <input type="hidden" th:field="*{id}">

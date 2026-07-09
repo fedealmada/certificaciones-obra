@@ -9,7 +9,21 @@
 <body>
 <div th:replace="~{fragments/layout :: navbar}"></div>
 <main class="container">
-    <h1 th:text="${material.id == null ? 'Nuevo material' : 'Editar material'}">Material</h1>
+    <div class="page-navigation mb-3">
+        <a th:href="@{/}"><i class="bi bi-house"></i> Inicio</a>
+        <i class="bi bi-chevron-right"></i>
+        <a th:href="@{/catalogo-materiales}">Catalogo de Materiales</a>
+        <i class="bi bi-chevron-right"></i>
+        <span th:text="${material.id == null ? 'Nuevo material' : 'Editar material'}">Material</span>
+    </div>
+
+    <div class="document-header mb-4">
+        <div>
+            <div class="document-kicker">Catalogo</div>
+            <h1 th:text="${material.id == null ? 'Nuevo material' : 'Editar material'}">Material</h1>
+            <div class="text-muted">Define nombre, unidad y estado del material catalogado.</div>
+        </div>
+    </div>
     <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
     <form method="post" th:action="@{/catalogo-materiales}" th:object="${material}">
         <input type="hidden" th:field="*{id}">

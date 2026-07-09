@@ -30,7 +30,6 @@
             </div>
         </div>
         <div class="document-actions">
-            <a class="btn btn-outline-secondary" th:href="@{/oc/{id}(id=${orden.id})}"><i class="bi bi-arrow-left"></i> Volver a OC</a>
             <a class="btn btn-outline-primary" th:href="@{/oc/{ocId}/certificaciones/{certId}/editar(ocId=${orden.id}, certId=${certificacion.id})}"><i class="bi bi-pencil-square"></i> Editar</a>
             <a class="btn btn-outline-success" th:href="@{/oc/{ocId}/certificaciones/{certId}/exportar(ocId=${orden.id}, certId=${certificacion.id})}"><i class="bi bi-file-earmark-spreadsheet"></i> Exportar Excel</a>
             <form method="post" th:action="@{/oc/{ocId}/certificaciones/{certId}/eliminar(ocId=${orden.id}, certId=${certificacion.id})}" onsubmit="return confirm('Eliminar este certificado? Los acumulados se recalcularan.');">

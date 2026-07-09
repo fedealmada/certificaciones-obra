@@ -9,13 +9,20 @@
 <body>
 <div th:replace="~{fragments/layout :: navbar}"></div>
 <main class="container">
+    <div class="page-navigation mb-3">
+        <a th:href="@{/}"><i class="bi bi-house"></i> Inicio</a>
+        <i class="bi bi-chevron-right"></i>
+        <a th:href="@{/oc}">Ordenes</a>
+        <i class="bi bi-chevron-right"></i>
+        <span>Importar OC</span>
+    </div>
+
     <div class="page-hero mb-3">
         <div>
             <div class="document-kicker">Carga automatica</div>
             <h1>Importar Ordenes de Compra</h1>
             <div class="text-muted">Adjunta uno o varios PDF/TXT, revisa diferencias y confirma que OC cargar.</div>
         </div>
-        <a class="btn btn-outline-secondary" th:href="@{/oc}"><i class="bi bi-arrow-left"></i> Volver a OC</a>
     </div>
 
     <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
