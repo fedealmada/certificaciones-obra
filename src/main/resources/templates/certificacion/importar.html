@@ -96,12 +96,24 @@
 
                 <div class="table-responsive">
                     <table class="table table-sm align-middle import-preview-table">
-                        <thead><tr><th>Certificado</th><th>Fecha</th><th class="text-end">Items con avance</th></tr></thead>
+                        <thead>
+                        <tr>
+                            <th>Certificado</th>
+                            <th>Fecha</th>
+                            <th class="text-end">Items con avance</th>
+                            <th class="text-end">Avance</th>
+                            <th class="text-end">Acumulado</th>
+                            <th class="text-end">Importe cert.</th>
+                        </tr>
+                        </thead>
                         <tbody>
                         <tr th:each="cert : ${orden.certificados()}">
                             <td th:text="${cert.numero()}"></td>
                             <td th:text="${#temporals.format(cert.fecha(), 'dd/MM/yyyy')}"></td>
                             <td class="text-end" th:text="${cert.itemsConAvance()}"></td>
+                            <td class="text-end" th:text="${#numbers.formatDecimal(cert.porcentajeActual(), 1, 'POINT', 2, 'COMMA') + ' %'}">0,00 %</td>
+                            <td class="text-end fw-semibold" th:text="${#numbers.formatDecimal(cert.porcentajeAcumulado(), 1, 'POINT', 2, 'COMMA') + ' %'}">0,00 %</td>
+                            <td class="text-end fw-semibold" th:text="${#numbers.formatDecimal(cert.importeActual(), 1, 'POINT', 2, 'COMMA')}">0,00</td>
                         </tr>
                         </tbody>
                     </table>

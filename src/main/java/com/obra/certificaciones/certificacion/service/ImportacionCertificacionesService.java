@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.Normalizer;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -160,15 +161,7 @@ public class ImportacionCertificacionesService {
         List<ItemImportadoVista> itemsVista = ordenParseada.items().stream()
                 .map(item -> new ItemImportadoVista(item.codigo(), item.detalle(), itemsFinal.containsKey(item.codigo())))
                 .toList();
-        List<CertificadoImportadoVista> certificadosVista = ordenParseada.certificados().stream()
-                .map(certificado -> new CertificadoImportadoVista(
-                        certificado.numero(),
-                        certificado.fecha(),
-                        (int) ordenParseada.items().stream()
-                                .filter(item -> item.avancesPorCertificado().getOrDefault(certificado.numero(), BigDecimal.ZERO).compareTo(BigDecimal.ZERO) > 0)
-                                .count()
-                ))
-                .toList();
+        List<CertificadoImportadoVista> certificadosVista = construirCertificadosVista(ordenParseada, ordenCompraOptional.orElse(null), items, despuesDeImportar);
 
         return new OrdenImportadaVista(
                 ordenParseada.numeroOc(),
@@ -214,6 +207,94 @@ public class ImportacionCertificacionesService {
         if (certificadosSinAvance > 0) {
             avisos.add(certificadosSinAvance + " certificados no tienen avance actual y no se importaran.");
         }
+    }
+
+    private List<CertificadoImportadoVista> construirCertificadosVista(OrdenParseada ordenParseada,
+                                                                       OrdenCompra ordenCompra,
+                                                                       Map<String, ItemOrdenCompra> items,
+                                                                       boolean despuesDeImportar) {
+        if (ordenCompra == null) {
+            return ordenParseada.certificados().stream()
+                    .map(certificado -> new CertificadoImportadoVista(
+                            certificado.numero(),
+                            certificado.fecha(),
+                            contarItemsConAvance(ordenParseada, certificado),
+                            BigDecimal.ZERO,
+                            BigDecimal.ZERO,
+                            BigDecimal.ZERO
+                    ))
+                    .toList();
+        }
+
+        BigDecimal totalContratado = totalManoObra(ordenCompra);
+        BigDecimal totalAcumulado = acumuladoInicial(ordenCompra, items, ordenParseada, despuesDeImportar);
+        List<CertificadoImportadoVista> certificados = new ArrayList<>();
+
+        for (CertificadoParseado certificado : ordenParseada.certificados()) {
+            BigDecimal importeActual = BigDecimal.ZERO;
+            for (ItemParseado itemParseado : ordenParseada.items()) {
+                BigDecimal porcentaje = itemParseado.avancesPorCertificado().getOrDefault(certificado.numero(), BigDecimal.ZERO);
+                if (porcentaje.compareTo(BigDecimal.ZERO) <= 0) {
+                    continue;
+                }
+                ItemOrdenCompra item = items.get(itemParseado.codigo());
+                if (item != null) {
+                    importeActual = importeActual.add(calculoService.calcularMonto(item.getImporte(), porcentaje));
+                }
+            }
+            totalAcumulado = totalAcumulado.add(importeActual);
+            certificados.add(new CertificadoImportadoVista(
+                    certificado.numero(),
+                    certificado.fecha(),
+                    contarItemsConAvance(ordenParseada, certificado),
+                    porcentaje(importeActual, totalContratado),
+                    porcentaje(totalAcumulado, totalContratado),
+                    importeActual
+            ));
+        }
+        return certificados;
+    }
+
+    private int contarItemsConAvance(OrdenParseada ordenParseada, CertificadoParseado certificado) {
+        return (int) ordenParseada.items().stream()
+                .filter(item -> item.avancesPorCertificado().getOrDefault(certificado.numero(), BigDecimal.ZERO).compareTo(BigDecimal.ZERO) > 0)
+                .count();
+    }
+
+    private BigDecimal totalManoObra(OrdenCompra ordenCompra) {
+        return ordenCompra.getItems().stream()
+                .filter(item -> item.getCategoria() == CategoriaItem.MANO_OBRA)
+                .map(item -> item.getImporte() == null ? BigDecimal.ZERO : item.getImporte())
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    private BigDecimal acumuladoInicial(OrdenCompra ordenCompra,
+                                        Map<String, ItemOrdenCompra> items,
+                                        OrdenParseada ordenParseada,
+                                        boolean despuesDeImportar) {
+        BigDecimal total = BigDecimal.ZERO;
+        for (ItemOrdenCompra item : items.values()) {
+            BigDecimal acumulado = calculoService.porcentajeAcumuladoItem(ordenCompra.getId(), item.getId());
+            if (despuesDeImportar) {
+                acumulado = acumulado.subtract(porcentajeParseadoTotal(ordenParseada, item.getItem())).max(BigDecimal.ZERO);
+            }
+            total = total.add(calculoService.calcularMonto(item.getImporte(), acumulado));
+        }
+        return total;
+    }
+
+    private BigDecimal porcentajeParseadoTotal(OrdenParseada ordenParseada, String itemCodigo) {
+        return ordenParseada.items().stream()
+                .filter(item -> item.codigo().equals(itemCodigo))
+                .flatMap(item -> item.avancesPorCertificado().values().stream())
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    private BigDecimal porcentaje(BigDecimal valor, BigDecimal total) {
+        if (valor == null || total == null || total.compareTo(BigDecimal.ZERO) <= 0) {
+            return BigDecimal.ZERO;
+        }
+        return valor.multiply(BigDecimal.valueOf(100)).divide(total, 2, RoundingMode.HALF_UP);
     }
 
     private Optional<OrdenCompra> seleccionarOrden(OrdenParseada ordenParseada) {
