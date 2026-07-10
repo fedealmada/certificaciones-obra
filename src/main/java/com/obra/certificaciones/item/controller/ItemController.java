@@ -6,6 +6,7 @@ import com.obra.certificaciones.rubro.entity.Rubro;
 import com.obra.certificaciones.rubro.service.RubroService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -13,12 +14,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigInteger;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,19 +48,35 @@ public class ItemController {
     public String actualizarRubro(@PathVariable Long id,
                                   @RequestParam(required = false) String rubroId,
                                   RedirectAttributes redirectAttributes) {
+        actualizarRubroItem(id, rubroId);
+        redirectAttributes.addFlashAttribute("mensaje", "Rubro actualizado.");
+        return "redirect:/items";
+    }
+
+    @PostMapping("/items/{id}/rubro/async")
+    @ResponseBody
+    public ResponseEntity<Map<String, String>> actualizarRubroAsync(@PathVariable Long id,
+                                                                    @RequestParam(required = false) String rubroId) {
+        Rubro rubro = actualizarRubroItem(id, rubroId);
+        return ResponseEntity.ok(Map.of(
+                "rubro", rubro == null ? "" : rubro.getNombreCompleto()
+        ));
+    }
+
+    private Rubro actualizarRubroItem(Long id, String rubroId) {
         ItemOrdenCompra item = itemOrdenCompraRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No existe el item."));
         if (!StringUtils.hasText(rubroId)) {
             item.setRubroEntidad(null);
             item.setRubro(null);
-        } else {
-            Rubro rubro = rubroService.obtener(Long.valueOf(rubroId));
-            item.setRubroEntidad(rubro);
-            item.setRubro(null);
+            itemOrdenCompraRepository.save(item);
+            return null;
         }
+        Rubro rubro = rubroService.obtener(Long.valueOf(rubroId));
+        item.setRubroEntidad(rubro);
+        item.setRubro(null);
         itemOrdenCompraRepository.save(item);
-        redirectAttributes.addFlashAttribute("mensaje", "Rubro actualizado.");
-        return "redirect:/items";
+        return rubro;
     }
 
     private Comparator<ItemOrdenCompra> compararItems() {

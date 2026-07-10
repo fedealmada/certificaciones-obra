@@ -81,6 +81,7 @@
                     th:data-categoria="${item.categoria}"
                     th:data-rubro="${item.rubroEntidad != null ? item.rubroEntidad.nombreCompleto : ''}"
                     th:data-importe="${item.importe}"
+                    th:data-search-base="${item.item + ' ' + item.ordenCompra.numero + ' ' + #temporals.format(item.ordenCompra.fecha, 'dd/MM/yyyy') + ' ' + (item.ordenCompra.proveedorEntidad?.nombre ?: '') + ' ' + item.detalle + ' ' + item.categoria}"
                     th:data-search="${item.item + ' ' + item.ordenCompra.numero + ' ' + #temporals.format(item.ordenCompra.fecha, 'dd/MM/yyyy') + ' ' + (item.ordenCompra.proveedorEntidad?.nombre ?: '') + ' ' + item.detalle + ' ' + (item.rubroEntidad != null ? item.rubroEntidad.nombreCompleto : '') + ' ' + item.categoria}">
                     <td><span class="item-code-pill" th:text="${item.item ?: '-'}"></span></td>
                     <td><a class="link-dark fw-semibold" th:href="@{/oc/{id}(id=${item.ordenCompra.id})}" th:text="${item.ordenCompra.numero}"></a></td>
@@ -89,8 +90,8 @@
                     <td class="items-master-detail" th:text="${item.detalle}"></td>
                     <td><span class="category-chip" th:text="${item.categoriaEntidad != null ? item.categoriaEntidad.nombre : item.categoria.descripcion}"></span></td>
                     <td class="oc-list-rubros">
-                        <form class="item-rubro-form" method="post" th:action="@{/items/{id}/rubro(id=${item.id})}">
-                            <select class="form-select item-rubro-select" name="rubroId" onchange="this.form.submit()" th:aria-label="${'Cambiar rubro del item ' + (item.item ?: '')}">
+                        <form class="item-rubro-form" method="post" th:action="@{/items/{id}/rubro(id=${item.id})}" th:data-async-action="@{/items/{id}/rubro/async(id=${item.id})}">
+                            <select class="form-select item-rubro-select" name="rubroId" th:data-saved-value="${item.rubroEntidad != null ? item.rubroEntidad.id : ''}" th:aria-label="${'Cambiar rubro del item ' + (item.item ?: '')}">
                                 <option value="" th:selected="${item.rubroEntidad == null}">Sin rubro</option>
                                 <option th:each="rubro : ${rubros}" th:value="${rubro.id}" th:text="${rubro.nombreCompleto}" th:selected="${item.rubroEntidad != null && rubro.id == item.rubroEntidad.id}"></option>
                             </select>
@@ -247,9 +248,52 @@ document.querySelector('#item-category-filter').addEventListener('change', () =>
     guardarFiltrosItems();
     aplicarFiltroItems();
 });
+document.querySelectorAll('.item-rubro-select').forEach(select => {
+    select.addEventListener('change', () => guardarRubroItem(select));
+});
 document.querySelectorAll('#items-table-master .table-sort-button').forEach(button => {
     button.addEventListener('click', () => ordenarItems(button.dataset.sort, button.dataset.type, true));
 });
+
+async function guardarRubroItem(select) {
+    const form = select.closest('.item-rubro-form');
+    const row = select.closest('tr');
+    const savedValue = select.dataset.savedValue || '';
+    const formData = new URLSearchParams();
+    formData.append('rubroId', select.value);
+
+    form.classList.remove('is-saved', 'is-error');
+    form.classList.add('is-saving');
+    select.disabled = true;
+
+    try {
+        const response = await fetch(form.dataset.asyncAction, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'fetch'
+            }
+        });
+        if (!response.ok) {
+            throw new Error('No se pudo guardar el rubro.');
+        }
+        const result = await response.json();
+        const rubro = result.rubro || '';
+        row.dataset.rubro = rubro;
+        row.dataset.search = `${row.dataset.searchBase || ''} ${rubro}`;
+        select.dataset.savedValue = select.value;
+        form.classList.add('is-saved');
+        aplicarFiltroItems();
+    } catch (error) {
+        select.value = savedValue;
+        form.classList.add('is-error');
+    } finally {
+        form.classList.remove('is-saving');
+        select.disabled = false;
+        window.setTimeout(() => form.classList.remove('is-saved', 'is-error'), 1400);
+    }
+}
 
 restaurarFiltrosItems();
 ordenarItems(itemCurrentSort.key, itemCurrentSort.type, false);

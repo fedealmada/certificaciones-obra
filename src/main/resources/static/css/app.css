@@ -365,6 +365,21 @@ h5 {
     font-size: 0.76rem;
 }
 
+.item-rubro-form.is-saving .item-rubro-select {
+    border-color: #9fbfbd;
+    background-color: #f4faf9;
+}
+
+.item-rubro-form.is-saved .item-rubro-select {
+    border-color: #7cab93;
+    background-color: #f0f8f4;
+}
+
+.item-rubro-form.is-error .item-rubro-select {
+    border-color: #c97979;
+    background-color: #fff5f5;
+}
+
 #items-table-master th:nth-child(5),
 #items-table-master td:nth-child(5) { width: 27%; }
 #items-table-master th:nth-child(7),
