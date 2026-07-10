@@ -4830,3 +4830,407 @@ main.container,
         min-height: 8rem;
     }
 }
+
+/* ObraCert visual direction */
+:root {
+    --ui-bg: #f6f7f9;
+    --ui-panel: #ffffff;
+    --ui-line: #e5e9f0;
+    --ui-line-strong: #d9dee7;
+    --ui-ink: #111827;
+    --ui-muted: #64748b;
+    --ui-blue: #2454d6;
+    --ui-blue-soft: #eef3ff;
+    --ui-green: #1b9a5f;
+    --ui-green-soft: #e8f7ef;
+    --ui-yellow: #b97808;
+    --ui-yellow-soft: #fff5df;
+    --ui-red: #9f2f2f;
+    --ui-red-soft: #fff0ef;
+}
+
+body {
+    background: var(--ui-bg);
+    color: var(--ui-ink);
+    font-size: 0.82rem;
+}
+
+h1 {
+    font-size: 1.28rem;
+    font-weight: 650;
+}
+
+h2,
+h3,
+h4,
+h5 {
+    font-weight: 650;
+}
+
+.page-hero,
+.document-header,
+.panel-section,
+.metric-card,
+.ticket-shell,
+.cert-detail-sheet,
+.cert-detail-summary,
+.cert-detail-table-wrap,
+.home-hero,
+.home-module-card {
+    border: 1px solid var(--ui-line);
+    border-left: 1px solid var(--ui-line);
+    border-radius: 8px;
+    background: var(--ui-panel);
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.035);
+}
+
+.document-kicker {
+    color: var(--ui-muted);
+    font-size: 0.7rem;
+    font-weight: 650;
+    letter-spacing: 0;
+}
+
+.btn {
+    min-height: 1.9rem;
+    border-radius: 6px;
+    font-size: 0.74rem;
+    font-weight: 650;
+}
+
+.btn-primary {
+    background: var(--ui-blue);
+    border-color: var(--ui-blue);
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    background: #1e40af;
+    border-color: #1e40af;
+}
+
+.btn-outline-primary {
+    border-color: #c8d5ff;
+    color: var(--ui-blue);
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus {
+    background: var(--ui-blue-soft);
+    border-color: #b8c8ff;
+    color: var(--ui-blue);
+}
+
+.table-responsive {
+    border: 1px solid var(--ui-line);
+    border-radius: 8px;
+    background: var(--ui-panel);
+}
+
+.table th,
+.table td,
+.oc-items-table th,
+.oc-items-table td,
+.cert-table th,
+.cert-table td,
+.cert-edit-table th,
+.cert-edit-table td,
+.oc-form-table th,
+.oc-form-table td,
+.import-preview-table th,
+.import-preview-table td {
+    padding: 0.62rem 0.72rem;
+    border-color: var(--ui-line);
+    font-size: 0.75rem;
+    line-height: 1.25;
+    vertical-align: middle;
+}
+
+.table thead th,
+.document-table thead th,
+.cert-table thead th,
+.cert-edit-table thead th,
+.oc-items-table thead th,
+.oc-form-table thead th,
+.import-preview-table thead th,
+.cert-items-head {
+    background: #f8fafc;
+    color: #334155;
+    border-color: var(--ui-line);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: none;
+}
+
+.table-hover tbody tr:hover td,
+.cert-table tbody tr:hover td,
+.cert-edit-table tbody tr:hover td,
+.oc-items-table tbody tr:hover td,
+.cert-click-row:hover td,
+.cert-item-row:hover {
+    background: #f8fbff;
+}
+
+.status-pill,
+.category-chip,
+.item-code-pill,
+.section-total-pill,
+.delivery-status-pill,
+.filter-active-pill {
+    border-radius: 6px;
+    font-size: 0.66rem;
+    font-weight: 700;
+    box-shadow: none;
+}
+
+.delivery-status-pill.is-complete {
+    border-color: #c7dcff;
+    background: #edf4ff;
+    color: #1d4ed8;
+}
+
+.delivery-status-pill.is-partial,
+.status-pending {
+    border-color: #f6d69a;
+    background: var(--ui-yellow-soft);
+    color: var(--ui-yellow);
+}
+
+.delivery-status-pill.is-pending,
+.delivery-status-pill.is-work-closed {
+    border-color: #e3b2b2;
+    background: var(--ui-red-soft);
+    color: var(--ui-red);
+}
+
+.delivery-status-pill.is-work-open,
+.status-done {
+    border-color: #bde6ce;
+    background: var(--ui-green-soft);
+    color: var(--ui-green);
+}
+
+.form-control,
+.form-select {
+    border-color: var(--ui-line-strong);
+    border-radius: 6px;
+    font-size: 0.76rem;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--ui-blue);
+    box-shadow: 0 0 0 2px rgba(36, 84, 214, 0.12) !important;
+}
+
+.dashboard-body .app-topbar {
+    display: none;
+}
+
+.dashboard-shell {
+    display: grid;
+    grid-template-columns: 15rem minmax(0, 1fr);
+    min-height: 100vh;
+}
+
+.dashboard-sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    padding: 1rem 0.75rem;
+    border-right: 1px solid var(--ui-line);
+    background: #ffffff;
+}
+
+.dashboard-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    height: 2.8rem;
+    padding: 0 0.5rem 0.75rem;
+    border-bottom: 1px solid var(--ui-line);
+    color: var(--ui-ink);
+    text-decoration: none;
+}
+
+.dashboard-brand-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.55rem;
+    height: 1.55rem;
+    border: 1px solid #c8d5ff;
+    border-radius: 6px;
+    background: var(--ui-blue-soft);
+    color: var(--ui-blue);
+}
+
+.dashboard-side-nav {
+    display: grid;
+    gap: 0.18rem;
+    padding-top: 0.75rem;
+}
+
+.dashboard-side-nav a {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-height: 2.15rem;
+    padding: 0.42rem 0.55rem;
+    border-radius: 6px;
+    color: #334155;
+    font-size: 0.76rem;
+    font-weight: 650;
+    text-decoration: none;
+}
+
+.dashboard-side-nav a i {
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+.dashboard-side-nav a:hover,
+.dashboard-side-nav a.is-active {
+    background: var(--ui-blue-soft);
+    color: var(--ui-blue);
+}
+
+.dashboard-side-nav a:hover i,
+.dashboard-side-nav a.is-active i {
+    color: var(--ui-blue);
+}
+
+.dashboard-workspace {
+    display: grid;
+    gap: 0.9rem;
+    align-content: start;
+    padding: 1rem 1.1rem 1.4rem;
+}
+
+.dashboard-topline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: 4.8rem;
+    padding: 1rem 1.1rem;
+    border: 1px solid var(--ui-line);
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.035);
+}
+
+.dashboard-topline h1 {
+    margin-bottom: 0.2rem;
+}
+
+.dashboard-topline-actions {
+    display: flex;
+    gap: 0.45rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.dashboard-metric-grid,
+.dashboard-main-grid,
+.dashboard-chart-grid {
+    display: grid;
+    gap: 0.9rem;
+}
+
+.dashboard-metric-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.dashboard-main-grid,
+.dashboard-chart-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.dashboard-body .metric-card {
+    min-height: 6.1rem;
+    padding: 0.85rem;
+}
+
+.dashboard-body .metric-value {
+    color: var(--ui-ink);
+    font-size: 1.35rem;
+    font-weight: 700;
+}
+
+.dashboard-body .metric-value-sm {
+    font-size: 1rem;
+}
+
+.dashboard-body .metric-card small {
+    display: block;
+    margin-top: 0.35rem;
+    color: var(--ui-muted);
+    font-size: 0.68rem;
+}
+
+.dashboard-body .metric-head i,
+.dashboard-body .module-icon {
+    border-radius: 6px;
+    background: var(--ui-blue-soft);
+    color: var(--ui-blue);
+}
+
+.dashboard-body .dashboard-action-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.55rem;
+}
+
+.dashboard-body .dashboard-action-grid a,
+.dashboard-body .work-state-grid div,
+.dashboard-body .chart-legend-row {
+    border: 1px solid var(--ui-line);
+    border-radius: 8px;
+    background: #ffffff;
+}
+
+.dashboard-body .bar-fill,
+.dashboard-body .progress-bar,
+.dashboard-body .oc-total-progress-fill {
+    background: var(--ui-blue);
+}
+
+@media (max-width: 1100px) {
+    .dashboard-shell {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-sidebar {
+        position: static;
+        height: auto;
+        border-right: 0;
+        border-bottom: 1px solid var(--ui-line);
+    }
+
+    .dashboard-side-nav,
+    .dashboard-metric-grid,
+    .dashboard-main-grid,
+    .dashboard-chart-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 720px) {
+    .dashboard-workspace {
+        padding: 0.75rem;
+    }
+
+    .dashboard-topline {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .dashboard-side-nav,
+    .dashboard-metric-grid,
+    .dashboard-main-grid,
+    .dashboard-chart-grid,
+    .dashboard-body .dashboard-action-grid {
+        grid-template-columns: 1fr;
+    }
+}
