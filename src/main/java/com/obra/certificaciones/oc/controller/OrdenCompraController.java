@@ -26,7 +26,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/oc")
@@ -52,6 +54,7 @@ public class OrdenCompraController {
         model.addAttribute("certificadosPorOrden", certificacionService.contarPorOrdenes(ordenes.stream()
                 .map(OrdenCompra::getId)
                 .toList()));
+        model.addAttribute("avancesPorOrden", calcularAvancesOrdenes(ordenes));
         model.addAttribute("categorias", categoriaOrdenService.listarActivas());
         model.addAttribute("proveedor", proveedor);
         model.addAttribute("categoriaSeleccionada", categoriaId);
@@ -169,5 +172,28 @@ public class OrdenCompraController {
             return BigDecimal.ZERO;
         }
         return valor.multiply(BigDecimal.valueOf(100)).divide(total, 2, RoundingMode.HALF_UP);
+    }
+
+    private Map<Long, BigDecimal> calcularAvancesOrdenes(List<OrdenCompra> ordenes) {
+        Map<Long, Map<Long, BigDecimal>> acumuladosPorOrden = calculoService.porcentajesAcumuladosPorOrdenes(ordenes.stream()
+                .map(OrdenCompra::getId)
+                .toList());
+        Map<Long, BigDecimal> avances = new HashMap<>();
+        for (OrdenCompra orden : ordenes) {
+            Map<Long, BigDecimal> acumuladosItems = acumuladosPorOrden.getOrDefault(orden.getId(), Map.of());
+            BigDecimal totalManoObra = BigDecimal.ZERO;
+            BigDecimal totalCertificado = BigDecimal.ZERO;
+            for (ItemOrdenCompra item : orden.getItems()) {
+                if (item.getCategoria() != CategoriaItem.MANO_OBRA) {
+                    continue;
+                }
+                BigDecimal importe = item.getImporte() == null ? BigDecimal.ZERO : item.getImporte();
+                BigDecimal acumulado = acumuladosItems.getOrDefault(item.getId(), BigDecimal.ZERO);
+                totalManoObra = totalManoObra.add(importe);
+                totalCertificado = totalCertificado.add(calculoService.calcularMonto(importe, acumulado));
+            }
+            avances.put(orden.getId(), porcentaje(totalCertificado, totalManoObra));
+        }
+        return avances;
     }
 }

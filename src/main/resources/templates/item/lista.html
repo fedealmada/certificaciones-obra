@@ -112,7 +112,7 @@ const itemRows = Array.from(itemsTable.querySelectorAll('tbody tr[data-item]'));
 const itemVisibleCount = document.querySelector('#item-visible-count');
 const itemEmptyFilterRow = document.querySelector('.items-empty-filter-row');
 const itemStorageKey = 'obraControl.items.filters';
-let itemCurrentSort = { key: 'item', direction: 'asc', type: 'code' };
+let itemCurrentSort = { key: 'fecha', direction: 'desc', type: 'date' };
 
 function normalizeItemText(value) {
     return (value || '').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
@@ -195,7 +195,7 @@ function restaurarFiltrosItems() {
 }
 
 function ordenarItems(key, type, toggleDirection) {
-    const direction = toggleDirection && itemCurrentSort.key === key && itemCurrentSort.direction === 'asc' ? 'desc' : 'asc';
+    const direction = toggleDirection ? (itemCurrentSort.key === key && itemCurrentSort.direction === 'asc' ? 'desc' : 'asc') : itemCurrentSort.direction;
     itemCurrentSort = { key, direction, type };
     const body = itemsTable.querySelector('tbody');
     const sortedRows = [...itemRows].sort((a, b) => {
