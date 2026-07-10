@@ -111,6 +111,7 @@ const itemsTable = document.querySelector('#items-table-master');
 const itemRows = Array.from(itemsTable.querySelectorAll('tbody tr[data-item]'));
 const itemVisibleCount = document.querySelector('#item-visible-count');
 const itemEmptyFilterRow = document.querySelector('.items-empty-filter-row');
+const itemStorageKey = 'obraControl.items.filters';
 let itemCurrentSort = { key: 'item', direction: 'asc', type: 'code' };
 
 function normalizeItemText(value) {
@@ -173,6 +174,26 @@ function aplicarFiltroItems() {
     itemEmptyFilterRow.classList.toggle('d-none', visibles !== 0);
 }
 
+function guardarFiltrosItems() {
+    const state = {
+        busqueda: document.querySelector('#item-search').value,
+        categoria: document.querySelector('#item-category-filter').value
+    };
+    localStorage.setItem(itemStorageKey, JSON.stringify(state));
+}
+
+function restaurarFiltrosItems() {
+    const raw = localStorage.getItem(itemStorageKey);
+    if (!raw) return;
+    try {
+        const state = JSON.parse(raw);
+        document.querySelector('#item-search').value = state.busqueda || '';
+        document.querySelector('#item-category-filter').value = state.categoria || '';
+    } catch (error) {
+        localStorage.removeItem(itemStorageKey);
+    }
+}
+
 function ordenarItems(key, type, toggleDirection) {
     const direction = toggleDirection && itemCurrentSort.key === key && itemCurrentSort.direction === 'asc' ? 'desc' : 'asc';
     itemCurrentSort = { key, direction, type };
@@ -202,17 +223,25 @@ function ordenarItems(key, type, toggleDirection) {
 }
 
 function limpiarBusquedaItems() {
+    localStorage.removeItem(itemStorageKey);
     document.querySelector('#item-search').value = '';
     document.querySelector('#item-category-filter').value = '';
     aplicarFiltroItems();
 }
 
-document.querySelector('#item-search').addEventListener('input', aplicarFiltroItems);
-document.querySelector('#item-category-filter').addEventListener('change', aplicarFiltroItems);
+document.querySelector('#item-search').addEventListener('input', () => {
+    guardarFiltrosItems();
+    aplicarFiltroItems();
+});
+document.querySelector('#item-category-filter').addEventListener('change', () => {
+    guardarFiltrosItems();
+    aplicarFiltroItems();
+});
 document.querySelectorAll('#items-table-master .table-sort-button').forEach(button => {
     button.addEventListener('click', () => ordenarItems(button.dataset.sort, button.dataset.type, true));
 });
 
+restaurarFiltrosItems();
 ordenarItems(itemCurrentSort.key, itemCurrentSort.type, false);
 aplicarFiltroItems();
 </script>

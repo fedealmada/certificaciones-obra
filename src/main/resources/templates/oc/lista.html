@@ -28,25 +28,24 @@
     </div>
 
     <section class="panel-section mb-3">
-        <form class="row g-2 align-items-end" method="get" th:action="@{/oc}" id="oc-filter-form">
-            <div class="col-md-3">
-                <label class="form-label">Proveedor</label>
-                <input class="form-control live-filter" name="proveedor" th:value="${proveedor}" data-filter="proveedor" placeholder="Buscar proveedor">
+        <form class="row g-2 align-items-end" id="oc-filter-form" onsubmit="return false;">
+            <div class="col-md-4">
+                <label class="form-label">Buscar OC o proveedor</label>
+                <input class="form-control live-filter" id="oc-search" data-filter="busqueda" placeholder="Ej: 450, Fedan, Sanitarios">
             </div>
             <div class="col-md-3">
                 <label class="form-label">Categoria</label>
-                <select class="form-select live-filter" name="categoriaId" data-filter="categoria">
+                <select class="form-select live-filter" id="oc-category-filter" data-filter="categoria">
                     <option value="">Todas</option>
                     <option th:each="cat : ${categorias}" th:value="${cat.id}" th:text="${cat.nombre}" th:selected="${cat.id == categoriaSeleccionada}"></option>
                 </select>
             </div>
             <div class="col-md-3">
                 <label class="form-label">Rubro</label>
-                <input class="form-control live-filter" name="rubro" th:value="${rubro}" data-filter="rubro" placeholder="Buscar rubro">
+                <input class="form-control live-filter" id="oc-rubro-filter" data-filter="rubro" placeholder="Buscar rubro">
             </div>
-            <div class="col-md-3 d-flex gap-2">
-                <button class="btn btn-outline-primary" type="submit"><i class="bi bi-funnel"></i> Filtrar</button>
-                <a class="btn btn-outline-secondary" th:href="@{/oc}"><i class="bi bi-x-lg"></i> Limpiar</a>
+            <div class="col-md-2 d-flex gap-2">
+                <button class="btn btn-outline-secondary w-100" type="button" onclick="clearOcFilters()"><i class="bi bi-x-lg"></i> Limpiar</button>
             </div>
         </form>
     </section>
@@ -120,6 +119,7 @@ const ocTable = document.querySelector('#oc-table');
 const ocRows = Array.from(ocTable.querySelectorAll('tbody tr[data-numero]'));
 const visibleCount = document.querySelector('#oc-visible-count');
 const emptyFilterRow = document.querySelector('.oc-empty-filter-row');
+const ocStorageKey = 'obraControl.oc.filters';
 let currentSort = { key: 'fecha', direction: 'desc', type: 'date' };
 
 function normalizeText(value) {
@@ -144,7 +144,7 @@ function sortValue(row, key, type) {
 }
 
 function applyFilters() {
-    const proveedor = normalizeText(document.querySelector('[data-filter="proveedor"]').value);
+    const busqueda = normalizeText(document.querySelector('[data-filter="busqueda"]').value);
     const rubro = normalizeText(document.querySelector('[data-filter="rubro"]').value);
     const categoriaSelect = document.querySelector('[data-filter="categoria"]');
     const categoria = normalizeText(categoriaSelect.selectedOptions[0]?.textContent || '');
@@ -152,10 +152,12 @@ function applyFilters() {
     let visibles = 0;
 
     ocRows.forEach(row => {
-        const matchesProveedor = normalizeText(row.dataset.proveedor).includes(proveedor);
+        const matchesBusqueda = !busqueda
+            || normalizeText(row.dataset.numero).includes(busqueda)
+            || normalizeText(row.dataset.proveedor).includes(busqueda);
         const matchesRubro = normalizeText(row.dataset.rubros).includes(rubro);
         const matchesCategoria = !filtraCategoria || normalizeText(row.dataset.categorias).includes(categoria);
-        const visible = matchesProveedor && matchesRubro && matchesCategoria;
+        const visible = matchesBusqueda && matchesRubro && matchesCategoria;
         row.classList.toggle('d-none', !visible);
         if (visible) {
             visibles++;
@@ -164,6 +166,36 @@ function applyFilters() {
 
     visibleCount.textContent = visibles;
     emptyFilterRow.classList.toggle('d-none', visibles !== 0);
+}
+
+function saveOcFilters() {
+    const state = {
+        busqueda: document.querySelector('[data-filter="busqueda"]').value,
+        rubro: document.querySelector('[data-filter="rubro"]').value,
+        categoria: document.querySelector('[data-filter="categoria"]').value
+    };
+    localStorage.setItem(ocStorageKey, JSON.stringify(state));
+}
+
+function restoreOcFilters() {
+    const raw = localStorage.getItem(ocStorageKey);
+    if (!raw) return;
+    try {
+        const state = JSON.parse(raw);
+        document.querySelector('[data-filter="busqueda"]').value = state.busqueda || '';
+        document.querySelector('[data-filter="rubro"]').value = state.rubro || '';
+        document.querySelector('[data-filter="categoria"]').value = state.categoria || '';
+    } catch (error) {
+        localStorage.removeItem(ocStorageKey);
+    }
+}
+
+function clearOcFilters() {
+    localStorage.removeItem(ocStorageKey);
+    document.querySelector('[data-filter="busqueda"]').value = '';
+    document.querySelector('[data-filter="rubro"]').value = '';
+    document.querySelector('[data-filter="categoria"]').value = '';
+    applyFilters();
 }
 
 function applySort(key, type, toggleDirection) {
@@ -191,8 +223,14 @@ function applySort(key, type, toggleDirection) {
 }
 
 document.querySelectorAll('.live-filter').forEach(field => {
-    field.addEventListener('input', applyFilters);
-    field.addEventListener('change', applyFilters);
+    field.addEventListener('input', () => {
+        saveOcFilters();
+        applyFilters();
+    });
+    field.addEventListener('change', () => {
+        saveOcFilters();
+        applyFilters();
+    });
 });
 
 document.querySelectorAll('.table-sort-button').forEach(button => {
@@ -214,6 +252,7 @@ ocRows.forEach(row => {
     });
 });
 
+restoreOcFilters();
 applySort(currentSort.key, currentSort.type, false);
 applyFilters();
 </script>
