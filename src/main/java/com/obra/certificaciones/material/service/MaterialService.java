@@ -48,6 +48,23 @@ public class MaterialService {
     }
 
     @Transactional(readOnly = true)
+    public long contarRecepciones(Long ordenCompraId) {
+        return recepcionMaterialRepository.countByOrdenCompraId(ordenCompraId);
+    }
+
+    @Transactional(readOnly = true)
+    public EstadoRecepcionMaterial calcularEstadoOrden(Long ordenCompraId) {
+        List<ItemMaterialResumen> resumenItems = calcularResumenItems(ordenCompraId);
+        if (resumenItems.isEmpty() || resumenItems.stream().allMatch(item -> item.estado() == EstadoRecepcionMaterial.PENDIENTE)) {
+            return EstadoRecepcionMaterial.PENDIENTE;
+        }
+        if (resumenItems.stream().allMatch(item -> item.estado() == EstadoRecepcionMaterial.COMPLETO)) {
+            return EstadoRecepcionMaterial.COMPLETO;
+        }
+        return EstadoRecepcionMaterial.PARCIAL;
+    }
+
+    @Transactional(readOnly = true)
     public RecepcionMaterialForm crearForm(Long ordenCompraId) {
         RecepcionMaterialForm form = new RecepcionMaterialForm();
         itemOrdenCompraRepository.findByOrdenCompraIdAndCategoriaOrderById(ordenCompraId, CategoriaItem.MATERIAL)

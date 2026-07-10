@@ -4,7 +4,9 @@ import com.obra.certificaciones.alerta.service.AlertaSistemaService;
 import com.obra.certificaciones.categoria.service.CategoriaOrdenService;
 import com.obra.certificaciones.certificacion.service.CertificacionCalculoService;
 import com.obra.certificaciones.certificacion.service.CertificacionService;
+import com.obra.certificaciones.material.dto.EstadoRecepcionMaterial;
 import com.obra.certificaciones.material.catalogo.service.MaterialCatalogoService;
+import com.obra.certificaciones.material.service.MaterialService;
 import com.obra.certificaciones.oc.dto.OrdenCompraForm;
 import com.obra.certificaciones.oc.entity.CategoriaItem;
 import com.obra.certificaciones.oc.entity.ItemOrdenCompra;
@@ -41,6 +43,7 @@ public class OrdenCompraController {
     private final RubroService rubroService;
     private final ItemOrdenCompraRepository itemOrdenCompraRepository;
     private final MaterialCatalogoService materialCatalogoService;
+    private final MaterialService materialService;
     private final CategoriaOrdenService categoriaOrdenService;
     private final AlertaSistemaService alertaSistemaService;
 
@@ -55,6 +58,9 @@ public class OrdenCompraController {
                 .map(OrdenCompra::getId)
                 .toList()));
         model.addAttribute("avancesPorOrden", calcularAvancesOrdenes(ordenes));
+        model.addAttribute("ordenesMateriales", calcularOrdenesMateriales(ordenes));
+        model.addAttribute("estadosEntregaPorOrden", calcularEstadosEntrega(ordenes));
+        model.addAttribute("viajesPorOrden", calcularViajesEntrega(ordenes));
         model.addAttribute("categorias", categoriaOrdenService.listarActivas());
         model.addAttribute("proveedor", proveedor);
         model.addAttribute("categoriaSeleccionada", categoriaId);
@@ -136,11 +142,14 @@ public class OrdenCompraController {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         BigDecimal totalManoObra = totalPorCategoria(ordenCompra, CategoriaItem.MANO_OBRA);
         BigDecimal porcentajeAvanceOc = porcentaje(totalCertificado, totalManoObra);
+        boolean ordenMaterial = esOrdenMaterial(ordenCompra);
         model.addAttribute("totalCertificado", totalCertificado);
         model.addAttribute("saldoOc", saldoOc);
         model.addAttribute("porcentajeAvanceOc", porcentajeAvanceOc);
         model.addAttribute("porcentajeAvanceOcBarra", porcentajeAvanceOc.min(BigDecimal.valueOf(100)));
         model.addAttribute("ordenCerrada", porcentajeAvanceOc.compareTo(BigDecimal.valueOf(100)) >= 0);
+        model.addAttribute("ordenMaterial", ordenMaterial);
+        model.addAttribute("estadoEntregaOrden", ordenMaterial ? materialService.calcularEstadoOrden(id) : null);
         model.addAttribute("alertasOrden", alertaSistemaService.alertasOrden(id));
         return "oc/detalle";
     }
@@ -197,5 +206,37 @@ public class OrdenCompraController {
             avances.put(orden.getId(), porcentaje(totalCertificado, totalManoObra));
         }
         return avances;
+    }
+
+    private Map<Long, Boolean> calcularOrdenesMateriales(List<OrdenCompra> ordenes) {
+        Map<Long, Boolean> resultado = new HashMap<>();
+        for (OrdenCompra orden : ordenes) {
+            resultado.put(orden.getId(), esOrdenMaterial(orden));
+        }
+        return resultado;
+    }
+
+    private Map<Long, EstadoRecepcionMaterial> calcularEstadosEntrega(List<OrdenCompra> ordenes) {
+        Map<Long, EstadoRecepcionMaterial> resultado = new HashMap<>();
+        for (OrdenCompra orden : ordenes) {
+            if (esOrdenMaterial(orden)) {
+                resultado.put(orden.getId(), materialService.calcularEstadoOrden(orden.getId()));
+            }
+        }
+        return resultado;
+    }
+
+    private Map<Long, Long> calcularViajesEntrega(List<OrdenCompra> ordenes) {
+        Map<Long, Long> resultado = new HashMap<>();
+        for (OrdenCompra orden : ordenes) {
+            if (esOrdenMaterial(orden)) {
+                resultado.put(orden.getId(), materialService.contarRecepciones(orden.getId()));
+            }
+        }
+        return resultado;
+    }
+
+    private boolean esOrdenMaterial(OrdenCompra ordenCompra) {
+        return ordenCompra.getItems().stream().anyMatch(item -> item.getCategoria() == CategoriaItem.MATERIAL);
     }
 }

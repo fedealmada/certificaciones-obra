@@ -82,7 +82,7 @@
                     <th class="text-end"><button class="table-sort-button justify-content-end" type="button" data-sort="items" data-type="number">Items <i class="bi bi-arrow-down-up"></i></button></th>
                     <th class="text-end"><button class="table-sort-button justify-content-end" type="button" data-sort="importe" data-type="number">Importe <i class="bi bi-arrow-down-up"></i></button></th>
                     <th class="text-end"><button class="table-sort-button justify-content-end" type="button" data-sort="avance" data-type="number">Avance <i class="bi bi-arrow-down-up"></i></button></th>
-                    <th class="text-end"><button class="table-sort-button justify-content-end" type="button" data-sort="certificados" data-type="number">Certif. <i class="bi bi-arrow-down-up"></i></button></th>
+                    <th class="text-end"><button class="table-sort-button justify-content-end" type="button" data-sort="certificados" data-type="number">Seguim. <i class="bi bi-arrow-down-up"></i></button></th>
                     <th class="text-end">Acciones</th>
                 </tr>
                 </thead>
@@ -99,7 +99,7 @@
                     th:data-items="${orden.items.size()}"
                     th:data-importe="${orden.total}"
                     th:data-avance="${avancesPorOrden.get(orden.id)}"
-                    th:data-certificados="${certificadosPorOrden.getOrDefault(orden.id, 0)}">
+                    th:data-certificados="${ordenesMateriales.getOrDefault(orden.id, false) ? viajesPorOrden.getOrDefault(orden.id, 0) : certificadosPorOrden.getOrDefault(orden.id, 0)}">
                     <td><span class="item-code-pill" th:text="${orden.numero}"></span></td>
                     <td th:text="${#temporals.format(orden.fecha, 'dd/MM/yyyy')}"></td>
                     <td th:text="${orden.proveedorEntidad?.nombre ?: '-'}"></td>
@@ -109,7 +109,17 @@
                     <td class="text-end fw-semibold" th:text="${#numbers.formatDecimal(orden.total, 1, 'POINT', 2, 'COMMA')}">0,00</td>
                     <td class="text-end fw-semibold" th:text="${#numbers.formatDecimal(avancesPorOrden.get(orden.id), 1, 'POINT', 2, 'COMMA') + '%'}">0,00%</td>
                     <td class="text-end">
-                        <a class="cert-count-pill" th:classappend="${certificadosPorOrden.getOrDefault(orden.id, 0) == 0 ? ' is-empty' : ''}" th:href="@{/oc/{id}(id=${orden.id})} + '#certificados'" th:text="${certificadosPorOrden.getOrDefault(orden.id, 0) == 1 ? '1 certificado' : certificadosPorOrden.getOrDefault(orden.id, 0) + ' certificados'}">0 certificados</a>
+                        <a th:if="${ordenesMateriales.getOrDefault(orden.id, false)}"
+                           class="delivery-status-pill"
+                           th:classappend="${estadosEntregaPorOrden.get(orden.id).name() == 'COMPLETO' ? ' is-complete' : (estadosEntregaPorOrden.get(orden.id).name() == 'PARCIAL' ? ' is-partial' : ' is-pending')}"
+                           th:href="@{/materiales/oc/{id}(id=${orden.id})}"
+                           th:text="${estadosEntregaPorOrden.get(orden.id).name() == 'COMPLETO' ? 'ENTREGA COMPLETA' : (estadosEntregaPorOrden.get(orden.id).name() == 'PARCIAL' ? 'ENTREGA PARCIAL' : 'ENTREGA PENDIENTE')}">ENTREGA PENDIENTE</a>
+                        <small th:if="${ordenesMateriales.getOrDefault(orden.id, false)}" class="delivery-trip-count" th:text="${viajesPorOrden.getOrDefault(orden.id, 0) == 1 ? '1 viaje' : viajesPorOrden.getOrDefault(orden.id, 0) + ' viajes'}">0 viajes</small>
+                        <a th:unless="${ordenesMateriales.getOrDefault(orden.id, false)}"
+                           class="cert-count-pill"
+                           th:classappend="${certificadosPorOrden.getOrDefault(orden.id, 0) == 0 ? ' is-empty' : ''}"
+                           th:href="@{/oc/{id}(id=${orden.id})} + '#certificados'"
+                           th:text="${certificadosPorOrden.getOrDefault(orden.id, 0) == 1 ? '1 certificado' : certificadosPorOrden.getOrDefault(orden.id, 0) + ' certificados'}">0 certificados</a>
                     </td>
                     <td class="text-end action-cell">
                         <a class="btn btn-sm btn-outline-secondary table-icon-action" th:href="@{/oc/{id}/editar(id=${orden.id})}" title="Editar OC" aria-label="Editar OC"><i class="bi bi-pencil-square"></i></a>

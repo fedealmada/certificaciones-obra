@@ -36,16 +36,23 @@
             <div class="document-kicker">Orden de compra</div>
             <div class="oc-title-status-row">
                 <h1 th:text="'OC ' + ${orden.numero}">OC</h1>
-                <span class="oc-state-pill"
+                <span th:if="${ordenMaterial}"
+                      class="delivery-status-pill"
+                      th:classappend="${estadoEntregaOrden.name() == 'COMPLETO' ? ' is-complete' : (estadoEntregaOrden.name() == 'PARCIAL' ? ' is-partial' : ' is-pending')}"
+                      th:text="${estadoEntregaOrden.name() == 'COMPLETO' ? 'ENTREGA COMPLETA' : (estadoEntregaOrden.name() == 'PARCIAL' ? 'ENTREGA PARCIAL' : 'ENTREGA PENDIENTE')}">ENTREGA PENDIENTE</span>
+                <span th:unless="${ordenMaterial}"
+                      class="oc-state-pill"
                       th:classappend="${ordenCerrada == true ? ' is-closed' : ' is-open'}"
                       th:text="${ordenCerrada == true ? 'CERRADA' : 'ABIERTA'}">ABIERTA</span>
             </div>
             <div class="document-subtitle" th:text="${orden.proveedorEntidad?.nombre ?: '-'}">Proveedor</div>
         </div>
         <div class="document-actions">
-            <a class="btn btn-primary" th:href="@{/oc/{id}/certificaciones/nueva(id=${orden.id})}"><i class="bi bi-plus-lg"></i> Nuevo Certificado</a>
+            <a class="btn btn-primary" th:if="${ordenMaterial}" th:href="@{/materiales/oc/{id}/recepciones/nueva(id=${orden.id})}"><i class="bi bi-truck"></i> Nueva recepcion</a>
+            <a class="btn btn-outline-primary" th:if="${ordenMaterial}" th:href="@{/materiales/oc/{id}(id=${orden.id})}"><i class="bi bi-box-seam"></i> Ver entregas</a>
+            <a class="btn btn-primary" th:unless="${ordenMaterial}" th:href="@{/oc/{id}/certificaciones/nueva(id=${orden.id})}"><i class="bi bi-plus-lg"></i> Nuevo Certificado</a>
             <a class="btn btn-outline-secondary" th:href="@{/oc/{id}/editar(id=${orden.id})}"><i class="bi bi-pencil-square"></i> Editar OC</a>
-            <form method="post" th:action="@{/oc/{id}/eliminar(id=${orden.id})}" onsubmit="return confirm('Eliminar esta orden de compra? Se eliminaran tambien sus items y certificados.');">
+            <form method="post" th:action="@{/oc/{id}/eliminar(id=${orden.id})}" onsubmit="return confirm('Eliminar esta orden de compra? Se eliminaran tambien sus items, certificados o recepciones asociadas.');">
                 <button class="btn btn-outline-danger" type="submit"><i class="bi bi-trash"></i> Eliminar OC</button>
             </form>
         </div>
@@ -147,7 +154,23 @@
         </div>
     </section>
 
-    <section class="panel-section" id="certificados">
+    <section class="panel-section mb-4" th:if="${ordenMaterial}">
+        <div class="section-title-row">
+            <h2 class="h5 mb-0"><i class="bi bi-truck"></i> Entregas mediante viajes</h2>
+            <span class="delivery-status-pill"
+                  th:classappend="${estadoEntregaOrden.name() == 'COMPLETO' ? ' is-complete' : (estadoEntregaOrden.name() == 'PARCIAL' ? ' is-partial' : ' is-pending')}"
+                  th:text="${estadoEntregaOrden.name() == 'COMPLETO' ? 'ENTREGA COMPLETA' : (estadoEntregaOrden.name() == 'PARCIAL' ? 'ENTREGA PARCIAL' : 'ENTREGA PENDIENTE')}">ENTREGA PENDIENTE</span>
+        </div>
+        <div class="p-3 d-flex flex-wrap gap-2 align-items-center justify-content-between">
+            <span class="text-muted">Esta OC es de materiales. Las cantidades se controlan por recepciones y viajes, no por certificados.</span>
+            <div class="d-flex flex-wrap gap-2">
+                <a class="btn btn-primary" th:href="@{/materiales/oc/{id}/recepciones/nueva(id=${orden.id})}"><i class="bi bi-plus-lg"></i> Nueva recepcion</a>
+                <a class="btn btn-outline-primary" th:href="@{/materiales/oc/{id}(id=${orden.id})}"><i class="bi bi-box-seam"></i> Ver entregas</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="panel-section" id="certificados" th:unless="${ordenMaterial}">
         <div class="section-title-row">
             <h2 class="h5 mb-0"><i class="bi bi-check2-square"></i> Certificados realizados</h2>
             <span class="section-total-pill" th:text="${certificaciones.size()} + ' certificados'">0 certificados</span>

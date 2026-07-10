@@ -2232,6 +2232,58 @@ h5 {
     font-size: 0.7rem;
 }
 
+.delivery-status-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 1.75rem;
+    min-width: 0;
+    padding: 0.24rem 0.36rem;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+    line-height: 1.05;
+    text-align: center;
+    text-decoration: none;
+}
+
+.delivery-status-pill.is-complete {
+    border-color: #9ec5fe;
+    background: #e7f1ff;
+    color: #084298;
+}
+
+.delivery-status-pill.is-partial {
+    border-color: #ffc58a;
+    background: #fff3e2;
+    color: #9a4b00;
+}
+
+.delivery-status-pill.is-pending {
+    border-color: #d7a4a4;
+    background: #f8e5e5;
+    color: #7a1f1f;
+}
+
+.oc-title-status-row .delivery-status-pill,
+.section-title-row .delivery-status-pill {
+    width: auto;
+    padding-left: 0.6rem;
+    padding-right: 0.6rem;
+}
+
+.delivery-trip-count {
+    display: block;
+    margin-top: 0.22rem;
+    color: var(--app-muted);
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-align: center;
+}
+
 .oc-list-table .action-cell {
     white-space: nowrap;
 }
