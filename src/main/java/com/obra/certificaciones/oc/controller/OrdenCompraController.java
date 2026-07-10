@@ -135,10 +135,12 @@ public class OrdenCompraController {
                 .map(resumen -> resumen.saldoPendiente() == null ? BigDecimal.ZERO : resumen.saldoPendiente())
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         BigDecimal totalManoObra = totalPorCategoria(ordenCompra, CategoriaItem.MANO_OBRA);
+        BigDecimal porcentajeAvanceOc = porcentaje(totalCertificado, totalManoObra);
         model.addAttribute("totalCertificado", totalCertificado);
         model.addAttribute("saldoOc", saldoOc);
-        model.addAttribute("porcentajeAvanceOc", porcentaje(totalCertificado, totalManoObra));
-        model.addAttribute("porcentajeAvanceOcBarra", porcentaje(totalCertificado, totalManoObra).min(BigDecimal.valueOf(100)));
+        model.addAttribute("porcentajeAvanceOc", porcentajeAvanceOc);
+        model.addAttribute("porcentajeAvanceOcBarra", porcentajeAvanceOc.min(BigDecimal.valueOf(100)));
+        model.addAttribute("ordenCerrada", porcentajeAvanceOc.compareTo(BigDecimal.valueOf(100)) >= 0);
         model.addAttribute("alertasOrden", alertaSistemaService.alertasOrden(id));
         return "oc/detalle";
     }

@@ -34,7 +34,12 @@
     <div class="document-header oc-detail-header mb-4">
         <div class="document-title-block">
             <div class="document-kicker">Orden de compra</div>
-            <h1 th:text="'OC ' + ${orden.numero}">OC</h1>
+            <div class="oc-title-status-row">
+                <h1 th:text="'OC ' + ${orden.numero}">OC</h1>
+                <span class="oc-state-pill"
+                      th:classappend="${ordenCerrada == true ? ' is-closed' : ' is-open'}"
+                      th:text="${ordenCerrada == true ? 'CERRADA' : 'ABIERTA'}">ABIERTA</span>
+            </div>
             <div class="document-subtitle" th:text="${orden.proveedorEntidad?.nombre ?: '-'}">Proveedor</div>
         </div>
         <div class="document-actions">

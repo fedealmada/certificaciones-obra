@@ -2333,6 +2333,41 @@ h5 {
     margin-bottom: 0.15rem;
 }
 
+.oc-title-status-row {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+}
+
+.oc-title-status-row h1 {
+    margin-bottom: 0;
+}
+
+.oc-state-pill {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.6rem;
+    padding: 0.24rem 0.55rem;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+}
+
+.oc-state-pill.is-open {
+    border-color: #a9d8bf;
+    background: #e8f7ef;
+    color: #176536;
+}
+
+.oc-state-pill.is-closed {
+    border-color: #e0aaa7;
+    background: #fff0ef;
+    color: #9b2d28;
+}
+
 .document-subtitle {
     color: #5b6470;
 }
