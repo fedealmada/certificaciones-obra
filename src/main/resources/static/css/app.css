@@ -2520,6 +2520,32 @@ h5 {
     font-weight: 750;
 }
 
+.section-title-actions {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.45rem;
+    flex-wrap: wrap;
+}
+
+.filter-active-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    min-height: 2rem;
+    padding: 0.3rem 0.6rem;
+    border: 1px solid #9fbfbd;
+    border-radius: 6px;
+    background: #edf7f6;
+    color: #00645f;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.filter-active-pill i {
+    font-size: 0.78rem;
+}
+
 .oc-items-table {
     width: 100%;
     min-width: 0;

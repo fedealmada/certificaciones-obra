@@ -53,7 +53,10 @@
     <section class="panel-section oc-list-panel">
         <div class="section-title-row">
             <h2 class="h5 mb-0"><i class="bi bi-receipt"></i> Ordenes cargadas</h2>
-            <span class="section-total-pill"><span id="oc-visible-count" th:text="${ordenes.size()}">0</span> <span>visibles</span></span>
+            <div class="section-title-actions">
+                <span class="filter-active-pill d-none" id="oc-filter-indicator"><i class="bi bi-funnel-fill"></i> Filtro activo</span>
+                <span class="section-total-pill"><span id="oc-visible-count" th:text="${ordenes.size()}">0</span> <span>visibles</span></span>
+            </div>
         </div>
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0 interactive-table oc-list-table" id="oc-table" data-no-resize="true">
@@ -127,6 +130,7 @@ const ocTable = document.querySelector('#oc-table');
 const ocRows = Array.from(ocTable.querySelectorAll('tbody tr[data-numero]'));
 const visibleCount = document.querySelector('#oc-visible-count');
 const emptyFilterRow = document.querySelector('.oc-empty-filter-row');
+const ocFilterIndicator = document.querySelector('#oc-filter-indicator');
 const ocStorageKey = 'obraControl.oc.filters';
 let currentSort = { key: 'fecha', direction: 'desc', type: 'date' };
 
@@ -174,6 +178,13 @@ function applyFilters() {
 
     visibleCount.textContent = visibles;
     emptyFilterRow.classList.toggle('d-none', visibles !== 0);
+    ocFilterIndicator.classList.toggle('d-none', !hasActiveOcFilters());
+}
+
+function hasActiveOcFilters() {
+    return document.querySelector('[data-filter="busqueda"]').value.trim() !== ''
+        || document.querySelector('[data-filter="rubro"]').value.trim() !== ''
+        || document.querySelector('[data-filter="categoria"]').value !== '';
 }
 
 function saveOcFilters() {
