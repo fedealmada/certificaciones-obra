@@ -5,6 +5,7 @@ import com.obra.certificaciones.categoria.service.CategoriaOrdenService;
 import com.obra.certificaciones.certificacion.service.CertificacionCalculoService;
 import com.obra.certificaciones.certificacion.service.CertificacionService;
 import com.obra.certificaciones.material.dto.EstadoRecepcionMaterial;
+import com.obra.certificaciones.material.dto.ItemMaterialResumen;
 import com.obra.certificaciones.material.catalogo.service.MaterialCatalogoService;
 import com.obra.certificaciones.material.service.MaterialService;
 import com.obra.certificaciones.oc.dto.OrdenCompraForm;
@@ -57,7 +58,9 @@ public class OrdenCompraController {
         model.addAttribute("certificadosPorOrden", certificacionService.contarPorOrdenes(ordenes.stream()
                 .map(OrdenCompra::getId)
                 .toList()));
-        model.addAttribute("avancesPorOrden", calcularAvancesOrdenes(ordenes));
+        Map<Long, BigDecimal> avancesPorOrden = calcularAvancesOrdenes(ordenes);
+        model.addAttribute("avancesPorOrden", avancesPorOrden);
+        model.addAttribute("ordenesCerradas", calcularOrdenesCerradas(avancesPorOrden));
         model.addAttribute("ordenesMateriales", calcularOrdenesMateriales(ordenes));
         model.addAttribute("estadosEntregaPorOrden", calcularEstadosEntrega(ordenes));
         model.addAttribute("viajesPorOrden", calcularViajesEntrega(ordenes));
@@ -143,6 +146,13 @@ public class OrdenCompraController {
         BigDecimal totalManoObra = totalPorCategoria(ordenCompra, CategoriaItem.MANO_OBRA);
         BigDecimal porcentajeAvanceOc = porcentaje(totalCertificado, totalManoObra);
         boolean ordenMaterial = esOrdenMaterial(ordenCompra);
+        List<ItemMaterialResumen> materialItemsResumen = ordenMaterial
+                ? materialService.calcularResumenItems(id)
+                : List.of();
+        BigDecimal totalMaterialCompradoCantidad = totalCantidadMaterial(materialItemsResumen, TipoCantidadMaterial.COMPRADA);
+        BigDecimal totalMaterialRecibidoCantidad = totalCantidadMaterial(materialItemsResumen, TipoCantidadMaterial.RECIBIDA);
+        BigDecimal totalMaterialPendienteCantidad = totalCantidadMaterial(materialItemsResumen, TipoCantidadMaterial.PENDIENTE);
+        BigDecimal porcentajeRecepcionOc = porcentaje(totalMaterialRecibidoCantidad, totalMaterialCompradoCantidad);
         model.addAttribute("totalCertificado", totalCertificado);
         model.addAttribute("saldoOc", saldoOc);
         model.addAttribute("porcentajeAvanceOc", porcentajeAvanceOc);
@@ -150,6 +160,11 @@ public class OrdenCompraController {
         model.addAttribute("ordenCerrada", porcentajeAvanceOc.compareTo(BigDecimal.valueOf(100)) >= 0);
         model.addAttribute("ordenMaterial", ordenMaterial);
         model.addAttribute("estadoEntregaOrden", ordenMaterial ? materialService.calcularEstadoOrden(id) : null);
+        model.addAttribute("totalMaterialCompradoCantidad", totalMaterialCompradoCantidad);
+        model.addAttribute("totalMaterialRecibidoCantidad", totalMaterialRecibidoCantidad);
+        model.addAttribute("totalMaterialPendienteCantidad", totalMaterialPendienteCantidad);
+        model.addAttribute("porcentajeRecepcionOc", porcentajeRecepcionOc);
+        model.addAttribute("porcentajeRecepcionOcBarra", porcentajeRecepcionOc.min(BigDecimal.valueOf(100)));
         model.addAttribute("alertasOrden", alertaSistemaService.alertasOrden(id));
         return "oc/detalle";
     }
@@ -208,6 +223,26 @@ public class OrdenCompraController {
         return avances;
     }
 
+    private Map<Long, Boolean> calcularOrdenesCerradas(Map<Long, BigDecimal> avancesPorOrden) {
+        Map<Long, Boolean> resultado = new HashMap<>();
+        for (Map.Entry<Long, BigDecimal> avance : avancesPorOrden.entrySet()) {
+            BigDecimal porcentaje = avance.getValue() == null ? BigDecimal.ZERO : avance.getValue();
+            resultado.put(avance.getKey(), porcentaje.compareTo(BigDecimal.valueOf(100)) >= 0);
+        }
+        return resultado;
+    }
+
+    private BigDecimal totalCantidadMaterial(List<ItemMaterialResumen> items, TipoCantidadMaterial tipo) {
+        return items.stream()
+                .map(item -> switch (tipo) {
+                    case COMPRADA -> item.cantidadComprada();
+                    case RECIBIDA -> item.cantidadRecibida();
+                    case PENDIENTE -> item.cantidadPendiente();
+                })
+                .map(valor -> valor == null ? BigDecimal.ZERO : valor)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
     private Map<Long, Boolean> calcularOrdenesMateriales(List<OrdenCompra> ordenes) {
         Map<Long, Boolean> resultado = new HashMap<>();
         for (OrdenCompra orden : ordenes) {
@@ -238,5 +273,11 @@ public class OrdenCompraController {
 
     private boolean esOrdenMaterial(OrdenCompra ordenCompra) {
         return ordenCompra.getItems().stream().anyMatch(item -> item.getCategoria() == CategoriaItem.MATERIAL);
+    }
+
+    private enum TipoCantidadMaterial {
+        COMPRADA,
+        RECIBIDA,
+        PENDIENTE
     }
 }

@@ -2268,6 +2268,18 @@ h5 {
     color: #7a1f1f;
 }
 
+.delivery-status-pill.is-work-open {
+    border-color: #a9d8bf;
+    background: #e8f7ef;
+    color: #176536;
+}
+
+.delivery-status-pill.is-work-closed {
+    border-color: #e0aaa7;
+    background: #fff0ef;
+    color: #9b2d28;
+}
+
 .oc-title-status-row .delivery-status-pill,
 .section-title-row .delivery-status-pill {
     width: auto;
@@ -2578,6 +2590,11 @@ h5 {
     background: linear-gradient(90deg, #2f80ed 0%, #5aa142 100%);
     box-shadow: 0 0 12px rgba(90, 161, 66, 0.45);
     transition: width 1.1s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.oc-total-progress-fill.is-material {
+    background: linear-gradient(90deg, #9a4b00 0%, #2f80ed 100%);
+    box-shadow: 0 0 12px rgba(47, 128, 237, 0.34);
 }
 
 .oc-total-progress-fill.is-empty {

@@ -12,9 +12,9 @@
     <div class="page-navigation mb-3">
         <a th:href="@{/}"><i class="bi bi-house"></i> Inicio</a>
         <i class="bi bi-chevron-right"></i>
-        <a th:href="@{/materiales}">Materiales</a>
+        <a th:href="@{/oc}">Ordenes</a>
         <i class="bi bi-chevron-right"></i>
-        <a th:href="@{/materiales/oc/{id}(id=${orden.id})}" th:text="'OC ' + ${orden.numero}">OC</a>
+        <a th:href="@{/oc/{id}(id=${orden.id})}" th:text="'OC ' + ${orden.numero}">OC</a>
         <i class="bi bi-chevron-right"></i>
         <span>Nueva recepcion</span>
     </div>
@@ -49,7 +49,7 @@
             </tr>
             </tbody>
         </table></div>
-        <div class="d-flex gap-2"><button class="btn btn-primary" type="submit" th:disabled="${itemsResumen.isEmpty()}">Guardar</button><a class="btn btn-outline-secondary" th:href="@{/materiales/oc/{id}(id=${orden.id})}">Cancelar</a></div>
+        <div class="d-flex gap-2"><button class="btn btn-primary" type="submit" th:disabled="${itemsResumen.isEmpty()}">Guardar</button><a class="btn btn-outline-secondary" th:href="@{/oc/{id}(id=${orden.id})}">Cancelar</a></div>
     </form>
 </main>
 </body>

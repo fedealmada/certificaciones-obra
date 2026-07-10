@@ -116,10 +116,11 @@
                            th:text="${estadosEntregaPorOrden.get(orden.id).name() == 'COMPLETO' ? 'ENTREGA COMPLETA' : (estadosEntregaPorOrden.get(orden.id).name() == 'PARCIAL' ? 'ENTREGA PARCIAL' : 'ENTREGA PENDIENTE')}">ENTREGA PENDIENTE</a>
                         <small th:if="${ordenesMateriales.getOrDefault(orden.id, false)}" class="delivery-trip-count" th:text="${viajesPorOrden.getOrDefault(orden.id, 0) == 1 ? '1 viaje' : viajesPorOrden.getOrDefault(orden.id, 0) + ' viajes'}">0 viajes</small>
                         <a th:unless="${ordenesMateriales.getOrDefault(orden.id, false)}"
-                           class="cert-count-pill"
-                           th:classappend="${certificadosPorOrden.getOrDefault(orden.id, 0) == 0 ? ' is-empty' : ''}"
+                           class="delivery-status-pill"
+                           th:classappend="${ordenesCerradas.getOrDefault(orden.id, false) ? ' is-work-closed' : ' is-work-open'}"
                            th:href="@{/oc/{id}(id=${orden.id})} + '#certificados'"
-                           th:text="${certificadosPorOrden.getOrDefault(orden.id, 0) == 1 ? '1 certificado' : certificadosPorOrden.getOrDefault(orden.id, 0) + ' certificados'}">0 certificados</a>
+                           th:text="${ordenesCerradas.getOrDefault(orden.id, false) ? 'CERRADA' : 'ABIERTA'}">ABIERTA</a>
+                        <small th:unless="${ordenesMateriales.getOrDefault(orden.id, false)}" class="delivery-trip-count" th:text="${certificadosPorOrden.getOrDefault(orden.id, 0) == 1 ? '1 certificado' : certificadosPorOrden.getOrDefault(orden.id, 0) + ' certificados'}">0 certificados</small>
                     </td>
                     <td class="text-end action-cell">
                         <a class="btn btn-sm btn-outline-secondary table-icon-action" th:href="@{/oc/{id}/editar(id=${orden.id})}" title="Editar OC" aria-label="Editar OC"><i class="bi bi-pencil-square"></i></a>

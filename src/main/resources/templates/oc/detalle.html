@@ -41,8 +41,8 @@
                       th:classappend="${estadoEntregaOrden.name() == 'COMPLETO' ? ' is-complete' : (estadoEntregaOrden.name() == 'PARCIAL' ? ' is-partial' : ' is-pending')}"
                       th:text="${estadoEntregaOrden.name() == 'COMPLETO' ? 'ENTREGA COMPLETA' : (estadoEntregaOrden.name() == 'PARCIAL' ? 'ENTREGA PARCIAL' : 'ENTREGA PENDIENTE')}">ENTREGA PENDIENTE</span>
                 <span th:unless="${ordenMaterial}"
-                      class="oc-state-pill"
-                      th:classappend="${ordenCerrada == true ? ' is-closed' : ' is-open'}"
+                      class="delivery-status-pill"
+                      th:classappend="${ordenCerrada == true ? ' is-work-closed' : ' is-work-open'}"
                       th:text="${ordenCerrada == true ? 'CERRADA' : 'ABIERTA'}">ABIERTA</span>
             </div>
             <div class="document-subtitle" th:text="${orden.proveedorEntidad?.nombre ?: '-'}">Proveedor</div>
@@ -79,14 +79,18 @@
                 <span>Total OC</span>
                 <strong th:text="${#numbers.formatDecimal(orden.total, 1, 'POINT', 2, 'COMMA')}">0,00</strong>
             </div>
-            <div class="ticket-summary-card"><span>Mano de obra</span><strong th:text="${#numbers.formatDecimal(totalManoObra, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
-            <div class="ticket-summary-card"><span>Materiales</span><strong th:text="${#numbers.formatDecimal(totalMateriales, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
+            <div class="ticket-summary-card" th:unless="${ordenMaterial}"><span>Mano de obra</span><strong th:text="${#numbers.formatDecimal(totalManoObra, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
+            <div class="ticket-summary-card" th:if="${ordenMaterial}"><span>Comprado</span><strong th:text="${#numbers.formatDecimal(totalMaterialCompradoCantidad, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
+            <div class="ticket-summary-card" th:unless="${ordenMaterial}"><span>Materiales</span><strong th:text="${#numbers.formatDecimal(totalMateriales, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
+            <div class="ticket-summary-card" th:if="${ordenMaterial}"><span>Recibido</span><strong th:text="${#numbers.formatDecimal(totalMaterialRecibidoCantidad, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
             <div class="ticket-summary-card"><span>Otros</span><strong th:text="${#numbers.formatDecimal(totalOtros, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
-            <div class="ticket-summary-card is-certified"><span>Certificado</span><strong th:text="${#numbers.formatDecimal(totalCertificado, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
-            <div class="ticket-summary-card is-balance"><span>Saldo mano de obra</span><strong th:text="${#numbers.formatDecimal(saldoOc, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
+            <div class="ticket-summary-card is-certified" th:unless="${ordenMaterial}"><span>Certificado</span><strong th:text="${#numbers.formatDecimal(totalCertificado, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
+            <div class="ticket-summary-card is-certified" th:if="${ordenMaterial}"><span>Recepcionado</span><strong th:text="${#numbers.formatDecimal(porcentajeRecepcionOc, 1, 'POINT', 2, 'COMMA')} + ' %'">0,00 %</strong></div>
+            <div class="ticket-summary-card is-balance" th:unless="${ordenMaterial}"><span>Saldo mano de obra</span><strong th:text="${#numbers.formatDecimal(saldoOc, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
+            <div class="ticket-summary-card is-balance" th:if="${ordenMaterial}"><span>Pendiente entrega</span><strong th:text="${#numbers.formatDecimal(totalMaterialPendienteCantidad, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
         </div>
 
-        <div class="oc-total-progress">
+        <div class="oc-total-progress" th:unless="${ordenMaterial}">
             <div class="oc-total-progress-head">
                 <div>
                     <span>Avance acumulado certificado</span>
@@ -96,6 +100,19 @@
             </div>
             <div class="oc-total-progress-track">
                 <div class="oc-total-progress-fill" th:data-progress="${porcentajeAvanceOcBarra}"></div>
+            </div>
+        </div>
+
+        <div class="oc-total-progress" th:if="${ordenMaterial}">
+            <div class="oc-total-progress-head">
+                <div>
+                    <span>Recepcion acumulada de materiales</span>
+                    <strong th:text="${#numbers.formatDecimal(porcentajeRecepcionOc, 1, 'POINT', 2, 'COMMA')} + ' %'">0,00 %</strong>
+                </div>
+                <small th:text="${#numbers.formatDecimal(totalMaterialRecibidoCantidad, 1, 'POINT', 2, 'COMMA') + ' recibido de ' + #numbers.formatDecimal(totalMaterialCompradoCantidad, 1, 'POINT', 2, 'COMMA') + ' comprado'}">0,00 recibido</small>
+            </div>
+            <div class="oc-total-progress-track">
+                <div class="oc-total-progress-fill is-material" th:data-progress="${porcentajeRecepcionOcBarra}"></div>
             </div>
         </div>
 
