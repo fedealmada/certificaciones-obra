@@ -2181,12 +2181,13 @@ h5 {
 
 .oc-list-table .oc-col-numero { width: 7%; }
 .oc-list-table .oc-col-fecha { width: 8%; }
-.oc-list-table .oc-col-proveedor { width: 18%; }
-.oc-list-table .oc-col-categorias { width: 12%; }
-.oc-list-table .oc-col-rubros { width: 23%; }
+.oc-list-table .oc-col-proveedor { width: 16%; }
+.oc-list-table .oc-col-categorias { width: 10%; }
+.oc-list-table .oc-col-rubros { width: 18%; }
 .oc-list-table .oc-col-items { width: 5%; }
+.oc-list-table .oc-col-importe { width: 11%; }
 .oc-list-table .oc-col-avance { width: 7%; }
-.oc-list-table .oc-col-certificados { width: 12%; }
+.oc-list-table .oc-col-certificados { width: 10%; }
 .oc-list-table .oc-col-acciones { width: 8%; }
 
 .oc-list-table th,
