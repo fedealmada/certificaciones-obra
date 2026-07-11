@@ -5596,6 +5596,216 @@ h5 {
     box-shadow: 0 0 18px rgba(189, 147, 249, 0.22);
 }
 
+/* Dark mode polish for imports, alerts, charts and legacy white surfaces */
+:root[data-theme="dark"] .alert,
+:root[data-theme="dark"] .system-alert,
+:root[data-theme="dark"] .import-drop,
+:root[data-theme="dark"] .import-order-card,
+:root[data-theme="dark"] .import-diff-box,
+:root[data-theme="dark"] .import-confirm-bar,
+:root[data-theme="dark"] .cert-import-body,
+:root[data-theme="dark"] .cert-import-actions,
+:root[data-theme="dark"] .import-result-panel,
+:root[data-theme="dark"] .import-summary-grid .metric-card,
+:root[data-theme="dark"] .provider-results,
+:root[data-theme="dark"] .provider-result,
+:root[data-theme="dark"] .provider-empty,
+:root[data-theme="dark"] .cert-summary div,
+:root[data-theme="dark"] .setting-toggle,
+:root[data-theme="dark"] .workflow-step,
+:root[data-theme="dark"] .workflow-arrow,
+:root[data-theme="dark"] .chart-legend-row,
+:root[data-theme="dark"] .pie-chart > div,
+:root[data-theme="dark"] .itemizado-node summary,
+:root[data-theme="dark"] .itemizado-excel,
+:root[data-theme="dark"] .oc-form-table-wrap,
+:root[data-theme="dark"] .import-preview-table-wrap {
+    border-color: #44475a;
+    background: #2f3241;
+    color: #f8f8f2;
+}
+
+:root[data-theme="dark"] .alert-warning,
+:root[data-theme="dark"] .import-duplicate-alert {
+    border-color: rgba(241, 250, 140, 0.36);
+    background: rgba(241, 250, 140, 0.12);
+    color: #f1fa8c;
+}
+
+:root[data-theme="dark"] .alert-danger {
+    border-color: rgba(255, 85, 85, 0.4);
+    background: rgba(255, 85, 85, 0.14);
+    color: #ffb8b8;
+}
+
+:root[data-theme="dark"] .alert-success {
+    border-color: rgba(80, 250, 123, 0.38);
+    background: rgba(80, 250, 123, 0.12);
+    color: #50fa7b;
+}
+
+:root[data-theme="dark"] .alert-info {
+    border-color: rgba(139, 233, 253, 0.38);
+    background: rgba(139, 233, 253, 0.12);
+    color: #8be9fd;
+}
+
+:root[data-theme="dark"] .system-alert:hover,
+:root[data-theme="dark"] .provider-result:hover,
+:root[data-theme="dark"] .provider-result:focus,
+:root[data-theme="dark"] .table-sort-button:hover,
+:root[data-theme="dark"] .table-sort-button.is-active {
+    background: rgba(189, 147, 249, 0.14);
+    color: #f8f8f2;
+}
+
+:root[data-theme="dark"] .system-alert-icon,
+:root[data-theme="dark"] .import-drop-icon,
+:root[data-theme="dark"] .setting-toggle-icon {
+    border-color: rgba(139, 233, 253, 0.28);
+    background: rgba(139, 233, 253, 0.12);
+    color: #8be9fd;
+}
+
+:root[data-theme="dark"] .import-order-card.is-existing {
+    border-color: rgba(241, 250, 140, 0.28);
+}
+
+:root[data-theme="dark"] .import-order-card.is-new {
+    border-color: rgba(80, 250, 123, 0.26);
+}
+
+:root[data-theme="dark"] .import-select-check,
+:root[data-theme="dark"] .import-item-chip,
+:root[data-theme="dark"] .itemizado-toggle,
+:root[data-theme="dark"] .monthly-bar-label,
+:root[data-theme="dark"] .monthly-bar-value {
+    color: #f8f8f2;
+}
+
+:root[data-theme="dark"] .import-item-chip {
+    border-color: rgba(139, 233, 253, 0.28);
+    background: rgba(139, 233, 253, 0.12);
+    color: #8be9fd;
+}
+
+:root[data-theme="dark"] .import-item-chip.is-missing {
+    border-color: rgba(255, 85, 85, 0.38);
+    background: rgba(255, 85, 85, 0.12);
+    color: #ffb8b8;
+}
+
+:root[data-theme="dark"] .table tbody tr:nth-child(even) td,
+:root[data-theme="dark"] .document-table tbody tr:nth-child(even) td,
+:root[data-theme="dark"] .cert-table tbody tr:nth-child(even) td,
+:root[data-theme="dark"] .cert-edit-table tbody tr:nth-child(even) td,
+:root[data-theme="dark"] .oc-items-table tbody tr:nth-child(even) td,
+:root[data-theme="dark"] .import-preview-table tbody tr:nth-child(even) td,
+:root[data-theme="dark"] .cert-item-row:nth-child(odd),
+:root[data-theme="dark"] .cert-item-row:nth-child(even) {
+    background: #343746;
+}
+
+:root[data-theme="dark"] .table tbody tr:nth-child(odd) td,
+:root[data-theme="dark"] .document-table tbody tr:nth-child(odd) td,
+:root[data-theme="dark"] .cert-table tbody tr:nth-child(odd) td,
+:root[data-theme="dark"] .cert-edit-table tbody tr:nth-child(odd) td,
+:root[data-theme="dark"] .oc-items-table tbody tr:nth-child(odd) td,
+:root[data-theme="dark"] .import-preview-table tbody tr:nth-child(odd) td {
+    background: #343746;
+}
+
+:root[data-theme="dark"] .table input,
+:root[data-theme="dark"] .table select,
+:root[data-theme="dark"] .table textarea,
+:root[data-theme="dark"] .import-text-preview,
+:root[data-theme="dark"] .import-textarea,
+:root[data-theme="dark"] .porcentaje-input,
+:root[data-theme="dark"] .cantidad-input,
+:root[data-theme="dark"] .precio-input,
+:root[data-theme="dark"] .importe-input,
+:root[data-theme="dark"] .detalle-input {
+    border-color: #5b6078;
+    background: #282a36;
+    color: #f8f8f2;
+}
+
+:root[data-theme="dark"] .table input:focus,
+:root[data-theme="dark"] .table select:focus,
+:root[data-theme="dark"] .table textarea:focus,
+:root[data-theme="dark"] .import-textarea:focus {
+    border-color: #8be9fd;
+    background: #282a36;
+    color: #f8f8f2;
+}
+
+:root[data-theme="dark"] .oc-total-bar,
+:root[data-theme="dark"] .cert-items-total,
+:root[data-theme="dark"] .cert-table tfoot td,
+:root[data-theme="dark"] .document-table tfoot td,
+:root[data-theme="dark"] .oc-items-table tfoot td {
+    border-color: #44475a;
+    background: #21222c;
+    color: #f8f8f2;
+}
+
+:root[data-theme="dark"] .ticket-summary-card,
+:root[data-theme="dark"] .ticket-summary-card.is-certified,
+:root[data-theme="dark"] .ticket-summary-card.is-balance,
+:root[data-theme="dark"] .ticket-top div {
+    border-color: #44475a;
+    background: #2f3241;
+    color: #f8f8f2;
+}
+
+:root[data-theme="dark"] .ticket-total-main strong,
+:root[data-theme="dark"] .ticket-total-main span,
+:root[data-theme="dark"] .cert-sheet-title span,
+:root[data-theme="dark"] .cert-sheet-title small,
+:root[data-theme="dark"] .cert-sheet-title strong,
+:root[data-theme="dark"] .cert-items-total > div {
+    color: #f8f8f2;
+}
+
+:root[data-theme="dark"] .monthly-evolution-chart,
+:root[data-theme="dark"] .chart-panel,
+:root[data-theme="dark"] .pie-chart {
+    border-color: #44475a;
+    background: #2f3241;
+}
+
+:root[data-theme="dark"] .pie-chart::after {
+    background: #343746;
+}
+
+:root[data-theme="dark"] .pie-chart strong,
+:root[data-theme="dark"] .pie-chart span,
+:root[data-theme="dark"] .chart-legend-row strong,
+:root[data-theme="dark"] .chart-legend-row small,
+:root[data-theme="dark"] .bar-chart-label span,
+:root[data-theme="dark"] .bar-chart-label strong {
+    color: #f8f8f2;
+}
+
+:root[data-theme="dark"] .empty-chart {
+    border-color: #44475a;
+    background: #2f3241;
+    color: #c7c9d9;
+}
+
+:root[data-theme="dark"] .modal-content,
+:root[data-theme="dark"] .dropdown-menu {
+    border-color: #44475a;
+    background: #343746;
+    color: #f8f8f2;
+}
+
+:root[data-theme="dark"] .bg-white,
+:root[data-theme="dark"] .bg-light {
+    background-color: #343746 !important;
+    color: #f8f8f2 !important;
+}
+
 @media (max-width: 720px) {
     .dashboard-workspace {
         padding: 0.75rem;
