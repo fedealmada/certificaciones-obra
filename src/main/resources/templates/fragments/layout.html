@@ -43,22 +43,52 @@
         const icon = button?.querySelector('i');
 
         if (sidebar) {
+            let closeTimer;
+            let navigatingFromSidebar = false;
+
             const openSidebar = () => {
+                window.clearTimeout(closeTimer);
                 sidebar.classList.add('is-open');
+                sidebar.classList.remove('is-closing');
                 sessionStorage.setItem('obraControl.sidebarOpen', 'true');
             };
-            const closeSidebar = () => {
+            const closeSidebar = ({force = false} = {}) => {
+                if (navigatingFromSidebar && !force) {
+                    return;
+                }
+                window.clearTimeout(closeTimer);
+                sidebar.classList.add('is-closing');
                 sidebar.classList.remove('is-open');
-                sessionStorage.removeItem('obraControl.sidebarOpen');
+                closeTimer = window.setTimeout(() => {
+                    sidebar.classList.remove('is-closing');
+                    sessionStorage.removeItem('obraControl.sidebarOpen');
+                }, 760);
             };
 
             if (sessionStorage.getItem('obraControl.sidebarOpen') === 'true') {
                 sidebar.classList.add('is-open');
             }
 
-            sidebar.addEventListener('pointerenter', openSidebar);
-            sidebar.addEventListener('pointerleave', closeSidebar);
-            sidebar.addEventListener('click', openSidebar);
+            sidebar.addEventListener('pointerenter', () => {
+                navigatingFromSidebar = false;
+                openSidebar();
+            });
+            sidebar.addEventListener('pointerleave', event => {
+                if (navigatingFromSidebar) {
+                    return;
+                }
+                if (event.relatedTarget && sidebar.contains(event.relatedTarget)) {
+                    return;
+                }
+                closeSidebar();
+            });
+            sidebar.addEventListener('click', event => {
+                openSidebar();
+                if (event.target.closest('a')) {
+                    navigatingFromSidebar = true;
+                    sessionStorage.setItem('obraControl.sidebarOpen', 'true');
+                }
+            });
         }
 
         function setTheme(theme) {
