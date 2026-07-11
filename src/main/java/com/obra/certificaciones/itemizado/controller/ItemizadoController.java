@@ -68,8 +68,8 @@ public class ItemizadoController {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, java.math.BigDecimal::add));
         byte[] contenido = itemizadoExportService.generarAvancesSheets(itemizado, avancesPorItem);
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, adjunto(itemizadoExportService.nombreArchivo("avances-sheets", "csv")))
-                .contentType(MediaType.parseMediaType("text/csv; charset=UTF-8"))
+                .header(HttpHeaders.CONTENT_DISPOSITION, adjunto(itemizadoExportService.nombreArchivo("avances-sheets", "xls")))
+                .contentType(MediaType.parseMediaType("application/vnd.ms-excel; charset=UTF-8"))
                 .body(contenido);
     }
 

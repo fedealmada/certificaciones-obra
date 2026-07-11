@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import java.awt.Color;
 import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.time.LocalDate;
@@ -168,19 +167,52 @@ public class ItemizadoExportService {
     }
 
     public byte[] generarAvancesSheets(ItemizadoVista itemizado, Map<Long, BigDecimal> avancesPorItem) {
-        StringBuilder csv = new StringBuilder("\uFEFF");
-        agregarFilaCsv(csv, List.of(ENCABEZADOS_AVANCES));
-        for (ItemizadoNodo raiz : itemizado.raices()) {
-            agregarNodoAvanceCsv(csv, raiz, avancesPorItem);
+        StringBuilder html = new StringBuilder();
+        int[] fila = {1};
+        List<Integer> rubrosRaiz = new ArrayList<>();
+        html.append("""
+                <html>
+                <head>
+                <meta charset="UTF-8">
+                <style>
+                table { border-collapse: collapse; font-family: Arial, sans-serif; font-size: 11px; }
+                th, td { border: 1px solid #1f2933; padding: 5px; vertical-align: top; }
+                th { background: #18202a; color: #ffffff; font-weight: bold; }
+                .num { text-align: right; mso-number-format:"0.00"; }
+                .pct { text-align: right; mso-number-format:"0.00"; }
+                .root td { background: #1d6b3a; color: #ffffff; font-weight: bold; }
+                .middle td { background: #dff1df; font-weight: bold; }
+                .leaf td { background: #fff7cc; font-weight: bold; }
+                .item td { background: #ffffff; }
+                .material td { background: #eef6ff; color: #1f2933; }
+                .total td { background: #18202a; color: #ffffff; font-weight: bold; }
+                </style>
+                </head>
+                <body>
+                <table>
+                """);
+        html.append("<tr>");
+        for (String encabezado : ENCABEZADOS_AVANCES) {
+            html.append("<th>").append(escaparHtml(encabezado)).append("</th>");
         }
-        agregarFilaCsv(csv, List.of(
-                "", "TOTAL", "", "TOTAL GENERAL", "", "", "", "", "", "",
-                formato(itemizado.totalManoObra()),
-                formato(itemizado.totalMateriales()),
-                formato(itemizado.totalGeneral()),
-                "", "", "", ""
-        ));
-        return csv.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        html.append("</tr>");
+        for (ItemizadoNodo raiz : itemizado.raices()) {
+            rubrosRaiz.add(agregarNodoAvanceHtml(html, raiz, avancesPorItem, fila));
+        }
+        int totalRow = ++fila[0];
+        html.append("<tr class=\"total\">")
+                .append(celda("")).append(celda("TOTAL")).append(celda("")).append(celda("TOTAL GENERAL"))
+                .append(celda("")).append(celda("")).append(celda("")).append(celda("")).append(celda("")).append(celda(""))
+                .append(celdaFormula(sumaReferencias("K", rubrosRaiz), "num"))
+                .append(celdaFormula(sumaReferencias("L", rubrosRaiz), "num"))
+                .append(celdaFormula("K" + totalRow + "+L" + totalRow, "num"))
+                .append(celdaFormula("IF(K" + totalRow + ">0,O" + totalRow + "/K" + totalRow + "*100,0)", "pct"))
+                .append(celdaFormula(sumaReferencias("O", rubrosRaiz), "num"))
+                .append(celdaFormula("MAX(K" + totalRow + "-O" + totalRow + ",0)", "num"))
+                .append(celda(""))
+                .append("</tr>");
+        html.append("</table></body></html>");
+        return html.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8);
     }
 
     public String nombreArchivo(String extension) {
@@ -217,81 +249,139 @@ public class ItemizadoExportService {
         return "<td class=\"num\">" + (valor == null ? "" : escaparHtml(formato(valor))) + "</td>";
     }
 
+    private String celdaNumeroPlano(BigDecimal valor) {
+        return "<td class=\"num\">" + (valor == null ? "" : valor.stripTrailingZeros().toPlainString()) + "</td>";
+    }
+
+    private String celdaFormula(String formula, String clase) {
+        return "<td class=\"" + escaparHtml(clase) + "\">=" + escaparHtml(formula) + "</td>";
+    }
+
+    private String token(String columna, int fila) {
+        return "__FORMULA_" + columna + fila + "__";
+    }
+
+    private void reemplazarUltimaFormula(StringBuilder html, String token, String formula) {
+        int indice = html.lastIndexOf(token);
+        if (indice >= 0) {
+            html.replace(indice, indice + token.length(), formula);
+        }
+    }
+
+    private String sumaReferencias(String columna, List<Integer> filas) {
+        if (filas.isEmpty()) {
+            return "0";
+        }
+        if (filas.size() == 1) {
+            return columna + filas.get(0);
+        }
+        return "SUM(" + filas.stream()
+                .map(fila -> columna + fila)
+                .collect(java.util.stream.Collectors.joining(",")) + ")";
+    }
+
     private String formato(BigDecimal valor) {
         return valor == null ? "" : formatoNumero.format(valor);
     }
 
-    private void agregarNodoAvanceCsv(StringBuilder csv, ItemizadoNodo nodo, Map<Long, BigDecimal> avancesPorItem) {
-        BigDecimal montoCertificado = montoCertificadoNodo(nodo, avancesPorItem);
-        BigDecimal avance = porcentaje(montoCertificado, nodo.getTotalManoObra());
-        agregarFilaCsv(csv, List.of(
-                String.valueOf(nodo.getNivel()),
-                "Rubro",
-                texto(nodo.getRubro().getCodigo()),
-                texto(nodo.getRubro().getNombre()),
-                "", "", "", "", "", "",
-                formato(nodo.getTotalManoObra()),
-                formato(nodo.getTotalMateriales()),
-                formato(nodo.getTotalGeneral()),
-                formato(avance),
-                formato(montoCertificado),
-                formato(nodo.getTotalManoObra().subtract(montoCertificado).max(BigDecimal.ZERO)),
-                estadoAvance(avance)
-        ));
+    private int agregarNodoAvanceHtml(StringBuilder html,
+                                       ItemizadoNodo nodo,
+                                       Map<Long, BigDecimal> avancesPorItem,
+                                       int[] fila) {
+        int rubroRow = ++fila[0];
+        List<Integer> filasDirectas = new ArrayList<>();
+        String clase = nodo.getNivel() == 0 ? "root" : nodo.getNivel() == 1 ? "middle" : "leaf";
+        String tokenK = token("K", rubroRow);
+        String tokenL = token("L", rubroRow);
+        String tokenM = token("M", rubroRow);
+        String tokenN = token("N", rubroRow);
+        String tokenO = token("O", rubroRow);
+        String tokenP = token("P", rubroRow);
+        html.append("<tr class=\"").append(clase).append("\">")
+                .append(celda(String.valueOf(nodo.getNivel())))
+                .append(celda("Rubro"))
+                .append(celda(nodo.getRubro().getCodigo()))
+                .append(celda(conIndentacion(nodo.getNivel(), nodo.getRubro().getNombre())))
+                .append(celda("")).append(celda("")).append(celda("")).append(celda("")).append(celda("")).append(celda(""))
+                .append(celdaFormula(tokenK, "num"))
+                .append(celdaFormula(tokenL, "num"))
+                .append(celdaFormula(tokenM, "num"))
+                .append(celdaFormula(tokenN, "pct"))
+                .append(celdaFormula(tokenO, "num"))
+                .append(celdaFormula(tokenP, "num"))
+                .append(celda(""))
+                .append("</tr>");
 
         for (ItemizadoItemFila item : nodo.getItems()) {
             BigDecimal avanceItem = avancesPorItem.getOrDefault(item.manoObra().getId(), BigDecimal.ZERO);
             BigDecimal importeManoObra = item.manoObra().getImporte() == null ? BigDecimal.ZERO : item.manoObra().getImporte();
-            BigDecimal montoItem = montoCertificado(importeManoObra, avanceItem);
-            agregarFilaCsv(csv, List.of(
-                    String.valueOf(nodo.getNivel() + 1),
-                    "Item",
-                    texto(item.codigoItemizado()),
-                    texto(nodo.getRubro().getNombre()),
-                    texto(item.manoObra().getItem()),
-                    texto(item.manoObra().getOrdenCompra().getNumero()),
-                    item.manoObra().getOrdenCompra().getProveedorEntidad() == null ? "" : texto(item.manoObra().getOrdenCompra().getProveedorEntidad().getNombre()),
-                    texto(item.manoObra().getDetalle()),
-                    texto(item.manoObra().getUnidad()),
-                    formato(item.manoObra().getCantidad()),
-                    formato(importeManoObra),
-                    formato(item.totalMateriales()),
-                    formato(item.totalGeneral()),
-                    formato(avanceItem),
-                    formato(montoItem),
-                    formato(importeManoObra.subtract(montoItem).max(BigDecimal.ZERO)),
-                    estadoAvance(avanceItem)
-            ));
+            int itemRow = ++fila[0];
+            filasDirectas.add(itemRow);
+            int primerMaterialRow = itemRow + 1;
+            String tokenItemL = token("L", itemRow);
+            html.append("<tr class=\"item\">")
+                    .append(celda(String.valueOf(nodo.getNivel() + 1)))
+                    .append(celda("Item"))
+                    .append(celda(item.codigoItemizado()))
+                    .append(celda(nodo.getRubro().getNombre()))
+                    .append(celda(item.manoObra().getItem()))
+                    .append(celda(item.manoObra().getOrdenCompra().getNumero()))
+                    .append(celda(item.manoObra().getOrdenCompra().getProveedorEntidad() == null ? "" : item.manoObra().getOrdenCompra().getProveedorEntidad().getNombre()))
+                    .append(celda(conIndentacion(nodo.getNivel() + 1, item.manoObra().getDetalle())))
+                    .append(celda(item.manoObra().getUnidad()))
+                    .append(celdaNumeroPlano(item.manoObra().getCantidad()))
+                    .append(celdaNumeroPlano(importeManoObra))
+                    .append(celdaFormula(tokenItemL, "num"))
+                    .append(celdaFormula("K" + itemRow + "+L" + itemRow, "num"))
+                    .append(celdaNumeroPlano(avanceItem))
+                    .append(celdaFormula("K" + itemRow + "*N" + itemRow + "/100", "num"))
+                    .append(celdaFormula("MAX(K" + itemRow + "-O" + itemRow + ",0)", "num"))
+                    .append(celda(estadoAvance(avanceItem)))
+                    .append("</tr>");
+
+            for (int i = 0; i < item.materiales().size(); i++) {
+                var material = item.materiales().get(i);
+                int materialRow = ++fila[0];
+                html.append("<tr class=\"material\">")
+                        .append(celda(String.valueOf(nodo.getNivel() + 2)))
+                        .append(celda("Material"))
+                        .append(celda(item.codigoItemizado() + ".M" + (i + 1)))
+                        .append(celda(nodo.getRubro().getNombre()))
+                        .append(celda(material.getItem()))
+                        .append(celda(material.getOrdenCompra().getNumero()))
+                        .append(celda(material.getOrdenCompra().getProveedorEntidad() == null ? "" : material.getOrdenCompra().getProveedorEntidad().getNombre()))
+                        .append(celda(conIndentacion(nodo.getNivel() + 2, material.getDetalle())))
+                        .append(celda(material.getUnidad()))
+                        .append(celdaNumeroPlano(material.getCantidad()))
+                        .append(celdaNumeroPlano(BigDecimal.ZERO))
+                        .append(celdaNumeroPlano(material.getImporte()))
+                        .append(celdaFormula("K" + materialRow + "+L" + materialRow, "num"))
+                        .append(celda(""))
+                        .append(celda(""))
+                        .append(celda(""))
+                        .append(celda("Material vinculado"))
+                        .append("</tr>");
+            }
+
+            if (!item.materiales().isEmpty()) {
+                int ultimoMaterialRow = fila[0];
+                reemplazarUltimaFormula(html, tokenItemL, "SUM(L" + primerMaterialRow + ":L" + ultimoMaterialRow + ")");
+            } else {
+                reemplazarUltimaFormula(html, tokenItemL, "0");
+            }
         }
 
         for (ItemizadoNodo hijo : nodo.getHijos()) {
-            agregarNodoAvanceCsv(csv, hijo, avancesPorItem);
+            filasDirectas.add(agregarNodoAvanceHtml(html, hijo, avancesPorItem, fila));
         }
-    }
 
-    private BigDecimal montoCertificadoNodo(ItemizadoNodo nodo, Map<Long, BigDecimal> avancesPorItem) {
-        BigDecimal total = nodo.getItems().stream()
-                .map(item -> montoCertificado(
-                        item.manoObra().getImporte() == null ? BigDecimal.ZERO : item.manoObra().getImporte(),
-                        avancesPorItem.getOrDefault(item.manoObra().getId(), BigDecimal.ZERO)))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        for (ItemizadoNodo hijo : nodo.getHijos()) {
-            total = total.add(montoCertificadoNodo(hijo, avancesPorItem));
-        }
-        return total;
-    }
-
-    private BigDecimal montoCertificado(BigDecimal importe, BigDecimal porcentaje) {
-        BigDecimal importeSeguro = importe == null ? BigDecimal.ZERO : importe;
-        BigDecimal porcentajeSeguro = porcentaje == null ? BigDecimal.ZERO : porcentaje;
-        return importeSeguro.multiply(porcentajeSeguro).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
-    }
-
-    private BigDecimal porcentaje(BigDecimal valor, BigDecimal total) {
-        if (valor == null || total == null || total.compareTo(BigDecimal.ZERO) <= 0) {
-            return BigDecimal.ZERO;
-        }
-        return valor.multiply(BigDecimal.valueOf(100)).divide(total, 2, RoundingMode.HALF_UP);
+        reemplazarUltimaFormula(html, tokenK, sumaReferencias("K", filasDirectas));
+        reemplazarUltimaFormula(html, tokenL, sumaReferencias("L", filasDirectas));
+        reemplazarUltimaFormula(html, tokenM, "K" + rubroRow + "+L" + rubroRow);
+        reemplazarUltimaFormula(html, tokenN, "IF(K" + rubroRow + ">0,O" + rubroRow + "/K" + rubroRow + "*100,0)");
+        reemplazarUltimaFormula(html, tokenO, sumaReferencias("O", filasDirectas));
+        reemplazarUltimaFormula(html, tokenP, "MAX(K" + rubroRow + "-O" + rubroRow + ",0)");
+        return rubroRow;
     }
 
     private String estadoAvance(BigDecimal avance) {
@@ -303,24 +393,6 @@ public class ItemizadoExportService {
             return "Terminado";
         }
         return "En ejecucion";
-    }
-
-    private void agregarFilaCsv(StringBuilder csv, List<String> valores) {
-        for (int i = 0; i < valores.size(); i++) {
-            if (i > 0) {
-                csv.append(';');
-            }
-            csv.append(escaparCsv(valores.get(i)));
-        }
-        csv.append("\r\n");
-    }
-
-    private String escaparCsv(String valor) {
-        String texto = texto(valor);
-        if (texto.contains(";") || texto.contains("\"") || texto.contains("\n") || texto.contains("\r")) {
-            return "\"" + texto.replace("\"", "\"\"") + "\"";
-        }
-        return texto;
     }
 
     private String conIndentacion(int nivel, String texto) {
