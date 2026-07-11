@@ -155,7 +155,7 @@
                     <td class="text-end">
                         <div class="oc-progress-number" th:text="${resumen.porcentajeAcumulado} + ' %'">0 %</div>
                         <div class="progress progress-thin oc-progress">
-                            <div class="progress-bar" th:style="'width: ' + ${resumen.porcentajeAcumulado > 100 ? 100 : resumen.porcentajeAcumulado} + '%'"></div>
+                            <div class="progress-bar" th:data-progress="${resumen.porcentajeAcumulado > 100 ? 100 : resumen.porcentajeAcumulado}"></div>
                         </div>
                     </td>
                     <td class="text-end" th:text="${#numbers.formatDecimal(resumen.montoAcumulado, 1, 'POINT', 2, 'COMMA')}"></td>
@@ -217,16 +217,19 @@ if (successOverlay) {
     window.setTimeout(() => successOverlay.remove(), 2500);
 }
 
-const totalProgressFill = document.querySelector('.oc-total-progress-fill');
-if (totalProgressFill) {
-    const target = Number.parseFloat(String(totalProgressFill.dataset.progress || '0').replace(',', '.'));
+document.querySelectorAll('.oc-total-progress-fill, .oc-progress .progress-bar').forEach((progressFill, index) => {
+    const target = Number.parseFloat(String(progressFill.dataset.progress || '0').replace(',', '.'));
     const safeTarget = Number.isFinite(target) ? Math.max(0, Math.min(100, target)) : 0;
-    totalProgressFill.style.width = '0%';
-    window.setTimeout(() => {
-        totalProgressFill.style.width = `${safeTarget}%`;
-        totalProgressFill.classList.toggle('is-empty', safeTarget === 0);
-    }, 320);
-}
+    progressFill.style.width = '0%';
+    progressFill.classList.toggle('is-empty', safeTarget === 0);
+
+    window.requestAnimationFrame(() => {
+        window.setTimeout(() => {
+            progressFill.classList.add('is-loaded');
+            progressFill.style.width = `${safeTarget}%`;
+        }, 180 + Math.min(index, 8) * 45);
+    });
+});
 
 document.querySelectorAll('.cert-click-row').forEach(row => {
     const abrirCertificado = () => {
