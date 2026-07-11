@@ -113,6 +113,7 @@ public class CertificacionController {
         var itemsCalculados = calculoService.calcularDetalle(certificacion);
         model.addAttribute("orden", orden);
         model.addAttribute("certificacion", certificacion);
+        model.addAttribute("certificacionesOrden", certificacionService.listarPorOrdenCompra(ordenCompraId));
         model.addAttribute("itemsCalculados", itemsCalculados);
         model.addAttribute("resumen", calculoService.calcularResumen(ordenCompraId, orden.getItems(), itemsCalculados));
         return "certificacion/detalle";

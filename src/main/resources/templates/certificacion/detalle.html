@@ -38,6 +38,22 @@
         </div>
     </div>
 
+    <section class="cert-switcher mb-4" th:if="${#lists.size(certificacionesOrden) > 1}">
+        <div class="cert-switcher-copy">
+            <span>Certificados de esta OC</span>
+            <strong th:text="'OC ' + ${orden.numero}">OC</strong>
+        </div>
+        <nav class="cert-switcher-nav" aria-label="Navegar certificados">
+            <a th:each="cert : ${certificacionesOrden}"
+               th:href="@{/oc/{ocId}/certificaciones/{certId}(ocId=${orden.id}, certId=${cert.id})}"
+               th:classappend="${cert.id.equals(certificacion.id)} ? ' is-active' : ''"
+               th:attr="aria-current=${cert.id.equals(certificacion.id)} ? 'page' : null"
+               th:text="${cert.numero}">
+                1
+            </a>
+        </nav>
+    </section>
+
     <section class="cert-sheet cert-detail-sheet mb-4">
         <div class="cert-sheet-title">
             <div>
