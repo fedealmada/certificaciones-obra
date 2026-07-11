@@ -490,7 +490,6 @@ async function ejecutarMovimientoRubro(rubroRow, targetRow) {
         }
         await refrescarItemizado({ rubroId });
         setItemizadoStatus('Rubro reubicado.', 'is-saved');
-        mostrarAvisoItemizado('Rubro reubicado', 'El rubro quedo arriba del rubro elegido.');
     } catch (error) {
         setItemizadoStatus('No se pudo reubicar el rubro.', 'is-error');
         mostrarAvisoItemizado('No se pudo reubicar', 'No se permite ubicar un rubro dentro de si mismo.', 'error');
