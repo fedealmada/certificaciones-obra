@@ -203,11 +203,11 @@ public class ItemizadoExportService {
         html.append("<tr class=\"total\">")
                 .append(celda("")).append(celda("TOTAL")).append(celda("")).append(celda("TOTAL GENERAL"))
                 .append(celda("")).append(celda("")).append(celda("")).append(celda("")).append(celda("")).append(celda(""))
-                .append(celdaFormula(sumaReferencias("K", rubrosRaiz), "num"))
-                .append(celdaFormula(sumaReferencias("L", rubrosRaiz), "num"))
+                .append(celdaFormula(sumarReferencias("K", rubrosRaiz), "num"))
+                .append(celdaFormula(sumarReferencias("L", rubrosRaiz), "num"))
                 .append(celdaFormula("K" + totalRow + "+L" + totalRow, "num"))
                 .append(celdaFormula(formulaPorcentaje("O" + totalRow, "K" + totalRow), "pct"))
-                .append(celdaFormula(sumaReferencias("O", rubrosRaiz), "num"))
+                .append(celdaFormula(sumarReferencias("O", rubrosRaiz), "num"))
                 .append(celdaFormula(formulaSaldo("K" + totalRow, "O" + totalRow), "num"))
                 .append(celda(""))
                 .append("</tr>");
@@ -268,24 +268,21 @@ public class ItemizadoExportService {
         }
     }
 
-    private String sumaReferencias(String columna, List<Integer> filas) {
+    private String sumarReferencias(String columna, List<Integer> filas) {
         if (filas.isEmpty()) {
             return "0";
         }
-        if (filas.size() == 1) {
-            return columna + filas.get(0);
-        }
-        return "SUMA(" + filas.stream()
+        return filas.stream()
                 .map(fila -> columna + fila)
-                .collect(java.util.stream.Collectors.joining(";")) + ")";
+                .collect(java.util.stream.Collectors.joining("+"));
     }
 
     private String formulaPorcentaje(String certificado, String total) {
-        return "SI(" + total + ">0;" + certificado + "/" + total + "*100;0)";
+        return certificado + "/(" + total + "+(" + total + "=0))*100";
     }
 
     private String formulaSaldo(String total, String certificado) {
-        return "SI(" + total + "-" + certificado + "<0;0;" + total + "-" + certificado + ")";
+        return "(" + total + "-" + certificado + ")*(" + total + ">" + certificado + ")";
     }
 
     private String formato(BigDecimal valor) {
@@ -373,7 +370,7 @@ public class ItemizadoExportService {
 
             if (!item.materiales().isEmpty()) {
                 int ultimoMaterialRow = fila[0];
-                reemplazarUltimaFormula(html, tokenItemL, "SUMA(L" + primerMaterialRow + ":L" + ultimoMaterialRow + ")");
+                reemplazarUltimaFormula(html, tokenItemL, sumarRango("L", primerMaterialRow, ultimoMaterialRow));
             } else {
                 reemplazarUltimaFormula(html, tokenItemL, "0");
             }
@@ -383,13 +380,21 @@ public class ItemizadoExportService {
             filasDirectas.add(agregarNodoAvanceHtml(html, hijo, avancesPorItem, fila));
         }
 
-        reemplazarUltimaFormula(html, tokenK, sumaReferencias("K", filasDirectas));
-        reemplazarUltimaFormula(html, tokenL, sumaReferencias("L", filasDirectas));
+        reemplazarUltimaFormula(html, tokenK, sumarReferencias("K", filasDirectas));
+        reemplazarUltimaFormula(html, tokenL, sumarReferencias("L", filasDirectas));
         reemplazarUltimaFormula(html, tokenM, "K" + rubroRow + "+L" + rubroRow);
         reemplazarUltimaFormula(html, tokenN, formulaPorcentaje("O" + rubroRow, "K" + rubroRow));
-        reemplazarUltimaFormula(html, tokenO, sumaReferencias("O", filasDirectas));
+        reemplazarUltimaFormula(html, tokenO, sumarReferencias("O", filasDirectas));
         reemplazarUltimaFormula(html, tokenP, formulaSaldo("K" + rubroRow, "O" + rubroRow));
         return rubroRow;
+    }
+
+    private String sumarRango(String columna, int inicio, int fin) {
+        List<Integer> filas = new ArrayList<>();
+        for (int fila = inicio; fila <= fin; fila++) {
+            filas.add(fila);
+        }
+        return sumarReferencias(columna, filas);
     }
 
     private String estadoAvance(BigDecimal avance) {
