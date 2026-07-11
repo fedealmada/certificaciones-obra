@@ -82,8 +82,8 @@
                 </thead>
                 <tbody>
                 <th:block th:each="nodo : ${itemizado.nodos}">
-                    <tr class="rubro-row itemizado-toggle-row itemizado-drop-target itemizado-context-rubro" th:data-level="${nodo.nivel}" th:data-rubro-id="${nodo.rubro.id}" th:data-rubro-code="${nodo.rubro.codigo}" th:data-rubro-name="${nodo.rubro.nombre}" th:data-rubro-full-name="${nodo.rubro.nombreCompleto}" th:classappend="${nodo.nivel == 0 ? ' rubro-root' : (nodo.nivel == 1 ? ' rubro-middle' : ' rubro-leaf')}">
-                        <td><button class="itemizado-toggle" type="button" onclick="toggleItemizadoRubro(this)">−</button><span th:text="${nodo.rubro.codigo ?: '-'}"></span></td>
+                    <tr class="rubro-row itemizado-toggle-row itemizado-drop-target itemizado-context-rubro itemizado-draggable-rubro" draggable="true" th:data-level="${nodo.nivel}" th:data-rubro-id="${nodo.rubro.id}" th:data-rubro-code="${nodo.rubro.codigo}" th:data-rubro-name="${nodo.rubro.nombre}" th:data-rubro-full-name="${nodo.rubro.nombreCompleto}" th:classappend="${nodo.nivel == 0 ? ' rubro-root' : (nodo.nivel == 1 ? ' rubro-middle' : ' rubro-leaf')}">
+                        <td><span class="itemizado-rubro-drag-handle" title="Mover rubro"><i class="bi bi-grip-vertical"></i></span><button class="itemizado-toggle" type="button" onclick="toggleItemizadoRubro(this)">−</button><span th:text="${nodo.rubro.codigo ?: '-'}"></span></td>
                         <td></td>
                         <td class="rubro-name" th:style="'padding-left:' + ${nodo.nivel * 18 + 8} + 'px'" th:text="${nodo.rubro.nombre}"></td>
                         <td></td>
@@ -125,6 +125,8 @@
         <div class="itemizado-context-menu d-none" id="itemizado-rubro-menu" role="menu">
             <button type="button" data-action="rename"><i class="bi bi-pencil-square"></i> Cambiar nombre</button>
             <button type="button" data-action="subrubro"><i class="bi bi-node-plus"></i> Crear subrubro</button>
+            <button type="button" data-action="move-root"><i class="bi bi-arrow-bar-up"></i> Llevar a raiz</button>
+            <button type="button" data-action="delete"><i class="bi bi-trash"></i> Eliminar vacio</button>
             <button type="button" data-action="root"><i class="bi bi-plus-lg"></i> Nuevo rubro raiz</button>
         </div>
 
@@ -137,8 +139,6 @@
                 <input type="hidden" id="itemizado-editor-mode">
                 <input type="hidden" id="itemizado-editor-rubro-id">
                 <input type="hidden" id="itemizado-editor-padre-id">
-                <label class="form-label" for="itemizado-editor-code">Codigo</label>
-                <input class="form-control" id="itemizado-editor-code" placeholder="Ej: 1.2">
                 <label class="form-label" for="itemizado-editor-name">Nombre</label>
                 <input class="form-control" id="itemizado-editor-name" required placeholder="Nombre del rubro">
                 <div class="itemizado-editor-actions">
@@ -181,6 +181,7 @@ let itemizadoRows = [];
 let itemizadoDropTargets = [];
 let itemizadoStatus = document.querySelector('#itemizado-drag-status');
 let draggedItemizadoRow = null;
+let draggedRubroRow = null;
 let itemizadoUndoStack = [];
 let itemizadoRedoStack = [];
 let itemizadoContextRow = null;
@@ -224,13 +225,20 @@ function guardarRubroItemizado(itemId, rubroId) {
     return itemizadoFormPost(`/items/${itemId}/rubro/async`, { rubroId });
 }
 
-function guardarRubroArbol({ mode, rubroId, padreId, codigo, nombre }) {
+function guardarRubroArbol({ mode, rubroId, padreId, nombre }) {
     const url = mode === 'rename' ? `/rubros/${rubroId}/async` : '/rubros/async';
     return itemizadoFormPost(url, {
-        codigo: codigo || '',
         nombre,
         padreId: mode === 'subrubro' ? padreId : null
     });
+}
+
+function moverRubroArbol(rubroId, padreId) {
+    return itemizadoFormPost(`/rubros/${rubroId}/mover/async`, { padreId });
+}
+
+function eliminarRubroVacio(rubroId) {
+    return itemizadoFormPost(`/rubros/${rubroId}/eliminar-vacio/async`, {});
 }
 
 async function refrescarItemizado(highlight = null) {
@@ -260,9 +268,17 @@ async function refrescarItemizado(highlight = null) {
     planillaActual.replaceWith(nuevaPlanilla);
     inicializarItemizadoDrag();
     if (highlight) {
-        const movedRow = document.querySelector(`.itemizado-draggable-row[data-item-id="${highlight.itemId}"]`);
-        const targetRow = document.querySelector(`.itemizado-drop-target[data-rubro-id="${highlight.rubroId}"]`);
-        moverFilaVisualmente(movedRow, targetRow);
+        if (highlight.itemId) {
+            const movedRow = document.querySelector(`.itemizado-draggable-row[data-item-id="${highlight.itemId}"]`);
+            const targetRow = document.querySelector(`.itemizado-drop-target[data-rubro-id="${highlight.rubroId}"]`);
+            moverFilaVisualmente(movedRow, targetRow);
+        }
+        if (highlight.rubroId && !highlight.itemId) {
+            document.querySelector(`.itemizado-context-rubro[data-rubro-id="${highlight.rubroId}"]`)?.classList.add('is-just-moved');
+            setTimeout(() => {
+                document.querySelector(`.itemizado-context-rubro[data-rubro-id="${highlight.rubroId}"]`)?.classList.remove('is-just-moved');
+            }, 1800);
+        }
     }
     updateItemizadoHistoryButtons();
     setItemizadoStatus('Itemizado actualizado.', 'is-saved');
@@ -294,7 +310,7 @@ function abrirMenuRubro(row, event) {
     itemizadoContextRow = row;
     menu.classList.remove('d-none');
     const menuWidth = 210;
-    const menuHeight = 132;
+    const menuHeight = 220;
     const left = Math.min(event.clientX, window.innerWidth - menuWidth - 12);
     const top = Math.min(event.clientY, window.innerHeight - menuHeight - 12);
     menu.style.left = `${Math.max(12, left)}px`;
@@ -313,13 +329,11 @@ function abrirEditorRubro(mode, row = null) {
     const modeInput = document.querySelector('#itemizado-editor-mode');
     const rubroInput = document.querySelector('#itemizado-editor-rubro-id');
     const padreInput = document.querySelector('#itemizado-editor-padre-id');
-    const codeInput = document.querySelector('#itemizado-editor-code');
     const nameInput = document.querySelector('#itemizado-editor-name');
 
     modeInput.value = mode;
     rubroInput.value = row?.dataset.rubroId || '';
     padreInput.value = mode === 'subrubro' ? (row?.dataset.rubroId || '') : '';
-    codeInput.value = mode === 'rename' ? (row?.dataset.rubroCode || '') : '';
     nameInput.value = mode === 'rename' ? (row?.dataset.rubroName || '') : '';
     kicker.textContent = mode === 'subrubro' ? (row?.dataset.rubroFullName || 'Subrubro') : 'Itemizado';
     title.textContent = mode === 'rename' ? 'Cambiar nombre del rubro'
@@ -333,7 +347,6 @@ async function guardarEditorRubro(event) {
     const mode = document.querySelector('#itemizado-editor-mode').value;
     const rubroId = document.querySelector('#itemizado-editor-rubro-id').value;
     const padreId = document.querySelector('#itemizado-editor-padre-id').value;
-    const codigo = document.querySelector('#itemizado-editor-code').value.trim();
     const nombre = document.querySelector('#itemizado-editor-name').value.trim();
     if (!nombre) {
         setItemizadoStatus('El nombre es obligatorio.', 'is-error');
@@ -341,15 +354,90 @@ async function guardarEditorRubro(event) {
     }
     setItemizadoStatus('Guardando rubro...', 'is-saving');
     try {
-        const response = await guardarRubroArbol({ mode, rubroId, padreId, codigo, nombre });
+        const response = await guardarRubroArbol({ mode, rubroId, padreId, nombre });
         if (!response.ok) {
             throw new Error('No se pudo guardar el rubro.');
         }
+        const data = await response.json();
         cerrarEditorRubro();
-        await refrescarItemizado();
+        await refrescarItemizado(data.id ? { rubroId: data.id } : null);
         setItemizadoStatus(mode === 'rename' ? 'Rubro actualizado.' : 'Rubro creado.', 'is-saved');
     } catch (error) {
         setItemizadoStatus('No se pudo guardar el rubro.', 'is-error');
+    }
+}
+
+function rubroEsDescendiente(target, dragged) {
+    const draggedLevel = Number.parseInt(dragged.dataset.level || '0', 10);
+    let next = dragged.nextElementSibling;
+    while (next) {
+        const nextLevel = Number.parseInt(next.dataset.level || '0', 10);
+        if (next.classList.contains('itemizado-toggle-row') && nextLevel <= draggedLevel) {
+            return false;
+        }
+        if (next === target) {
+            return true;
+        }
+        next = next.nextElementSibling;
+    }
+    return false;
+}
+
+async function ejecutarMovimientoRubro(rubroRow, targetRow) {
+    if (!rubroRow || !targetRow) return;
+    const rubroId = rubroRow.dataset.rubroId;
+    const padreId = targetRow.dataset.rubroId;
+    if (!rubroId || !padreId || rubroId === padreId || rubroEsDescendiente(targetRow, rubroRow)) {
+        clearItemizadoDropState();
+        return;
+    }
+    rubroRow.classList.add('is-saving');
+    setItemizadoStatus('Moviendo rubro...', 'is-saving');
+    try {
+        const response = await moverRubroArbol(rubroId, padreId);
+        if (!response.ok) {
+            throw new Error('No se pudo mover el rubro.');
+        }
+        await refrescarItemizado({ rubroId });
+        setItemizadoStatus('Rubro movido.', 'is-saved');
+    } catch (error) {
+        setItemizadoStatus('No se pudo mover el rubro.', 'is-error');
+    } finally {
+        rubroRow.classList.remove('is-saving');
+        clearItemizadoDropState();
+    }
+}
+
+async function moverRubroARaiz(row) {
+    if (!row) return;
+    setItemizadoStatus('Moviendo rubro...', 'is-saving');
+    try {
+        const response = await moverRubroArbol(row.dataset.rubroId, null);
+        if (!response.ok) {
+            throw new Error('No se pudo mover el rubro.');
+        }
+        await refrescarItemizado({ rubroId: row.dataset.rubroId });
+        setItemizadoStatus('Rubro movido a raiz.', 'is-saved');
+    } catch (error) {
+        setItemizadoStatus('No se pudo mover el rubro.', 'is-error');
+    }
+}
+
+async function eliminarRubroDesdeItemizado(row) {
+    if (!row) return;
+    if (!confirm('Eliminar este rubro? Solo se permite si no tiene items ni subrubros.')) {
+        return;
+    }
+    setItemizadoStatus('Eliminando rubro...', 'is-saving');
+    try {
+        const response = await eliminarRubroVacio(row.dataset.rubroId);
+        if (!response.ok) {
+            throw new Error('No se pudo eliminar el rubro.');
+        }
+        await refrescarItemizado();
+        setItemizadoStatus('Rubro eliminado.', 'is-saved');
+    } catch (error) {
+        setItemizadoStatus('No se puede eliminar: tiene items o subrubros.', 'is-error');
     }
 }
 
@@ -420,6 +508,7 @@ function inicializarItemizadoDrag() {
     itemizadoDropTargets = Array.from(document.querySelectorAll('.itemizado-drop-target'));
     itemizadoStatus = document.querySelector('#itemizado-drag-status');
     draggedItemizadoRow = null;
+    draggedRubroRow = null;
     document.querySelector('#itemizado-undo')?.addEventListener('click', deshacerMovimientoItemizado);
     document.querySelector('#itemizado-redo')?.addEventListener('click', rehacerMovimientoItemizado);
     document.querySelector('#itemizado-new-root')?.addEventListener('click', () => abrirEditorRubro('root'));
@@ -435,7 +524,13 @@ function inicializarItemizadoDrag() {
         if (!button) return;
         const action = button.dataset.action;
         cerrarMenuRubro();
-        abrirEditorRubro(action === 'root' ? 'root' : action, itemizadoContextRow);
+        if (action === 'delete') {
+            eliminarRubroDesdeItemizado(itemizadoContextRow);
+        } else if (action === 'move-root') {
+            moverRubroARaiz(itemizadoContextRow);
+        } else {
+            abrirEditorRubro(action === 'root' ? 'root' : action, itemizadoContextRow);
+        }
     });
     updateItemizadoHistoryButtons();
 
@@ -443,6 +538,22 @@ function inicializarItemizadoDrag() {
         row.addEventListener('contextmenu', event => {
             event.preventDefault();
             abrirMenuRubro(row, event);
+        });
+        row.addEventListener('dragstart', event => {
+            if (event.target.closest('.itemizado-toggle')) {
+                event.preventDefault();
+                return;
+            }
+            draggedRubroRow = row;
+            row.classList.add('is-dragging');
+            event.dataTransfer.effectAllowed = 'move';
+            event.dataTransfer.setData('text/plain', row.dataset.rubroId);
+            setItemizadoStatus('');
+        });
+        row.addEventListener('dragend', () => {
+            row.classList.remove('is-dragging', 'is-saving', 'is-error');
+            draggedRubroRow = null;
+            clearItemizadoDropState();
         });
     });
 
@@ -464,9 +575,11 @@ function inicializarItemizadoDrag() {
 
     itemizadoDropTargets.forEach(target => {
         target.addEventListener('dragover', event => {
-            if (!draggedItemizadoRow) return;
+            if (!draggedItemizadoRow && !draggedRubroRow) return;
             event.preventDefault();
-            const sameRubro = draggedItemizadoRow.dataset.currentRubroId === target.dataset.rubroId;
+            const sameRubro = draggedItemizadoRow
+                ? draggedItemizadoRow.dataset.currentRubroId === target.dataset.rubroId
+                : draggedRubroRow.dataset.rubroId === target.dataset.rubroId || rubroEsDescendiente(target, draggedRubroRow);
             target.classList.toggle('is-drop-target', !sameRubro);
             target.classList.toggle('is-drop-invalid', sameRubro);
             event.dataTransfer.dropEffect = sameRubro ? 'none' : 'move';
@@ -478,6 +591,10 @@ function inicializarItemizadoDrag() {
 
         target.addEventListener('drop', async event => {
             event.preventDefault();
+            if (draggedRubroRow) {
+                await ejecutarMovimientoRubro(draggedRubroRow, target);
+                return;
+            }
             if (!draggedItemizadoRow) return;
             const itemId = draggedItemizadoRow.dataset.itemId;
             const rubroId = target.dataset.rubroId;

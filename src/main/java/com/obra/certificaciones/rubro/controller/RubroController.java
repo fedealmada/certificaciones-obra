@@ -65,11 +65,9 @@ public class RubroController {
     @PostMapping("/async")
     @ResponseBody
     public ResponseEntity<Map<String, String>> crearAsync(@RequestParam String nombre,
-                                                          @RequestParam(required = false) String codigo,
                                                           @RequestParam(required = false) Long padreId) {
         Rubro rubro = new Rubro();
         rubro.setNombre(nombre);
-        rubro.setCodigo(codigo);
         rubro.setPadreId(padreId);
         rubro.setActivo(true);
         return ResponseEntity.ok(respuestaRubro(rubroService.guardar(rubro)));
@@ -78,9 +76,21 @@ public class RubroController {
     @PostMapping("/{id}/async")
     @ResponseBody
     public ResponseEntity<Map<String, String>> actualizarAsync(@PathVariable Long id,
-                                                               @RequestParam String nombre,
-                                                               @RequestParam(required = false) String codigo) {
-        return ResponseEntity.ok(respuestaRubro(rubroService.actualizarBasico(id, codigo, nombre)));
+                                                               @RequestParam String nombre) {
+        return ResponseEntity.ok(respuestaRubro(rubroService.actualizarBasico(id, nombre)));
+    }
+
+    @PostMapping("/{id}/mover/async")
+    @ResponseBody
+    public ResponseEntity<Map<String, String>> moverAsync(@PathVariable Long id,
+                                                          @RequestParam(required = false) Long padreId) {
+        return ResponseEntity.ok(respuestaRubro(rubroService.mover(id, padreId)));
+    }
+
+    @PostMapping("/{id}/eliminar-vacio/async")
+    @ResponseBody
+    public ResponseEntity<Map<String, String>> eliminarVacioAsync(@PathVariable Long id) {
+        return ResponseEntity.ok(Map.of("mensaje", rubroService.eliminarVacio(id)));
     }
 
     @PostMapping("/{id}/eliminar")

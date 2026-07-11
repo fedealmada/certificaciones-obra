@@ -40,16 +40,51 @@ public class RubroService {
     public Rubro guardar(Rubro rubro) {
         validar(rubro);
         aplicarPadre(rubro);
-        return rubroRepository.save(rubro);
+        Rubro guardado = rubroRepository.save(rubro);
+        renumerarCodigosJerarquia();
+        return guardado;
     }
 
     @Transactional
-    public Rubro actualizarBasico(Long id, String codigo, String nombre) {
+    public Rubro actualizarBasico(Long id, String nombre) {
         Rubro rubro = obtener(id);
-        rubro.setCodigo(codigo);
         rubro.setNombre(nombre);
         validar(rubro);
-        return rubroRepository.save(rubro);
+        Rubro guardado = rubroRepository.save(rubro);
+        renumerarCodigosJerarquia();
+        return guardado;
+    }
+
+    @Transactional
+    public Rubro mover(Long id, Long padreId) {
+        Rubro rubro = obtener(id);
+        if (padreId == null) {
+            rubro.setPadre(null);
+        } else {
+            if (id.equals(padreId)) {
+                throw new IllegalArgumentException("Un rubro no puede moverse dentro de si mismo.");
+            }
+            Rubro padre = obtener(padreId);
+            validarPadreNoSeaDescendiente(rubro, padre);
+            rubro.setPadre(padre);
+        }
+        Rubro guardado = rubroRepository.save(rubro);
+        renumerarCodigosJerarquia();
+        return guardado;
+    }
+
+    @Transactional
+    public String eliminarVacio(Long id) {
+        Rubro rubro = obtener(id);
+        if (itemOrdenCompraRepository.existsByRubroEntidadId(id)) {
+            throw new IllegalArgumentException("No se puede eliminar porque tiene items vinculados.");
+        }
+        if (rubroRepository.existsByPadre_Id(id)) {
+            throw new IllegalArgumentException("No se puede eliminar porque tiene subrubros.");
+        }
+        rubroRepository.delete(rubro);
+        renumerarCodigosJerarquia();
+        return "Rubro eliminado.";
     }
 
     @Transactional
@@ -123,5 +158,38 @@ public class RubroService {
         }
         Rubro padre = obtener(rubro.getPadreId());
         rubro.setPadre(padre);
+    }
+
+    private void validarPadreNoSeaDescendiente(Rubro rubro, Rubro posiblePadre) {
+        Rubro actual = posiblePadre;
+        while (actual != null) {
+            if (actual.getId().equals(rubro.getId())) {
+                throw new IllegalArgumentException("No se puede mover un rubro dentro de un subrubro propio.");
+            }
+            actual = actual.getPadre();
+        }
+    }
+
+    private void renumerarCodigosJerarquia() {
+        List<Rubro> rubros = rubroRepository.findAllByOrderByCodigoAscNombreAsc();
+        List<Rubro> raices = rubros.stream()
+                .filter(rubro -> rubro.getPadre() == null)
+                .sorted(RubroComparators.porCodigoNatural())
+                .toList();
+        for (int i = 0; i < raices.size(); i++) {
+            renumerarRubro(raices.get(i), String.valueOf(i + 1), rubros);
+        }
+        rubroRepository.saveAll(rubros);
+    }
+
+    private void renumerarRubro(Rubro rubro, String codigo, List<Rubro> todos) {
+        rubro.setCodigo(codigo);
+        List<Rubro> hijos = todos.stream()
+                .filter(hijo -> hijo.getPadre() != null && hijo.getPadre().getId().equals(rubro.getId()))
+                .sorted(RubroComparators.porCodigoNatural())
+                .toList();
+        for (int i = 0; i < hijos.size(); i++) {
+            renumerarRubro(hijos.get(i), codigo + "." + (i + 1), todos);
+        }
     }
 }
