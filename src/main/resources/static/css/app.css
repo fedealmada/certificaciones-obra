@@ -6378,3 +6378,381 @@ main.container,
         grid-template-columns: 1fr;
     }
 }
+
+/* Final dark-mode harmonization and soft theme switching */
+:root {
+    --theme-transition: 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html,
+body,
+body::before,
+body::after,
+body *:not(.oc-total-progress-fill):not(.cert-detail-progress-fill):not(.progress-bar):not(.bar-fill),
+body *::before,
+body *::after {
+    transition:
+        background-color var(--theme-transition),
+        border-color var(--theme-transition),
+        color var(--theme-transition),
+        box-shadow var(--theme-transition),
+        fill var(--theme-transition),
+        stroke var(--theme-transition);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html,
+    body,
+    body::before,
+    body::after,
+    body *,
+    body *::before,
+    body *::after {
+        transition: none !important;
+    }
+}
+
+:root[data-theme="dark"] html,
+:root[data-theme="dark"] body {
+    background: var(--app-bg) !important;
+    color: var(--ui-ink) !important;
+}
+
+html[data-theme="dark"],
+html[data-theme="dark"] body {
+    background: var(--app-bg) !important;
+    color: var(--ui-ink) !important;
+}
+
+:root[data-theme="dark"] .dashboard-main,
+:root[data-theme="dark"] main,
+:root[data-theme="dark"] .container,
+:root[data-theme="dark"] .container-fluid,
+:root[data-theme="dark"] .page-shell,
+:root[data-theme="dark"] .panel-section,
+:root[data-theme="dark"] .card,
+:root[data-theme="dark"] .card-body,
+:root[data-theme="dark"] .work-action-card,
+:root[data-theme="dark"] .table-responsive,
+:root[data-theme="dark"] .oc-form-table-wrap,
+:root[data-theme="dark"] .import-preview-table-wrap,
+:root[data-theme="dark"] .cert-detail-table-wrap,
+:root[data-theme="dark"] .itemizado-planilla,
+:root[data-theme="dark"] .itemizado-tree,
+:root[data-theme="dark"] .itemizado-content,
+:root[data-theme="dark"] .itemizado-items {
+    background-color: var(--ui-surface) !important;
+}
+
+:root[data-theme="dark"] .table,
+:root[data-theme="dark"] .table tbody,
+:root[data-theme="dark"] .document-table,
+:root[data-theme="dark"] .interactive-table,
+:root[data-theme="dark"] .items-master-table,
+:root[data-theme="dark"] .oc-list-table,
+:root[data-theme="dark"] .oc-items-table,
+:root[data-theme="dark"] .oc-form-table,
+:root[data-theme="dark"] .cert-table,
+:root[data-theme="dark"] .cert-edit-table,
+:root[data-theme="dark"] .import-preview-table,
+:root[data-theme="dark"] .itemizado-excel {
+    background-color: var(--ui-surface) !important;
+    color: var(--ui-ink) !important;
+}
+
+:root[data-theme="dark"] .table thead th,
+:root[data-theme="dark"] .document-table thead th,
+:root[data-theme="dark"] .interactive-table thead th,
+:root[data-theme="dark"] .items-master-table thead th,
+:root[data-theme="dark"] .oc-list-table thead th,
+:root[data-theme="dark"] .oc-items-table thead th,
+:root[data-theme="dark"] .oc-form-table thead th,
+:root[data-theme="dark"] .cert-table thead th,
+:root[data-theme="dark"] .cert-edit-table thead th,
+:root[data-theme="dark"] .import-preview-table thead th,
+:root[data-theme="dark"] .itemizado-excel thead th {
+    background-color: var(--ui-surface-2) !important;
+    border-color: var(--ui-line) !important;
+    color: var(--ui-muted) !important;
+}
+
+:root[data-theme="dark"] .table tbody tr,
+:root[data-theme="dark"] .table tbody tr:nth-child(odd),
+:root[data-theme="dark"] .table tbody tr:nth-child(even),
+:root[data-theme="dark"] .document-table tbody tr,
+:root[data-theme="dark"] .interactive-table tbody tr,
+:root[data-theme="dark"] .items-master-table tbody tr,
+:root[data-theme="dark"] .oc-list-table tbody tr,
+:root[data-theme="dark"] .oc-items-table tbody tr,
+:root[data-theme="dark"] .oc-form-table tbody tr,
+:root[data-theme="dark"] .cert-table tbody tr,
+:root[data-theme="dark"] .cert-edit-table tbody tr,
+:root[data-theme="dark"] .import-preview-table tbody tr {
+    background-color: var(--ui-surface) !important;
+}
+
+:root[data-theme="dark"] .table tbody tr:nth-child(even) td,
+:root[data-theme="dark"] .document-table tbody tr:nth-child(even) td,
+:root[data-theme="dark"] .interactive-table tbody tr:nth-child(even) td,
+:root[data-theme="dark"] .items-master-table tbody tr:nth-child(even) td,
+:root[data-theme="dark"] .oc-list-table tbody tr:nth-child(even) td,
+:root[data-theme="dark"] .oc-items-table tbody tr:nth-child(even) td,
+:root[data-theme="dark"] .oc-form-table tbody tr:nth-child(even) td,
+:root[data-theme="dark"] .cert-table tbody tr:nth-child(even) td,
+:root[data-theme="dark"] .cert-edit-table tbody tr:nth-child(even) td,
+:root[data-theme="dark"] .import-preview-table tbody tr:nth-child(even) td {
+    background-color: #303241 !important;
+}
+
+:root[data-theme="dark"] .table tbody tr:nth-child(odd) td,
+:root[data-theme="dark"] .document-table tbody tr:nth-child(odd) td,
+:root[data-theme="dark"] .interactive-table tbody tr:nth-child(odd) td,
+:root[data-theme="dark"] .items-master-table tbody tr:nth-child(odd) td,
+:root[data-theme="dark"] .oc-list-table tbody tr:nth-child(odd) td,
+:root[data-theme="dark"] .oc-items-table tbody tr:nth-child(odd) td,
+:root[data-theme="dark"] .oc-form-table tbody tr:nth-child(odd) td,
+:root[data-theme="dark"] .cert-table tbody tr:nth-child(odd) td,
+:root[data-theme="dark"] .cert-edit-table tbody tr:nth-child(odd) td,
+:root[data-theme="dark"] .import-preview-table tbody tr:nth-child(odd) td {
+    background-color: var(--ui-surface) !important;
+}
+
+:root[data-theme="dark"] .table td,
+:root[data-theme="dark"] .document-table td,
+:root[data-theme="dark"] .interactive-table td,
+:root[data-theme="dark"] .items-master-table td,
+:root[data-theme="dark"] .oc-list-table td,
+:root[data-theme="dark"] .oc-items-table td,
+:root[data-theme="dark"] .oc-form-table td,
+:root[data-theme="dark"] .cert-table td,
+:root[data-theme="dark"] .cert-edit-table td,
+:root[data-theme="dark"] .import-preview-table td,
+:root[data-theme="dark"] .itemizado-excel td {
+    border-color: var(--ui-line) !important;
+    color: var(--ui-ink) !important;
+}
+
+:root[data-theme="dark"] .table tbody tr:hover td,
+:root[data-theme="dark"] .document-table tbody tr:hover td,
+:root[data-theme="dark"] .interactive-table tbody tr:hover td,
+:root[data-theme="dark"] .items-master-table tbody tr:hover td,
+:root[data-theme="dark"] .oc-list-table tbody tr:hover td,
+:root[data-theme="dark"] .oc-items-table tbody tr:hover td,
+:root[data-theme="dark"] .oc-form-table tbody tr:hover td,
+:root[data-theme="dark"] .cert-table tbody tr:hover td,
+:root[data-theme="dark"] .cert-edit-table tbody tr:hover td,
+:root[data-theme="dark"] .import-preview-table tbody tr:hover td {
+    background-color: #3b3e51 !important;
+    color: var(--ui-ink) !important;
+}
+
+:root[data-theme="dark"] .item-detail-title,
+:root[data-theme="dark"] .items-master-detail,
+:root[data-theme="dark"] .oc-list-rubros,
+:root[data-theme="dark"] .itemizado-name,
+:root[data-theme="dark"] .itemizado-excel .rubro-name,
+:root[data-theme="dark"] .material-no-aplica,
+:root[data-theme="dark"] .mano-obra-sin-vinculo,
+:root[data-theme="dark"] .metric-value,
+:root[data-theme="dark"] .metric-card strong,
+:root[data-theme="dark"] .metric-card div,
+:root[data-theme="dark"] .ticket-summary-card strong,
+:root[data-theme="dark"] .ticket-summary-card span,
+:root[data-theme="dark"] .cert-summary strong,
+:root[data-theme="dark"] .cert-summary span {
+    color: var(--ui-ink) !important;
+}
+
+:root[data-theme="dark"] .text-muted,
+:root[data-theme="dark"] small,
+:root[data-theme="dark"] .small,
+:root[data-theme="dark"] .metric-label,
+:root[data-theme="dark"] .document-subtitle,
+:root[data-theme="dark"] .item-detail-subtitle,
+:root[data-theme="dark"] .itemizado-materiales-vinculados,
+:root[data-theme="dark"] .itemizado-totals small,
+:root[data-theme="dark"] .form-text,
+:root[data-theme="dark"] .table-sort-button {
+    color: var(--ui-muted) !important;
+}
+
+:root[data-theme="dark"] .form-control,
+:root[data-theme="dark"] .form-select,
+:root[data-theme="dark"] .input-group-text,
+:root[data-theme="dark"] .item-rubro-select,
+:root[data-theme="dark"] .detalle-input,
+:root[data-theme="dark"] .cantidad-input,
+:root[data-theme="dark"] .precio-input,
+:root[data-theme="dark"] .importe-input,
+:root[data-theme="dark"] .porcentaje-input,
+:root[data-theme="dark"] .import-textarea,
+:root[data-theme="dark"] .import-text-preview {
+    background-color: #282a36 !important;
+    border-color: var(--ui-line) !important;
+    color: var(--ui-ink) !important;
+}
+
+:root[data-theme="dark"] .form-control::placeholder,
+:root[data-theme="dark"] .import-textarea::placeholder {
+    color: #b6bbd2 !important;
+    opacity: 1;
+}
+
+:root[data-theme="dark"] .form-control:focus,
+:root[data-theme="dark"] .form-select:focus,
+:root[data-theme="dark"] .item-rubro-select:focus,
+:root[data-theme="dark"] .table input:focus,
+:root[data-theme="dark"] .table select:focus,
+:root[data-theme="dark"] .table textarea:focus {
+    background-color: #303241 !important;
+    border-color: #8be9fd !important;
+    box-shadow: 0 0 0 0.16rem rgba(139, 233, 253, 0.18) !important;
+    color: var(--ui-ink) !important;
+}
+
+:root[data-theme="dark"] .metric-card,
+:root[data-theme="dark"] .ticket-summary-card,
+:root[data-theme="dark"] .work-action-card,
+:root[data-theme="dark"] .card,
+:root[data-theme="dark"] .card-body,
+:root[data-theme="dark"] .list-group-item,
+:root[data-theme="dark"] .system-alert,
+:root[data-theme="dark"] .alert,
+:root[data-theme="dark"] .import-drop,
+:root[data-theme="dark"] .import-order-card,
+:root[data-theme="dark"] .import-confirm-bar,
+:root[data-theme="dark"] .cert-import-actions,
+:root[data-theme="dark"] .cert-import-body,
+:root[data-theme="dark"] .cert-meta-grid div,
+:root[data-theme="dark"] .cert-detail-summary > div,
+:root[data-theme="dark"] .home-module-card,
+:root[data-theme="dark"] .dashboard-body .dashboard-action-grid a,
+:root[data-theme="dark"] .dashboard-body .work-state-grid div,
+:root[data-theme="dark"] .provider-results,
+:root[data-theme="dark"] .provider-result,
+:root[data-theme="dark"] .provider-empty,
+:root[data-theme="dark"] .setting-toggle,
+:root[data-theme="dark"] .workflow-step,
+:root[data-theme="dark"] .workflow-arrow {
+    background-color: var(--ui-surface) !important;
+    border-color: var(--ui-line) !important;
+    color: var(--ui-ink) !important;
+}
+
+:root[data-theme="dark"] .alert-warning,
+:root[data-theme="dark"] .import-duplicate-alert {
+    background-color: rgba(255, 184, 108, 0.13) !important;
+    border-color: rgba(255, 184, 108, 0.32) !important;
+    color: #ffe0a6 !important;
+}
+
+:root[data-theme="dark"] .alert-danger {
+    background-color: rgba(255, 85, 85, 0.13) !important;
+    border-color: rgba(255, 85, 85, 0.32) !important;
+    color: #ffb7b7 !important;
+}
+
+:root[data-theme="dark"] .alert-success {
+    background-color: rgba(80, 250, 123, 0.12) !important;
+    border-color: rgba(80, 250, 123, 0.28) !important;
+    color: #b9ffc9 !important;
+}
+
+:root[data-theme="dark"] .alert-info {
+    background-color: rgba(139, 233, 253, 0.12) !important;
+    border-color: rgba(139, 233, 253, 0.28) !important;
+    color: #c8f7ff !important;
+}
+
+:root[data-theme="dark"] .oc-total-progress,
+:root[data-theme="dark"] .ticket-note,
+:root[data-theme="dark"] .progress-thin,
+:root[data-theme="dark"] .oc-total-progress-track,
+:root[data-theme="dark"] .cert-detail-progress-track,
+:root[data-theme="dark"] .bar-track {
+    background-color: #252736 !important;
+    border-color: var(--ui-line) !important;
+}
+
+:root[data-theme="dark"] .itemizado-node summary,
+:root[data-theme="dark"] .itemizado-excel .item-row td {
+    background-color: var(--ui-surface) !important;
+    color: var(--ui-ink) !important;
+}
+
+:root[data-theme="dark"] .itemizado-excel .item-row:nth-child(even) td {
+    background-color: #303241 !important;
+}
+
+:root[data-theme="dark"] .itemizado-excel .rubro-root td {
+    background-color: #44475a !important;
+    color: var(--ui-ink) !important;
+}
+
+:root[data-theme="dark"] .itemizado-excel .rubro-middle td {
+    background-color: #3b3e51 !important;
+    color: var(--ui-ink) !important;
+}
+
+:root[data-theme="dark"] .itemizado-excel .rubro-leaf td,
+:root[data-theme="dark"] .itemizado-excel .total-cell,
+:root[data-theme="dark"] .itemizado-excel tfoot td {
+    background-color: #282a36 !important;
+    color: var(--ui-ink) !important;
+}
+
+:root[data-theme="dark"] .itemizado-code,
+:root[data-theme="dark"] .itemizado-toggle {
+    background-color: #44475a !important;
+    border-color: #6272a4 !important;
+    color: var(--ui-ink) !important;
+}
+
+:root[data-theme="dark"] .chart-panel,
+:root[data-theme="dark"] .monthly-evolution-chart,
+:root[data-theme="dark"] .pie-chart,
+:root[data-theme="dark"] .chart-legend-row,
+:root[data-theme="dark"] .bar-chart-label,
+:root[data-theme="dark"] .empty-chart {
+    background-color: var(--ui-surface) !important;
+    border-color: var(--ui-line) !important;
+    color: var(--ui-ink) !important;
+}
+
+:root[data-theme="dark"] .chart-legend-row strong,
+:root[data-theme="dark"] .chart-legend-row small,
+:root[data-theme="dark"] .bar-chart-label span,
+:root[data-theme="dark"] .bar-chart-label strong,
+:root[data-theme="dark"] .pie-chart strong,
+:root[data-theme="dark"] .pie-chart span,
+:root[data-theme="dark"] .monthly-bar-label,
+:root[data-theme="dark"] .monthly-bar-value {
+    color: var(--ui-ink) !important;
+}
+
+:root[data-theme="dark"] .bg-white,
+:root[data-theme="dark"] .bg-light,
+:root[data-theme="dark"] .bg-body,
+:root[data-theme="dark"] .text-bg-light,
+:root[data-theme="dark"] .modal-content,
+:root[data-theme="dark"] .dropdown-menu {
+    background-color: var(--ui-surface) !important;
+    border-color: var(--ui-line) !important;
+    color: var(--ui-ink) !important;
+}
+
+:root[data-theme="dark"] .text-dark,
+:root[data-theme="dark"] .text-body,
+:root[data-theme="dark"] .text-secondary,
+:root[data-theme="dark"] .dropdown-item,
+:root[data-theme="dark"] .card-title,
+:root[data-theme="dark"] .card-text {
+    color: var(--ui-ink) !important;
+}
+
+:root[data-theme="dark"] .btn-light,
+:root[data-theme="dark"] .btn-outline-light {
+    background-color: #343746 !important;
+    border-color: var(--ui-line) !important;
+    color: var(--ui-ink) !important;
+}
