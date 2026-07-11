@@ -9,23 +9,6 @@
 <body class="dashboard-body">
 <div th:replace="~{fragments/layout :: navbar}"></div>
 <main class="dashboard-shell">
-    <aside class="dashboard-sidebar">
-        <a class="dashboard-brand" th:href="@{/}">
-            <span class="dashboard-brand-mark"><i class="bi bi-building-check"></i></span>
-            <strong>ObraControl</strong>
-        </a>
-        <nav class="dashboard-side-nav" aria-label="Navegacion principal">
-            <a class="is-active" th:href="@{/dashboard}"><i class="bi bi-grid-1x2"></i><span>Dashboard</span></a>
-            <a th:href="@{/oc}"><i class="bi bi-receipt"></i><span>Ordenes</span></a>
-            <a th:href="@{/items}"><i class="bi bi-list-task"></i><span>Items</span></a>
-            <a th:href="@{/certificaciones/importar}"><i class="bi bi-clipboard-check"></i><span>Certificados</span></a>
-            <a th:href="@{/materiales}"><i class="bi bi-truck"></i><span>Entregas</span></a>
-            <a th:href="@{/proveedores}"><i class="bi bi-people"></i><span>Proveedores</span></a>
-            <a th:href="@{/reportes}"><i class="bi bi-bar-chart"></i><span>Reportes</span></a>
-            <a th:href="@{/configuracion}"><i class="bi bi-gear"></i><span>Configuracion</span></a>
-        </nav>
-    </aside>
-
     <section class="dashboard-workspace">
         <header class="dashboard-topline">
             <div>
