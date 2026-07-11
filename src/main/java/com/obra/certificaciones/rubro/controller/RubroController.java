@@ -87,6 +87,13 @@ public class RubroController {
         return ResponseEntity.ok(respuestaRubro(rubroService.mover(id, padreId)));
     }
 
+    @PostMapping("/{id}/reubicar-antes/async")
+    @ResponseBody
+    public ResponseEntity<Map<String, String>> reubicarAntesAsync(@PathVariable Long id,
+                                                                  @RequestParam Long targetId) {
+        return ResponseEntity.ok(respuestaRubro(rubroService.reubicarAntes(id, targetId)));
+    }
+
     @PostMapping("/{id}/eliminar-vacio/async")
     @ResponseBody
     public ResponseEntity<Map<String, String>> eliminarVacioAsync(@PathVariable Long id) {

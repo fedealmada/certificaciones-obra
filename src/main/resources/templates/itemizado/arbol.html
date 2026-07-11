@@ -290,6 +290,10 @@ function moverRubroArbol(rubroId, padreId) {
     return itemizadoFormPost(`/rubros/${rubroId}/mover/async`, { padreId });
 }
 
+function reubicarRubroAntes(rubroId, targetId) {
+    return itemizadoFormPost(`/rubros/${rubroId}/reubicar-antes/async`, { targetId });
+}
+
 function eliminarRubroVacio(rubroId) {
     return itemizadoFormPost(`/rubros/${rubroId}/eliminar-vacio/async`, {});
 }
@@ -457,24 +461,24 @@ function rubroEsDescendiente(target, dragged) {
 async function ejecutarMovimientoRubro(rubroRow, targetRow) {
     if (!rubroRow || !targetRow) return;
     const rubroId = rubroRow.dataset.rubroId;
-    const padreId = targetRow.dataset.rubroId;
-    if (!rubroId || !padreId || rubroId === padreId || rubroEsDescendiente(targetRow, rubroRow)) {
+    const targetId = targetRow.dataset.rubroId;
+    if (!rubroId || !targetId || rubroId === targetId || rubroEsDescendiente(targetRow, rubroRow)) {
         clearItemizadoDropState();
         return;
     }
     rubroRow.classList.add('is-saving');
-    setItemizadoStatus('Moviendo rubro...', 'is-saving');
+    setItemizadoStatus('Reubicando rubro...', 'is-saving');
     try {
-        const response = await moverRubroArbol(rubroId, padreId);
+        const response = await reubicarRubroAntes(rubroId, targetId);
         if (!response.ok) {
-            throw new Error('No se pudo mover el rubro.');
+            throw new Error('No se pudo reubicar el rubro.');
         }
         await refrescarItemizado({ rubroId });
-        setItemizadoStatus('Rubro movido.', 'is-saved');
-        mostrarAvisoItemizado('Rubro movido', 'El rubro quedo ubicado en su nueva posicion.');
+        setItemizadoStatus('Rubro reubicado.', 'is-saved');
+        mostrarAvisoItemizado('Rubro reubicado', 'El rubro quedo arriba del rubro elegido.');
     } catch (error) {
-        setItemizadoStatus('No se pudo mover el rubro.', 'is-error');
-        mostrarAvisoItemizado('No se pudo mover', 'No se permite mover un rubro dentro de si mismo.', 'error');
+        setItemizadoStatus('No se pudo reubicar el rubro.', 'is-error');
+        mostrarAvisoItemizado('No se pudo reubicar', 'No se permite ubicar un rubro dentro de si mismo.', 'error');
     } finally {
         rubroRow.classList.remove('is-saving');
         clearItemizadoDropState();
@@ -543,9 +547,6 @@ async function ejecutarMovimientoItemizado(movimiento, options = {}) {
             itemizadoRedoStack = [];
         }
         await refrescarItemizado({ itemId: movimiento.itemId, rubroId: movimiento.toRubroId });
-        mostrarAvisoItemizado(options.status === 'Deshaciendo...' ? 'Movimiento deshecho'
-            : (options.status === 'Rehaciendo...' ? 'Movimiento rehecho' : 'Item movido'),
-            'El itemizado se actualizo correctamente.');
         return true;
     } catch (error) {
         row?.classList.add('is-error');
@@ -582,7 +583,6 @@ async function ejecutarReordenItemizado(row, targetRow) {
             keepOrder: true
         });
         setItemizadoStatus('Item reordenado.', 'is-saved');
-        mostrarAvisoItemizado('Item reordenado', 'La posicion del item quedo guardada.');
         return true;
     } catch (error) {
         row.classList.add('is-error');

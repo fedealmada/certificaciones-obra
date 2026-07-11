@@ -26,6 +26,8 @@ public class Rubro {
     private Long id;
 
     private String codigo;
+    private Integer ordenItemizado;
+
     @Column(columnDefinition = "TEXT")
     private String nombre;
 

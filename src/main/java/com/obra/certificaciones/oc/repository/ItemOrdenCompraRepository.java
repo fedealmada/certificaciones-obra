@@ -8,8 +8,13 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ItemOrdenCompraRepository extends JpaRepository<ItemOrdenCompra, Long> {
+    @Override
+    @EntityGraph(attributePaths = {"ordenCompra", "rubroEntidad"})
+    Optional<ItemOrdenCompra> findById(Long id);
+
     @EntityGraph(attributePaths = {"ordenCompra", "ordenCompra.proveedorEntidad", "rubroEntidad", "itemManoObraVinculado", "materialCatalogo", "categoriaEntidad"})
     List<ItemOrdenCompra> findAllByOrderByIdAsc();
 

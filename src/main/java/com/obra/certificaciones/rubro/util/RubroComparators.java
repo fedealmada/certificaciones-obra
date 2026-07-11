@@ -20,6 +20,12 @@ public final class RubroComparators {
                 .thenComparing(rubro -> textoSeguro(rubro.getNombre()), String.CASE_INSENSITIVE_ORDER);
     }
 
+    public static Comparator<Rubro> porOrdenItemizado() {
+        return Comparator
+                .comparing(Rubro::getOrdenItemizado, Comparator.nullsLast(Integer::compareTo))
+                .thenComparing(porCodigoNatural());
+    }
+
     private static int compararCodigoNatural(String izquierdo, String derecho) {
         String codigoIzquierdo = textoSeguro(izquierdo).trim();
         String codigoDerecho = textoSeguro(derecho).trim();

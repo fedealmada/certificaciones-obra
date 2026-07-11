@@ -11,7 +11,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -68,9 +71,44 @@ public class RubroService {
             validarPadreNoSeaDescendiente(rubro, padre);
             rubro.setPadre(padre);
         }
+        rubro.setOrdenItemizado(siguienteOrdenRubro(padreId, id));
         Rubro guardado = rubroRepository.save(rubro);
         renumerarCodigosJerarquia();
         return guardado;
+    }
+
+    @Transactional
+    public Rubro reubicarAntes(Long id, Long targetId) {
+        Rubro rubro = obtener(id);
+        Rubro target = obtener(targetId);
+        if (id.equals(targetId)) {
+            return rubro;
+        }
+        Rubro nuevoPadre = target.getPadre();
+        if (nuevoPadre != null) {
+            validarPadreNoSeaDescendiente(rubro, nuevoPadre);
+        }
+        rubro.setPadre(nuevoPadre);
+
+        List<Rubro> todos = rubroRepository.findAllByOrderByCodigoAscNombreAsc();
+        List<Rubro> hermanos = rubrosMismoPadre(nuevoPadre == null ? null : nuevoPadre.getId(), todos).stream()
+                .filter(hermano -> !Objects.equals(hermano.getId(), rubro.getId()))
+                .sorted(compararRubrosPorOrden())
+                .collect(java.util.stream.Collectors.toCollection(ArrayList::new));
+        int targetIndex = 0;
+        for (int i = 0; i < hermanos.size(); i++) {
+            if (Objects.equals(hermanos.get(i).getId(), target.getId())) {
+                targetIndex = i;
+                break;
+            }
+        }
+        hermanos.add(targetIndex, rubro);
+        for (int i = 0; i < hermanos.size(); i++) {
+            hermanos.get(i).setOrdenItemizado((i + 1) * 10);
+        }
+        rubroRepository.saveAll(hermanos);
+        renumerarCodigosJerarquia();
+        return rubro;
     }
 
     @Transactional
@@ -174,10 +212,11 @@ public class RubroService {
         List<Rubro> rubros = rubroRepository.findAllByOrderByCodigoAscNombreAsc();
         List<Rubro> raices = rubros.stream()
                 .filter(rubro -> rubro.getPadre() == null)
-                .sorted(RubroComparators.porCodigoNatural())
+                .sorted(compararRubrosPorOrden())
                 .toList();
         for (int i = 0; i < raices.size(); i++) {
             renumerarRubro(raices.get(i), String.valueOf(i + 1), rubros);
+            raices.get(i).setOrdenItemizado((i + 1) * 10);
         }
         rubroRepository.saveAll(rubros);
     }
@@ -186,10 +225,33 @@ public class RubroService {
         rubro.setCodigo(codigo);
         List<Rubro> hijos = todos.stream()
                 .filter(hijo -> hijo.getPadre() != null && hijo.getPadre().getId().equals(rubro.getId()))
-                .sorted(RubroComparators.porCodigoNatural())
+                .sorted(compararRubrosPorOrden())
                 .toList();
         for (int i = 0; i < hijos.size(); i++) {
+            hijos.get(i).setOrdenItemizado((i + 1) * 10);
             renumerarRubro(hijos.get(i), codigo + "." + (i + 1), todos);
         }
+    }
+
+    private int siguienteOrdenRubro(Long padreId, Long excluirId) {
+        List<Rubro> todos = rubroRepository.findAllByOrderByCodigoAscNombreAsc();
+        return rubrosMismoPadre(padreId, todos).stream()
+                .filter(rubro -> !Objects.equals(rubro.getId(), excluirId))
+                .map(Rubro::getOrdenItemizado)
+                .filter(Objects::nonNull)
+                .max(Integer::compareTo)
+                .orElse(0) + 10;
+    }
+
+    private List<Rubro> rubrosMismoPadre(Long padreId, List<Rubro> todos) {
+        return todos.stream()
+                .filter(rubro -> padreId == null
+                        ? rubro.getPadre() == null
+                        : rubro.getPadre() != null && Objects.equals(rubro.getPadre().getId(), padreId))
+                .toList();
+    }
+
+    private Comparator<Rubro> compararRubrosPorOrden() {
+        return RubroComparators.porOrdenItemizado();
     }
 }
