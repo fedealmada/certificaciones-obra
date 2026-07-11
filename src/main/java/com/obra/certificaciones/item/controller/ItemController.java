@@ -69,8 +69,9 @@ public class ItemController {
     @PostMapping("/items/{id}/itemizado-orden/async")
     @ResponseBody
     public ResponseEntity<Map<String, String>> reordenarItemizadoAsync(@PathVariable Long id,
-                                                                       @RequestParam Long targetItemId) {
-        Rubro rubro = reordenarItemizado(id, targetItemId);
+                                                                       @RequestParam Long targetItemId,
+                                                                       @RequestParam(defaultValue = "before") String position) {
+        Rubro rubro = reordenarItemizado(id, targetItemId, position);
         return ResponseEntity.ok(Map.of(
                 "rubro", rubro == null ? "" : rubro.getNombreCompleto()
         ));
@@ -94,7 +95,7 @@ public class ItemController {
         return rubro;
     }
 
-    private Rubro reordenarItemizado(Long id, Long targetItemId) {
+    private Rubro reordenarItemizado(Long id, Long targetItemId, String position) {
         ItemOrdenCompra item = itemOrdenCompraRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No existe el item."));
         ItemOrdenCompra target = itemOrdenCompraRepository.findById(targetItemId)
@@ -122,7 +123,8 @@ public class ItemController {
                 break;
             }
         }
-        ordenados.add(targetIndex, item);
+        int insertIndex = "after".equalsIgnoreCase(position) ? targetIndex + 1 : targetIndex;
+        ordenados.add(Math.min(insertIndex, ordenados.size()), item);
         guardarOrdenItemizado(ordenados);
         return rubro;
     }

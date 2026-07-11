@@ -242,7 +242,7 @@ function prepararVistaArrastre(row, event) {
 
 function clearItemizadoDropState() {
     itemizadoDropTargets.forEach(row => row.classList.remove('is-drop-target', 'is-drop-invalid'));
-    itemizadoRows.forEach(row => row.classList.remove('is-item-drop-target', 'is-drop-invalid'));
+    itemizadoRows.forEach(row => row.classList.remove('is-item-drop-target', 'is-item-drop-before', 'is-item-drop-after', 'is-drop-invalid'));
 }
 
 function updateItemizadoHistoryButtons() {
@@ -274,8 +274,8 @@ function guardarRubroItemizado(itemId, rubroId) {
     return itemizadoFormPost(`/items/${itemId}/rubro/async`, { rubroId });
 }
 
-function reordenarItemizado(itemId, targetItemId) {
-    return itemizadoFormPost(`/items/${itemId}/itemizado-orden/async`, { targetItemId });
+function reordenarItemizado(itemId, targetItemId, position) {
+    return itemizadoFormPost(`/items/${itemId}/itemizado-orden/async`, { targetItemId, position });
 }
 
 function guardarRubroArbol({ mode, rubroId, padreId, nombre }) {
@@ -362,14 +362,29 @@ function moverFilaVisualmente(row, target) {
     setTimeout(() => row.classList.remove('is-just-moved'), 1800);
 }
 
-function moverItemAntes(row, targetRow) {
+function moverItemJuntoA(row, targetRow, position = 'before') {
     if (!row || !targetRow || row === targetRow) return;
     row.dataset.currentRubroId = targetRow.dataset.currentRubroId;
     row.dataset.level = targetRow.dataset.level;
-    targetRow.parentNode.insertBefore(row, targetRow);
+    const reference = position === 'after' ? targetRow.nextElementSibling : targetRow;
+    if (reference === row) return;
+    targetRow.parentNode.insertBefore(row, reference);
     row.classList.remove('d-none');
     row.classList.add('is-just-moved');
     setTimeout(() => row.classList.remove('is-just-moved'), 1800);
+}
+
+function posicionDropItem(row, event) {
+    const rect = row.getBoundingClientRect();
+    return event.clientY > rect.top + rect.height / 2 ? 'after' : 'before';
+}
+
+function marcarDropItem(row, event) {
+    const position = posicionDropItem(row, event);
+    itemizadoRows.forEach(itemRow => itemRow.classList.remove('is-item-drop-target', 'is-item-drop-before', 'is-item-drop-after'));
+    row.classList.add('is-item-drop-target', position === 'after' ? 'is-item-drop-after' : 'is-item-drop-before');
+    row.dataset.dropPosition = position;
+    return position;
 }
 
 function cerrarMenuRubro() {
@@ -559,7 +574,7 @@ async function ejecutarMovimientoItemizado(movimiento, options = {}) {
     }
 }
 
-async function ejecutarReordenItemizado(row, targetRow) {
+async function ejecutarReordenItemizado(row, targetRow, position = 'before') {
     if (!row || !targetRow || row === targetRow) return false;
     const itemId = row.dataset.itemId;
     const targetItemId = targetRow.dataset.itemId;
@@ -572,11 +587,11 @@ async function ejecutarReordenItemizado(row, targetRow) {
     setItemizadoStatus('Ordenando item...', 'is-saving');
 
     try {
-        const response = await reordenarItemizado(itemId, targetItemId);
+        const response = await reordenarItemizado(itemId, targetItemId, position);
         if (!response.ok) {
             throw new Error('No se pudo reordenar el item.');
         }
-        moverItemAntes(row, targetRow);
+        moverItemJuntoA(row, targetRow, position);
         await refrescarItemizado({
             itemId,
             rubroId: targetRow.dataset.currentRubroId,
@@ -698,12 +713,13 @@ function inicializarItemizadoDrag() {
         row.addEventListener('dragover', event => {
             if (!draggedItemizadoRow || draggedItemizadoRow === row) return;
             event.preventDefault();
-            row.classList.add('is-item-drop-target');
+            marcarDropItem(row, event);
             event.dataTransfer.dropEffect = 'move';
         });
 
         row.addEventListener('dragleave', () => {
-            row.classList.remove('is-item-drop-target');
+            row.classList.remove('is-item-drop-target', 'is-item-drop-before', 'is-item-drop-after');
+            delete row.dataset.dropPosition;
         });
 
         row.addEventListener('drop', async event => {
@@ -713,7 +729,8 @@ function inicializarItemizadoDrag() {
                 clearItemizadoDropState();
                 return;
             }
-            await ejecutarReordenItemizado(draggedItemizadoRow, row);
+            const position = row.dataset.dropPosition || posicionDropItem(row, event);
+            await ejecutarReordenItemizado(draggedItemizadoRow, row, position);
         });
     });
 
