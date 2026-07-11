@@ -6085,6 +6085,19 @@ main.container,
     width: auto;
 }
 
+main,
+.dashboard-shell,
+.cert-detail-page {
+    transition: opacity 180ms ease, transform 180ms ease;
+}
+
+body.is-page-leaving main,
+body.is-page-leaving .dashboard-shell,
+body.is-page-leaving .cert-detail-page {
+    opacity: 0.78;
+    transform: translateY(3px);
+}
+
 @media (max-width: 900px) {
     body,
     body:has(.app-sidebar:hover) {

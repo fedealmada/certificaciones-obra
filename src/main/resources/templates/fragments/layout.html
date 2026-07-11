@@ -5,6 +5,9 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <script>
     (() => {
+        if (document.documentElement.dataset.theme) {
+            return;
+        }
         const savedTheme = localStorage.getItem('obraControl.theme');
         const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
         const theme = savedTheme || (prefersDark ? 'dark' : 'light');
@@ -86,6 +89,7 @@
                 openSidebar();
                 if (event.target.closest('a')) {
                     navigatingFromSidebar = true;
+                    document.body.classList.add('is-page-leaving');
                     sessionStorage.setItem('obraControl.sidebarOpen', 'true');
                 }
             });
