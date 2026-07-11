@@ -52,7 +52,13 @@
                       th:classappend="${ordenCerrada == true ? ' is-work-closed' : ' is-work-open'}"
                       th:text="${ordenCerrada == true ? 'CERRADA' : 'ABIERTA'}">ABIERTA</span>
             </div>
-            <div class="document-subtitle" th:text="${orden.proveedorEntidad?.nombre ?: '-'}">Proveedor</div>
+            <div class="document-subtitle">
+                <a class="provider-inline-link"
+                   th:if="${orden.proveedorEntidad != null}"
+                   th:href="@{/proveedores/{id}(id=${orden.proveedorEntidad.id})}"
+                   th:text="${orden.proveedorEntidad.nombre}">Proveedor</a>
+                <span th:unless="${orden.proveedorEntidad != null}">-</span>
+            </div>
         </div>
         <div class="document-actions">
             <a class="btn btn-primary" th:if="${ordenMaterial}" th:href="@{/materiales/oc/{id}/recepciones/nueva(id=${orden.id})}"><i class="bi bi-truck"></i> Nueva recepcion</a>
@@ -69,7 +75,13 @@
         <div class="ticket-top">
             <div>
                 <span>Proveedor / Contratista</span>
-                <strong th:text="${orden.proveedorEntidad?.nombre ?: '-'}">Proveedor</strong>
+                <strong>
+                    <a class="provider-inline-link"
+                       th:if="${orden.proveedorEntidad != null}"
+                       th:href="@{/proveedores/{id}(id=${orden.proveedorEntidad.id})}"
+                       th:text="${orden.proveedorEntidad.nombre}">Proveedor</a>
+                    <span th:unless="${orden.proveedorEntidad != null}">-</span>
+                </strong>
             </div>
             <div>
                 <span>Fecha OC</span>

@@ -34,26 +34,84 @@
             <a class="btn btn-outline-secondary" th:href="@{/proveedores/{id}/editar(id=${proveedor.id})}"><i class="bi bi-pencil-square"></i> Editar</a>
         </div>
     </div>
-    <div class="row g-3 mb-4">
-        <div class="col-md-3"><div class="metric-card"><div class="metric-label">Contacto</div><div class="metric-value metric-value-sm" th:text="${proveedor.contacto ?: '-'}">-</div></div></div>
-        <div class="col-md-3"><div class="metric-card"><div class="metric-label">Telefono</div><div class="metric-value metric-value-sm" th:text="${proveedor.telefono ?: '-'}">-</div></div></div>
-        <div class="col-md-3"><div class="metric-card"><div class="metric-label">Email</div><div class="metric-value metric-value-sm" th:text="${proveedor.email ?: '-'}">-</div></div></div>
-        <div class="col-md-3"><div class="metric-card"><div class="metric-label">OC asociadas</div><div class="metric-value metric-value-sm" th:text="${ordenes.size()}">0</div></div></div>
+    <div class="provider-analysis-grid mb-4">
+        <div class="metric-card provider-main-metric">
+            <div class="metric-head"><div class="metric-label">Gasto total</div><i class="bi bi-cash-stack"></i></div>
+            <div class="metric-value metric-value-sm" th:text="${#numbers.formatDecimal(analisis.totalComprado, 1, 'POINT', 2, 'COMMA')}">0,00</div>
+            <small th:text="${ordenes.size()} + ' ordenes de compra'">0 ordenes</small>
+        </div>
+        <div class="metric-card">
+            <div class="metric-head"><div class="metric-label">Promedio por OC</div><i class="bi bi-graph-up"></i></div>
+            <div class="metric-value metric-value-sm" th:text="${#numbers.formatDecimal(analisis.promedioOrden, 1, 'POINT', 2, 'COMMA')}">0,00</div>
+            <small>Ticket promedio</small>
+        </div>
+        <div class="metric-card">
+            <div class="metric-head"><div class="metric-label">Ultima OC</div><i class="bi bi-calendar-check"></i></div>
+            <div class="metric-value metric-value-sm" th:text="${analisis.ultimaOrden != null ? 'OC ' + analisis.ultimaOrden.numero : '-'}">-</div>
+            <small th:text="${analisis.ultimaOrden != null && analisis.ultimaOrden.fecha != null ? #temporals.format(analisis.ultimaOrden.fecha, 'dd/MM/yyyy') : 'Sin compras'}">Sin compras</small>
+        </div>
+        <div class="metric-card">
+            <div class="metric-head"><div class="metric-label">Contacto</div><i class="bi bi-person-lines-fill"></i></div>
+            <div class="metric-value metric-value-sm" th:text="${proveedor.contacto ?: '-'}">-</div>
+            <small th:text="${proveedor.telefono != null && !proveedor.telefono.isBlank() ? proveedor.telefono : (proveedor.email ?: 'Sin datos de contacto')}">Sin datos</small>
+        </div>
     </div>
 
-    <section><h2 class="h4">Ordenes de Compra</h2><div class="table-responsive"><table class="table table-hover align-middle">
-        <thead><tr><th>Numero</th><th>Fecha</th><th>Items</th><th>Observacion</th><th class="text-end">Acciones</th></tr></thead>
+    <div class="provider-analysis-panels mb-4">
+        <section class="panel-section provider-chart-panel">
+            <div class="section-title-row">
+                <h2 class="h5 mb-0"><i class="bi bi-pie-chart"></i> Distribucion por categoria</h2>
+                <span class="section-total-pill" th:text="${#lists.size(analisis.categorias)} + ' categorias'">0 categorias</span>
+            </div>
+            <div class="bar-chart-list" th:if="${!analisis.categorias.isEmpty()}">
+                <div class="bar-chart-row" th:each="categoria : ${analisis.categorias}">
+                    <div class="bar-chart-label">
+                        <span th:text="${categoria.nombre}">Categoria</span>
+                        <strong th:text="${#numbers.formatDecimal(categoria.valor, 1, 'POINT', 2, 'COMMA')}">0,00</strong>
+                    </div>
+                    <div class="bar-track"><div class="bar-fill" th:style="'width: ' + ${categoria.porcentaje} + '%'"></div></div>
+                </div>
+            </div>
+            <div class="empty-state" th:if="${analisis.categorias.isEmpty()}">Sin datos para graficar.</div>
+        </section>
+
+        <section class="panel-section provider-chart-panel">
+            <div class="section-title-row">
+                <h2 class="h5 mb-0"><i class="bi bi-bar-chart-line"></i> Evolucion mensual</h2>
+                <span class="section-total-pill">Ultimos meses</span>
+            </div>
+            <div class="provider-month-chart" th:if="${!analisis.evolucionMensual.isEmpty()}">
+                <div class="provider-month-bar" th:each="mes : ${analisis.evolucionMensual}">
+                    <strong th:text="${#numbers.formatDecimal(mes.valor, 1, 'POINT', 0, 'COMMA')}">0</strong>
+                    <div class="provider-month-track">
+                        <div class="provider-month-fill" th:style="'height: ' + ${mes.porcentaje} + '%'"></div>
+                    </div>
+                    <span th:text="${mes.nombre}">Mes</span>
+                </div>
+            </div>
+            <div class="empty-state" th:if="${analisis.evolucionMensual.isEmpty()}">Sin compras con fecha cargada.</div>
+        </section>
+    </div>
+
+    <section class="panel-section">
+        <div class="section-title-row">
+            <h2 class="h5 mb-0"><i class="bi bi-receipt"></i> Ordenes de compra</h2>
+            <span class="section-total-pill" th:text="${ordenes.size()} + ' OC'">0 OC</span>
+        </div>
+        <div class="table-responsive"><table class="table table-hover align-middle document-table">
+        <thead><tr><th>Numero</th><th>Fecha</th><th>Items</th><th class="text-end">Total</th><th>Observacion</th><th class="text-end">Acciones</th></tr></thead>
         <tbody>
         <tr th:each="orden : ${ordenes}">
             <td th:text="${orden.numero}"></td>
-            <td th:text="${#temporals.format(orden.fecha, 'dd/MM/yyyy')}"></td>
+            <td th:text="${orden.fecha != null ? #temporals.format(orden.fecha, 'dd/MM/yyyy') : '-'}"></td>
             <td th:text="${orden.items.size()}"></td>
+            <td class="text-end fw-semibold" th:text="${#numbers.formatDecimal(orden.total, 1, 'POINT', 2, 'COMMA')}">0,00</td>
             <td th:text="${orden.observacion}"></td>
             <td class="text-end action-cell">
                 <a class="btn btn-sm btn-outline-primary table-icon-action" th:href="@{/oc/{id}(id=${orden.id})}" title="Abrir OC" aria-label="Abrir OC"><i class="bi bi-box-arrow-up-right"></i></a>
             </td>
         </tr>
-        <tr th:if="${ordenes.isEmpty()}"><td colspan="5" class="text-center text-muted py-4">Este proveedor todavia no tiene ordenes asociadas.</td></tr>
+        <tr th:if="${ordenes.isEmpty()}"><td colspan="6" class="text-center text-muted py-4">Este proveedor todavia no tiene ordenes asociadas.</td></tr>
         </tbody>
     </table></div></section>
 </main>
