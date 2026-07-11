@@ -206,9 +206,9 @@ public class ItemizadoExportService {
                 .append(celdaFormula(sumaReferencias("K", rubrosRaiz), "num"))
                 .append(celdaFormula(sumaReferencias("L", rubrosRaiz), "num"))
                 .append(celdaFormula("K" + totalRow + "+L" + totalRow, "num"))
-                .append(celdaFormula("IF(K" + totalRow + ">0,O" + totalRow + "/K" + totalRow + "*100,0)", "pct"))
+                .append(celdaFormula(formulaPorcentaje("O" + totalRow, "K" + totalRow), "pct"))
                 .append(celdaFormula(sumaReferencias("O", rubrosRaiz), "num"))
-                .append(celdaFormula("MAX(K" + totalRow + "-O" + totalRow + ",0)", "num"))
+                .append(celdaFormula(formulaSaldo("K" + totalRow, "O" + totalRow), "num"))
                 .append(celda(""))
                 .append("</tr>");
         html.append("</table></body></html>");
@@ -275,9 +275,17 @@ public class ItemizadoExportService {
         if (filas.size() == 1) {
             return columna + filas.get(0);
         }
-        return "SUM(" + filas.stream()
+        return "SUMA(" + filas.stream()
                 .map(fila -> columna + fila)
-                .collect(java.util.stream.Collectors.joining(",")) + ")";
+                .collect(java.util.stream.Collectors.joining(";")) + ")";
+    }
+
+    private String formulaPorcentaje(String certificado, String total) {
+        return "SI(" + total + ">0;" + certificado + "/" + total + "*100;0)";
+    }
+
+    private String formulaSaldo(String total, String certificado) {
+        return "SI(" + total + "-" + certificado + "<0;0;" + total + "-" + certificado + ")";
     }
 
     private String formato(BigDecimal valor) {
@@ -335,7 +343,7 @@ public class ItemizadoExportService {
                     .append(celdaFormula("K" + itemRow + "+L" + itemRow, "num"))
                     .append(celdaNumeroPlano(avanceItem))
                     .append(celdaFormula("K" + itemRow + "*N" + itemRow + "/100", "num"))
-                    .append(celdaFormula("MAX(K" + itemRow + "-O" + itemRow + ",0)", "num"))
+                    .append(celdaFormula(formulaSaldo("K" + itemRow, "O" + itemRow), "num"))
                     .append(celda(estadoAvance(avanceItem)))
                     .append("</tr>");
 
@@ -365,7 +373,7 @@ public class ItemizadoExportService {
 
             if (!item.materiales().isEmpty()) {
                 int ultimoMaterialRow = fila[0];
-                reemplazarUltimaFormula(html, tokenItemL, "SUM(L" + primerMaterialRow + ":L" + ultimoMaterialRow + ")");
+                reemplazarUltimaFormula(html, tokenItemL, "SUMA(L" + primerMaterialRow + ":L" + ultimoMaterialRow + ")");
             } else {
                 reemplazarUltimaFormula(html, tokenItemL, "0");
             }
@@ -378,9 +386,9 @@ public class ItemizadoExportService {
         reemplazarUltimaFormula(html, tokenK, sumaReferencias("K", filasDirectas));
         reemplazarUltimaFormula(html, tokenL, sumaReferencias("L", filasDirectas));
         reemplazarUltimaFormula(html, tokenM, "K" + rubroRow + "+L" + rubroRow);
-        reemplazarUltimaFormula(html, tokenN, "IF(K" + rubroRow + ">0,O" + rubroRow + "/K" + rubroRow + "*100,0)");
+        reemplazarUltimaFormula(html, tokenN, formulaPorcentaje("O" + rubroRow, "K" + rubroRow));
         reemplazarUltimaFormula(html, tokenO, sumaReferencias("O", filasDirectas));
-        reemplazarUltimaFormula(html, tokenP, "MAX(K" + rubroRow + "-O" + rubroRow + ",0)");
+        reemplazarUltimaFormula(html, tokenP, formulaSaldo("K" + rubroRow, "O" + rubroRow));
         return rubroRow;
     }
 
