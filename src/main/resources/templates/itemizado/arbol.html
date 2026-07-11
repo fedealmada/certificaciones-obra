@@ -241,7 +241,10 @@ function prepararVistaArrastre(row, event) {
 }
 
 function clearItemizadoDropState() {
-    itemizadoDropTargets.forEach(row => row.classList.remove('is-drop-target', 'is-drop-invalid'));
+    itemizadoDropTargets.forEach(row => {
+        row.classList.remove('is-drop-target', 'is-drop-before', 'is-drop-after', 'is-drop-inside', 'is-drop-invalid');
+        delete row.dataset.dropPosition;
+    });
     itemizadoRows.forEach(row => row.classList.remove('is-item-drop-target', 'is-item-drop-before', 'is-item-drop-after', 'is-drop-invalid'));
 }
 
@@ -290,8 +293,8 @@ function moverRubroArbol(rubroId, padreId) {
     return itemizadoFormPost(`/rubros/${rubroId}/mover/async`, { padreId });
 }
 
-function reubicarRubroAntes(rubroId, targetId) {
-    return itemizadoFormPost(`/rubros/${rubroId}/reubicar-antes/async`, { targetId });
+function reubicarRubro(rubroId, targetId, position) {
+    return itemizadoFormPost(`/rubros/${rubroId}/reubicar/async`, { targetId, position });
 }
 
 function eliminarRubroVacio(rubroId) {
@@ -387,6 +390,22 @@ function marcarDropItem(row, event) {
     return position;
 }
 
+function posicionDropRubro(row, event) {
+    const rect = row.getBoundingClientRect();
+    const offset = event.clientY - rect.top;
+    if (offset < rect.height * 0.32) return 'before';
+    if (offset > rect.height * 0.68) return 'after';
+    return 'inside';
+}
+
+function marcarDropRubro(row, event) {
+    const position = posicionDropRubro(row, event);
+    itemizadoDropTargets.forEach(target => target.classList.remove('is-drop-target', 'is-drop-before', 'is-drop-after', 'is-drop-inside'));
+    row.classList.add('is-drop-target', `is-drop-${position}`);
+    row.dataset.dropPosition = position;
+    return position;
+}
+
 function cerrarMenuRubro() {
     document.querySelector('#itemizado-rubro-menu')?.classList.add('d-none');
 }
@@ -473,7 +492,7 @@ function rubroEsDescendiente(target, dragged) {
     return false;
 }
 
-async function ejecutarMovimientoRubro(rubroRow, targetRow) {
+async function ejecutarMovimientoRubro(rubroRow, targetRow, position = 'before') {
     if (!rubroRow || !targetRow) return;
     const rubroId = rubroRow.dataset.rubroId;
     const targetId = targetRow.dataset.rubroId;
@@ -484,7 +503,7 @@ async function ejecutarMovimientoRubro(rubroRow, targetRow) {
     rubroRow.classList.add('is-saving');
     setItemizadoStatus('Reubicando rubro...', 'is-saving');
     try {
-        const response = await reubicarRubroAntes(rubroId, targetId);
+        const response = await reubicarRubro(rubroId, targetId, position);
         if (!response.ok) {
             throw new Error('No se pudo reubicar el rubro.');
         }
@@ -737,22 +756,34 @@ function inicializarItemizadoDrag() {
         target.addEventListener('dragover', event => {
             if (!draggedItemizadoRow && !draggedRubroRow) return;
             event.preventDefault();
-            const sameRubro = draggedItemizadoRow
-                ? draggedItemizadoRow.dataset.currentRubroId === target.dataset.rubroId
-                : draggedRubroRow.dataset.rubroId === target.dataset.rubroId || rubroEsDescendiente(target, draggedRubroRow);
-            target.classList.toggle('is-drop-target', !sameRubro);
-            target.classList.toggle('is-drop-invalid', sameRubro);
-            event.dataTransfer.dropEffect = sameRubro ? 'none' : 'move';
+            if (draggedItemizadoRow) {
+                const sameRubro = draggedItemizadoRow.dataset.currentRubroId === target.dataset.rubroId;
+                target.classList.toggle('is-drop-target', !sameRubro);
+                target.classList.toggle('is-drop-invalid', sameRubro);
+                event.dataTransfer.dropEffect = sameRubro ? 'none' : 'move';
+                return;
+            }
+            const invalidRubro = draggedRubroRow.dataset.rubroId === target.dataset.rubroId || rubroEsDescendiente(target, draggedRubroRow);
+            target.classList.toggle('is-drop-invalid', invalidRubro);
+            if (invalidRubro) {
+                target.classList.remove('is-drop-target', 'is-drop-before', 'is-drop-after', 'is-drop-inside');
+                event.dataTransfer.dropEffect = 'none';
+                return;
+            }
+            marcarDropRubro(target, event);
+            event.dataTransfer.dropEffect = 'move';
         });
 
         target.addEventListener('dragleave', () => {
-            target.classList.remove('is-drop-target', 'is-drop-invalid');
+            target.classList.remove('is-drop-target', 'is-drop-before', 'is-drop-after', 'is-drop-inside', 'is-drop-invalid');
+            delete target.dataset.dropPosition;
         });
 
         target.addEventListener('drop', async event => {
             event.preventDefault();
             if (draggedRubroRow) {
-                await ejecutarMovimientoRubro(draggedRubroRow, target);
+                const position = target.dataset.dropPosition || posicionDropRubro(target, event);
+                await ejecutarMovimientoRubro(draggedRubroRow, target, position);
                 return;
             }
             if (!draggedItemizadoRow) return;

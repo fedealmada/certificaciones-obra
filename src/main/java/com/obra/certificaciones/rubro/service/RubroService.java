@@ -78,12 +78,21 @@ public class RubroService {
     }
 
     @Transactional
-    public Rubro reubicarAntes(Long id, Long targetId) {
+    public Rubro reubicar(Long id, Long targetId, String position) {
         Rubro rubro = obtener(id);
         Rubro target = obtener(targetId);
         if (id.equals(targetId)) {
             return rubro;
         }
+        if ("inside".equalsIgnoreCase(position)) {
+            validarPadreNoSeaDescendiente(rubro, target);
+            rubro.setPadre(target);
+            rubro.setOrdenItemizado(siguienteOrdenRubro(target.getId(), rubro.getId()));
+            Rubro guardado = rubroRepository.save(rubro);
+            renumerarCodigosJerarquia();
+            return guardado;
+        }
+
         Rubro nuevoPadre = target.getPadre();
         if (nuevoPadre != null) {
             validarPadreNoSeaDescendiente(rubro, nuevoPadre);
@@ -102,7 +111,8 @@ public class RubroService {
                 break;
             }
         }
-        hermanos.add(targetIndex, rubro);
+        int insertIndex = "after".equalsIgnoreCase(position) ? targetIndex + 1 : targetIndex;
+        hermanos.add(Math.min(insertIndex, hermanos.size()), rubro);
         for (int i = 0; i < hermanos.size(); i++) {
             hermanos.get(i).setOrdenItemizado((i + 1) * 10);
         }

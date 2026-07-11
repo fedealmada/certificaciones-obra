@@ -7488,6 +7488,18 @@ html[data-theme="dark"] body {
     filter: brightness(1.03);
 }
 
+.itemizado-drop-target.is-drop-before td {
+    box-shadow: inset 0 3px 0 var(--app-blue), inset 0 0 0 999px rgba(47, 128, 237, 0.08);
+}
+
+.itemizado-drop-target.is-drop-after td {
+    box-shadow: inset 0 -3px 0 var(--app-blue), inset 0 0 0 999px rgba(47, 128, 237, 0.08);
+}
+
+.itemizado-drop-target.is-drop-inside td {
+    box-shadow: inset 0 0 0 2px var(--app-blue), inset 0 0 0 999px rgba(47, 128, 237, 0.12);
+}
+
 .itemizado-drop-target.is-drop-invalid td {
     box-shadow: inset 0 0 0 2px rgba(211, 75, 66, 0.55);
 }
@@ -7524,6 +7536,18 @@ html[data-theme="dark"] body {
 :root[data-theme="dark"] .itemizado-drop-target.is-drop-target td {
     box-shadow: inset 0 0 0 2px #8fd6ff;
     filter: brightness(1.08);
+}
+
+:root[data-theme="dark"] .itemizado-drop-target.is-drop-before td {
+    box-shadow: inset 0 3px 0 #8fd6ff, inset 0 0 0 999px rgba(143, 214, 255, 0.1);
+}
+
+:root[data-theme="dark"] .itemizado-drop-target.is-drop-after td {
+    box-shadow: inset 0 -3px 0 #8fd6ff, inset 0 0 0 999px rgba(143, 214, 255, 0.1);
+}
+
+:root[data-theme="dark"] .itemizado-drop-target.is-drop-inside td {
+    box-shadow: inset 0 0 0 2px #8fd6ff, inset 0 0 0 999px rgba(143, 214, 255, 0.14);
 }
 
 :root[data-theme="dark"] .itemizado-drop-target.is-drop-invalid td {
@@ -8058,8 +8082,16 @@ html[data-theme="dark"] body {
     box-shadow: inset 0 -3px 0 var(--app-blue), inset 0 0 0 999px rgba(47, 128, 237, 0.08);
 }
 
-.itemizado-draggable-rubro.is-drop-target td {
+.itemizado-draggable-rubro.is-drop-before td {
     box-shadow: inset 0 3px 0 var(--app-blue), inset 0 0 0 999px rgba(47, 128, 237, 0.08);
+}
+
+.itemizado-draggable-rubro.is-drop-after td {
+    box-shadow: inset 0 -3px 0 var(--app-blue), inset 0 0 0 999px rgba(47, 128, 237, 0.08);
+}
+
+.itemizado-draggable-rubro.is-drop-inside td {
+    box-shadow: inset 0 0 0 2px var(--app-blue), inset 0 0 0 999px rgba(47, 128, 237, 0.12);
 }
 
 :root[data-theme="dark"] .work-action-success .work-action-card {
@@ -8088,8 +8120,16 @@ html[data-theme="dark"] body {
     box-shadow: inset 0 -3px 0 #8be9fd, inset 0 0 0 999px rgba(139, 233, 253, 0.1);
 }
 
-:root[data-theme="dark"] .itemizado-draggable-rubro.is-drop-target td {
+:root[data-theme="dark"] .itemizado-draggable-rubro.is-drop-before td {
     box-shadow: inset 0 3px 0 #8be9fd, inset 0 0 0 999px rgba(139, 233, 253, 0.1);
+}
+
+:root[data-theme="dark"] .itemizado-draggable-rubro.is-drop-after td {
+    box-shadow: inset 0 -3px 0 #8be9fd, inset 0 0 0 999px rgba(139, 233, 253, 0.1);
+}
+
+:root[data-theme="dark"] .itemizado-draggable-rubro.is-drop-inside td {
+    box-shadow: inset 0 0 0 2px #8be9fd, inset 0 0 0 999px rgba(139, 233, 253, 0.14);
 }
 
 :root[data-theme="dark"] .itemizado-toolbar {
