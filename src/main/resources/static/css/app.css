@@ -5216,6 +5216,386 @@ h5 {
     }
 }
 
+/* Table label alignment and Dracula dark mode */
+.theme-toggle-button {
+    border: 0;
+    background: transparent;
+    text-align: left;
+}
+
+.app-sidebar .theme-toggle-button {
+    width: 100%;
+}
+
+.table .delivery-status-pill,
+.table .category-chip,
+.table .status-pill,
+.table .item-code-pill,
+.interactive-table .delivery-status-pill,
+.interactive-table .category-chip,
+.interactive-table .status-pill,
+.interactive-table .item-code-pill,
+.document-table .delivery-status-pill,
+.document-table .category-chip,
+.document-table .status-pill,
+.document-table .item-code-pill {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    min-height: 1.72rem;
+    padding: 0.28rem 0.38rem;
+    white-space: normal;
+    overflow-wrap: normal;
+    word-break: normal;
+    line-height: 1.12;
+}
+
+.oc-list-table .delivery-status-pill,
+.oc-list-table .category-chip,
+.oc-list-table .item-code-pill {
+    white-space: normal;
+}
+
+.oc-list-table .delivery-trip-count {
+    width: 100%;
+}
+
+.oc-list-table thead th,
+.oc-list-table thead th.text-end,
+.oc-list-table .table-sort-button {
+    color: #334155;
+    font-weight: 780;
+}
+
+.oc-list-table .table-sort-button {
+    width: 100%;
+    text-align: left;
+}
+
+.oc-list-table th.text-end,
+.oc-list-table td.text-end {
+    text-align: right !important;
+}
+
+.oc-list-table th:last-child {
+    font-weight: 780;
+}
+
+.oc-list-table tbody td {
+    color: #334155;
+    font-weight: 520;
+}
+
+.oc-list-table tbody td.fw-semibold,
+.oc-list-table tbody td .item-code-pill {
+    font-weight: 760;
+}
+
+:root[data-theme="dark"] {
+    color-scheme: dark;
+    --ui-bg: #282a36;
+    --ui-panel: #343746;
+    --ui-line: #44475a;
+    --ui-line-strong: #5b6078;
+    --ui-ink: #f8f8f2;
+    --ui-muted: #c7c9d9;
+    --ui-blue: #8be9fd;
+    --ui-blue-soft: rgba(139, 233, 253, 0.14);
+    --ui-green: #50fa7b;
+    --ui-green-soft: rgba(80, 250, 123, 0.14);
+    --ui-yellow: #f1fa8c;
+    --ui-yellow-soft: rgba(241, 250, 140, 0.16);
+    --ui-red: #ff5555;
+    --ui-red-soft: rgba(255, 85, 85, 0.16);
+}
+
+:root[data-theme="dark"] body {
+    background: #282a36;
+    color: #f8f8f2;
+}
+
+:root[data-theme="dark"] .app-sidebar,
+:root[data-theme="dark"] .dashboard-body .app-topbar {
+    border-color: #44475a;
+    background: #21222c;
+    box-shadow: none;
+}
+
+:root[data-theme="dark"] .app-sidebar:hover,
+:root[data-theme="dark"] .app-sidebar:focus-within {
+    box-shadow: 14px 0 38px rgba(0, 0, 0, 0.36);
+}
+
+:root[data-theme="dark"] .app-sidebar .app-brand {
+    border-color: #44475a;
+    color: #f8f8f2;
+}
+
+:root[data-theme="dark"] .app-sidebar .app-brand-mark,
+:root[data-theme="dark"] .dashboard-brand-mark,
+:root[data-theme="dark"] .home-module-icon,
+:root[data-theme="dark"] .dashboard-body .module-icon,
+:root[data-theme="dark"] .dashboard-body .metric-head i {
+    border-color: rgba(139, 233, 253, 0.35);
+    background: rgba(139, 233, 253, 0.14);
+    color: #8be9fd;
+}
+
+:root[data-theme="dark"] .app-sidebar .nav-link {
+    color: #c7c9d9;
+}
+
+:root[data-theme="dark"] .app-sidebar .nav-link i {
+    color: #bd93f9;
+}
+
+:root[data-theme="dark"] .app-sidebar .nav-link:hover,
+:root[data-theme="dark"] .app-sidebar .nav-link:focus {
+    background: rgba(189, 147, 249, 0.16);
+    color: #f8f8f2;
+}
+
+:root[data-theme="dark"] .app-sidebar .nav-link:hover i,
+:root[data-theme="dark"] .app-sidebar .nav-link:focus i {
+    color: #ff79c6;
+}
+
+:root[data-theme="dark"] .page-hero,
+:root[data-theme="dark"] .document-header,
+:root[data-theme="dark"] .panel-section,
+:root[data-theme="dark"] .metric-card,
+:root[data-theme="dark"] .ticket-shell,
+:root[data-theme="dark"] .cert-detail-sheet,
+:root[data-theme="dark"] .cert-detail-summary,
+:root[data-theme="dark"] .cert-detail-table-wrap,
+:root[data-theme="dark"] .home-hero,
+:root[data-theme="dark"] .home-module-card,
+:root[data-theme="dark"] .dashboard-topline,
+:root[data-theme="dark"] .dashboard-body .metric-card,
+:root[data-theme="dark"] .dashboard-body .panel-section,
+:root[data-theme="dark"] .table-responsive {
+    border-color: #44475a;
+    background: #343746;
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.18);
+}
+
+:root[data-theme="dark"] .home-hero {
+    background:
+        linear-gradient(135deg, rgba(189, 147, 249, 0.16), rgba(52, 55, 70, 0.1) 44%),
+        #343746;
+}
+
+:root[data-theme="dark"] .home-hero-stats div,
+:root[data-theme="dark"] .cert-meta-grid div,
+:root[data-theme="dark"] .cert-detail-summary > div,
+:root[data-theme="dark"] .dashboard-body .dashboard-action-grid a,
+:root[data-theme="dark"] .dashboard-body .work-state-grid div,
+:root[data-theme="dark"] .dashboard-body .chart-legend-row {
+    border-color: #44475a;
+    background: #2f3241;
+}
+
+:root[data-theme="dark"] h1,
+:root[data-theme="dark"] h2,
+:root[data-theme="dark"] h3,
+:root[data-theme="dark"] h4,
+:root[data-theme="dark"] h5,
+:root[data-theme="dark"] .home-hero h1,
+:root[data-theme="dark"] .home-module-content strong,
+:root[data-theme="dark"] .cert-item-detail strong,
+:root[data-theme="dark"] .cert-value-stack strong,
+:root[data-theme="dark"] .cert-row-link,
+:root[data-theme="dark"] .document-subtitle,
+:root[data-theme="dark"] .ticket-top strong,
+:root[data-theme="dark"] .ticket-summary-grid strong,
+:root[data-theme="dark"] .cert-meta-grid strong,
+:root[data-theme="dark"] .cert-detail-summary strong {
+    color: #f8f8f2;
+}
+
+:root[data-theme="dark"] .text-muted,
+:root[data-theme="dark"] .document-kicker,
+:root[data-theme="dark"] .home-hero p,
+:root[data-theme="dark"] .home-module-content small,
+:root[data-theme="dark"] .home-hero-stats span,
+:root[data-theme="dark"] .metric-card small,
+:root[data-theme="dark"] .ticket-top span,
+:root[data-theme="dark"] .ticket-summary-grid span,
+:root[data-theme="dark"] .cert-meta-grid span,
+:root[data-theme="dark"] .cert-detail-summary span,
+:root[data-theme="dark"] .cert-detail-summary small,
+:root[data-theme="dark"] .delivery-trip-count {
+    color: #c7c9d9 !important;
+}
+
+:root[data-theme="dark"] .page-navigation {
+    border-color: #44475a;
+    background: rgba(33, 34, 44, 0.86);
+    color: #c7c9d9;
+}
+
+:root[data-theme="dark"] .page-navigation a {
+    color: #8be9fd;
+}
+
+:root[data-theme="dark"] .page-navigation span {
+    color: #f8f8f2;
+}
+
+:root[data-theme="dark"] .table,
+:root[data-theme="dark"] .document-table,
+:root[data-theme="dark"] .interactive-table,
+:root[data-theme="dark"] .cert-table,
+:root[data-theme="dark"] .oc-items-table,
+:root[data-theme="dark"] .oc-form-table,
+:root[data-theme="dark"] .cert-edit-table,
+:root[data-theme="dark"] .import-preview-table {
+    --bs-table-bg: #343746;
+    --bs-table-color: #f8f8f2;
+    --bs-table-border-color: #44475a;
+    --bs-table-hover-bg: #3f4254;
+    --bs-table-hover-color: #f8f8f2;
+    color: #f8f8f2;
+}
+
+:root[data-theme="dark"] .table th,
+:root[data-theme="dark"] .table td,
+:root[data-theme="dark"] .oc-list-table tbody td,
+:root[data-theme="dark"] .oc-items-table td,
+:root[data-theme="dark"] #certificados tbody td {
+    border-color: #44475a;
+    color: #f8f8f2;
+}
+
+:root[data-theme="dark"] .table thead th,
+:root[data-theme="dark"] .document-table thead th,
+:root[data-theme="dark"] .cert-table thead th,
+:root[data-theme="dark"] .cert-edit-table thead th,
+:root[data-theme="dark"] .oc-items-table thead th,
+:root[data-theme="dark"] .oc-form-table thead th,
+:root[data-theme="dark"] .import-preview-table thead th,
+:root[data-theme="dark"] .cert-items-head,
+:root[data-theme="dark"] .oc-list-table thead th,
+:root[data-theme="dark"] .oc-list-table .table-sort-button,
+:root[data-theme="dark"] #certificados .table thead th {
+    border-color: #44475a;
+    background: #282a36;
+    color: #f8f8f2;
+}
+
+:root[data-theme="dark"] .table-hover tbody tr:hover td,
+:root[data-theme="dark"] .cert-table tbody tr:hover td,
+:root[data-theme="dark"] .cert-edit-table tbody tr:hover td,
+:root[data-theme="dark"] .oc-items-table tbody tr:hover td,
+:root[data-theme="dark"] .cert-click-row:hover td,
+:root[data-theme="dark"] .cert-item-row:hover {
+    background: #3f4254;
+}
+
+:root[data-theme="dark"] .form-control,
+:root[data-theme="dark"] .form-select,
+:root[data-theme="dark"] .item-rubro-select {
+    border-color: #5b6078;
+    background-color: #282a36;
+    color: #f8f8f2;
+}
+
+:root[data-theme="dark"] .form-control::placeholder {
+    color: #8f93a8;
+}
+
+:root[data-theme="dark"] .form-control:focus,
+:root[data-theme="dark"] .form-select:focus {
+    border-color: #8be9fd;
+    box-shadow: 0 0 0 2px rgba(139, 233, 253, 0.16) !important;
+}
+
+:root[data-theme="dark"] .btn-primary {
+    border-color: #bd93f9;
+    background: #bd93f9;
+    color: #282a36;
+}
+
+:root[data-theme="dark"] .btn-outline-primary,
+:root[data-theme="dark"] .btn-outline-secondary {
+    border-color: #5b6078;
+    background: #2f3241;
+    color: #f8f8f2;
+}
+
+:root[data-theme="dark"] .btn-outline-danger {
+    border-color: rgba(255, 85, 85, 0.55);
+    background: rgba(255, 85, 85, 0.08);
+    color: #ffb8b8;
+}
+
+:root[data-theme="dark"] .delivery-status-pill.is-complete,
+:root[data-theme="dark"] #certificados .cert-row-link {
+    border-color: rgba(139, 233, 253, 0.42);
+    background: rgba(139, 233, 253, 0.15);
+    color: #8be9fd;
+}
+
+:root[data-theme="dark"] .delivery-status-pill.is-partial,
+:root[data-theme="dark"] .status-pending {
+    border-color: rgba(241, 250, 140, 0.38);
+    background: rgba(241, 250, 140, 0.14);
+    color: #f1fa8c;
+}
+
+:root[data-theme="dark"] .delivery-status-pill.is-pending,
+:root[data-theme="dark"] .delivery-status-pill.is-work-closed {
+    border-color: rgba(255, 85, 85, 0.42);
+    background: rgba(255, 85, 85, 0.14);
+    color: #ffb8b8;
+}
+
+:root[data-theme="dark"] .delivery-status-pill.is-work-open,
+:root[data-theme="dark"] .status-done {
+    border-color: rgba(80, 250, 123, 0.4);
+    background: rgba(80, 250, 123, 0.14);
+    color: #50fa7b;
+}
+
+:root[data-theme="dark"] .status-progress,
+:root[data-theme="dark"] .category-chip,
+:root[data-theme="dark"] .item-code-pill,
+:root[data-theme="dark"] .section-total-pill,
+:root[data-theme="dark"] .filter-active-pill,
+:root[data-theme="dark"] .home-status-pill {
+    border-color: rgba(189, 147, 249, 0.38);
+    background: rgba(189, 147, 249, 0.14);
+    color: #bd93f9;
+}
+
+:root[data-theme="dark"] .ticket-total-main,
+:root[data-theme="dark"] .cert-sheet-title,
+:root[data-theme="dark"] .cert-items-total {
+    background: linear-gradient(135deg, #44475a, #6272a4);
+}
+
+:root[data-theme="dark"] .oc-total-progress,
+:root[data-theme="dark"] .ticket-note {
+    border-color: #44475a;
+    background: linear-gradient(180deg, #343746 0%, #2f3241 100%);
+    color: #f8f8f2;
+}
+
+:root[data-theme="dark"] .oc-total-progress-track,
+:root[data-theme="dark"] .cert-detail-progress-track,
+:root[data-theme="dark"] .progress-thin,
+:root[data-theme="dark"] .bar-track {
+    background: #282a36;
+}
+
+:root[data-theme="dark"] .oc-total-progress-fill,
+:root[data-theme="dark"] .cert-detail-progress-fill,
+:root[data-theme="dark"] .progress-bar,
+:root[data-theme="dark"] .bar-fill {
+    background: linear-gradient(90deg, #8be9fd 0%, #bd93f9 68%, #50fa7b 100%);
+    box-shadow: 0 0 18px rgba(189, 147, 249, 0.22);
+}
+
 @media (max-width: 720px) {
     .dashboard-workspace {
         padding: 0.75rem;
