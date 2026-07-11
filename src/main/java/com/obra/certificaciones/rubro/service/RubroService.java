@@ -44,6 +44,15 @@ public class RubroService {
     }
 
     @Transactional
+    public Rubro actualizarBasico(Long id, String codigo, String nombre) {
+        Rubro rubro = obtener(id);
+        rubro.setCodigo(codigo);
+        rubro.setNombre(nombre);
+        validar(rubro);
+        return rubroRepository.save(rubro);
+    }
+
+    @Transactional
     public String eliminar(Long id) {
         Rubro rubro = obtener(id);
         int itemsDesvinculados = desvincularItems(rubro);

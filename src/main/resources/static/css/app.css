@@ -7198,6 +7198,97 @@ html[data-theme="dark"] body {
     opacity: 0.42;
 }
 
+.itemizado-inline-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    min-height: 1.85rem;
+    padding: 0.22rem 0.58rem;
+    border: 1px solid #d8dde3;
+    border-radius: 6px;
+    background: #ffffff;
+    color: var(--app-ink);
+    font-size: 0.76rem;
+    font-weight: 740;
+}
+
+.itemizado-inline-button:hover,
+.itemizado-inline-button:focus-visible {
+    border-color: var(--app-blue);
+    color: var(--app-blue);
+    box-shadow: 0 0 0 0.16rem rgba(47, 128, 237, 0.12);
+}
+
+.itemizado-context-rubro {
+    cursor: context-menu;
+}
+
+.itemizado-context-menu {
+    position: fixed;
+    z-index: 1080;
+    width: 13rem;
+    padding: 0.32rem;
+    border: 1px solid #d8dde3;
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 0 18px 42px rgba(24, 32, 42, 0.18);
+}
+
+.itemizado-context-menu button {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.52rem 0.58rem;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--app-ink);
+    font-size: 0.82rem;
+    font-weight: 680;
+    text-align: left;
+}
+
+.itemizado-context-menu button:hover,
+.itemizado-context-menu button:focus-visible {
+    background: #edf5ff;
+    color: var(--app-blue);
+}
+
+.itemizado-editor-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1090;
+    display: grid;
+    place-items: center;
+    padding: 1rem;
+    background: rgba(24, 32, 42, 0.28);
+}
+
+.itemizado-editor-panel {
+    width: min(28rem, 100%);
+    display: grid;
+    gap: 0.72rem;
+    padding: 1rem;
+    border: 1px solid #d8dde3;
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 0 26px 70px rgba(24, 32, 42, 0.22);
+}
+
+.itemizado-editor-panel h2 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 760;
+}
+
+.itemizado-editor-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 0.3rem;
+}
+
 .itemizado-drag-status.is-saving {
     color: var(--app-blue);
 }
@@ -7557,6 +7648,34 @@ html[data-theme="dark"] body {
     border-color: #8be9fd;
     color: #8be9fd;
     box-shadow: 0 0 0 0.16rem rgba(139, 233, 253, 0.14);
+}
+
+:root[data-theme="dark"] .itemizado-inline-button,
+:root[data-theme="dark"] .itemizado-context-menu,
+:root[data-theme="dark"] .itemizado-editor-panel {
+    background: #282a36;
+    border-color: #44475a;
+    color: #f8f8f2;
+}
+
+:root[data-theme="dark"] .itemizado-context-menu {
+    box-shadow: 0 18px 44px rgba(8, 9, 14, 0.46);
+}
+
+:root[data-theme="dark"] .itemizado-context-menu button {
+    color: #f8f8f2;
+}
+
+:root[data-theme="dark"] .itemizado-context-menu button:hover,
+:root[data-theme="dark"] .itemizado-context-menu button:focus-visible,
+:root[data-theme="dark"] .itemizado-inline-button:hover,
+:root[data-theme="dark"] .itemizado-inline-button:focus-visible {
+    background: #343746;
+    color: #8be9fd;
+}
+
+:root[data-theme="dark"] .itemizado-editor-backdrop {
+    background: rgba(8, 9, 14, 0.58);
 }
 
 :root[data-theme="dark"] .itemizado-drag-handle {

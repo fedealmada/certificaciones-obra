@@ -4,6 +4,7 @@ import com.obra.certificaciones.rubro.entity.Rubro;
 import com.obra.certificaciones.rubro.service.RubroService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -12,6 +13,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.Map;
 
 @Controller
 @RequestMapping("/rubros")
@@ -57,6 +62,27 @@ public class RubroController {
         }
     }
 
+    @PostMapping("/async")
+    @ResponseBody
+    public ResponseEntity<Map<String, String>> crearAsync(@RequestParam String nombre,
+                                                          @RequestParam(required = false) String codigo,
+                                                          @RequestParam(required = false) Long padreId) {
+        Rubro rubro = new Rubro();
+        rubro.setNombre(nombre);
+        rubro.setCodigo(codigo);
+        rubro.setPadreId(padreId);
+        rubro.setActivo(true);
+        return ResponseEntity.ok(respuestaRubro(rubroService.guardar(rubro)));
+    }
+
+    @PostMapping("/{id}/async")
+    @ResponseBody
+    public ResponseEntity<Map<String, String>> actualizarAsync(@PathVariable Long id,
+                                                               @RequestParam String nombre,
+                                                               @RequestParam(required = false) String codigo) {
+        return ResponseEntity.ok(respuestaRubro(rubroService.actualizarBasico(id, codigo, nombre)));
+    }
+
     @PostMapping("/{id}/eliminar")
     public String eliminar(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
@@ -75,5 +101,14 @@ public class RubroController {
             redirectAttributes.addFlashAttribute("error", "No se pudieron eliminar todos los rubros porque hay datos vinculados que deben revisarse.");
         }
         return "redirect:/rubros";
+    }
+
+    private Map<String, String> respuestaRubro(Rubro rubro) {
+        return Map.of(
+                "id", String.valueOf(rubro.getId()),
+                "codigo", rubro.getCodigo() == null ? "" : rubro.getCodigo(),
+                "nombre", rubro.getNombre() == null ? "" : rubro.getNombre(),
+                "nombreCompleto", rubro.getNombreCompleto()
+        );
     }
 }

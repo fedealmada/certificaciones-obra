@@ -44,6 +44,7 @@
                 <button class="itemizado-history-button" id="itemizado-undo" type="button" title="Deshacer movimiento" disabled><i class="bi bi-arrow-counterclockwise"></i></button>
                 <button class="itemizado-history-button" id="itemizado-redo" type="button" title="Rehacer movimiento" disabled><i class="bi bi-arrow-clockwise"></i></button>
             </div>
+            <button class="itemizado-inline-button" id="itemizado-new-root" type="button"><i class="bi bi-plus-lg"></i> Rubro</button>
             <small class="itemizado-drag-status" id="itemizado-drag-status" aria-live="polite"></small>
         </div>
 
@@ -81,7 +82,7 @@
                 </thead>
                 <tbody>
                 <th:block th:each="nodo : ${itemizado.nodos}">
-                    <tr class="rubro-row itemizado-toggle-row itemizado-drop-target" th:data-level="${nodo.nivel}" th:data-rubro-id="${nodo.rubro.id}" th:data-rubro-name="${nodo.rubro.nombreCompleto}" th:classappend="${nodo.nivel == 0 ? ' rubro-root' : (nodo.nivel == 1 ? ' rubro-middle' : ' rubro-leaf')}">
+                    <tr class="rubro-row itemizado-toggle-row itemizado-drop-target itemizado-context-rubro" th:data-level="${nodo.nivel}" th:data-rubro-id="${nodo.rubro.id}" th:data-rubro-code="${nodo.rubro.codigo}" th:data-rubro-name="${nodo.rubro.nombre}" th:data-rubro-full-name="${nodo.rubro.nombreCompleto}" th:classappend="${nodo.nivel == 0 ? ' rubro-root' : (nodo.nivel == 1 ? ' rubro-middle' : ' rubro-leaf')}">
                         <td><button class="itemizado-toggle" type="button" onclick="toggleItemizadoRubro(this)">−</button><span th:text="${nodo.rubro.codigo ?: '-'}"></span></td>
                         <td></td>
                         <td class="rubro-name" th:style="'padding-left:' + ${nodo.nivel * 18 + 8} + 'px'" th:text="${nodo.rubro.nombre}"></td>
@@ -120,6 +121,32 @@
                 </tfoot>
             </table>
         </div>
+
+        <div class="itemizado-context-menu d-none" id="itemizado-rubro-menu" role="menu">
+            <button type="button" data-action="rename"><i class="bi bi-pencil-square"></i> Cambiar nombre</button>
+            <button type="button" data-action="subrubro"><i class="bi bi-node-plus"></i> Crear subrubro</button>
+            <button type="button" data-action="root"><i class="bi bi-plus-lg"></i> Nuevo rubro raiz</button>
+        </div>
+
+        <div class="itemizado-editor-backdrop d-none" id="itemizado-rubro-editor">
+            <form class="itemizado-editor-panel">
+                <div>
+                    <div class="document-kicker" id="itemizado-editor-kicker">Rubro</div>
+                    <h2 id="itemizado-editor-title">Editar rubro</h2>
+                </div>
+                <input type="hidden" id="itemizado-editor-mode">
+                <input type="hidden" id="itemizado-editor-rubro-id">
+                <input type="hidden" id="itemizado-editor-padre-id">
+                <label class="form-label" for="itemizado-editor-code">Codigo</label>
+                <input class="form-control" id="itemizado-editor-code" placeholder="Ej: 1.2">
+                <label class="form-label" for="itemizado-editor-name">Nombre</label>
+                <input class="form-control" id="itemizado-editor-name" required placeholder="Nombre del rubro">
+                <div class="itemizado-editor-actions">
+                    <button class="btn btn-outline-secondary" type="button" id="itemizado-editor-cancel">Cancelar</button>
+                    <button class="btn btn-primary" type="submit">Guardar</button>
+                </div>
+            </form>
+        </div>
     </section>
 </main>
 <script>
@@ -156,6 +183,7 @@ let itemizadoStatus = document.querySelector('#itemizado-drag-status');
 let draggedItemizadoRow = null;
 let itemizadoUndoStack = [];
 let itemizadoRedoStack = [];
+let itemizadoContextRow = null;
 
 function setItemizadoStatus(message, type = '') {
     if (!itemizadoStatus) return;
@@ -174,10 +202,14 @@ function updateItemizadoHistoryButtons() {
     if (redoButton) redoButton.disabled = itemizadoRedoStack.length === 0;
 }
 
-function guardarRubroItemizado(itemId, rubroId) {
+function itemizadoFormPost(url, values) {
     const formData = new FormData();
-    formData.append('rubroId', rubroId);
-    return fetch(`/items/${itemId}/rubro/async`, {
+    Object.entries(values).forEach(([key, value]) => {
+        if (value !== null && value !== undefined) {
+            formData.append(key, value);
+        }
+    });
+    return fetch(url, {
         method: 'POST',
         body: formData,
         cache: 'no-store',
@@ -185,6 +217,19 @@ function guardarRubroItemizado(itemId, rubroId) {
             'X-Requested-With': 'XMLHttpRequest',
             'Cache-Control': 'no-cache'
         }
+    });
+}
+
+function guardarRubroItemizado(itemId, rubroId) {
+    return itemizadoFormPost(`/items/${itemId}/rubro/async`, { rubroId });
+}
+
+function guardarRubroArbol({ mode, rubroId, padreId, codigo, nombre }) {
+    const url = mode === 'rename' ? `/rubros/${rubroId}/async` : '/rubros/async';
+    return itemizadoFormPost(url, {
+        codigo: codigo || '',
+        nombre,
+        padreId: mode === 'subrubro' ? padreId : null
     });
 }
 
@@ -237,6 +282,75 @@ function moverFilaVisualmente(row, target) {
     target.parentNode.insertBefore(row, target.nextElementSibling);
     row.classList.add('is-just-moved');
     setTimeout(() => row.classList.remove('is-just-moved'), 1800);
+}
+
+function cerrarMenuRubro() {
+    document.querySelector('#itemizado-rubro-menu')?.classList.add('d-none');
+}
+
+function abrirMenuRubro(row, event) {
+    const menu = document.querySelector('#itemizado-rubro-menu');
+    if (!menu) return;
+    itemizadoContextRow = row;
+    menu.classList.remove('d-none');
+    const menuWidth = 210;
+    const menuHeight = 132;
+    const left = Math.min(event.clientX, window.innerWidth - menuWidth - 12);
+    const top = Math.min(event.clientY, window.innerHeight - menuHeight - 12);
+    menu.style.left = `${Math.max(12, left)}px`;
+    menu.style.top = `${Math.max(12, top)}px`;
+}
+
+function cerrarEditorRubro() {
+    document.querySelector('#itemizado-rubro-editor')?.classList.add('d-none');
+}
+
+function abrirEditorRubro(mode, row = null) {
+    const editor = document.querySelector('#itemizado-rubro-editor');
+    if (!editor) return;
+    const title = document.querySelector('#itemizado-editor-title');
+    const kicker = document.querySelector('#itemizado-editor-kicker');
+    const modeInput = document.querySelector('#itemizado-editor-mode');
+    const rubroInput = document.querySelector('#itemizado-editor-rubro-id');
+    const padreInput = document.querySelector('#itemizado-editor-padre-id');
+    const codeInput = document.querySelector('#itemizado-editor-code');
+    const nameInput = document.querySelector('#itemizado-editor-name');
+
+    modeInput.value = mode;
+    rubroInput.value = row?.dataset.rubroId || '';
+    padreInput.value = mode === 'subrubro' ? (row?.dataset.rubroId || '') : '';
+    codeInput.value = mode === 'rename' ? (row?.dataset.rubroCode || '') : '';
+    nameInput.value = mode === 'rename' ? (row?.dataset.rubroName || '') : '';
+    kicker.textContent = mode === 'subrubro' ? (row?.dataset.rubroFullName || 'Subrubro') : 'Itemizado';
+    title.textContent = mode === 'rename' ? 'Cambiar nombre del rubro'
+        : (mode === 'subrubro' ? 'Nuevo subrubro' : 'Nuevo rubro raiz');
+    editor.classList.remove('d-none');
+    setTimeout(() => nameInput.focus(), 40);
+}
+
+async function guardarEditorRubro(event) {
+    event.preventDefault();
+    const mode = document.querySelector('#itemizado-editor-mode').value;
+    const rubroId = document.querySelector('#itemizado-editor-rubro-id').value;
+    const padreId = document.querySelector('#itemizado-editor-padre-id').value;
+    const codigo = document.querySelector('#itemizado-editor-code').value.trim();
+    const nombre = document.querySelector('#itemizado-editor-name').value.trim();
+    if (!nombre) {
+        setItemizadoStatus('El nombre es obligatorio.', 'is-error');
+        return;
+    }
+    setItemizadoStatus('Guardando rubro...', 'is-saving');
+    try {
+        const response = await guardarRubroArbol({ mode, rubroId, padreId, codigo, nombre });
+        if (!response.ok) {
+            throw new Error('No se pudo guardar el rubro.');
+        }
+        cerrarEditorRubro();
+        await refrescarItemizado();
+        setItemizadoStatus(mode === 'rename' ? 'Rubro actualizado.' : 'Rubro creado.', 'is-saved');
+    } catch (error) {
+        setItemizadoStatus('No se pudo guardar el rubro.', 'is-error');
+    }
 }
 
 async function ejecutarMovimientoItemizado(movimiento, options = {}) {
@@ -308,7 +422,29 @@ function inicializarItemizadoDrag() {
     draggedItemizadoRow = null;
     document.querySelector('#itemizado-undo')?.addEventListener('click', deshacerMovimientoItemizado);
     document.querySelector('#itemizado-redo')?.addEventListener('click', rehacerMovimientoItemizado);
+    document.querySelector('#itemizado-new-root')?.addEventListener('click', () => abrirEditorRubro('root'));
+    document.querySelector('#itemizado-editor-cancel')?.addEventListener('click', cerrarEditorRubro);
+    document.querySelector('#itemizado-rubro-editor form')?.addEventListener('submit', guardarEditorRubro);
+    document.querySelector('#itemizado-rubro-editor')?.addEventListener('click', event => {
+        if (event.target.id === 'itemizado-rubro-editor') {
+            cerrarEditorRubro();
+        }
+    });
+    document.querySelector('#itemizado-rubro-menu')?.addEventListener('click', event => {
+        const button = event.target.closest('button[data-action]');
+        if (!button) return;
+        const action = button.dataset.action;
+        cerrarMenuRubro();
+        abrirEditorRubro(action === 'root' ? 'root' : action, itemizadoContextRow);
+    });
     updateItemizadoHistoryButtons();
+
+    document.querySelectorAll('.itemizado-context-rubro').forEach(row => {
+        row.addEventListener('contextmenu', event => {
+            event.preventDefault();
+            abrirMenuRubro(row, event);
+        });
+    });
 
     itemizadoRows.forEach(row => {
         row.addEventListener('dragstart', event => {
@@ -358,6 +494,19 @@ function inicializarItemizadoDrag() {
         });
     });
 }
+
+document.addEventListener('click', event => {
+    if (!event.target.closest('#itemizado-rubro-menu')) {
+        cerrarMenuRubro();
+    }
+});
+
+document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') {
+        cerrarMenuRubro();
+        cerrarEditorRubro();
+    }
+});
 
 inicializarItemizadoDrag();
 </script>
