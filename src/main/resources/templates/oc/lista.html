@@ -182,8 +182,10 @@ function applyFilters() {
         const matchesCategoria = !filtraCategoria || normalizeText(row.dataset.categorias).includes(categoria);
         const visible = matchesBusqueda && matchesRubro && matchesCategoria;
         row.classList.toggle('d-none', !visible);
+        row.classList.remove('is-visible-even', 'is-visible-odd');
         if (visible) {
             visibles++;
+            row.classList.add(visibles % 2 === 0 ? 'is-visible-even' : 'is-visible-odd');
         }
     });
 

@@ -172,7 +172,11 @@ function aplicarFiltroItems() {
         const coincideCategoria = !categoria || row.dataset.categoria === categoria;
         const visible = coincideTexto && coincideCategoria;
         row.classList.toggle('d-none', !visible);
-        if (visible) visibles++;
+        row.classList.remove('is-visible-even', 'is-visible-odd');
+        if (visible) {
+            visibles++;
+            row.classList.add(visibles % 2 === 0 ? 'is-visible-even' : 'is-visible-odd');
+        }
     });
 
     itemVisibleCount.textContent = visibles;
