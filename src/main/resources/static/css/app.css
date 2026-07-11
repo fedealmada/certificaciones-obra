@@ -7221,6 +7221,11 @@ html[data-theme="dark"] body {
 
 .itemizado-context-rubro {
     cursor: context-menu;
+    scroll-margin-top: 7rem;
+}
+
+.itemizado-draggable-row {
+    scroll-margin-top: 7rem;
 }
 
 .itemizado-context-menu {
@@ -7289,6 +7294,72 @@ html[data-theme="dark"] body {
     margin-top: 0.3rem;
 }
 
+.itemizado-action-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1200;
+    display: grid;
+    place-items: center;
+    padding: 1rem;
+    pointer-events: none;
+    background: rgba(24, 32, 42, 0.18);
+    animation: workOverlayIn 160ms ease both;
+}
+
+.itemizado-action-overlay.is-leaving {
+    animation: workOverlayOut 420ms ease both;
+}
+
+.itemizado-action-card {
+    width: min(22rem, 100%);
+    display: grid;
+    justify-items: center;
+    gap: 0.52rem;
+    padding: 1.45rem;
+    border-radius: 8px;
+    background: #31ad4b;
+    color: #ffffff;
+    text-align: center;
+    box-shadow: 0 24px 60px rgba(24, 32, 42, 0.28);
+}
+
+.itemizado-action-overlay.is-error .itemizado-action-card {
+    background: #b94a42;
+}
+
+.itemizado-action-icon {
+    width: 4rem;
+    height: 4rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid currentColor;
+    border-radius: 50%;
+    font-size: 2rem;
+    animation: workIconPop 520ms ease both;
+}
+
+.itemizado-action-kicker {
+    font-size: 0.72rem;
+    font-weight: 820;
+    opacity: 0.84;
+    text-transform: uppercase;
+}
+
+.itemizado-action-card h2 {
+    margin: 0;
+    color: inherit;
+    font-size: 1.28rem;
+    font-weight: 760;
+}
+
+.itemizado-action-card p {
+    margin: 0;
+    color: inherit;
+    font-size: 0.88rem;
+    opacity: 0.92;
+}
+
 .itemizado-drag-status.is-saving {
     color: var(--app-blue);
 }
@@ -7343,9 +7414,11 @@ html[data-theme="dark"] body {
 
 .itemizado-draggable-row.is-dragging td,
 .itemizado-draggable-rubro.is-dragging td {
-    opacity: 0.55;
-    outline: 2px dashed rgba(47, 128, 237, 0.45);
+    opacity: 1;
+    outline: 2px solid rgba(47, 128, 237, 0.72);
     outline-offset: -3px;
+    box-shadow: inset 0 0 0 999px rgba(47, 128, 237, 0.12), 0 14px 28px rgba(24, 32, 42, 0.18);
+    transform: scale(1.006);
 }
 
 .itemizado-draggable-row.is-saving td,
@@ -7357,6 +7430,35 @@ html[data-theme="dark"] body {
 .itemizado-draggable-rubro.is-error td {
     outline: 2px solid rgba(211, 75, 66, 0.55);
     outline-offset: -3px;
+}
+
+.itemizado-drag-preview {
+    position: fixed;
+    top: -1000px;
+    left: -1000px;
+    z-index: 1300;
+    width: 18rem;
+    display: grid;
+    gap: 0.18rem;
+    padding: 0.65rem 0.75rem;
+    border: 1px solid var(--app-blue);
+    border-radius: 8px;
+    background: #ffffff;
+    color: var(--app-ink);
+    box-shadow: 0 20px 42px rgba(24, 32, 42, 0.22);
+}
+
+.itemizado-drag-preview strong {
+    font-size: 0.78rem;
+    font-weight: 820;
+}
+
+.itemizado-drag-preview span {
+    font-size: 0.82rem;
+    font-weight: 650;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 @keyframes itemizadoMovedFade {
@@ -7375,7 +7477,9 @@ html[data-theme="dark"] body {
 }
 
 .itemizado-draggable-row.is-just-moved td,
-.itemizado-draggable-rubro.is-just-moved td {
+.itemizado-draggable-rubro.is-just-moved td,
+.itemizado-draggable-row.is-scroll-focus td,
+.itemizado-draggable-rubro.is-scroll-focus td {
     animation: itemizadoMovedFade 1.8s ease-out both;
 }
 
@@ -7695,6 +7799,32 @@ html[data-theme="dark"] body {
 
 :root[data-theme="dark"] .itemizado-editor-backdrop {
     background: rgba(8, 9, 14, 0.58);
+}
+
+:root[data-theme="dark"] .itemizado-action-overlay {
+    background: rgba(8, 9, 14, 0.42);
+}
+
+:root[data-theme="dark"] .itemizado-action-card {
+    background: #2f9e58;
+    box-shadow: 0 24px 70px rgba(8, 9, 14, 0.52);
+}
+
+:root[data-theme="dark"] .itemizado-action-overlay.is-error .itemizado-action-card {
+    background: #c84f57;
+}
+
+:root[data-theme="dark"] .itemizado-draggable-row.is-dragging td,
+:root[data-theme="dark"] .itemizado-draggable-rubro.is-dragging td {
+    outline-color: rgba(139, 233, 253, 0.8);
+    box-shadow: inset 0 0 0 999px rgba(139, 233, 253, 0.12), 0 16px 34px rgba(8, 9, 14, 0.32);
+}
+
+:root[data-theme="dark"] .itemizado-drag-preview {
+    background: #343746;
+    border-color: #8be9fd;
+    color: #f8f8f2;
+    box-shadow: 0 22px 50px rgba(8, 9, 14, 0.48);
 }
 
 :root[data-theme="dark"] .itemizado-drag-handle {
