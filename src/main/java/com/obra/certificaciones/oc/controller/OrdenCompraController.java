@@ -59,11 +59,15 @@ public class OrdenCompraController {
                 .map(OrdenCompra::getId)
                 .toList()));
         Map<Long, BigDecimal> avancesPorOrden = calcularAvancesOrdenes(ordenes);
+        Map<Long, Boolean> ordenesMateriales = calcularOrdenesMateriales(ordenes);
         model.addAttribute("avancesPorOrden", avancesPorOrden);
         model.addAttribute("ordenesCerradas", calcularOrdenesCerradas(avancesPorOrden));
-        model.addAttribute("ordenesMateriales", calcularOrdenesMateriales(ordenes));
-        model.addAttribute("estadosEntregaPorOrden", calcularEstadosEntrega(ordenes));
-        model.addAttribute("viajesPorOrden", calcularViajesEntrega(ordenes));
+        model.addAttribute("ordenesMateriales", ordenesMateriales);
+        model.addAttribute("estadosEntregaPorOrden", materialService.calcularEstadosOrdenes(ordenes));
+        model.addAttribute("viajesPorOrden", materialService.contarRecepcionesPorOrdenes(ordenesMateriales.entrySet().stream()
+                .filter(entry -> Boolean.TRUE.equals(entry.getValue()))
+                .map(Map.Entry::getKey)
+                .toList()));
         model.addAttribute("categorias", categoriaOrdenService.listarActivas());
         model.addAttribute("proveedor", proveedor);
         model.addAttribute("categoriaSeleccionada", categoriaId);
@@ -125,11 +129,15 @@ public class OrdenCompraController {
     @GetMapping("/{id}")
     public String detalle(@PathVariable Long id, Model model) {
         OrdenCompra ordenCompra = ordenCompraService.obtener(id);
-        var itemsResumen = calculoService.calcularResumenItems(ordenCompra.getId(), ordenCompra.getItems());
+        Map<Long, BigDecimal> acumuladosPorItem = calculoService.porcentajesAcumuladosPorItem(id);
+        var itemsResumen = calculoService.calcularResumenItems(ordenCompra.getItems(), acumuladosPorItem);
         var certificadosResumen = certificacionService.listarPorOrdenCompra(id).stream()
-                .map(certificacion -> new com.obra.certificaciones.certificacion.dto.CertificacionResumenVista(
-                        certificacion,
-                        calculoService.calcularResumen(id, ordenCompra.getItems(), calculoService.calcularDetalle(certificacion))))
+                .map(certificacion -> {
+                    var detalleCertificacion = calculoService.calcularDetalle(certificacion);
+                    return new com.obra.certificaciones.certificacion.dto.CertificacionResumenVista(
+                            certificacion,
+                            calculoService.calcularResumen(ordenCompra.getItems(), detalleCertificacion, acumuladosPorItem));
+                })
                 .toList();
         model.addAttribute("orden", ordenCompra);
         model.addAttribute("itemsResumen", itemsResumen);
@@ -153,13 +161,16 @@ public class OrdenCompraController {
         BigDecimal totalMaterialRecibidoCantidad = totalCantidadMaterial(materialItemsResumen, TipoCantidadMaterial.RECIBIDA);
         BigDecimal totalMaterialPendienteCantidad = totalCantidadMaterial(materialItemsResumen, TipoCantidadMaterial.PENDIENTE);
         BigDecimal porcentajeRecepcionOc = porcentaje(totalMaterialRecibidoCantidad, totalMaterialCompradoCantidad);
+        EstadoRecepcionMaterial estadoEntregaOrden = ordenMaterial
+                ? estadoEntregaOrden(materialItemsResumen)
+                : null;
         model.addAttribute("totalCertificado", totalCertificado);
         model.addAttribute("saldoOc", saldoOc);
         model.addAttribute("porcentajeAvanceOc", porcentajeAvanceOc);
         model.addAttribute("porcentajeAvanceOcBarra", porcentajeAvanceOc.min(BigDecimal.valueOf(100)));
         model.addAttribute("ordenCerrada", porcentajeAvanceOc.compareTo(BigDecimal.valueOf(100)) >= 0);
         model.addAttribute("ordenMaterial", ordenMaterial);
-        model.addAttribute("estadoEntregaOrden", ordenMaterial ? materialService.calcularEstadoOrden(id) : null);
+        model.addAttribute("estadoEntregaOrden", estadoEntregaOrden);
         model.addAttribute("totalMaterialCompradoCantidad", totalMaterialCompradoCantidad);
         model.addAttribute("totalMaterialRecibidoCantidad", totalMaterialRecibidoCantidad);
         model.addAttribute("totalMaterialPendienteCantidad", totalMaterialPendienteCantidad);
@@ -251,28 +262,18 @@ public class OrdenCompraController {
         return resultado;
     }
 
-    private Map<Long, EstadoRecepcionMaterial> calcularEstadosEntrega(List<OrdenCompra> ordenes) {
-        Map<Long, EstadoRecepcionMaterial> resultado = new HashMap<>();
-        for (OrdenCompra orden : ordenes) {
-            if (esOrdenMaterial(orden)) {
-                resultado.put(orden.getId(), materialService.calcularEstadoOrden(orden.getId()));
-            }
-        }
-        return resultado;
-    }
-
-    private Map<Long, Long> calcularViajesEntrega(List<OrdenCompra> ordenes) {
-        Map<Long, Long> resultado = new HashMap<>();
-        for (OrdenCompra orden : ordenes) {
-            if (esOrdenMaterial(orden)) {
-                resultado.put(orden.getId(), materialService.contarRecepciones(orden.getId()));
-            }
-        }
-        return resultado;
-    }
-
     private boolean esOrdenMaterial(OrdenCompra ordenCompra) {
         return ordenCompra.getItems().stream().anyMatch(item -> item.getCategoria() == CategoriaItem.MATERIAL);
+    }
+
+    private EstadoRecepcionMaterial estadoEntregaOrden(List<ItemMaterialResumen> resumenItems) {
+        if (resumenItems.isEmpty() || resumenItems.stream().allMatch(item -> item.estado() == EstadoRecepcionMaterial.PENDIENTE)) {
+            return EstadoRecepcionMaterial.PENDIENTE;
+        }
+        if (resumenItems.stream().allMatch(item -> item.estado() == EstadoRecepcionMaterial.COMPLETO)) {
+            return EstadoRecepcionMaterial.COMPLETO;
+        }
+        return EstadoRecepcionMaterial.PARCIAL;
     }
 
     private enum TipoCantidadMaterial {

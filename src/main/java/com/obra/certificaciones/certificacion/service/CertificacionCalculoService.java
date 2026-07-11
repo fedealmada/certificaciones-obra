@@ -179,9 +179,14 @@ public class CertificacionCalculoService {
     public ResumenCertificacion calcularResumen(Long ordenCompraId,
                                                 List<ItemOrdenCompra> itemsOrdenCompra,
                                                 List<ItemCertificacionCalculado> itemsCertificado) {
+        return calcularResumen(itemsOrdenCompra, itemsCertificado, porcentajesAcumuladosPorItem(ordenCompraId));
+    }
+
+    public ResumenCertificacion calcularResumen(List<ItemOrdenCompra> itemsOrdenCompra,
+                                                List<ItemCertificacionCalculado> itemsCertificado,
+                                                Map<Long, BigDecimal> acumuladosPorItem) {
         BigDecimal totalContratado = BigDecimal.ZERO;
         BigDecimal totalAcumulado = BigDecimal.ZERO;
-        Map<Long, BigDecimal> acumuladosPorItem = porcentajesAcumuladosPorItem(ordenCompraId);
         BigDecimal totalActual = itemsCertificado.stream()
                 .map(ItemCertificacionCalculado::montoActual)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);

@@ -20,7 +20,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -53,8 +55,42 @@ public class MaterialService {
     }
 
     @Transactional(readOnly = true)
+    public Map<Long, Long> contarRecepcionesPorOrdenes(List<Long> ordenCompraIds) {
+        if (ordenCompraIds == null || ordenCompraIds.isEmpty()) {
+            return Map.of();
+        }
+        Map<Long, Long> conteos = new HashMap<>();
+        recepcionMaterialRepository.countByOrdenCompraIds(ordenCompraIds)
+                .forEach(fila -> conteos.put((Long) fila[0], (Long) fila[1]));
+        return conteos;
+    }
+
+    @Transactional(readOnly = true)
     public EstadoRecepcionMaterial calcularEstadoOrden(Long ordenCompraId) {
         List<ItemMaterialResumen> resumenItems = calcularResumenItems(ordenCompraId);
+        return calcularEstadoOrden(resumenItems);
+    }
+
+    @Transactional(readOnly = true)
+    public Map<Long, EstadoRecepcionMaterial> calcularEstadosOrdenes(List<OrdenCompra> ordenes) {
+        if (ordenes == null || ordenes.isEmpty()) {
+            return Map.of();
+        }
+        List<Long> ordenCompraIds = ordenes.stream()
+                .map(OrdenCompra::getId)
+                .toList();
+        Map<Long, Map<Long, BigDecimal>> recibidasPorOrden = cantidadesRecibidasPorOrdenes(ordenCompraIds);
+        Map<Long, EstadoRecepcionMaterial> estados = new HashMap<>();
+        for (OrdenCompra orden : ordenes) {
+            if (orden.getItems().stream().noneMatch(item -> item.getCategoria() == CategoriaItem.MATERIAL)) {
+                continue;
+            }
+            estados.put(orden.getId(), calcularEstadoOrden(resumenItems(orden.getItems(), recibidasPorOrden.getOrDefault(orden.getId(), Map.of()))));
+        }
+        return estados;
+    }
+
+    private EstadoRecepcionMaterial calcularEstadoOrden(List<ItemMaterialResumen> resumenItems) {
         if (resumenItems.isEmpty() || resumenItems.stream().allMatch(item -> item.estado() == EstadoRecepcionMaterial.PENDIENTE)) {
             return EstadoRecepcionMaterial.PENDIENTE;
         }
@@ -117,24 +153,43 @@ public class MaterialService {
 
     @Transactional(readOnly = true)
     public List<ItemMaterialResumen> calcularResumenItems(Long ordenCompraId) {
-        return itemOrdenCompraRepository.findByOrdenCompraIdAndCategoriaOrderById(ordenCompraId, CategoriaItem.MATERIAL)
-                .stream()
+        List<ItemOrdenCompra> items = itemOrdenCompraRepository.findByOrdenCompraIdAndCategoriaOrderById(ordenCompraId, CategoriaItem.MATERIAL);
+        return resumenItems(items, cantidadesRecibidasPorItem(ordenCompraId));
+    }
+
+    @Transactional(readOnly = true)
+    public BigDecimal cantidadRecibidaItem(Long ordenCompraId, Long itemOrdenCompraId) {
+        return cantidadesRecibidasPorItem(ordenCompraId).getOrDefault(itemOrdenCompraId, BigDecimal.ZERO);
+    }
+
+    private List<ItemMaterialResumen> resumenItems(List<ItemOrdenCompra> items, Map<Long, BigDecimal> recibidasPorItem) {
+        return items.stream()
+                .filter(item -> item.getCategoria() == CategoriaItem.MATERIAL)
                 .map(item -> {
                     BigDecimal comprada = cantidadSegura(item.getCantidad());
-                    BigDecimal recibida = cantidadRecibidaItem(ordenCompraId, item.getId());
+                    BigDecimal recibida = recibidasPorItem.getOrDefault(item.getId(), BigDecimal.ZERO);
                     BigDecimal pendiente = comprada.subtract(recibida).max(BigDecimal.ZERO);
                     return new ItemMaterialResumen(item, comprada, recibida, pendiente, calcularEstado(comprada, recibida));
                 })
                 .toList();
     }
 
-    @Transactional(readOnly = true)
-    public BigDecimal cantidadRecibidaItem(Long ordenCompraId, Long itemOrdenCompraId) {
-        return itemRecepcionMaterialRepository.findByRecepcionMaterialOrdenCompraIdOrderByRecepcionMaterialFechaAscRecepcionMaterialIdAsc(ordenCompraId)
-                .stream()
-                .filter(item -> item.getItemOrdenCompra().getId().equals(itemOrdenCompraId))
-                .map(item -> cantidadSegura(item.getCantidadRecibida()))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    private Map<Long, BigDecimal> cantidadesRecibidasPorItem(Long ordenCompraId) {
+        return cantidadesRecibidasPorOrdenes(List.of(ordenCompraId)).getOrDefault(ordenCompraId, Map.of());
+    }
+
+    private Map<Long, Map<Long, BigDecimal>> cantidadesRecibidasPorOrdenes(List<Long> ordenCompraIds) {
+        if (ordenCompraIds == null || ordenCompraIds.isEmpty()) {
+            return Map.of();
+        }
+        Map<Long, Map<Long, BigDecimal>> recibidas = new HashMap<>();
+        for (Object[] fila : itemRecepcionMaterialRepository.sumCantidadesByOrdenCompraIds(ordenCompraIds)) {
+            Long ordenId = (Long) fila[0];
+            Long itemId = (Long) fila[1];
+            BigDecimal cantidad = fila[2] == null ? BigDecimal.ZERO : (BigDecimal) fila[2];
+            recibidas.computeIfAbsent(ordenId, id -> new HashMap<>()).put(itemId, cantidad);
+        }
+        return recibidas;
     }
 
     private void validarRecepcion(Long ordenCompraId, RecepcionMaterialForm form) {

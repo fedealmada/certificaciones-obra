@@ -29,7 +29,10 @@ public class AlertaSistemaService {
     public List<AlertaSistema> alertasGenerales() {
         List<AlertaSistema> alertas = new ArrayList<>();
         List<OrdenCompra> ordenes = ordenCompraRepository.buscarConFiltros(null, null, null);
-        ordenes.forEach(orden -> alertas.addAll(alertasOrden(orden)));
+        Map<Long, Map<Long, BigDecimal>> acumuladosPorOrden = calculoService.porcentajesAcumuladosPorOrdenes(ordenes.stream()
+                .map(OrdenCompra::getId)
+                .toList());
+        ordenes.forEach(orden -> alertas.addAll(alertasOrden(orden, acumuladosPorOrden.getOrDefault(orden.getId(), Map.of()))));
         return alertas.stream().limit(12).toList();
     }
 
@@ -41,6 +44,10 @@ public class AlertaSistemaService {
     }
 
     private List<AlertaSistema> alertasOrden(OrdenCompra orden) {
+        return alertasOrden(orden, calculoService.porcentajesAcumuladosPorItem(orden.getId()));
+    }
+
+    private List<AlertaSistema> alertasOrden(OrdenCompra orden, Map<Long, BigDecimal> acumuladosPorItem) {
         List<AlertaSistema> alertas = new ArrayList<>();
         String enlace = "/oc/" + orden.getId();
 
@@ -78,7 +85,6 @@ public class AlertaSistemaService {
             alertas.add(alerta("baja", "Materiales sin mano de obra", materialesSinVincular + " materiales no estan vinculados a un item de mano de obra.", enlace, "bi-link-45deg"));
         }
 
-        Map<Long, BigDecimal> acumuladosPorItem = calculoService.porcentajesAcumuladosPorItem(orden.getId());
         orden.getItems().stream()
                 .filter(item -> item.getCategoria() == CategoriaItem.MANO_OBRA)
                 .filter(item -> acumuladosPorItem.getOrDefault(item.getId(), BigDecimal.ZERO).compareTo(BigDecimal.valueOf(100)) > 0)
