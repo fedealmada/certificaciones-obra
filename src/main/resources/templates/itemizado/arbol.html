@@ -167,12 +167,22 @@ function guardarRubroItemizado(itemId, rubroId) {
     return fetch(`/items/${itemId}/rubro/async`, {
         method: 'POST',
         body: formData,
-        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        cache: 'no-store',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Cache-Control': 'no-cache'
+        }
     });
 }
 
 async function refrescarItemizado() {
-    const response = await fetch('/itemizado', { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+    const response = await fetch(`/itemizado?_=${Date.now()}`, {
+        cache: 'no-store',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Cache-Control': 'no-cache'
+        }
+    });
     if (!response.ok) {
         throw new Error('No se pudo actualizar el itemizado.');
     }
@@ -185,11 +195,32 @@ async function refrescarItemizado() {
     if (nuevasMetricas && metricasActuales) {
         metricasActuales.replaceWith(nuevasMetricas);
     }
-    if (nuevaPlanilla && planillaActual) {
-        planillaActual.replaceWith(nuevaPlanilla);
-        inicializarItemizadoDrag();
-        setItemizadoStatus('Itemizado actualizado.', 'is-saved');
+    if (!nuevaPlanilla || !planillaActual) {
+        window.location.reload();
+        return;
     }
+    planillaActual.replaceWith(nuevaPlanilla);
+    inicializarItemizadoDrag();
+    setItemizadoStatus('Itemizado actualizado.', 'is-saved');
+}
+
+function moverFilaVisualmente(row, target) {
+    if (!row || !target) return;
+    const targetLevel = Number.parseInt(target.dataset.level || '0', 10);
+    row.dataset.currentRubroId = target.dataset.rubroId;
+    row.dataset.level = String(targetLevel + 1);
+
+    let insertBefore = target.nextElementSibling;
+    while (insertBefore) {
+        const nextLevel = Number.parseInt(insertBefore.dataset.level || '0', 10);
+        if (insertBefore.classList.contains('itemizado-toggle-row') && nextLevel <= targetLevel) {
+            break;
+        }
+        insertBefore = insertBefore.nextElementSibling;
+    }
+    target.parentNode.insertBefore(row, insertBefore);
+    row.classList.add('is-just-moved');
+    setTimeout(() => row.classList.remove('is-just-moved'), 900);
 }
 
 function inicializarItemizadoDrag() {
@@ -247,7 +278,7 @@ function inicializarItemizadoDrag() {
                 if (!response.ok) {
                     throw new Error('No se pudo guardar el rubro.');
                 }
-                draggedItemizadoRow.dataset.currentRubroId = rubroId;
+                moverFilaVisualmente(draggedItemizadoRow, target);
                 await refrescarItemizado();
             } catch (error) {
                 draggedItemizadoRow.classList.add('is-error');
