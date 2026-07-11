@@ -39,6 +39,7 @@
         <div class="itemizado-toolbar">
             <strong>Total general</strong>
             <span th:text="${#numbers.formatDecimal(itemizado.totalGeneral, 1, 'POINT', 2, 'COMMA')}">0</span>
+            <small class="itemizado-drag-status" id="itemizado-drag-status" aria-live="polite"></small>
         </div>
 
         <div th:if="${itemizado.nodos.isEmpty()}" class="text-center text-muted py-4">
@@ -75,7 +76,7 @@
                 </thead>
                 <tbody>
                 <th:block th:each="nodo : ${itemizado.nodos}">
-                    <tr class="rubro-row itemizado-toggle-row" th:data-level="${nodo.nivel}" th:classappend="${nodo.nivel == 0 ? ' rubro-root' : (nodo.nivel == 1 ? ' rubro-middle' : ' rubro-leaf')}">
+                    <tr class="rubro-row itemizado-toggle-row itemizado-drop-target" th:data-level="${nodo.nivel}" th:data-rubro-id="${nodo.rubro.id}" th:data-rubro-name="${nodo.rubro.nombreCompleto}" th:classappend="${nodo.nivel == 0 ? ' rubro-root' : (nodo.nivel == 1 ? ' rubro-middle' : ' rubro-leaf')}">
                         <td><button class="itemizado-toggle" type="button" onclick="toggleItemizadoRubro(this)">−</button><span th:text="${nodo.rubro.codigo ?: '-'}"></span></td>
                         <td></td>
                         <td class="rubro-name" th:style="'padding-left:' + ${nodo.nivel * 18 + 8} + 'px'" th:text="${nodo.rubro.nombre}"></td>
@@ -87,8 +88,8 @@
                         <td class="text-end" th:text="${#numbers.formatDecimal(nodo.totalMateriales, 1, 'POINT', 2, 'COMMA')}"></td>
                         <td class="text-end total-cell" th:text="${#numbers.formatDecimal(nodo.totalGeneral, 1, 'POINT', 2, 'COMMA')}"></td>
                     </tr>
-                    <tr th:each="item : ${nodo.items}" class="item-row itemizado-child-row" th:data-level="${nodo.nivel + 1}">
-                        <td th:text="${item.codigoItemizado}"></td>
+                    <tr th:each="item : ${nodo.items}" class="item-row itemizado-child-row itemizado-draggable-row" draggable="true" th:data-level="${nodo.nivel + 1}" th:data-item-id="${item.manoObra.id}" th:data-current-rubro-id="${nodo.rubro.id}">
+                        <td><span class="itemizado-drag-handle" title="Mover item"><i class="bi bi-grip-vertical"></i></span><span th:text="${item.codigoItemizado}"></span></td>
                         <td th:text="${item.manoObra.item}"></td>
                         <td th:style="'padding-left:' + ${(nodo.nivel + 1) * 18 + 8} + 'px'">
                             <span th:text="${item.manoObra.detalle}"></span>
@@ -143,6 +144,92 @@ function toggleItemizadoRubro(button) {
         next = next.nextElementSibling;
     }
 }
+
+const itemizadoRows = Array.from(document.querySelectorAll('.itemizado-draggable-row'));
+const itemizadoDropTargets = Array.from(document.querySelectorAll('.itemizado-drop-target'));
+const itemizadoStatus = document.querySelector('#itemizado-drag-status');
+let draggedItemizadoRow = null;
+
+function setItemizadoStatus(message, type = '') {
+    if (!itemizadoStatus) return;
+    itemizadoStatus.textContent = message;
+    itemizadoStatus.className = `itemizado-drag-status ${type}`.trim();
+}
+
+function clearItemizadoDropState() {
+    itemizadoDropTargets.forEach(row => row.classList.remove('is-drop-target', 'is-drop-invalid'));
+}
+
+function guardarRubroItemizado(itemId, rubroId) {
+    const formData = new FormData();
+    formData.append('rubroId', rubroId);
+    return fetch(`/items/${itemId}/rubro/async`, {
+        method: 'POST',
+        body: formData,
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    });
+}
+
+itemizadoRows.forEach(row => {
+    row.addEventListener('dragstart', event => {
+        draggedItemizadoRow = row;
+        row.classList.add('is-dragging');
+        event.dataTransfer.effectAllowed = 'move';
+        event.dataTransfer.setData('text/plain', row.dataset.itemId);
+        setItemizadoStatus('');
+    });
+
+    row.addEventListener('dragend', () => {
+        row.classList.remove('is-dragging', 'is-saving', 'is-error');
+        draggedItemizadoRow = null;
+        clearItemizadoDropState();
+    });
+});
+
+itemizadoDropTargets.forEach(target => {
+    target.addEventListener('dragover', event => {
+        if (!draggedItemizadoRow) return;
+        event.preventDefault();
+        const sameRubro = draggedItemizadoRow.dataset.currentRubroId === target.dataset.rubroId;
+        target.classList.toggle('is-drop-target', !sameRubro);
+        target.classList.toggle('is-drop-invalid', sameRubro);
+        event.dataTransfer.dropEffect = sameRubro ? 'none' : 'move';
+    });
+
+    target.addEventListener('dragleave', () => {
+        target.classList.remove('is-drop-target', 'is-drop-invalid');
+    });
+
+    target.addEventListener('drop', async event => {
+        event.preventDefault();
+        if (!draggedItemizadoRow) return;
+        const itemId = draggedItemizadoRow.dataset.itemId;
+        const rubroId = target.dataset.rubroId;
+        if (!itemId || !rubroId || draggedItemizadoRow.dataset.currentRubroId === rubroId) {
+            clearItemizadoDropState();
+            return;
+        }
+
+        draggedItemizadoRow.classList.add('is-saving');
+        clearItemizadoDropState();
+        setItemizadoStatus('Guardando...', 'is-saving');
+
+        try {
+            const response = await guardarRubroItemizado(itemId, rubroId);
+            if (!response.ok) {
+                throw new Error('No se pudo guardar el rubro.');
+            }
+            setItemizadoStatus('Rubro actualizado.', 'is-saved');
+            draggedItemizadoRow.dataset.currentRubroId = rubroId;
+            setTimeout(() => window.location.reload(), 550);
+        } catch (error) {
+            draggedItemizadoRow.classList.add('is-error');
+            setItemizadoStatus('No se pudo guardar.', 'is-error');
+        } finally {
+            draggedItemizadoRow.classList.remove('is-saving');
+        }
+    });
+});
 </script>
 </body>
 </html>

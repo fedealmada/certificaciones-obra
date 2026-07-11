@@ -7140,3 +7140,114 @@ html[data-theme="dark"] body {
 .oc-list-table tbody tr.is-visible-odd td {
     background: #ffffff;
 }
+
+/* Interactive itemizado tree */
+.itemizado-toolbar {
+    gap: 0.75rem;
+}
+
+.itemizado-drag-status {
+    margin-left: auto;
+    color: var(--app-muted);
+    font-size: 0.74rem;
+    font-weight: 700;
+}
+
+.itemizado-drag-status.is-saving {
+    color: var(--app-blue);
+}
+
+.itemizado-drag-status.is-saved {
+    color: var(--app-green);
+}
+
+.itemizado-drag-status.is-error {
+    color: var(--app-red);
+}
+
+.itemizado-draggable-row {
+    cursor: grab;
+}
+
+.itemizado-draggable-row:active {
+    cursor: grabbing;
+}
+
+.itemizado-drag-handle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.35rem;
+    height: 1.35rem;
+    margin-right: 0.25rem;
+    border: 1px solid #d8dde3;
+    border-radius: 5px;
+    background: #ffffff;
+    color: #66717d;
+    vertical-align: middle;
+}
+
+.itemizado-draggable-row:hover .itemizado-drag-handle {
+    border-color: var(--app-blue);
+    color: var(--app-blue);
+}
+
+.itemizado-draggable-row.is-dragging td {
+    opacity: 0.55;
+    outline: 2px dashed rgba(47, 128, 237, 0.45);
+    outline-offset: -3px;
+}
+
+.itemizado-draggable-row.is-saving td {
+    filter: saturate(0.85);
+}
+
+.itemizado-draggable-row.is-error td {
+    outline: 2px solid rgba(211, 75, 66, 0.55);
+    outline-offset: -3px;
+}
+
+.itemizado-drop-target.is-drop-target td {
+    box-shadow: inset 0 0 0 2px var(--app-blue);
+    filter: brightness(1.03);
+}
+
+.itemizado-drop-target.is-drop-invalid td {
+    box-shadow: inset 0 0 0 2px rgba(211, 75, 66, 0.55);
+}
+
+:root[data-theme="dark"] .itemizado-drag-status {
+    color: #dce1ea;
+}
+
+:root[data-theme="dark"] .itemizado-drag-status.is-saving {
+    color: #8fd6ff;
+}
+
+:root[data-theme="dark"] .itemizado-drag-status.is-saved {
+    color: #7ee2a8;
+}
+
+:root[data-theme="dark"] .itemizado-drag-status.is-error {
+    color: #ffb1ad;
+}
+
+:root[data-theme="dark"] .itemizado-drag-handle {
+    background: #666b7b;
+    border-color: #858c9f;
+    color: #fbfcff;
+}
+
+:root[data-theme="dark"] .itemizado-draggable-row:hover .itemizado-drag-handle {
+    border-color: #8fd6ff;
+    color: #8fd6ff;
+}
+
+:root[data-theme="dark"] .itemizado-drop-target.is-drop-target td {
+    box-shadow: inset 0 0 0 2px #8fd6ff;
+    filter: brightness(1.08);
+}
+
+:root[data-theme="dark"] .itemizado-drop-target.is-drop-invalid td {
+    box-shadow: inset 0 0 0 2px #ffb1ad;
+}
