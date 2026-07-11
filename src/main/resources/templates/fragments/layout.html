@@ -38,8 +38,33 @@
     </div>
     <script>
     (() => {
+        const sidebar = document.currentScript.closest('.app-sidebar');
         const button = document.querySelector('.theme-toggle-button');
         const icon = button?.querySelector('i');
+
+        if (sidebar) {
+            const openSidebar = () => {
+                sidebar.classList.add('is-open');
+                sessionStorage.setItem('obraControl.sidebarOpen', 'true');
+            };
+            const closeSidebar = () => {
+                sidebar.classList.remove('is-open');
+                sessionStorage.removeItem('obraControl.sidebarOpen');
+            };
+
+            if (sessionStorage.getItem('obraControl.sidebarOpen') === 'true') {
+                sidebar.classList.add('is-open');
+            }
+
+            sidebar.addEventListener('pointerenter', openSidebar);
+            sidebar.addEventListener('pointerleave', closeSidebar);
+            sidebar.addEventListener('click', openSidebar);
+            document.addEventListener('pointermove', event => {
+                if (sidebar.classList.contains('is-open') && !sidebar.contains(event.target) && !sidebar.matches(':hover')) {
+                    closeSidebar();
+                }
+            });
+        }
 
         function setTheme(theme) {
             document.documentElement.dataset.theme = theme;

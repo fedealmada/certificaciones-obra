@@ -221,13 +221,15 @@ document.querySelectorAll('.oc-total-progress-fill, .oc-progress .progress-bar')
     const target = Number.parseFloat(String(progressFill.dataset.progress || '0').replace(',', '.'));
     const safeTarget = Number.isFinite(target) ? Math.max(0, Math.min(100, target)) : 0;
     progressFill.style.width = '0%';
+    progressFill.classList.remove('is-loaded');
     progressFill.classList.toggle('is-empty', safeTarget === 0);
+    progressFill.offsetWidth;
 
     window.requestAnimationFrame(() => {
         window.setTimeout(() => {
             progressFill.classList.add('is-loaded');
             progressFill.style.width = `${safeTarget}%`;
-        }, 180 + Math.min(index, 8) * 45);
+        }, 520 + Math.min(index, 8) * 80);
     });
 });
 
