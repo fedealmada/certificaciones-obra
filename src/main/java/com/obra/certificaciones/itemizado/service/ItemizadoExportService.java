@@ -171,7 +171,7 @@ public class ItemizadoExportService {
         int[] fila = {1};
         List<Integer> rubrosRaiz = new ArrayList<>();
         html.append("""
-                <html>
+                <html xmlns:x="urn:schemas-microsoft-com:office:excel">
                 <head>
                 <meta charset="UTF-8">
                 <style>
@@ -200,13 +200,14 @@ public class ItemizadoExportService {
             rubrosRaiz.add(agregarNodoAvanceHtml(html, raiz, avancesPorItem, fila));
         }
         int totalRow = ++fila[0];
+        boolean tieneRubros = !rubrosRaiz.isEmpty();
         html.append("<tr class=\"total\">")
                 .append(celda("")).append(celda("TOTAL")).append(celda("")).append(celda("TOTAL GENERAL"))
                 .append(celda("")).append(celda("")).append(celda("")).append(celda("")).append(celda("")).append(celda(""))
                 .append(celdaFormula(sumarReferencias("K", rubrosRaiz), "num"))
                 .append(celdaFormula(sumarReferencias("L", rubrosRaiz), "num"))
                 .append(celdaFormula("K" + totalRow + "+L" + totalRow, "num"))
-                .append(celdaFormula(formulaPorcentaje("O" + totalRow, "K" + totalRow), "pct"))
+                .append(tieneRubros ? celdaFormula(formulaPorcentaje("O" + totalRow, "K" + totalRow), "pct") : celdaNumeroPlano(BigDecimal.ZERO))
                 .append(celdaFormula(sumarReferencias("O", rubrosRaiz), "num"))
                 .append(celdaFormula(formulaSaldo("K" + totalRow, "O" + totalRow), "num"))
                 .append(celda(""))
@@ -250,11 +251,18 @@ public class ItemizadoExportService {
     }
 
     private String celdaNumeroPlano(BigDecimal valor) {
-        return "<td class=\"num\">" + (valor == null ? "" : valor.stripTrailingZeros().toPlainString()) + "</td>";
+        if (valor == null) {
+            return "<td class=\"num\"></td>";
+        }
+        String numero = valor.stripTrailingZeros().toPlainString();
+        return "<td class=\"num\" x:num=\"" + escaparHtml(numero) + "\">" + escaparHtml(numero) + "</td>";
     }
 
     private String celdaFormula(String formula, String clase) {
-        return "<td class=\"" + escaparHtml(clase) + "\">=" + escaparHtml(formula) + "</td>";
+        String formulaExcel = "=" + formula;
+        return "<td class=\"" + escaparHtml(clase) + "\" x:fmla=\"" + escaparHtml(formulaExcel) + "\">"
+                + escaparHtml(formulaExcel)
+                + "</td>";
     }
 
     private String token(String columna, int fila) {
@@ -278,11 +286,11 @@ public class ItemizadoExportService {
     }
 
     private String formulaPorcentaje(String certificado, String total) {
-        return certificado + "/(" + total + "+(" + total + "=0))*100";
+        return "IFERROR(" + certificado + "/" + total + "*100,0)";
     }
 
     private String formulaSaldo(String total, String certificado) {
-        return "(" + total + "-" + certificado + ")*(" + total + ">" + certificado + ")";
+        return total + "-" + certificado;
     }
 
     private String formato(BigDecimal valor) {
