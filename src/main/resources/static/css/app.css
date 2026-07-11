@@ -7167,6 +7167,37 @@ html[data-theme="dark"] body {
     font-weight: 700;
 }
 
+.itemizado-history-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.itemizado-history-button {
+    width: 1.85rem;
+    height: 1.85rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #d8dde3;
+    border-radius: 6px;
+    background: #ffffff;
+    color: var(--app-ink);
+    font-size: 0.86rem;
+}
+
+.itemizado-history-button:hover:not(:disabled),
+.itemizado-history-button:focus-visible:not(:disabled) {
+    border-color: var(--app-blue);
+    color: var(--app-blue);
+    box-shadow: 0 0 0 0.16rem rgba(47, 128, 237, 0.12);
+}
+
+.itemizado-history-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.42;
+}
+
 .itemizado-drag-status.is-saving {
     color: var(--app-blue);
 }
@@ -7219,6 +7250,25 @@ html[data-theme="dark"] body {
 .itemizado-draggable-row.is-error td {
     outline: 2px solid rgba(211, 75, 66, 0.55);
     outline-offset: -3px;
+}
+
+@keyframes itemizadoMovedFade {
+    0% {
+        background-color: rgba(80, 250, 123, 0.34);
+        box-shadow: inset 0 0 0 2px rgba(47, 125, 104, 0.45);
+    }
+    55% {
+        background-color: rgba(80, 250, 123, 0.18);
+        box-shadow: inset 0 0 0 2px rgba(47, 125, 104, 0.22);
+    }
+    100% {
+        background-color: inherit;
+        box-shadow: inset 0 0 0 0 rgba(47, 125, 104, 0);
+    }
+}
+
+.itemizado-draggable-row.is-just-moved td {
+    animation: itemizadoMovedFade 1.8s ease-out both;
 }
 
 .itemizado-drop-target.is-drop-target td {
@@ -7496,6 +7546,19 @@ html[data-theme="dark"] body {
     color: #f8f8f2;
 }
 
+:root[data-theme="dark"] .itemizado-history-button {
+    background: #3f4354;
+    border-color: #6272a4;
+    color: #f8f8f2;
+}
+
+:root[data-theme="dark"] .itemizado-history-button:hover:not(:disabled),
+:root[data-theme="dark"] .itemizado-history-button:focus-visible:not(:disabled) {
+    border-color: #8be9fd;
+    color: #8be9fd;
+    box-shadow: 0 0 0 0.16rem rgba(139, 233, 253, 0.14);
+}
+
 :root[data-theme="dark"] .itemizado-drag-handle {
     background: #3f4354;
     border-color: #6272a4;
@@ -7645,8 +7708,7 @@ html[data-theme="dark"] body {
 :root[data-theme="dark"] .interactive-table tbody tr:hover td,
 :root[data-theme="dark"] .items-master-table tbody tr:hover td,
 :root[data-theme="dark"] .oc-list-table tbody tr:hover td,
-:root[data-theme="dark"] .oc-items-table tbody tr:hover td,
-:root[data-theme="dark"] .itemizado-draggable-row.is-just-moved td {
+:root[data-theme="dark"] .oc-items-table tbody tr:hover td {
     background: #343746 !important;
 }
 

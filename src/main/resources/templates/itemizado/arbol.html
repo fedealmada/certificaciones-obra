@@ -40,6 +40,10 @@
             <strong>Total general</strong>
             <span th:text="${#numbers.formatDecimal(itemizado.totalGeneral, 1, 'POINT', 2, 'COMMA')}">0</span>
             <small class="itemizado-drag-help"><i class="bi bi-arrows-move"></i> Arrastra un item sobre otro rubro para moverlo</small>
+            <div class="itemizado-history-actions" aria-label="Historial de movimientos">
+                <button class="itemizado-history-button" id="itemizado-undo" type="button" title="Deshacer movimiento" disabled><i class="bi bi-arrow-counterclockwise"></i></button>
+                <button class="itemizado-history-button" id="itemizado-redo" type="button" title="Rehacer movimiento" disabled><i class="bi bi-arrow-clockwise"></i></button>
+            </div>
             <small class="itemizado-drag-status" id="itemizado-drag-status" aria-live="polite"></small>
         </div>
 
@@ -150,6 +154,8 @@ let itemizadoRows = [];
 let itemizadoDropTargets = [];
 let itemizadoStatus = document.querySelector('#itemizado-drag-status');
 let draggedItemizadoRow = null;
+let itemizadoUndoStack = [];
+let itemizadoRedoStack = [];
 
 function setItemizadoStatus(message, type = '') {
     if (!itemizadoStatus) return;
@@ -159,6 +165,13 @@ function setItemizadoStatus(message, type = '') {
 
 function clearItemizadoDropState() {
     itemizadoDropTargets.forEach(row => row.classList.remove('is-drop-target', 'is-drop-invalid'));
+}
+
+function updateItemizadoHistoryButtons() {
+    const undoButton = document.querySelector('#itemizado-undo');
+    const redoButton = document.querySelector('#itemizado-redo');
+    if (undoButton) undoButton.disabled = itemizadoUndoStack.length === 0;
+    if (redoButton) redoButton.disabled = itemizadoRedoStack.length === 0;
 }
 
 function guardarRubroItemizado(itemId, rubroId) {
@@ -175,7 +188,7 @@ function guardarRubroItemizado(itemId, rubroId) {
     });
 }
 
-async function refrescarItemizado() {
+async function refrescarItemizado(highlight = null) {
     const response = await fetch(`/itemizado?_=${Date.now()}`, {
         cache: 'no-store',
         headers: {
@@ -201,6 +214,12 @@ async function refrescarItemizado() {
     }
     planillaActual.replaceWith(nuevaPlanilla);
     inicializarItemizadoDrag();
+    if (highlight) {
+        const movedRow = document.querySelector(`.itemizado-draggable-row[data-item-id="${highlight.itemId}"]`);
+        const targetRow = document.querySelector(`.itemizado-drop-target[data-rubro-id="${highlight.rubroId}"]`);
+        moverFilaVisualmente(movedRow, targetRow);
+    }
+    updateItemizadoHistoryButtons();
     setItemizadoStatus('Itemizado actualizado.', 'is-saved');
 }
 
@@ -210,17 +229,76 @@ function moverFilaVisualmente(row, target) {
     row.dataset.currentRubroId = target.dataset.rubroId;
     row.dataset.level = String(targetLevel + 1);
 
-    let insertBefore = target.nextElementSibling;
-    while (insertBefore) {
-        const nextLevel = Number.parseInt(insertBefore.dataset.level || '0', 10);
-        if (insertBefore.classList.contains('itemizado-toggle-row') && nextLevel <= targetLevel) {
-            break;
-        }
-        insertBefore = insertBefore.nextElementSibling;
+    const toggle = target.querySelector('.itemizado-toggle');
+    if (toggle && toggle.textContent === '+') {
+        toggle.textContent = '−';
     }
-    target.parentNode.insertBefore(row, insertBefore);
+    row.classList.remove('d-none');
+    target.parentNode.insertBefore(row, target.nextElementSibling);
     row.classList.add('is-just-moved');
-    setTimeout(() => row.classList.remove('is-just-moved'), 900);
+    setTimeout(() => row.classList.remove('is-just-moved'), 1800);
+}
+
+async function ejecutarMovimientoItemizado(movimiento, options = {}) {
+    const row = document.querySelector(`.itemizado-draggable-row[data-item-id="${movimiento.itemId}"]`);
+    const target = document.querySelector(`.itemizado-drop-target[data-rubro-id="${movimiento.toRubroId}"]`);
+    if (row) {
+        row.classList.add('is-saving');
+    }
+    clearItemizadoDropState();
+    setItemizadoStatus(options.status || 'Guardando...', 'is-saving');
+
+    try {
+        const response = await guardarRubroItemizado(movimiento.itemId, movimiento.toRubroId);
+        if (!response.ok) {
+            throw new Error('No se pudo guardar el rubro.');
+        }
+        if (row && target) {
+            moverFilaVisualmente(row, target);
+        }
+        if (options.record !== false) {
+            itemizadoUndoStack.push(movimiento);
+            itemizadoRedoStack = [];
+        }
+        await refrescarItemizado({ itemId: movimiento.itemId, rubroId: movimiento.toRubroId });
+        return true;
+    } catch (error) {
+        row?.classList.add('is-error');
+        setItemizadoStatus('No se pudo guardar.', 'is-error');
+        return false;
+    } finally {
+        row?.classList.remove('is-saving');
+        updateItemizadoHistoryButtons();
+    }
+}
+
+async function deshacerMovimientoItemizado() {
+    const movimiento = itemizadoUndoStack.pop();
+    if (!movimiento) return;
+    const inverso = {
+        itemId: movimiento.itemId,
+        fromRubroId: movimiento.toRubroId,
+        toRubroId: movimiento.fromRubroId
+    };
+    const ok = await ejecutarMovimientoItemizado(inverso, { record: false, status: 'Deshaciendo...' });
+    if (ok) {
+        itemizadoRedoStack.push(movimiento);
+    } else {
+        itemizadoUndoStack.push(movimiento);
+    }
+    updateItemizadoHistoryButtons();
+}
+
+async function rehacerMovimientoItemizado() {
+    const movimiento = itemizadoRedoStack.pop();
+    if (!movimiento) return;
+    const ok = await ejecutarMovimientoItemizado(movimiento, { record: false, status: 'Rehaciendo...' });
+    if (ok) {
+        itemizadoUndoStack.push(movimiento);
+    } else {
+        itemizadoRedoStack.push(movimiento);
+    }
+    updateItemizadoHistoryButtons();
 }
 
 function inicializarItemizadoDrag() {
@@ -228,6 +306,9 @@ function inicializarItemizadoDrag() {
     itemizadoDropTargets = Array.from(document.querySelectorAll('.itemizado-drop-target'));
     itemizadoStatus = document.querySelector('#itemizado-drag-status');
     draggedItemizadoRow = null;
+    document.querySelector('#itemizado-undo')?.addEventListener('click', deshacerMovimientoItemizado);
+    document.querySelector('#itemizado-redo')?.addEventListener('click', rehacerMovimientoItemizado);
+    updateItemizadoHistoryButtons();
 
     itemizadoRows.forEach(row => {
         row.addEventListener('dragstart', event => {
@@ -269,23 +350,11 @@ function inicializarItemizadoDrag() {
                 return;
             }
 
-            draggedItemizadoRow.classList.add('is-saving');
-            clearItemizadoDropState();
-            setItemizadoStatus('Guardando...', 'is-saving');
-
-            try {
-                const response = await guardarRubroItemizado(itemId, rubroId);
-                if (!response.ok) {
-                    throw new Error('No se pudo guardar el rubro.');
-                }
-                moverFilaVisualmente(draggedItemizadoRow, target);
-                await refrescarItemizado();
-            } catch (error) {
-                draggedItemizadoRow.classList.add('is-error');
-                setItemizadoStatus('No se pudo guardar.', 'is-error');
-            } finally {
-                draggedItemizadoRow?.classList.remove('is-saving');
-            }
+            await ejecutarMovimientoItemizado({
+                itemId,
+                fromRubroId: draggedItemizadoRow.dataset.currentRubroId,
+                toRubroId: rubroId
+            });
         });
     });
 }
