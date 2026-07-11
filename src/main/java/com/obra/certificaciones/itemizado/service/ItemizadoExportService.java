@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.awt.Color;
 import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.time.LocalDate;
@@ -25,6 +26,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +35,11 @@ public class ItemizadoExportService {
     private static final String[] ENCABEZADOS = {
             "Codigo", "Item", "Rubro / Item", "OC", "Unidad", "Cantidad",
             "Precio Unitario", "Mano de Obra", "Materiales", "Total"
+    };
+    private static final String[] ENCABEZADOS_AVANCES = {
+            "Nivel", "Tipo", "Codigo", "Rubro", "Item OC", "OC", "Proveedor", "Detalle",
+            "Unidad", "Cantidad", "Importe Mano de Obra", "Materiales Vinculados", "Total Item",
+            "Avance %", "Monto Certificado", "Saldo Pendiente", "Estado"
     };
     private static final float[] ANCHOS_PDF = {8, 8, 34, 7, 7, 8, 10, 10, 10, 10};
     private static final DateTimeFormatter FECHA_ARCHIVO = DateTimeFormatter.ofPattern("yyyyMMdd");
@@ -160,8 +167,28 @@ public class ItemizadoExportService {
         }
     }
 
+    public byte[] generarAvancesSheets(ItemizadoVista itemizado, Map<Long, BigDecimal> avancesPorItem) {
+        StringBuilder csv = new StringBuilder("\uFEFF");
+        agregarFilaCsv(csv, List.of(ENCABEZADOS_AVANCES));
+        for (ItemizadoNodo raiz : itemizado.raices()) {
+            agregarNodoAvanceCsv(csv, raiz, avancesPorItem);
+        }
+        agregarFilaCsv(csv, List.of(
+                "", "TOTAL", "", "TOTAL GENERAL", "", "", "", "", "", "",
+                formato(itemizado.totalManoObra()),
+                formato(itemizado.totalMateriales()),
+                formato(itemizado.totalGeneral()),
+                "", "", "", ""
+        ));
+        return csv.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8);
+    }
+
     public String nombreArchivo(String extension) {
         return "itemizado-obra-" + LocalDate.now().format(FECHA_ARCHIVO) + "." + extension;
+    }
+
+    public String nombreArchivo(String sufijo, String extension) {
+        return "itemizado-" + sufijo + "-" + LocalDate.now().format(FECHA_ARCHIVO) + "." + extension;
     }
 
     private void agregarFilaPdf(PdfPTable tabla, Color fondo, Color texto, boolean negrita, List<String> valores) {
@@ -192,6 +219,108 @@ public class ItemizadoExportService {
 
     private String formato(BigDecimal valor) {
         return valor == null ? "" : formatoNumero.format(valor);
+    }
+
+    private void agregarNodoAvanceCsv(StringBuilder csv, ItemizadoNodo nodo, Map<Long, BigDecimal> avancesPorItem) {
+        BigDecimal montoCertificado = montoCertificadoNodo(nodo, avancesPorItem);
+        BigDecimal avance = porcentaje(montoCertificado, nodo.getTotalManoObra());
+        agregarFilaCsv(csv, List.of(
+                String.valueOf(nodo.getNivel()),
+                "Rubro",
+                texto(nodo.getRubro().getCodigo()),
+                texto(nodo.getRubro().getNombre()),
+                "", "", "", "", "", "",
+                formato(nodo.getTotalManoObra()),
+                formato(nodo.getTotalMateriales()),
+                formato(nodo.getTotalGeneral()),
+                formato(avance),
+                formato(montoCertificado),
+                formato(nodo.getTotalManoObra().subtract(montoCertificado).max(BigDecimal.ZERO)),
+                estadoAvance(avance)
+        ));
+
+        for (ItemizadoItemFila item : nodo.getItems()) {
+            BigDecimal avanceItem = avancesPorItem.getOrDefault(item.manoObra().getId(), BigDecimal.ZERO);
+            BigDecimal importeManoObra = item.manoObra().getImporte() == null ? BigDecimal.ZERO : item.manoObra().getImporte();
+            BigDecimal montoItem = montoCertificado(importeManoObra, avanceItem);
+            agregarFilaCsv(csv, List.of(
+                    String.valueOf(nodo.getNivel() + 1),
+                    "Item",
+                    texto(item.codigoItemizado()),
+                    texto(nodo.getRubro().getNombre()),
+                    texto(item.manoObra().getItem()),
+                    texto(item.manoObra().getOrdenCompra().getNumero()),
+                    item.manoObra().getOrdenCompra().getProveedorEntidad() == null ? "" : texto(item.manoObra().getOrdenCompra().getProveedorEntidad().getNombre()),
+                    texto(item.manoObra().getDetalle()),
+                    texto(item.manoObra().getUnidad()),
+                    formato(item.manoObra().getCantidad()),
+                    formato(importeManoObra),
+                    formato(item.totalMateriales()),
+                    formato(item.totalGeneral()),
+                    formato(avanceItem),
+                    formato(montoItem),
+                    formato(importeManoObra.subtract(montoItem).max(BigDecimal.ZERO)),
+                    estadoAvance(avanceItem)
+            ));
+        }
+
+        for (ItemizadoNodo hijo : nodo.getHijos()) {
+            agregarNodoAvanceCsv(csv, hijo, avancesPorItem);
+        }
+    }
+
+    private BigDecimal montoCertificadoNodo(ItemizadoNodo nodo, Map<Long, BigDecimal> avancesPorItem) {
+        BigDecimal total = nodo.getItems().stream()
+                .map(item -> montoCertificado(
+                        item.manoObra().getImporte() == null ? BigDecimal.ZERO : item.manoObra().getImporte(),
+                        avancesPorItem.getOrDefault(item.manoObra().getId(), BigDecimal.ZERO)))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        for (ItemizadoNodo hijo : nodo.getHijos()) {
+            total = total.add(montoCertificadoNodo(hijo, avancesPorItem));
+        }
+        return total;
+    }
+
+    private BigDecimal montoCertificado(BigDecimal importe, BigDecimal porcentaje) {
+        BigDecimal importeSeguro = importe == null ? BigDecimal.ZERO : importe;
+        BigDecimal porcentajeSeguro = porcentaje == null ? BigDecimal.ZERO : porcentaje;
+        return importeSeguro.multiply(porcentajeSeguro).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+    }
+
+    private BigDecimal porcentaje(BigDecimal valor, BigDecimal total) {
+        if (valor == null || total == null || total.compareTo(BigDecimal.ZERO) <= 0) {
+            return BigDecimal.ZERO;
+        }
+        return valor.multiply(BigDecimal.valueOf(100)).divide(total, 2, RoundingMode.HALF_UP);
+    }
+
+    private String estadoAvance(BigDecimal avance) {
+        BigDecimal avanceSeguro = avance == null ? BigDecimal.ZERO : avance;
+        if (avanceSeguro.compareTo(BigDecimal.ZERO) <= 0) {
+            return "Pendiente";
+        }
+        if (avanceSeguro.compareTo(BigDecimal.valueOf(100)) >= 0) {
+            return "Terminado";
+        }
+        return "En ejecucion";
+    }
+
+    private void agregarFilaCsv(StringBuilder csv, List<String> valores) {
+        for (int i = 0; i < valores.size(); i++) {
+            if (i > 0) {
+                csv.append(';');
+            }
+            csv.append(escaparCsv(valores.get(i)));
+        }
+        csv.append("\r\n");
+    }
+
+    private String escaparCsv(String valor) {
+        String texto = texto(valor);
+        if (texto.contains(";") || texto.contains("\"") || texto.contains("\n") || texto.contains("\r")) {
+            return "\"" + texto.replace("\"", "\"\"") + "\"";
+        }
+        return texto;
     }
 
     private String conIndentacion(int nivel, String texto) {
