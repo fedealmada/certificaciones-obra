@@ -59,11 +59,6 @@
             sidebar.addEventListener('pointerenter', openSidebar);
             sidebar.addEventListener('pointerleave', closeSidebar);
             sidebar.addEventListener('click', openSidebar);
-            document.addEventListener('pointermove', event => {
-                if (sidebar.classList.contains('is-open') && !sidebar.contains(event.target) && !sidebar.matches(':hover')) {
-                    closeSidebar();
-                }
-            });
         }
 
         function setTheme(theme) {
