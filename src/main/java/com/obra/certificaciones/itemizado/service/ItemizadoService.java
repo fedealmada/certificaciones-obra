@@ -148,7 +148,8 @@ public class ItemizadoService {
 
     private Comparator<ItemizadoItemFila> compararItems() {
         return Comparator
-                .comparing((ItemizadoItemFila item) -> textoSeguro(item.manoObra().getOrdenCompra().getNumero()))
+                .comparing((ItemizadoItemFila item) -> item.manoObra().getOrdenItemizado(), Comparator.nullsLast(Integer::compareTo))
+                .thenComparing(item -> textoSeguro(item.manoObra().getOrdenCompra().getNumero()))
                 .thenComparing(item -> textoSeguro(item.manoObra().getItem()))
                 .thenComparing(item -> textoSeguro(item.manoObra().getDetalle()));
     }

@@ -64,6 +64,7 @@ public class ItemOrdenCompra {
 
     @Column(length = 1000)
     private String rubro;
+    private Integer ordenItemizado;
     private BigDecimal cantidad = BigDecimal.ZERO;
     private BigDecimal precioUnitario = BigDecimal.ZERO;
     private BigDecimal importe = BigDecimal.ZERO;

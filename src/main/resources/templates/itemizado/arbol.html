@@ -47,7 +47,7 @@
         <div class="itemizado-toolbar">
             <strong>Total general</strong>
             <span th:text="${#numbers.formatDecimal(itemizado.totalGeneral, 1, 'POINT', 2, 'COMMA')}">0</span>
-            <small class="itemizado-drag-help"><i class="bi bi-arrows-move"></i> Arrastra un item sobre otro rubro para moverlo</small>
+            <small class="itemizado-drag-help"><i class="bi bi-arrows-move"></i> Arrastra un item sobre otro item o rubro para moverlo</small>
             <div class="itemizado-history-actions" aria-label="Historial de movimientos">
                 <button class="itemizado-history-button" id="itemizado-undo" type="button" title="Deshacer movimiento" disabled><i class="bi bi-arrow-counterclockwise"></i></button>
                 <button class="itemizado-history-button" id="itemizado-redo" type="button" title="Rehacer movimiento" disabled><i class="bi bi-arrow-clockwise"></i></button>
@@ -242,6 +242,7 @@ function prepararVistaArrastre(row, event) {
 
 function clearItemizadoDropState() {
     itemizadoDropTargets.forEach(row => row.classList.remove('is-drop-target', 'is-drop-invalid'));
+    itemizadoRows.forEach(row => row.classList.remove('is-item-drop-target', 'is-drop-invalid'));
 }
 
 function updateItemizadoHistoryButtons() {
@@ -271,6 +272,10 @@ function itemizadoFormPost(url, values) {
 
 function guardarRubroItemizado(itemId, rubroId) {
     return itemizadoFormPost(`/items/${itemId}/rubro/async`, { rubroId });
+}
+
+function reordenarItemizado(itemId, targetItemId) {
+    return itemizadoFormPost(`/items/${itemId}/itemizado-orden/async`, { targetItemId });
 }
 
 function guardarRubroArbol({ mode, rubroId, padreId, nombre }) {
@@ -319,7 +324,9 @@ async function refrescarItemizado(highlight = null) {
         if (highlight.itemId) {
             const movedRow = document.querySelector(`.itemizado-draggable-row[data-item-id="${highlight.itemId}"]`);
             const targetRow = document.querySelector(`.itemizado-drop-target[data-rubro-id="${highlight.rubroId}"]`);
-            moverFilaVisualmente(movedRow, targetRow);
+            if (!highlight.keepOrder) {
+                moverFilaVisualmente(movedRow, targetRow);
+            }
             enfocarElementoItemizado(movedRow);
         }
         if (highlight.rubroId && !highlight.itemId) {
@@ -347,6 +354,16 @@ function moverFilaVisualmente(row, target) {
     }
     row.classList.remove('d-none');
     target.parentNode.insertBefore(row, target.nextElementSibling);
+    row.classList.add('is-just-moved');
+    setTimeout(() => row.classList.remove('is-just-moved'), 1800);
+}
+
+function moverItemAntes(row, targetRow) {
+    if (!row || !targetRow || row === targetRow) return;
+    row.dataset.currentRubroId = targetRow.dataset.currentRubroId;
+    row.dataset.level = targetRow.dataset.level;
+    targetRow.parentNode.insertBefore(row, targetRow);
+    row.classList.remove('d-none');
     row.classList.add('is-just-moved');
     setTimeout(() => row.classList.remove('is-just-moved'), 1800);
 }
@@ -541,6 +558,43 @@ async function ejecutarMovimientoItemizado(movimiento, options = {}) {
     }
 }
 
+async function ejecutarReordenItemizado(row, targetRow) {
+    if (!row || !targetRow || row === targetRow) return false;
+    const itemId = row.dataset.itemId;
+    const targetItemId = targetRow.dataset.itemId;
+    if (!itemId || !targetItemId || itemId === targetItemId) {
+        clearItemizadoDropState();
+        return false;
+    }
+    row.classList.add('is-saving');
+    clearItemizadoDropState();
+    setItemizadoStatus('Ordenando item...', 'is-saving');
+
+    try {
+        const response = await reordenarItemizado(itemId, targetItemId);
+        if (!response.ok) {
+            throw new Error('No se pudo reordenar el item.');
+        }
+        moverItemAntes(row, targetRow);
+        await refrescarItemizado({
+            itemId,
+            rubroId: targetRow.dataset.currentRubroId,
+            keepOrder: true
+        });
+        setItemizadoStatus('Item reordenado.', 'is-saved');
+        mostrarAvisoItemizado('Item reordenado', 'La posicion del item quedo guardada.');
+        return true;
+    } catch (error) {
+        row.classList.add('is-error');
+        setItemizadoStatus('No se pudo ordenar.', 'is-error');
+        mostrarAvisoItemizado('No se pudo ordenar', 'El item no pudo cambiar de posicion.', 'error');
+        return false;
+    } finally {
+        row.classList.remove('is-saving');
+        updateItemizadoHistoryButtons();
+    }
+}
+
 async function deshacerMovimientoItemizado() {
     const movimiento = itemizadoUndoStack.pop();
     if (!movimiento) return;
@@ -639,6 +693,27 @@ function inicializarItemizadoDrag() {
             row.classList.remove('is-dragging', 'is-saving', 'is-error');
             draggedItemizadoRow = null;
             clearItemizadoDropState();
+        });
+
+        row.addEventListener('dragover', event => {
+            if (!draggedItemizadoRow || draggedItemizadoRow === row) return;
+            event.preventDefault();
+            row.classList.add('is-item-drop-target');
+            event.dataTransfer.dropEffect = 'move';
+        });
+
+        row.addEventListener('dragleave', () => {
+            row.classList.remove('is-item-drop-target');
+        });
+
+        row.addEventListener('drop', async event => {
+            event.preventDefault();
+            event.stopPropagation();
+            if (!draggedItemizadoRow || draggedItemizadoRow === row) {
+                clearItemizadoDropState();
+                return;
+            }
+            await ejecutarReordenItemizado(draggedItemizadoRow, row);
         });
     });
 

@@ -1,5 +1,6 @@
 package com.obra.certificaciones.item.controller;
 
+import com.obra.certificaciones.oc.entity.CategoriaItem;
 import com.obra.certificaciones.oc.entity.ItemOrdenCompra;
 import com.obra.certificaciones.oc.repository.ItemOrdenCompraRepository;
 import com.obra.certificaciones.rubro.entity.Rubro;
@@ -19,9 +20,11 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -63,26 +66,96 @@ public class ItemController {
         ));
     }
 
+    @PostMapping("/items/{id}/itemizado-orden/async")
+    @ResponseBody
+    public ResponseEntity<Map<String, String>> reordenarItemizadoAsync(@PathVariable Long id,
+                                                                       @RequestParam Long targetItemId) {
+        Rubro rubro = reordenarItemizado(id, targetItemId);
+        return ResponseEntity.ok(Map.of(
+                "rubro", rubro == null ? "" : rubro.getNombreCompleto()
+        ));
+    }
+
     private Rubro actualizarRubroItem(Long id, String rubroId) {
         ItemOrdenCompra item = itemOrdenCompraRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No existe el item."));
         if (!StringUtils.hasText(rubroId)) {
             item.setRubroEntidad(null);
             item.setRubro(null);
+            item.setOrdenItemizado(null);
             itemOrdenCompraRepository.save(item);
             return null;
         }
         Rubro rubro = rubroService.obtener(Long.valueOf(rubroId));
         item.setRubroEntidad(rubro);
         item.setRubro(null);
+        item.setOrdenItemizado(siguienteOrdenItemizado(rubro.getId(), item.getId()));
         itemOrdenCompraRepository.save(item);
         return rubro;
+    }
+
+    private Rubro reordenarItemizado(Long id, Long targetItemId) {
+        ItemOrdenCompra item = itemOrdenCompraRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No existe el item."));
+        ItemOrdenCompra target = itemOrdenCompraRepository.findById(targetItemId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No existe el item destino."));
+        if (Objects.equals(item.getId(), target.getId())) {
+            return target.getRubroEntidad();
+        }
+        Rubro rubro = target.getRubroEntidad();
+        if (rubro == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El item destino no tiene rubro.");
+        }
+
+        item.setRubroEntidad(rubro);
+        item.setRubro(null);
+
+        List<ItemOrdenCompra> ordenados = itemOrdenCompraRepository.findByRubroEntidadId(rubro.getId()).stream()
+                .filter(itemOrden -> itemOrden.getCategoria() == CategoriaItem.MANO_OBRA)
+                .filter(itemOrden -> !Objects.equals(itemOrden.getId(), item.getId()))
+                .sorted(compararItemsParaItemizado())
+                .collect(java.util.stream.Collectors.toCollection(ArrayList::new));
+        int targetIndex = 0;
+        for (int i = 0; i < ordenados.size(); i++) {
+            if (Objects.equals(ordenados.get(i).getId(), target.getId())) {
+                targetIndex = i;
+                break;
+            }
+        }
+        ordenados.add(targetIndex, item);
+        guardarOrdenItemizado(ordenados);
+        return rubro;
+    }
+
+    private int siguienteOrdenItemizado(Long rubroId, Long excluirItemId) {
+        return itemOrdenCompraRepository.findByRubroEntidadId(rubroId).stream()
+                .filter(item -> item.getCategoria() == CategoriaItem.MANO_OBRA)
+                .filter(item -> !Objects.equals(item.getId(), excluirItemId))
+                .map(ItemOrdenCompra::getOrdenItemizado)
+                .filter(Objects::nonNull)
+                .max(Integer::compareTo)
+                .orElse(0) + 10;
+    }
+
+    private void guardarOrdenItemizado(List<ItemOrdenCompra> items) {
+        for (int i = 0; i < items.size(); i++) {
+            items.get(i).setOrdenItemizado((i + 1) * 10);
+        }
+        itemOrdenCompraRepository.saveAll(items);
     }
 
     private Comparator<ItemOrdenCompra> compararItems() {
         return Comparator
                 .comparing(ItemOrdenCompra::getItem, ItemController::compararCodigoNatural)
                 .thenComparing(item -> textoSeguro(item.getOrdenCompra().getNumero()), ItemController::compararCodigoNatural)
+                .thenComparing(item -> textoSeguro(item.getDetalle()), String.CASE_INSENSITIVE_ORDER);
+    }
+
+    private Comparator<ItemOrdenCompra> compararItemsParaItemizado() {
+        return Comparator
+                .comparing(ItemOrdenCompra::getOrdenItemizado, Comparator.nullsLast(Integer::compareTo))
+                .thenComparing(item -> textoSeguro(item.getOrdenCompra().getNumero()), ItemController::compararCodigoNatural)
+                .thenComparing(ItemOrdenCompra::getItem, ItemController::compararCodigoNatural)
                 .thenComparing(item -> textoSeguro(item.getDetalle()), String.CASE_INSENSITIVE_ORDER);
     }
 

@@ -19,6 +19,7 @@ public interface ItemOrdenCompraRepository extends JpaRepository<ItemOrdenCompra
     @EntityGraph(attributePaths = {"ordenCompra", "rubroEntidad", "itemManoObraVinculado", "materialCatalogo", "categoriaEntidad"})
     List<ItemOrdenCompra> findByOrdenCompraIdAndCategoriaOrderById(Long ordenCompraId, CategoriaItem categoria);
 
+    @EntityGraph(attributePaths = {"ordenCompra", "rubroEntidad"})
     List<ItemOrdenCompra> findByRubroEntidadId(Long rubroId);
 
     long countByRubroEntidadIsNotNull();
