@@ -46,7 +46,8 @@ public class InicioController {
                                 "modulo.dashboard",
                                 "modulo.itemizado",
                                 "modulo.items",
-                                "modulo.materiales"
+                                "modulo.materiales",
+                                "modulo.asistencia"
                         ).contains(modulo.clave())).toList()
                 ),
                 new AreaTrabajo(

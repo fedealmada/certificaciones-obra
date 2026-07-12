@@ -75,6 +75,7 @@ public class DepositoService {
         DepositoTrabajador existente = obtenerTrabajador(trabajador.getId());
         existente.setNombre(trabajador.getNombre().trim());
         existente.setSector(trabajador.getSector());
+        existente.setEmpresa(trabajador.getEmpresa());
         existente.setActivo(trabajador.isActivo());
         return trabajadorRepository.save(existente);
     }

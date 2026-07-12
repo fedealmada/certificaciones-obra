@@ -55,6 +55,10 @@
                         <input class="form-control" th:field="*{sector}" placeholder="Pintura, mantenimiento, electricidad">
                     </div>
                     <div class="col-12">
+                        <label class="form-label">Empresa</label>
+                        <input class="form-control" th:field="*{empresa}" placeholder="Empresa contratista o cuadrilla">
+                    </div>
+                    <div class="col-12">
                         <label class="form-label">Estado</label>
                         <select class="form-select" th:field="*{activo}">
                             <option value="true">Activa</option>
@@ -76,10 +80,11 @@
             </div>
             <div class="table-responsive">
                 <table class="table table-hover align-middle document-table">
-                    <thead><tr><th>Nombre</th><th>Sector</th><th>Estado</th><th class="text-end">Acciones</th></tr></thead>
+                    <thead><tr><th>Nombre</th><th>Empresa</th><th>Sector</th><th>Estado</th><th class="text-end">Acciones</th></tr></thead>
                     <tbody>
                     <tr th:each="personaFila : ${personas}">
                         <td><strong th:text="${personaFila.nombre}">Persona</strong></td>
+                        <td th:text="${personaFila.empresa ?: '-'}">Empresa</td>
                         <td th:text="${personaFila.sector ?: '-'}">Sector</td>
                         <td>
                             <span class="delivery-status-pill"
@@ -93,7 +98,7 @@
                             </form>
                         </td>
                     </tr>
-                    <tr th:if="${personas.isEmpty()}"><td colspan="4" class="text-center text-muted py-4">Todavia no hay personas cargadas.</td></tr>
+                    <tr th:if="${personas.isEmpty()}"><td colspan="5" class="text-center text-muted py-4">Todavia no hay personas cargadas.</td></tr>
                     </tbody>
                 </table>
             </div>

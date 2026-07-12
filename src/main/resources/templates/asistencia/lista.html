@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Asistencia</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script>
+    (() => {
+        const savedTheme = localStorage.getItem('obraControl.theme');
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.dataset.theme = savedTheme || (prefersDark ? 'dark' : 'light');
+    })();
+    </script>
+    <link th:href="@{/css/app.css}" rel="stylesheet">
+</head>
+<body>
+<div th:replace="~{fragments/layout :: navbar}"></div>
+<main class="container">
+    <div class="page-navigation mb-3">
+        <a th:href="@{/}"><i class="bi bi-house"></i> Inicio</a>
+        <i class="bi bi-chevron-right"></i>
+        <span>Asistencia</span>
+    </div>
+
+    <div class="document-header mb-4">
+        <div>
+            <div class="document-kicker">Personal de obra</div>
+            <h1>Asistencia diaria</h1>
+            <div class="text-muted">Control de ingresos, empresas presentes y horas trabajadas.</div>
+        </div>
+        <div class="document-actions">
+            <a class="btn btn-outline-secondary" th:href="@{/deposito/personas}"><i class="bi bi-people"></i> Personas</a>
+            <a class="btn btn-primary" th:href="@{/asistencia/nueva(fecha=${fecha})}"><i class="bi bi-plus-lg"></i> Registrar asistencia</a>
+        </div>
+    </div>
+
+    <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
+
+    <form class="panel-section asistencia-filter mb-3" method="get" th:action="@{/asistencia}">
+        <div>
+            <label class="form-label">Fecha</label>
+            <input class="form-control" type="date" name="fecha" th:value="${fecha}">
+        </div>
+        <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i> Ver dia</button>
+        <a class="btn btn-outline-secondary" th:href="@{/asistencia}"><i class="bi bi-calendar-day"></i> Hoy</a>
+    </form>
+
+    <div class="dashboard-metric-grid mb-3">
+        <div class="metric-card"><div class="metric-head"><div class="metric-label">Presentes</div><i class="bi bi-person-check"></i></div><div class="metric-value" th:text="${asistencias.size()}">0</div><small>Personas registradas</small></div>
+        <div class="metric-card"><div class="metric-head"><div class="metric-label">Empresas</div><i class="bi bi-buildings"></i></div><div class="metric-value" th:text="${resumenEmpresas.size()}">0</div><small>Con personal en obra</small></div>
+        <div class="metric-card"><div class="metric-head"><div class="metric-label">Horas</div><i class="bi bi-clock-history"></i></div><div class="metric-value metric-value-sm" th:text="${#numbers.formatDecimal(totalHoras, 1, 'POINT', 2, 'COMMA')}">0,00</div><small>Total del dia</small></div>
+        <div class="metric-card"><div class="metric-head"><div class="metric-label">Fecha</div><i class="bi bi-calendar3"></i></div><div class="metric-value metric-value-sm" th:text="${#temporals.format(fecha, 'dd/MM/yyyy')}">01/01/2026</div><small>Dia consultado</small></div>
+    </div>
+
+    <div class="asistencia-grid mb-3">
+        <section class="panel-section">
+            <div class="section-title-row">
+                <h2 class="h5 mb-0"><i class="bi bi-buildings"></i> Resumen por empresa</h2>
+                <span class="section-total-pill" th:text="${resumenEmpresas.size()} + ' empresas'">0 empresas</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle document-table">
+                    <thead><tr><th>Empresa</th><th class="text-end">Personas</th><th class="text-end">Horas</th></tr></thead>
+                    <tbody>
+                    <tr th:each="resumen : ${resumenEmpresas}">
+                        <td><strong th:text="${resumen.empresa()}">Empresa</strong></td>
+                        <td class="text-end" th:text="${resumen.personas()}">0</td>
+                        <td class="text-end fw-semibold" th:text="${#numbers.formatDecimal(resumen.horas(), 1, 'POINT', 2, 'COMMA')}">0,00</td>
+                    </tr>
+                    <tr th:if="${resumenEmpresas.isEmpty()}"><td colspan="3" class="text-center text-muted py-4">No hay asistencia registrada para esta fecha.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="panel-section">
+            <div class="section-title-row">
+                <h2 class="h5 mb-0"><i class="bi bi-clock"></i> Ultimos registros</h2>
+            </div>
+            <div class="asistencia-recent-list">
+                <a th:each="registro, iter : ${recientes}" th:if="${iter.index < 8}" th:href="@{/asistencia/{id}/editar(id=${registro.id})}">
+                    <span><strong th:text="${registro.trabajadorNombre}">Persona</strong><small th:text="${#temporals.format(registro.fecha, 'dd/MM/yyyy') + ' / ' + (registro.empresa ?: 'Sin empresa')}">Fecha</small></span>
+                    <b th:text="${#numbers.formatDecimal(registro.horasTrabajadas, 1, 'POINT', 2, 'COMMA') + ' h'}">0 h</b>
+                </a>
+            </div>
+        </section>
+    </div>
+
+    <section class="panel-section">
+        <div class="section-title-row">
+            <h2 class="h5 mb-0"><i class="bi bi-list-check"></i> Personal del dia</h2>
+            <span class="section-total-pill" th:text="${asistencias.size()} + ' registros'">0 registros</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle document-table">
+                <thead><tr><th>Persona</th><th>Empresa</th><th>Sector</th><th>Ingreso</th><th>Salida</th><th class="text-end">Horas</th><th>Observacion</th><th class="text-end">Acciones</th></tr></thead>
+                <tbody>
+                <tr th:each="registro : ${asistencias}">
+                    <td><strong th:text="${registro.trabajadorNombre}">Persona</strong></td>
+                    <td th:text="${registro.empresa ?: '-'}">Empresa</td>
+                    <td th:text="${registro.sector ?: '-'}">Sector</td>
+                    <td th:text="${registro.horaIngreso == null ? '-' : #temporals.format(registro.horaIngreso, 'HH:mm')}">08:00</td>
+                    <td th:text="${registro.horaSalida == null ? '-' : #temporals.format(registro.horaSalida, 'HH:mm')}">17:00</td>
+                    <td class="text-end fw-semibold" th:text="${#numbers.formatDecimal(registro.horasTrabajadas, 1, 'POINT', 2, 'COMMA')}">0,00</td>
+                    <td th:text="${registro.observacion ?: '-'}">-</td>
+                    <td class="text-end action-cell">
+                        <a class="btn btn-sm btn-outline-secondary table-icon-action" th:href="@{/asistencia/{id}/editar(id=${registro.id})}" title="Editar asistencia" aria-label="Editar asistencia"><i class="bi bi-pencil-square"></i></a>
+                        <form method="post" th:action="@{/asistencia/{id}/eliminar(id=${registro.id})}" onsubmit="return confirm('Eliminar este registro de asistencia?');">
+                            <button class="btn btn-sm btn-outline-danger table-icon-action" type="submit" title="Eliminar asistencia" aria-label="Eliminar asistencia"><i class="bi bi-trash"></i></button>
+                        </form>
+                    </td>
+                </tr>
+                <tr th:if="${asistencias.isEmpty()}"><td colspan="8" class="text-center text-muted py-4">Todavia no hay asistencia registrada para esta fecha.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+</body>
+</html>

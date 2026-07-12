@@ -27,6 +27,7 @@ public class ConfiguracionSistemaService {
                 new ModuloSistema("modulo.items", "Items", "Buscador general de items de OC.", "/items", "bi-list-task", "green"),
                 new ModuloSistema("modulo.importarCertificados", "Importar certificados", "Pegar planillas y cargar avances automaticamente.", "/certificaciones/importar", "bi-clipboard-check", "blue"),
                 new ModuloSistema("modulo.itemizado", "Itemizado", "Arbol de rubros e itemizado general.", "/itemizado", "bi-diagram-3", "green"),
+                new ModuloSistema("modulo.asistencia", "Asistencia", "Control diario de personal, empresas y horas.", "/asistencia", "bi-person-check", "green"),
                 new ModuloSistema("modulo.proveedores", "Proveedores", "Contratistas, contactos y OC asociadas.", "/proveedores", "bi-person-lines-fill", "yellow"),
                 new ModuloSistema("modulo.categorias", "Categorias", "Categorias manuales para compras e items.", "/categorias", "bi-tags", "blue"),
                 new ModuloSistema("modulo.rubros", "Rubros", "Estructura jerarquica de rubros de obra.", "/rubros", "bi-folder2-open", "green"),

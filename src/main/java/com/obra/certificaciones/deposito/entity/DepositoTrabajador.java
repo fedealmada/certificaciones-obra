@@ -19,5 +19,6 @@ public class DepositoTrabajador {
     @Column(length = 500)
     private String nombre;
     private String sector;
+    private String empresa;
     private boolean activo = true;
 }
