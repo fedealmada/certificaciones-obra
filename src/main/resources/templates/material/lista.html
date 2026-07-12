@@ -29,19 +29,41 @@
             <div class="text-muted">Ordenes configuradas para control por recepciones, viajes o unidades recibidas.</div>
         </div>
     </div>
-    <div class="table-responsive"><table class="table table-hover align-middle">
-        <thead><tr><th>Numero OC</th><th>Fecha</th><th>Proveedor</th><th>Items</th><th class="text-end">Acciones</th></tr></thead>
+    <div class="table-responsive"><table class="table table-hover align-middle document-table">
+        <thead><tr><th>Numero OC</th><th>Fecha</th><th>Proveedor</th><th class="text-end">Viajes</th><th class="text-end">Previsto</th><th class="text-end">Recibido</th><th class="text-end">Pendiente</th><th>Avance</th><th>Estado</th><th class="text-end">Acciones</th></tr></thead>
         <tbody>
         <tr th:each="orden : ${ordenes}">
-            <td th:text="${orden.numero}"></td>
+            <td><a class="cert-row-link" th:href="@{/materiales/oc/{id}(id=${orden.id})}" th:text="${orden.numero}">OC</a></td>
             <td th:text="${#temporals.format(orden.fecha, 'dd/MM/yyyy')}"></td>
             <td th:text="${orden.proveedorEntidad?.nombre ?: '-'}"></td>
-            <td th:text="${orden.items.size()}"></td>
+            <td class="text-end" th:text="${viajesPorOrden.getOrDefault(orden.id, 0)}">0</td>
+            <td class="text-end" th:text="${#numbers.formatDecimal(previstoPorOrden.getOrDefault(orden.id, T(java.math.BigDecimal).ZERO), 1, 'POINT', 2, 'COMMA')}">0,00</td>
+            <td class="text-end fw-semibold" th:text="${#numbers.formatDecimal(recibidoPorOrden.getOrDefault(orden.id, T(java.math.BigDecimal).ZERO), 1, 'POINT', 2, 'COMMA')}">0,00</td>
+            <td class="text-end" th:text="${#numbers.formatDecimal(pendientePorOrden.getOrDefault(orden.id, T(java.math.BigDecimal).ZERO), 1, 'POINT', 2, 'COMMA')}">0,00</td>
+            <td>
+                <div class="oc-progress-number" th:text="${#numbers.formatDecimal(avancePorOrden.getOrDefault(orden.id, T(java.math.BigDecimal).ZERO), 1, 'POINT', 2, 'COMMA')} + ' %'">0,00 %</div>
+                <div class="progress progress-thin oc-progress">
+                    <div class="progress-bar" th:data-progress="${avancePorOrden.getOrDefault(orden.id, T(java.math.BigDecimal).ZERO) > 100 ? 100 : avancePorOrden.getOrDefault(orden.id, T(java.math.BigDecimal).ZERO)}"></div>
+                </div>
+            </td>
+            <td>
+                <span class="delivery-status-pill"
+                      th:with="estado=${estadosPorOrden.get(orden.id)}"
+                      th:classappend="${estado != null && estado.name() == 'COMPLETO' ? ' is-complete' : (estado != null && estado.name() == 'PARCIAL' ? ' is-partial' : ' is-pending')}"
+                      th:text="${estado != null && estado.name() == 'COMPLETO' ? 'ENTREGA COMPLETA' : (estado != null && estado.name() == 'PARCIAL' ? 'ENTREGA PARCIAL' : 'ENTREGA PENDIENTE')}">PENDIENTE</span>
+            </td>
             <td class="text-end"><a class="btn btn-sm btn-outline-primary table-icon-action" th:href="@{/materiales/oc/{id}(id=${orden.id})}" title="Abrir entregas" aria-label="Abrir entregas"><i class="bi bi-box-arrow-up-right"></i></a></td>
         </tr>
-        <tr th:if="${ordenes.isEmpty()}"><td colspan="5" class="text-center text-muted py-4">No hay ordenes configuradas para entregas o viajes.</td></tr>
+        <tr th:if="${ordenes.isEmpty()}"><td colspan="10" class="text-center text-muted py-4">No hay ordenes configuradas para entregas o viajes.</td></tr>
         </tbody>
     </table></div>
 </main>
+<script>
+document.querySelectorAll('.oc-progress .progress-bar').forEach(progressFill => {
+    const target = Number.parseFloat(String(progressFill.dataset.progress || '0').replace(',', '.'));
+    const safeTarget = Number.isFinite(target) ? Math.max(0, Math.min(100, target)) : 0;
+    progressFill.style.width = `${safeTarget}%`;
+});
+</script>
 </body>
 </html>

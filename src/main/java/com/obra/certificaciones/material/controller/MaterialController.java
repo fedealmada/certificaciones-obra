@@ -4,6 +4,7 @@ import com.obra.certificaciones.material.dto.ItemMaterialResumen;
 import com.obra.certificaciones.material.dto.RecepcionMaterialForm;
 import com.obra.certificaciones.material.entity.RecepcionMaterial;
 import com.obra.certificaciones.material.service.MaterialService;
+import com.obra.certificaciones.material.dto.EstadoRecepcionMaterial;
 import com.obra.certificaciones.oc.entity.OrdenCompra;
 import com.obra.certificaciones.oc.service.OrdenCompraService;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +33,16 @@ public class MaterialController {
 
     @GetMapping
     public String listar(Model model) {
-        model.addAttribute("ordenes", materialService.listarOrdenesConMateriales());
+        List<OrdenCompra> ordenes = materialService.listarOrdenesConMateriales();
+        Map<Long, List<ItemMaterialResumen>> resumenesPorOrden = new HashMap<>();
+        ordenes.forEach(orden -> resumenesPorOrden.put(orden.getId(), materialService.calcularResumenItems(orden.getId())));
+        model.addAttribute("ordenes", ordenes);
+        model.addAttribute("viajesPorOrden", materialService.contarRecepcionesPorOrdenes(ordenes.stream().map(OrdenCompra::getId).toList()));
+        model.addAttribute("estadosPorOrden", materialService.calcularEstadosOrdenes(ordenes));
+        model.addAttribute("previstoPorOrden", totalesPorOrden(resumenesPorOrden, "comprado"));
+        model.addAttribute("recibidoPorOrden", totalesPorOrden(resumenesPorOrden, "recibido"));
+        model.addAttribute("pendientePorOrden", totalesPorOrden(resumenesPorOrden, "pendiente"));
+        model.addAttribute("avancePorOrden", avancesPorOrden(resumenesPorOrden));
         return "material/lista";
     }
 
@@ -40,9 +50,14 @@ public class MaterialController {
     public String detalle(@PathVariable Long ordenCompraId, Model model) {
         OrdenCompra orden = ordenCompraService.obtener(ordenCompraId);
         var itemsResumen = materialService.calcularResumenItems(ordenCompraId);
+        List<RecepcionMaterial> recepciones = materialService.listarRecepciones(ordenCompraId);
         model.addAttribute("orden", orden);
         cargarResumenMateriales(itemsResumen, model);
-        model.addAttribute("recepciones", materialService.listarRecepciones(ordenCompraId));
+        model.addAttribute("recepciones", recepciones);
+        model.addAttribute("cantidadesPorRecepcion", cantidadesPorRecepcion(recepciones));
+        model.addAttribute("importesPorRecepcion", importesPorRecepcion(recepciones));
+        model.addAttribute("avancesPorRecepcion", avancesPorRecepcion(recepciones));
+        model.addAttribute("estadosPorRecepcion", estadosPorRecepcion(recepciones, itemsResumen));
         return "material/detalle";
     }
 
@@ -60,7 +75,7 @@ public class MaterialController {
         try {
             RecepcionMaterial recepcion = materialService.guardar(ordenCompraId, form);
             redirectAttributes.addFlashAttribute("accionCompletada", true);
-            redirectAttributes.addFlashAttribute("accionTitulo", "¡Entrega agregada!");
+            redirectAttributes.addFlashAttribute("accionTitulo", "Entrega agregada");
             redirectAttributes.addFlashAttribute("accionMensaje", "El envio quedo registrado correctamente en la orden de compra.");
             return "redirect:/materiales/oc/" + ordenCompraId + "/recepciones/" + recepcion.getId();
         } catch (IllegalArgumentException ex) {
@@ -143,6 +158,7 @@ public class MaterialController {
         model.addAttribute("totalMaterialComprado", sumar(itemsResumen, "comprado"));
         model.addAttribute("totalMaterialRecibido", sumar(itemsResumen, "recibido"));
         model.addAttribute("totalMaterialPendiente", sumar(itemsResumen, "pendiente"));
+        model.addAttribute("porcentajeMaterialRecibido", porcentaje(sumar(itemsResumen, "recibido"), sumar(itemsResumen, "comprado")));
     }
 
     private BigDecimal sumar(List<ItemMaterialResumen> itemsResumen, String campo) {
@@ -211,5 +227,54 @@ public class MaterialController {
             porcentajes.put(item.getId(), porcentaje(cantidad, comprada));
         });
         return porcentajes;
+    }
+
+    private Map<Long, BigDecimal> totalesPorOrden(Map<Long, List<ItemMaterialResumen>> resumenesPorOrden, String campo) {
+        Map<Long, BigDecimal> totales = new HashMap<>();
+        resumenesPorOrden.forEach((ordenId, resumenes) -> totales.put(ordenId, sumar(resumenes, campo)));
+        return totales;
+    }
+
+    private Map<Long, BigDecimal> avancesPorOrden(Map<Long, List<ItemMaterialResumen>> resumenesPorOrden) {
+        Map<Long, BigDecimal> avances = new HashMap<>();
+        resumenesPorOrden.forEach((ordenId, resumenes) ->
+                avances.put(ordenId, porcentaje(sumar(resumenes, "recibido"), sumar(resumenes, "comprado"))));
+        return avances;
+    }
+
+    private Map<Long, BigDecimal> cantidadesPorRecepcion(List<RecepcionMaterial> recepciones) {
+        Map<Long, BigDecimal> cantidades = new HashMap<>();
+        recepciones.forEach(recepcion -> cantidades.put(recepcion.getId(), totalRecibido(recepcion)));
+        return cantidades;
+    }
+
+    private Map<Long, BigDecimal> importesPorRecepcion(List<RecepcionMaterial> recepciones) {
+        Map<Long, BigDecimal> importes = new HashMap<>();
+        recepciones.forEach(recepcion -> importes.put(recepcion.getId(), importeRecibido(recepcion)));
+        return importes;
+    }
+
+    private Map<Long, BigDecimal> avancesPorRecepcion(List<RecepcionMaterial> recepciones) {
+        Map<Long, BigDecimal> avances = new HashMap<>();
+        recepciones.forEach(recepcion -> avances.put(recepcion.getId(),
+                porcentaje(totalRecibido(recepcion), cantidadCompradaRecepcion(recepcion))));
+        return avances;
+    }
+
+    private Map<Long, EstadoRecepcionMaterial> estadosPorRecepcion(List<RecepcionMaterial> recepciones, List<ItemMaterialResumen> itemsResumen) {
+        Map<Long, EstadoRecepcionMaterial> estados = new HashMap<>();
+        Map<Long, EstadoRecepcionMaterial> estadosItems = new HashMap<>();
+        itemsResumen.forEach(resumen -> estadosItems.put(resumen.itemOrdenCompra().getId(), resumen.estado()));
+        recepciones.forEach(recepcion -> estados.put(recepcion.getId(), estadoRecepcion(recepcion, estadosItems)));
+        return estados;
+    }
+
+    private EstadoRecepcionMaterial estadoRecepcion(RecepcionMaterial recepcion, Map<Long, EstadoRecepcionMaterial> estadosItems) {
+        if (recepcion.getItems().isEmpty()) {
+            return EstadoRecepcionMaterial.PENDIENTE;
+        }
+        boolean todosCompletos = recepcion.getItems().stream()
+                .allMatch(item -> estadosItems.getOrDefault(item.getItemOrdenCompra().getId(), EstadoRecepcionMaterial.PENDIENTE) == EstadoRecepcionMaterial.COMPLETO);
+        return todosCompletos ? EstadoRecepcionMaterial.COMPLETO : EstadoRecepcionMaterial.PARCIAL;
     }
 }
