@@ -1,7 +1,12 @@
 package com.obra.certificaciones.material.controller;
 
+import com.obra.certificaciones.deposito.dto.IngresoDepositoRecepcionForm;
+import com.obra.certificaciones.deposito.entity.DepositoItem;
+import com.obra.certificaciones.deposito.entity.TipoInsumoDeposito;
+import com.obra.certificaciones.deposito.service.DepositoService;
 import com.obra.certificaciones.material.dto.ItemMaterialResumen;
 import com.obra.certificaciones.material.dto.RecepcionMaterialForm;
+import com.obra.certificaciones.material.entity.ItemRecepcionMaterial;
 import com.obra.certificaciones.material.entity.RecepcionMaterial;
 import com.obra.certificaciones.material.service.MaterialService;
 import com.obra.certificaciones.material.dto.EstadoRecepcionMaterial;
@@ -31,6 +36,7 @@ public class MaterialController {
 
     private final MaterialService materialService;
     private final OrdenCompraService ordenCompraService;
+    private final DepositoService depositoService;
 
     @GetMapping
     public String listar(Model model) {
@@ -154,6 +160,44 @@ public class MaterialController {
     public String eliminarRecepcion(@PathVariable Long ordenCompraId, @PathVariable Long recepcionId) {
         materialService.eliminarRecepcion(ordenCompraId, recepcionId);
         return "redirect:/materiales/oc/" + ordenCompraId;
+    }
+
+    @GetMapping("/oc/{ordenCompraId}/recepciones/{recepcionId}/items/{itemRecepcionId}/deposito")
+    public String ingresoDeposito(@PathVariable Long ordenCompraId,
+                                  @PathVariable Long recepcionId,
+                                  @PathVariable Long itemRecepcionId,
+                                  @RequestParam(required = false) String origen,
+                                  Model model) {
+        ItemRecepcionMaterial itemRecepcion = obtenerItemRecepcionValido(ordenCompraId, recepcionId, itemRecepcionId);
+        IngresoDepositoRecepcionForm form = new IngresoDepositoRecepcionForm();
+        form.setCantidad(itemRecepcion.getCantidadRecibida());
+        form.setNuevoInsumoNombre(nombreSugeridoDeposito(itemRecepcion));
+        form.setCategoria("Materiales");
+        cargarIngresoDeposito(model, ordenCompraId, recepcionId, itemRecepcion, form, origen);
+        return "material/ingreso-deposito";
+    }
+
+    @PostMapping("/oc/{ordenCompraId}/recepciones/{recepcionId}/items/{itemRecepcionId}/deposito")
+    public String guardarIngresoDeposito(@PathVariable Long ordenCompraId,
+                                         @PathVariable Long recepcionId,
+                                         @PathVariable Long itemRecepcionId,
+                                         @RequestParam(required = false) String origen,
+                                         @ModelAttribute("form") IngresoDepositoRecepcionForm form,
+                                         Model model,
+                                         RedirectAttributes redirectAttributes) {
+        ItemRecepcionMaterial itemRecepcion = obtenerItemRecepcionValido(ordenCompraId, recepcionId, itemRecepcionId);
+        try {
+            DepositoItem itemDeposito = obtenerOCrearInsumoDeposito(form, itemRecepcion);
+            depositoService.registrarEntradaDesdeRecepcion(itemRecepcion, itemDeposito, form.getCantidad(), form.getResponsable(), form.getObservacion());
+            redirectAttributes.addFlashAttribute("accionCompletada", true);
+            redirectAttributes.addFlashAttribute("accionTitulo", "Ingreso al deposito");
+            redirectAttributes.addFlashAttribute("accionMensaje", "El material recibido quedo registrado como stock del deposito.");
+            return "redirect:/materiales/oc/" + ordenCompraId + "/recepciones/" + recepcionId + sufijoOrigen(origen);
+        } catch (IllegalArgumentException ex) {
+            model.addAttribute("error", ex.getMessage());
+            cargarIngresoDeposito(model, ordenCompraId, recepcionId, itemRecepcion, form, origen);
+            return "material/ingreso-deposito";
+        }
     }
 
     private void cargarFormulario(Long ordenCompraId, Long recepcionId, RecepcionMaterialForm form, boolean modoEdicion, String origen, Model model) {
@@ -301,5 +345,52 @@ public class MaterialController {
 
     private String sufijoOrigen(String origen) {
         return esOrigenEntregas(origen) ? "?origen=entregas" : "";
+    }
+
+    private ItemRecepcionMaterial obtenerItemRecepcionValido(Long ordenCompraId, Long recepcionId, Long itemRecepcionId) {
+        ItemRecepcionMaterial itemRecepcion = materialService.obtenerItemRecepcion(itemRecepcionId);
+        if (!itemRecepcion.getRecepcionMaterial().getId().equals(recepcionId)
+                || !itemRecepcion.getRecepcionMaterial().getOrdenCompra().getId().equals(ordenCompraId)) {
+            throw new IllegalArgumentException("El item no pertenece a esta recepcion.");
+        }
+        return itemRecepcion;
+    }
+
+    private void cargarIngresoDeposito(Model model,
+                                       Long ordenCompraId,
+                                       Long recepcionId,
+                                       ItemRecepcionMaterial itemRecepcion,
+                                       IngresoDepositoRecepcionForm form,
+                                       String origen) {
+        model.addAttribute("orden", ordenCompraService.obtener(ordenCompraId));
+        model.addAttribute("recepcion", itemRecepcion.getRecepcionMaterial());
+        model.addAttribute("itemRecepcion", itemRecepcion);
+        model.addAttribute("form", form);
+        model.addAttribute("insumosDeposito", depositoService.listarItemsActivos());
+        model.addAttribute("origen", origen);
+        model.addAttribute("desdeModuloEntregas", esOrigenEntregas(origen));
+    }
+
+    private DepositoItem obtenerOCrearInsumoDeposito(IngresoDepositoRecepcionForm form, ItemRecepcionMaterial itemRecepcion) {
+        if (form.getDepositoItemId() != null) {
+            return depositoService.obtener(form.getDepositoItemId());
+        }
+        DepositoItem nuevo = new DepositoItem();
+        nuevo.setNombre(form.getNuevoInsumoNombre());
+        nuevo.setCategoria(form.getCategoria());
+        nuevo.setUbicacion(form.getUbicacion());
+        nuevo.setStockMinimo(form.getStockMinimo());
+        nuevo.setUnidad(itemRecepcion.getItemOrdenCompra().getUnidad());
+        nuevo.setTipo(TipoInsumoDeposito.CONSUMIBLE);
+        nuevo.setObservacion("Creado desde recepcion OC " + itemRecepcion.getRecepcionMaterial().getOrdenCompra().getNumero());
+        return depositoService.guardarItem(nuevo);
+    }
+
+    private String nombreSugeridoDeposito(ItemRecepcionMaterial itemRecepcion) {
+        if (itemRecepcion.getItemOrdenCompra().getMaterialCatalogo() != null
+                && itemRecepcion.getItemOrdenCompra().getMaterialCatalogo().getNombre() != null) {
+            return itemRecepcion.getItemOrdenCompra().getMaterialCatalogo().getNombre();
+        }
+        return itemRecepcion.getItemOrdenCompra().getDetalle();
     }
 }

@@ -48,6 +48,12 @@ public class MaterialService {
     }
 
     @Transactional(readOnly = true)
+    public ItemRecepcionMaterial obtenerItemRecepcion(Long id) {
+        return itemRecepcionMaterialRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("No existe el item de recepcion " + id));
+    }
+
+    @Transactional(readOnly = true)
     public List<RecepcionMaterial> listarRecepciones(Long ordenCompraId) {
         return recepcionMaterialRepository.findByOrdenCompraIdOrderByFechaAscIdAsc(ordenCompraId);
     }

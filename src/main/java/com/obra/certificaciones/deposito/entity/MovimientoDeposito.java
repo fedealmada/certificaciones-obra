@@ -39,4 +39,9 @@ public class MovimientoDeposito {
 
     @Column(length = 1200)
     private String observacion;
+
+    private Long ordenCompraId;
+    private Long recepcionMaterialId;
+    private Long itemRecepcionMaterialId;
+    private String ordenCompraNumero;
 }

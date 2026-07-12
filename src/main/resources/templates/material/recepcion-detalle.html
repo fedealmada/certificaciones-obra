@@ -129,15 +129,16 @@
     </div>
 
     <section class="cert-detail-table-wrap cert-items-panel">
-        <div class="cert-items-grid cert-items-head">
+        <div class="cert-items-grid cert-items-grid-deposito cert-items-head">
             <div>Item</div>
             <div>Detalle</div>
             <div>Contratado</div>
             <div>Recibido</div>
             <div>Importe</div>
+            <div>Deposito</div>
         </div>
 
-        <article class="cert-items-grid cert-item-row" th:each="item : ${recepcion.items}">
+        <article class="cert-items-grid cert-items-grid-deposito cert-item-row" th:each="item : ${recepcion.items}">
             <div class="cert-item-code" th:text="${item.itemOrdenCompra.item}"></div>
             <div class="cert-item-detail">
                 <div>
@@ -185,14 +186,21 @@
                     </div>
                 </div>
             </div>
+            <div class="cert-item-actions">
+                <a class="btn btn-sm btn-outline-primary"
+                   th:href="@{/materiales/oc/{ocId}/recepciones/{recepcionId}/items/{itemId}/deposito(ocId=${orden.id}, recepcionId=${recepcion.id}, itemId=${item.id}, origen=${origen})}">
+                    <i class="bi bi-box-arrow-in-down"></i> Enviar
+                </a>
+            </div>
         </article>
 
-        <div class="cert-items-grid cert-items-total">
+        <div class="cert-items-grid cert-items-grid-deposito cert-items-total">
             <div>Totales de la recepcion</div>
             <div></div>
             <div th:text="${#numbers.formatDecimal(totalCompradoRecepcion, 1, 'POINT', 2, 'COMMA')}">0,00</div>
             <div th:text="${#numbers.formatDecimal(totalRecibidoRecepcion, 1, 'POINT', 2, 'COMMA') + ' recibido'}">0,00</div>
             <div th:text="${#numbers.formatDecimal(importeRecibidoRecepcion, 1, 'POINT', 2, 'COMMA')}">0,00</div>
+            <div></div>
         </div>
     </section>
 </main>

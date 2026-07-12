@@ -59,7 +59,7 @@
         </div>
         <div class="table-responsive">
             <table class="table table-hover align-middle document-table">
-                <thead><tr><th>Fecha</th><th>Tipo</th><th class="text-end">Cantidad</th><th class="text-end">Anterior</th><th class="text-end">Resultante</th><th>Responsable</th><th>Destino</th><th>Observacion</th></tr></thead>
+                <thead><tr><th>Fecha</th><th>Tipo</th><th class="text-end">Cantidad</th><th class="text-end">Anterior</th><th class="text-end">Resultante</th><th>Responsable</th><th>Destino</th><th>Origen</th><th>Observacion</th></tr></thead>
                 <tbody>
                 <tr th:each="mov : ${movimientos}">
                     <td th:text="${#temporals.format(mov.fecha, 'dd/MM/yyyy')}">01/01/2026</td>
@@ -69,9 +69,10 @@
                     <td class="text-end fw-semibold" th:text="${#numbers.formatDecimal(mov.stockResultante, 1, 'POINT', 2, 'COMMA')}">0,00</td>
                     <td th:text="${mov.responsable ?: '-'}">-</td>
                     <td th:text="${mov.destino ?: '-'}">-</td>
+                    <td th:text="${mov.ordenCompraNumero == null ? '-' : 'OC ' + mov.ordenCompraNumero}">-</td>
                     <td th:text="${mov.observacion ?: '-'}">-</td>
                 </tr>
-                <tr th:if="${movimientos.isEmpty()}"><td colspan="8" class="text-center text-muted py-4">Todavia no hay movimientos para este insumo.</td></tr>
+                <tr th:if="${movimientos.isEmpty()}"><td colspan="9" class="text-center text-muted py-4">Todavia no hay movimientos para este insumo.</td></tr>
                 </tbody>
             </table>
         </div>

@@ -3520,6 +3520,10 @@ h5 {
     grid-template-columns: minmax(3.8rem, 0.35fr) minmax(16rem, 1.8fr) minmax(9rem, 0.9fr) minmax(9rem, 0.9fr) minmax(10rem, 1fr);
 }
 
+.cert-items-grid-deposito {
+    grid-template-columns: minmax(3.8rem, 0.35fr) minmax(15rem, 1.7fr) minmax(8rem, 0.8fr) minmax(8rem, 0.8fr) minmax(8rem, 0.8fr) minmax(7.5rem, 0.7fr);
+}
+
 .cert-items-grid > div {
     min-width: 0;
 }
@@ -3583,6 +3587,16 @@ h5 {
 
 .cert-items-total > div:not(:first-child) {
     font-variant-numeric: tabular-nums;
+}
+
+.cert-item-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.cert-item-actions .btn {
+    white-space: nowrap;
 }
 
 .cert-items-panel .cert-item-detail {

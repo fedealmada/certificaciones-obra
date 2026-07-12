@@ -7,6 +7,7 @@ import com.obra.certificaciones.deposito.entity.TipoInsumoDeposito;
 import com.obra.certificaciones.deposito.entity.TipoMovimientoDeposito;
 import com.obra.certificaciones.deposito.repository.DepositoItemRepository;
 import com.obra.certificaciones.deposito.repository.MovimientoDepositoRepository;
+import com.obra.certificaciones.material.entity.ItemRecepcionMaterial;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,13 @@ public class DepositoService {
     @Transactional(readOnly = true)
     public List<DepositoItem> listarItems() {
         return itemRepository.findAllByOrderByActivoDescNombreAsc();
+    }
+
+    @Transactional(readOnly = true)
+    public List<DepositoItem> listarItemsActivos() {
+        return itemRepository.findAllByOrderByActivoDescNombreAsc().stream()
+                .filter(DepositoItem::isActivo)
+                .toList();
     }
 
     @Transactional(readOnly = true)
@@ -96,6 +104,52 @@ public class DepositoService {
 
         item.setStockActual(resultante);
         itemRepository.save(item);
+        return movimientoRepository.save(movimiento);
+    }
+
+    @Transactional
+    public MovimientoDeposito registrarEntradaDesdeRecepcion(ItemRecepcionMaterial itemRecepcion,
+                                                            DepositoItem itemDeposito,
+                                                            BigDecimal cantidad,
+                                                            String responsable,
+                                                            String observacion) {
+        if (itemRecepcion == null || itemRecepcion.getRecepcionMaterial() == null) {
+            throw new IllegalArgumentException("No se pudo identificar la recepcion de origen.");
+        }
+        if (itemDeposito == null) {
+            throw new IllegalArgumentException("Debe seleccionar o crear un insumo de deposito.");
+        }
+        BigDecimal cantidadSegura = valorSeguro(cantidad);
+        if (cantidadSegura.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("La cantidad a ingresar al deposito debe ser mayor a 0.");
+        }
+        BigDecimal yaIngresado = movimientoRepository.sumCantidadByItemRecepcionMaterialIdAndTipo(itemRecepcion.getId(), TipoMovimientoDeposito.ENTRADA);
+        if (valorSeguro(itemRecepcion.getCantidadRecibida()).compareTo(valorSeguro(yaIngresado).add(cantidadSegura)) < 0) {
+            throw new IllegalArgumentException("No se puede ingresar al deposito mas cantidad que la recibida en este viaje.");
+        }
+        if (!itemDeposito.isActivo()) {
+            throw new IllegalArgumentException("No se puede ingresar stock a un insumo inactivo.");
+        }
+
+        BigDecimal anterior = valorSeguro(itemDeposito.getStockActual());
+        BigDecimal resultante = anterior.add(cantidadSegura);
+        MovimientoDeposito movimiento = new MovimientoDeposito();
+        movimiento.setItem(itemDeposito);
+        movimiento.setFecha(itemRecepcion.getRecepcionMaterial().getFecha());
+        movimiento.setTipo(TipoMovimientoDeposito.ENTRADA);
+        movimiento.setCantidad(cantidadSegura);
+        movimiento.setStockAnterior(anterior);
+        movimiento.setStockResultante(resultante);
+        movimiento.setResponsable(responsable);
+        movimiento.setDestino("OC " + itemRecepcion.getRecepcionMaterial().getOrdenCompra().getNumero());
+        movimiento.setObservacion(observacion);
+        movimiento.setOrdenCompraId(itemRecepcion.getRecepcionMaterial().getOrdenCompra().getId());
+        movimiento.setRecepcionMaterialId(itemRecepcion.getRecepcionMaterial().getId());
+        movimiento.setItemRecepcionMaterialId(itemRecepcion.getId());
+        movimiento.setOrdenCompraNumero(itemRecepcion.getRecepcionMaterial().getOrdenCompra().getNumero());
+
+        itemDeposito.setStockActual(resultante);
+        itemRepository.save(itemDeposito);
         return movimientoRepository.save(movimiento);
     }
 
