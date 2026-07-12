@@ -22,8 +22,7 @@
         <a th:if="${desdeModuloEntregas}" th:href="@{/materiales}">Entregas</a>
         <a th:unless="${desdeModuloEntregas}" th:href="@{/oc}">Ordenes</a>
         <i class="bi bi-chevron-right"></i>
-        <a th:if="${desdeModuloEntregas}" th:href="@{/materiales/oc/{id}(id=${orden.id}, origen='entregas')}" th:text="'OC ' + ${orden.numero}">OC</a>
-        <a th:unless="${desdeModuloEntregas}" th:href="@{/oc/{id}(id=${orden.id})}" th:text="'OC ' + ${orden.numero}">OC</a>
+        <a th:href="@{/oc/{id}(id=${orden.id})}" th:text="'OC ' + ${orden.numero}">OC</a>
         <i class="bi bi-chevron-right"></i>
         <span th:text="${modoEdicion ? 'Editar entrega' : 'Nueva entrega'}">Nueva entrega</span>
     </div>
