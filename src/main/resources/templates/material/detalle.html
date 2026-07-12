@@ -33,18 +33,18 @@
             <div class="text-muted" th:text="${orden.proveedorEntidad?.nombre ?: '-'}"></div>
         </div>
         <div class="document-actions">
-            <a class="btn btn-primary" th:href="@{/materiales/oc/{id}/recepciones/nueva(id=${orden.id})}"><i class="bi bi-plus-lg"></i> Nueva recepcion</a>
+            <a class="btn btn-primary" th:href="@{/materiales/oc/{id}/recepciones/nueva(id=${orden.id})}"><i class="bi bi-plus-lg"></i> Nueva entrega</a>
         </div>
     </div>
 
     <div class="row g-3 mb-4">
-        <div class="col-md-4"><div class="metric-card"><div class="metric-label">Cantidad comprada</div><div class="metric-value metric-value-sm" th:text="${#numbers.formatDecimal(totalMaterialComprado, 1, 'POINT', 2, 'COMMA')}">0,00</div></div></div>
+        <div class="col-md-4"><div class="metric-card"><div class="metric-label">Cantidad prevista</div><div class="metric-value metric-value-sm" th:text="${#numbers.formatDecimal(totalMaterialComprado, 1, 'POINT', 2, 'COMMA')}">0,00</div></div></div>
         <div class="col-md-4"><div class="metric-card"><div class="metric-label">Cantidad recibida</div><div class="metric-value metric-value-sm" th:text="${#numbers.formatDecimal(totalMaterialRecibido, 1, 'POINT', 2, 'COMMA')}">0,00</div></div></div>
         <div class="col-md-4"><div class="metric-card"><div class="metric-label">Cantidad pendiente</div><div class="metric-value metric-value-sm" th:text="${#numbers.formatDecimal(totalMaterialPendiente, 1, 'POINT', 2, 'COMMA')}">0,00</div></div></div>
     </div>
 
     <section class="mb-4"><h2 class="h4">Items con entrega</h2><div class="table-responsive"><table class="table table-hover align-middle">
-        <thead><tr><th>Item</th><th>Detalle</th><th>Vinculado a</th><th>Unidad</th><th class="text-end">Comprado</th><th class="text-end">Recibido</th><th class="text-end">Pendiente</th><th>Avance</th><th>Estado</th></tr></thead>
+        <thead><tr><th>Item</th><th>Detalle</th><th>Vinculado a</th><th>Unidad</th><th class="text-end">Previsto</th><th class="text-end">Recibido</th><th class="text-end">Pendiente</th><th>Avance</th><th>Estado</th></tr></thead>
         <tbody>
         <tr th:each="resumen : ${itemsResumen}">
             <td th:text="${resumen.itemOrdenCompra.item}"></td>
@@ -72,7 +72,7 @@
         </tbody>
     </table></div></section>
 
-    <section><h2 class="h4">Recepciones</h2><div class="table-responsive"><table class="table table-hover align-middle">
+    <section><h2 class="h4">Entregas registradas</h2><div class="table-responsive"><table class="table table-hover align-middle">
         <thead><tr><th>Fecha</th><th>Remito</th><th>Observacion</th><th>Items</th><th class="text-end">Acciones</th></tr></thead>
         <tbody>
         <tr th:each="recepcion : ${recepciones}">
@@ -80,9 +80,9 @@
             <td th:text="${#strings.isEmpty(recepcion.remito) ? 'Sin remito' : recepcion.remito}"></td>
             <td th:text="${recepcion.observacion}"></td>
             <td th:text="${recepcion.items.size()}"></td>
-            <td class="text-end action-cell"><a class="btn btn-sm btn-outline-primary table-icon-action" th:href="@{/materiales/oc/{ocId}/recepciones/{id}(ocId=${orden.id}, id=${recepcion.id})}" title="Ver recepcion" aria-label="Ver recepcion"><i class="bi bi-eye"></i></a><form method="post" th:action="@{/materiales/oc/{ocId}/recepciones/{id}/eliminar(ocId=${orden.id}, id=${recepcion.id})}" onsubmit="return confirm('Eliminar esta recepcion?');"><button class="btn btn-sm btn-outline-danger table-icon-action" type="submit" title="Eliminar recepcion" aria-label="Eliminar recepcion"><i class="bi bi-trash"></i></button></form></td>
+            <td class="text-end action-cell"><a class="btn btn-sm btn-outline-primary table-icon-action" th:href="@{/materiales/oc/{ocId}/recepciones/{id}(ocId=${orden.id}, id=${recepcion.id})}" title="Ver entrega" aria-label="Ver entrega"><i class="bi bi-eye"></i></a><form method="post" th:action="@{/materiales/oc/{ocId}/recepciones/{id}/eliminar(ocId=${orden.id}, id=${recepcion.id})}" onsubmit="return confirm('Eliminar esta entrega?');"><button class="btn btn-sm btn-outline-danger table-icon-action" type="submit" title="Eliminar entrega" aria-label="Eliminar entrega"><i class="bi bi-trash"></i></button></form></td>
         </tr>
-        <tr th:if="${recepciones.isEmpty()}"><td colspan="5" class="text-center text-muted py-4">Todavia no hay recepciones.</td></tr>
+        <tr th:if="${recepciones.isEmpty()}"><td colspan="5" class="text-center text-muted py-4">Todavia no hay entregas registradas.</td></tr>
         </tbody>
     </table></div></section>
 </main>

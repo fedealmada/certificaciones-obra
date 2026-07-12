@@ -66,7 +66,7 @@
             </div>
         </div>
         <div class="document-actions">
-            <a class="btn btn-primary" th:if="${ordenMaterial}" th:href="@{/materiales/oc/{id}/recepciones/nueva(id=${orden.id})}"><i class="bi bi-truck"></i> Nueva recepcion</a>
+            <a class="btn btn-primary" th:if="${ordenMaterial}" th:href="@{/materiales/oc/{id}/recepciones/nueva(id=${orden.id})}"><i class="bi bi-truck"></i> Nueva entrega</a>
             <a class="btn btn-outline-primary" th:if="${ordenMaterial}" th:href="@{/materiales/oc/{id}(id=${orden.id})}"><i class="bi bi-box-seam"></i> Ver entregas</a>
             <a class="btn btn-primary" th:if="${ordenCertificable}" th:href="@{/oc/{id}/certificaciones/nueva(id=${orden.id})}"><i class="bi bi-plus-lg"></i> Nuevo Certificado</a>
             <a class="btn btn-outline-secondary" th:href="@{/oc/{id}/editar(id=${orden.id})}"><i class="bi bi-pencil-square"></i> Editar OC</a>
@@ -108,7 +108,7 @@
                 <strong th:text="${#numbers.formatDecimal(orden.total, 1, 'POINT', 2, 'COMMA')}">0,00</strong>
             </div>
             <div class="ticket-summary-card" th:if="${ordenCertificable}"><span>Base certificable</span><strong th:text="${#numbers.formatDecimal(totalCertificable, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
-            <div class="ticket-summary-card" th:if="${ordenMaterial}"><span>Comprado</span><strong th:text="${#numbers.formatDecimal(totalMaterialCompradoCantidad, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
+            <div class="ticket-summary-card" th:if="${ordenMaterial}"><span>Previsto</span><strong th:text="${#numbers.formatDecimal(totalMaterialCompradoCantidad, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
             <div class="ticket-summary-card" th:if="${ordenCertificable || ordenSoloRegistro}"><span>Materiales</span><strong th:text="${#numbers.formatDecimal(totalMateriales, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
             <div class="ticket-summary-card" th:if="${ordenMaterial}"><span>Recibido</span><strong th:text="${#numbers.formatDecimal(totalMaterialRecibidoCantidad, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
             <div class="ticket-summary-card"><span>Otros</span><strong th:text="${#numbers.formatDecimal(totalOtros, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
@@ -138,7 +138,7 @@
                     <span>Recepcion acumulada de entregas</span>
                     <strong th:text="${#numbers.formatDecimal(porcentajeRecepcionOc, 1, 'POINT', 2, 'COMMA')} + ' %'">0,00 %</strong>
                 </div>
-                <small th:text="${#numbers.formatDecimal(totalMaterialRecibidoCantidad, 1, 'POINT', 2, 'COMMA') + ' recibido de ' + #numbers.formatDecimal(totalMaterialCompradoCantidad, 1, 'POINT', 2, 'COMMA') + ' comprado'}">0,00 recibido</small>
+                <small th:text="${#numbers.formatDecimal(totalMaterialRecibidoCantidad, 1, 'POINT', 2, 'COMMA') + ' recibido de ' + #numbers.formatDecimal(totalMaterialCompradoCantidad, 1, 'POINT', 2, 'COMMA') + ' previsto'}">0,00 recibido</small>
             </div>
             <div class="oc-total-progress-track">
                 <div class="oc-total-progress-fill is-material" th:data-progress="${porcentajeRecepcionOcBarra}"></div>
@@ -220,7 +220,7 @@
         <div class="p-3 d-flex flex-wrap gap-2 align-items-center justify-content-between">
             <span class="text-muted">Esta OC se controla por recepciones, viajes o unidades recibidas, no por certificados.</span>
             <div class="d-flex flex-wrap gap-2">
-                <a class="btn btn-primary" th:href="@{/materiales/oc/{id}/recepciones/nueva(id=${orden.id})}"><i class="bi bi-plus-lg"></i> Nueva recepcion</a>
+                <a class="btn btn-primary" th:href="@{/materiales/oc/{id}/recepciones/nueva(id=${orden.id})}"><i class="bi bi-plus-lg"></i> Nueva entrega</a>
                 <a class="btn btn-outline-primary" th:href="@{/materiales/oc/{id}(id=${orden.id})}"><i class="bi bi-box-seam"></i> Ver entregas</a>
             </div>
         </div>

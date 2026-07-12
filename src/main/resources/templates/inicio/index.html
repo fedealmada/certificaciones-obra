@@ -25,7 +25,7 @@
                 </div>
                 <span class="home-status-pill"><i class="bi bi-lightning-charge-fill"></i> Panel activo</span>
             </div>
-            <p>Accede rapido a compras, certificaciones, materiales, reportes e itemizado desde un solo lugar.</p>
+            <p>Accede rapido a compras, certificaciones, entregas, reportes e itemizado desde un solo lugar.</p>
             <div class="home-hero-actions">
                 <a class="btn btn-primary" th:if="${configuracion.activo('modulo.oc')}" th:href="@{/oc/nueva}"><i class="bi bi-plus-lg"></i> Nueva OC</a>
                 <a class="btn btn-outline-secondary" th:if="${configuracion.activo('modulo.importarCertificados')}" th:href="@{/certificaciones/importar}"><i class="bi bi-clipboard-check"></i> Importar certificados</a>

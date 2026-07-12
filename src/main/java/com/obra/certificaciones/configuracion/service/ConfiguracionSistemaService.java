@@ -30,7 +30,7 @@ public class ConfiguracionSistemaService {
                 new ModuloSistema("modulo.proveedores", "Proveedores", "Contratistas, contactos y OC asociadas.", "/proveedores", "bi-person-lines-fill", "yellow"),
                 new ModuloSistema("modulo.categorias", "Categorias", "Categorias manuales para compras e items.", "/categorias", "bi-tags", "blue"),
                 new ModuloSistema("modulo.rubros", "Rubros", "Estructura jerarquica de rubros de obra.", "/rubros", "bi-folder2-open", "green"),
-                new ModuloSistema("modulo.materiales", "Materiales", "Recepciones y seguimiento de materiales.", "/materiales", "bi-box-seam", "yellow"),
+                new ModuloSistema("modulo.materiales", "Entregas y viajes", "Entregas, viajes y seguimiento por unidades.", "/materiales", "bi-truck", "yellow"),
                 new ModuloSistema("modulo.catalogo", "Catalogo", "Catalogo maestro de materiales.", "/catalogo-materiales", "bi-archive", "blue"),
                 new ModuloSistema("modulo.reportes", "Reportes", "Gastos, evolucion mensual y analisis.", "/reportes", "bi-graph-up-arrow", "green")
         );
