@@ -6,6 +6,7 @@ import com.obra.certificaciones.oc.entity.CategoriaItem;
 import com.obra.certificaciones.oc.entity.ItemOrdenCompra;
 import com.obra.certificaciones.oc.entity.OrdenCompra;
 import com.obra.certificaciones.oc.repository.OrdenCompraRepository;
+import com.obra.certificaciones.obra.entity.Obra;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,9 +27,9 @@ public class AlertaSistemaService {
     private final CertificacionCalculoService calculoService;
 
     @Transactional(readOnly = true)
-    public List<AlertaSistema> alertasGenerales() {
+    public List<AlertaSistema> alertasGenerales(Obra obra) {
         List<AlertaSistema> alertas = new ArrayList<>();
-        List<OrdenCompra> ordenes = ordenCompraRepository.buscarConFiltros(null, null, null);
+        List<OrdenCompra> ordenes = ordenCompraRepository.buscarConFiltros(obra.getId(), null, null, null);
         Map<Long, Map<Long, BigDecimal>> acumuladosPorOrden = calculoService.porcentajesAcumuladosPorOrdenes(ordenes.stream()
                 .map(OrdenCompra::getId)
                 .toList());

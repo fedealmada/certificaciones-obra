@@ -23,7 +23,7 @@ public class DashboardController {
         var obra = obraService.obraActiva(session);
         model.addAttribute("reporte", reporteService.generarGeneral(obra));
         model.addAttribute("ultimasOrdenes", ordenCompraRepository.findTop5ByObraIdOrderByFechaDescIdDesc(obra.getId()));
-        model.addAttribute("alertas", alertaSistemaService.alertasGenerales());
+        model.addAttribute("alertas", alertaSistemaService.alertasGenerales(obra));
         return "dashboard/index";
     }
 }
