@@ -9,8 +9,13 @@ import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 public interface MovimientoDepositoRepository extends JpaRepository<MovimientoDeposito, Long> {
+    @Override
+    @EntityGraph(attributePaths = {"item"})
+    Optional<MovimientoDeposito> findById(Long id);
+
     @EntityGraph(attributePaths = {"item"})
     List<MovimientoDeposito> findTop12ByOrderByFechaDescIdDesc();
 
