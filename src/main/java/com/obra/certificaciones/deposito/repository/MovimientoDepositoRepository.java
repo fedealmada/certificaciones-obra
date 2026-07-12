@@ -17,6 +17,11 @@ public interface MovimientoDepositoRepository extends JpaRepository<MovimientoDe
     @EntityGraph(attributePaths = {"item"})
     List<MovimientoDeposito> findTop80ByItemIdOrderByFechaDescIdDesc(Long itemId);
 
+    List<MovimientoDeposito> findByItemIdOrderByFechaAscIdAsc(Long itemId);
+
+    @EntityGraph(attributePaths = {"item"})
+    List<MovimientoDeposito> findByTipoAndRequiereDevolucionTrueAndDevueltoFalseOrderByFechaAscIdAsc(TipoMovimientoDeposito tipo);
+
     boolean existsByItemId(Long itemId);
 
     @Query("""

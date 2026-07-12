@@ -21,33 +21,41 @@
         <i class="bi bi-chevron-right"></i>
         <a th:href="@{/deposito}">Deposito</a>
         <i class="bi bi-chevron-right"></i>
-        <span>Movimiento</span>
+        <span th:text="${modoEdicion ? 'Editar movimiento' : 'Movimiento'}">Movimiento</span>
     </div>
 
     <div class="document-header mb-4">
         <div>
             <div class="document-kicker">Panol</div>
-            <h1 th:text="${item.nombre}">Insumo</h1>
-            <div class="text-muted">Registra entradas, salidas, devoluciones o ajustes de stock.</div>
+            <h1 th:text="${modoEdicion ? 'Editar movimiento' : item.nombre}">Insumo</h1>
+            <div class="text-muted" th:text="${modoEdicion ? item.nombre : 'Registra entradas, salidas, devoluciones o ajustes de stock.'}">Movimiento</div>
         </div>
         <div class="document-actions">
             <span class="section-total-pill" th:text="${'Stock actual: ' + #numbers.formatDecimal(item.stockActual, 1, 'POINT', 2, 'COMMA')}">Stock</span>
         </div>
     </div>
     <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
-    <form method="post" th:action="@{/deposito/{id}/movimiento(id=${item.id})}" th:object="${form}">
+    <form method="post" th:action="${modoEdicion ? '/deposito/movimientos/' + movimiento.id : '/deposito/' + item.id + '/movimiento'}" th:object="${form}">
         <section class="panel-section mb-3">
             <div class="row g-3">
                 <div class="col-md-3"><label class="form-label">Fecha</label><input class="form-control" type="date" th:field="*{fecha}" required></div>
                 <div class="col-md-3"><label class="form-label">Tipo</label><select class="form-select" th:field="*{tipo}"><option th:each="tipo : ${tiposMovimiento}" th:value="${tipo}" th:text="${tipo.descripcion}"></option></select></div>
                 <div class="col-md-3"><label class="form-label">Cantidad</label><input class="form-control" type="number" step="0.01" min="0.01" th:field="*{cantidad}" required></div>
                 <div class="col-md-3"><label class="form-label">Responsable</label><input class="form-control" th:field="*{responsable}" placeholder="Quien retira o devuelve"></div>
-                <div class="col-md-6"><label class="form-label">Destino / trabajo</label><input class="form-control" th:field="*{destino}" placeholder="Sector, frente, rubro o trabajo"></div>
-                <div class="col-md-6"><label class="form-label">Observacion</label><input class="form-control" th:field="*{observacion}" placeholder="Detalle del movimiento"></div>
+                <div class="col-md-4"><label class="form-label">Trabajador registrado</label><select class="form-select" th:field="*{trabajadorId}"><option value="">Sin trabajador</option><option th:each="trabajador : ${trabajadores}" th:value="${trabajador.id}" th:text="${trabajador.nombre}">Trabajador</option></select></div>
+                <div class="col-md-4"><label class="form-label">Nuevo trabajador</label><input class="form-control" th:field="*{trabajadorNombre}" placeholder="Ej: Juan Carlos"></div>
+                <div class="col-md-4"><label class="form-label">Destino / trabajo</label><input class="form-control" th:field="*{destino}" placeholder="Sector, frente, rubro o trabajo"></div>
+                <div class="col-md-8"><label class="form-label">Observacion</label><input class="form-control" th:field="*{observacion}" placeholder="Detalle del movimiento"></div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <label class="form-check deposito-check">
+                        <input class="form-check-input" type="checkbox" th:field="*{requiereDevolucion}">
+                        <span class="form-check-label">Debe devolver</span>
+                    </label>
+                </div>
             </div>
         </section>
         <div class="d-flex gap-2 mb-4">
-            <button class="btn btn-primary" type="submit"><i class="bi bi-check2"></i> Registrar movimiento</button>
+            <button class="btn btn-primary" type="submit"><i class="bi bi-check2"></i> <span th:text="${modoEdicion ? 'Guardar cambios' : 'Registrar movimiento'}">Registrar movimiento</span></button>
             <a class="btn btn-outline-secondary" th:href="@{/deposito}">Cancelar</a>
         </div>
     </form>
@@ -59,7 +67,7 @@
         </div>
         <div class="table-responsive">
             <table class="table table-hover align-middle document-table">
-                <thead><tr><th>Fecha</th><th>Tipo</th><th class="text-end">Cantidad</th><th class="text-end">Anterior</th><th class="text-end">Resultante</th><th>Responsable</th><th>Destino</th><th>Origen</th><th>Observacion</th></tr></thead>
+                <thead><tr><th>Fecha</th><th>Tipo</th><th class="text-end">Cantidad</th><th class="text-end">Anterior</th><th class="text-end">Resultante</th><th>Persona</th><th>Destino</th><th>Estado</th><th class="text-end">Acciones</th></tr></thead>
                 <tbody>
                 <tr th:each="mov : ${movimientos}">
                     <td th:text="${#temporals.format(mov.fecha, 'dd/MM/yyyy')}">01/01/2026</td>
@@ -67,10 +75,14 @@
                     <td class="text-end" th:text="${#numbers.formatDecimal(mov.cantidad, 1, 'POINT', 2, 'COMMA')}">0,00</td>
                     <td class="text-end" th:text="${#numbers.formatDecimal(mov.stockAnterior, 1, 'POINT', 2, 'COMMA')}">0,00</td>
                     <td class="text-end fw-semibold" th:text="${#numbers.formatDecimal(mov.stockResultante, 1, 'POINT', 2, 'COMMA')}">0,00</td>
-                    <td th:text="${mov.responsable ?: '-'}">-</td>
+                    <td th:text="${mov.trabajadorNombre ?: (mov.responsable ?: '-')}">-</td>
                     <td th:text="${mov.destino ?: '-'}">-</td>
-                    <td th:text="${mov.ordenCompraNumero == null ? '-' : 'OC ' + mov.ordenCompraNumero}">-</td>
-                    <td th:text="${mov.observacion ?: '-'}">-</td>
+                    <td><span class="delivery-status-pill" th:classappend="${mov.requiereDevolucion && !mov.devuelto ? ' is-pending' : ' is-complete'}" th:text="${mov.requiereDevolucion && !mov.devuelto ? 'PENDIENTE DEV.' : 'OK'}">OK</span></td>
+                    <td class="text-end action-cell">
+                        <a class="btn btn-sm btn-outline-primary table-icon-action" th:href="@{/deposito/movimientos/{id}(id=${mov.id})}" title="Ver movimiento" aria-label="Ver movimiento"><i class="bi bi-eye"></i></a>
+                        <a class="btn btn-sm btn-outline-secondary table-icon-action" th:if="${mov.ordenCompraId == null && mov.movimientoOrigenId == null}" th:href="@{/deposito/movimientos/{id}/editar(id=${mov.id})}" title="Editar movimiento" aria-label="Editar movimiento"><i class="bi bi-pencil-square"></i></a>
+                        <a class="btn btn-sm btn-outline-success table-icon-action" th:if="${mov.requiereDevolucion && !mov.devuelto}" th:href="@{/deposito/movimientos/{id}/devolver(id=${mov.id})}" title="Registrar devolucion" aria-label="Registrar devolucion"><i class="bi bi-arrow-return-left"></i></a>
+                    </td>
                 </tr>
                 <tr th:if="${movimientos.isEmpty()}"><td colspan="9" class="text-center text-muted py-4">Todavia no hay movimientos para este insumo.</td></tr>
                 </tbody>

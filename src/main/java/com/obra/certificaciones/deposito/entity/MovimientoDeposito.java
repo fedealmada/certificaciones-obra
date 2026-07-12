@@ -35,7 +35,12 @@ public class MovimientoDeposito {
     private BigDecimal stockAnterior = BigDecimal.ZERO;
     private BigDecimal stockResultante = BigDecimal.ZERO;
     private String responsable;
+    private Long trabajadorId;
+    private String trabajadorNombre;
     private String destino;
+    private boolean requiereDevolucion;
+    private boolean devuelto;
+    private Long movimientoOrigenId;
 
     @Column(length = 1200)
     private String observacion;

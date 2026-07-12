@@ -7493,6 +7493,26 @@ html[data-theme="dark"] body {
     color: #c4c9d4;
 }
 
+.deposito-check {
+    min-height: 2.35rem;
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.55rem 0.7rem;
+    border: 1px solid var(--app-line);
+    border-radius: 8px;
+    background: #ffffff;
+    color: var(--app-ink);
+    font-weight: 720;
+}
+
+:root[data-theme="dark"] .deposito-check {
+    background: #343847;
+    border-color: rgba(237, 241, 247, 0.13);
+    color: #f5f7fb;
+}
+
 .interactive-table thead th:last-child,
 .oc-list-table th:last-child,
 .items-master-table th:last-child {

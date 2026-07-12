@@ -15,5 +15,6 @@ public class IngresoDepositoRecepcionForm {
     private BigDecimal stockMinimo = BigDecimal.ZERO;
     private BigDecimal cantidad = BigDecimal.ZERO;
     private String responsable;
+    private String destino;
     private String observacion;
 }

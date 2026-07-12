@@ -188,7 +188,7 @@ public class MaterialController {
         ItemRecepcionMaterial itemRecepcion = obtenerItemRecepcionValido(ordenCompraId, recepcionId, itemRecepcionId);
         try {
             DepositoItem itemDeposito = obtenerOCrearInsumoDeposito(form, itemRecepcion);
-            depositoService.registrarEntradaDesdeRecepcion(itemRecepcion, itemDeposito, form.getCantidad(), form.getResponsable(), form.getObservacion());
+            depositoService.registrarEntradaDesdeRecepcion(itemRecepcion, itemDeposito, form.getCantidad(), form.getResponsable(), form.getDestino(), form.getObservacion());
             redirectAttributes.addFlashAttribute("accionCompletada", true);
             redirectAttributes.addFlashAttribute("accionTitulo", "Ingreso al deposito");
             redirectAttributes.addFlashAttribute("accionMensaje", "El material recibido quedo registrado como stock del deposito.");

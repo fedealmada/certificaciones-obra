@@ -26,6 +26,7 @@ public class DepositoController {
         var items = depositoService.listarItems();
         model.addAttribute("items", items);
         model.addAttribute("movimientos", depositoService.movimientosRecientes());
+        model.addAttribute("devolucionesPendientes", depositoService.devolucionesPendientes());
         model.addAttribute("totalItems", items.stream().filter(DepositoItem::isActivo).count());
         model.addAttribute("bajoStock", depositoService.contarBajoStock());
         model.addAttribute("totalUnidades", depositoService.totalUnidades());
@@ -72,7 +73,9 @@ public class DepositoController {
         model.addAttribute("item", depositoService.obtener(id));
         model.addAttribute("form", new MovimientoDepositoForm());
         model.addAttribute("tiposMovimiento", TipoMovimientoDeposito.values());
+        model.addAttribute("trabajadores", depositoService.listarTrabajadoresActivos());
         model.addAttribute("movimientos", depositoService.movimientosItem(id));
+        model.addAttribute("modoEdicion", false);
         return "deposito/movimiento";
     }
 
@@ -90,8 +93,86 @@ public class DepositoController {
             model.addAttribute("item", depositoService.obtener(id));
             model.addAttribute("form", form);
             model.addAttribute("tiposMovimiento", TipoMovimientoDeposito.values());
+            model.addAttribute("trabajadores", depositoService.listarTrabajadoresActivos());
             model.addAttribute("movimientos", depositoService.movimientosItem(id));
+            model.addAttribute("modoEdicion", false);
             return "deposito/movimiento";
+        }
+    }
+
+    @GetMapping("/movimientos/{movimientoId}")
+    public String detalleMovimiento(@PathVariable Long movimientoId, Model model) {
+        model.addAttribute("movimiento", depositoService.obtenerMovimiento(movimientoId));
+        return "deposito/movimiento-detalle";
+    }
+
+    @GetMapping("/movimientos/{movimientoId}/editar")
+    public String editarMovimiento(@PathVariable Long movimientoId, Model model) {
+        var movimiento = depositoService.obtenerMovimiento(movimientoId);
+        model.addAttribute("item", movimiento.getItem());
+        model.addAttribute("movimiento", movimiento);
+        model.addAttribute("form", depositoService.formDesdeMovimiento(movimiento));
+        model.addAttribute("tiposMovimiento", TipoMovimientoDeposito.values());
+        model.addAttribute("trabajadores", depositoService.listarTrabajadoresActivos());
+        model.addAttribute("movimientos", depositoService.movimientosItem(movimiento.getItem().getId()));
+        model.addAttribute("modoEdicion", true);
+        return "deposito/movimiento";
+    }
+
+    @PostMapping("/movimientos/{movimientoId}")
+    public String actualizarMovimiento(@PathVariable Long movimientoId,
+                                       @ModelAttribute("form") MovimientoDepositoForm form,
+                                       Model model,
+                                       RedirectAttributes redirectAttributes) {
+        var movimiento = depositoService.obtenerMovimiento(movimientoId);
+        try {
+            depositoService.actualizarMovimiento(movimientoId, form);
+            redirectAttributes.addFlashAttribute("success", "Movimiento actualizado correctamente.");
+            return "redirect:/deposito/movimientos/" + movimientoId;
+        } catch (IllegalArgumentException ex) {
+            model.addAttribute("error", ex.getMessage());
+            model.addAttribute("item", movimiento.getItem());
+            model.addAttribute("movimiento", movimiento);
+            model.addAttribute("form", form);
+            model.addAttribute("tiposMovimiento", TipoMovimientoDeposito.values());
+            model.addAttribute("trabajadores", depositoService.listarTrabajadoresActivos());
+            model.addAttribute("movimientos", depositoService.movimientosItem(movimiento.getItem().getId()));
+            model.addAttribute("modoEdicion", true);
+            return "deposito/movimiento";
+        }
+    }
+
+    @GetMapping("/movimientos/{movimientoId}/devolver")
+    public String devolverMovimiento(@PathVariable Long movimientoId, Model model) {
+        var movimiento = depositoService.obtenerMovimiento(movimientoId);
+        MovimientoDepositoForm form = new MovimientoDepositoForm();
+        form.setTipo(TipoMovimientoDeposito.DEVOLUCION);
+        form.setCantidad(movimiento.getCantidad());
+        form.setTrabajadorId(movimiento.getTrabajadorId());
+        form.setTrabajadorNombre(movimiento.getTrabajadorNombre());
+        form.setResponsable(movimiento.getResponsable());
+        form.setDestino(movimiento.getDestino());
+        model.addAttribute("movimiento", movimiento);
+        model.addAttribute("form", form);
+        model.addAttribute("trabajadores", depositoService.listarTrabajadoresActivos());
+        return "deposito/devolucion";
+    }
+
+    @PostMapping("/movimientos/{movimientoId}/devolver")
+    public String guardarDevolucion(@PathVariable Long movimientoId,
+                                    @ModelAttribute("form") MovimientoDepositoForm form,
+                                    Model model,
+                                    RedirectAttributes redirectAttributes) {
+        try {
+            var devolucion = depositoService.registrarDevolucion(movimientoId, form);
+            redirectAttributes.addFlashAttribute("success", "Devolucion registrada correctamente.");
+            return "redirect:/deposito/movimientos/" + devolucion.getId();
+        } catch (IllegalArgumentException ex) {
+            model.addAttribute("error", ex.getMessage());
+            model.addAttribute("movimiento", depositoService.obtenerMovimiento(movimientoId));
+            model.addAttribute("form", form);
+            model.addAttribute("trabajadores", depositoService.listarTrabajadoresActivos());
+            return "deposito/devolucion";
         }
     }
 }

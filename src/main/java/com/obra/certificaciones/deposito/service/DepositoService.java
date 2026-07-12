@@ -2,10 +2,12 @@ package com.obra.certificaciones.deposito.service;
 
 import com.obra.certificaciones.deposito.dto.MovimientoDepositoForm;
 import com.obra.certificaciones.deposito.entity.DepositoItem;
+import com.obra.certificaciones.deposito.entity.DepositoTrabajador;
 import com.obra.certificaciones.deposito.entity.MovimientoDeposito;
 import com.obra.certificaciones.deposito.entity.TipoInsumoDeposito;
 import com.obra.certificaciones.deposito.entity.TipoMovimientoDeposito;
 import com.obra.certificaciones.deposito.repository.DepositoItemRepository;
+import com.obra.certificaciones.deposito.repository.DepositoTrabajadorRepository;
 import com.obra.certificaciones.deposito.repository.MovimientoDepositoRepository;
 import com.obra.certificaciones.material.entity.ItemRecepcionMaterial;
 import jakarta.persistence.EntityNotFoundException;
@@ -23,6 +25,7 @@ import java.util.List;
 public class DepositoService {
     private final DepositoItemRepository itemRepository;
     private final MovimientoDepositoRepository movimientoRepository;
+    private final DepositoTrabajadorRepository trabajadorRepository;
 
     @Transactional(readOnly = true)
     public List<DepositoItem> listarItems() {
@@ -47,9 +50,25 @@ public class DepositoService {
     }
 
     @Transactional(readOnly = true)
+    public List<DepositoTrabajador> listarTrabajadoresActivos() {
+        return trabajadorRepository.findByActivoTrueOrderByNombreAsc();
+    }
+
+    @Transactional(readOnly = true)
+    public List<MovimientoDeposito> devolucionesPendientes() {
+        return movimientoRepository.findByTipoAndRequiereDevolucionTrueAndDevueltoFalseOrderByFechaAscIdAsc(TipoMovimientoDeposito.SALIDA);
+    }
+
+    @Transactional(readOnly = true)
     public DepositoItem obtener(Long id) {
         return itemRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("No existe el insumo de deposito " + id));
+    }
+
+    @Transactional(readOnly = true)
+    public MovimientoDeposito obtenerMovimiento(Long id) {
+        return movimientoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("No existe el movimiento de deposito " + id));
     }
 
     @Transactional
@@ -93,18 +112,78 @@ public class DepositoService {
 
         MovimientoDeposito movimiento = new MovimientoDeposito();
         movimiento.setItem(item);
-        movimiento.setFecha(form.getFecha() == null ? LocalDate.now() : form.getFecha());
-        movimiento.setTipo(form.getTipo());
-        movimiento.setCantidad(cantidad);
         movimiento.setStockAnterior(anterior);
         movimiento.setStockResultante(resultante);
-        movimiento.setResponsable(form.getResponsable());
-        movimiento.setDestino(form.getDestino());
-        movimiento.setObservacion(form.getObservacion());
+        aplicarDatosMovimiento(movimiento, form, cantidad);
 
-        item.setStockActual(resultante);
-        itemRepository.save(item);
-        return movimientoRepository.save(movimiento);
+        movimientoRepository.save(movimiento);
+        recalcularStockItem(item);
+        return movimiento;
+    }
+
+    @Transactional
+    public MovimientoDeposito actualizarMovimiento(Long movimientoId, MovimientoDepositoForm form) {
+        MovimientoDeposito movimiento = obtenerMovimiento(movimientoId);
+        if (movimiento.getOrdenCompraId() != null || movimiento.getMovimientoOrigenId() != null) {
+            throw new IllegalArgumentException("Este movimiento esta vinculado a otro proceso y no puede editarse desde aqui.");
+        }
+        DepositoItem item = movimiento.getItem();
+        validarDatosMovimiento(item, form);
+        BigDecimal cantidad = valorSeguro(form.getCantidad());
+
+        aplicarDatosMovimiento(movimiento, form, cantidad);
+        movimientoRepository.save(movimiento);
+        recalcularStockItem(item);
+        return movimiento;
+    }
+
+    @Transactional
+    public MovimientoDeposito registrarDevolucion(Long movimientoSalidaId, MovimientoDepositoForm form) {
+        MovimientoDeposito salida = obtenerMovimiento(movimientoSalidaId);
+        if (salida.getTipo() != TipoMovimientoDeposito.SALIDA || !salida.isRequiereDevolucion()) {
+            throw new IllegalArgumentException("El movimiento seleccionado no tiene devolucion pendiente.");
+        }
+        if (salida.isDevuelto()) {
+            throw new IllegalArgumentException("Este movimiento ya fue devuelto.");
+        }
+        form.setTipo(TipoMovimientoDeposito.DEVOLUCION);
+        form.setCantidad(salida.getCantidad());
+        DepositoItem item = salida.getItem();
+        validarMovimiento(item, form);
+        BigDecimal anterior = valorSeguro(item.getStockActual());
+        BigDecimal resultante = calcularStockResultante(anterior, TipoMovimientoDeposito.DEVOLUCION, valorSeguro(salida.getCantidad()));
+
+        MovimientoDeposito devolucion = new MovimientoDeposito();
+        devolucion.setItem(item);
+        devolucion.setStockAnterior(anterior);
+        devolucion.setStockResultante(resultante);
+        aplicarDatosMovimiento(devolucion, form, valorSeguro(salida.getCantidad()));
+        devolucion.setMovimientoOrigenId(salida.getId());
+        devolucion.setTrabajadorId(salida.getTrabajadorId());
+        devolucion.setTrabajadorNombre(salida.getTrabajadorNombre());
+        devolucion.setResponsable(StringUtils.hasText(form.getResponsable()) ? form.getResponsable() : salida.getResponsable());
+        devolucion.setDestino(salida.getDestino());
+
+        salida.setDevuelto(true);
+        movimientoRepository.save(salida);
+        movimientoRepository.save(devolucion);
+        recalcularStockItem(item);
+        return devolucion;
+    }
+
+    @Transactional(readOnly = true)
+    public MovimientoDepositoForm formDesdeMovimiento(MovimientoDeposito movimiento) {
+        MovimientoDepositoForm form = new MovimientoDepositoForm();
+        form.setFecha(movimiento.getFecha());
+        form.setTipo(movimiento.getTipo());
+        form.setCantidad(movimiento.getCantidad());
+        form.setResponsable(movimiento.getResponsable());
+        form.setTrabajadorId(movimiento.getTrabajadorId());
+        form.setTrabajadorNombre(movimiento.getTrabajadorNombre());
+        form.setDestino(movimiento.getDestino());
+        form.setObservacion(movimiento.getObservacion());
+        form.setRequiereDevolucion(movimiento.isRequiereDevolucion());
+        return form;
     }
 
     @Transactional
@@ -112,6 +191,7 @@ public class DepositoService {
                                                             DepositoItem itemDeposito,
                                                             BigDecimal cantidad,
                                                             String responsable,
+                                                            String destino,
                                                             String observacion) {
         if (itemRecepcion == null || itemRecepcion.getRecepcionMaterial() == null) {
             throw new IllegalArgumentException("No se pudo identificar la recepcion de origen.");
@@ -141,16 +221,16 @@ public class DepositoService {
         movimiento.setStockAnterior(anterior);
         movimiento.setStockResultante(resultante);
         movimiento.setResponsable(responsable);
-        movimiento.setDestino("OC " + itemRecepcion.getRecepcionMaterial().getOrdenCompra().getNumero());
+        movimiento.setDestino(destino);
         movimiento.setObservacion(observacion);
         movimiento.setOrdenCompraId(itemRecepcion.getRecepcionMaterial().getOrdenCompra().getId());
         movimiento.setRecepcionMaterialId(itemRecepcion.getRecepcionMaterial().getId());
         movimiento.setItemRecepcionMaterialId(itemRecepcion.getId());
         movimiento.setOrdenCompraNumero(itemRecepcion.getRecepcionMaterial().getOrdenCompra().getNumero());
 
-        itemDeposito.setStockActual(resultante);
-        itemRepository.save(itemDeposito);
-        return movimientoRepository.save(movimiento);
+        movimientoRepository.save(movimiento);
+        recalcularStockItem(itemDeposito);
+        return movimiento;
     }
 
     @Transactional(readOnly = true)
@@ -185,6 +265,15 @@ public class DepositoService {
     }
 
     private void validarMovimiento(DepositoItem item, MovimientoDepositoForm form) {
+        validarMovimientoConStock(item, form, valorSeguro(item.getStockActual()));
+    }
+
+    private void validarMovimientoConStock(DepositoItem item, MovimientoDepositoForm form, BigDecimal stockBase) {
+        validarDatosMovimiento(item, form);
+        calcularStockResultante(stockBase, form.getTipo(), valorSeguro(form.getCantidad()));
+    }
+
+    private void validarDatosMovimiento(DepositoItem item, MovimientoDepositoForm form) {
         if (!item.isActivo()) {
             throw new IllegalArgumentException("No se pueden registrar movimientos en un insumo inactivo.");
         }
@@ -197,7 +286,6 @@ public class DepositoService {
         if (valorSeguro(form.getCantidad()).compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("La cantidad debe ser mayor a 0.");
         }
-        calcularStockResultante(valorSeguro(item.getStockActual()), form.getTipo(), valorSeguro(form.getCantidad()));
     }
 
     private BigDecimal calcularStockResultante(BigDecimal anterior, TipoMovimientoDeposito tipo, BigDecimal cantidad) {
@@ -214,5 +302,50 @@ public class DepositoService {
 
     private BigDecimal valorSeguro(BigDecimal valor) {
         return valor == null ? BigDecimal.ZERO : valor;
+    }
+
+    private void aplicarDatosMovimiento(MovimientoDeposito movimiento, MovimientoDepositoForm form, BigDecimal cantidad) {
+        DepositoTrabajador trabajador = obtenerOCrearTrabajador(form);
+        movimiento.setFecha(form.getFecha() == null ? LocalDate.now() : form.getFecha());
+        movimiento.setTipo(form.getTipo());
+        movimiento.setCantidad(cantidad);
+        movimiento.setResponsable(form.getResponsable());
+        movimiento.setTrabajadorId(trabajador == null ? null : trabajador.getId());
+        movimiento.setTrabajadorNombre(trabajador == null ? form.getTrabajadorNombre() : trabajador.getNombre());
+        movimiento.setDestino(form.getDestino());
+        movimiento.setObservacion(form.getObservacion());
+        movimiento.setRequiereDevolucion(form.getTipo() == TipoMovimientoDeposito.SALIDA && form.isRequiereDevolucion());
+        if (form.getTipo() != TipoMovimientoDeposito.SALIDA) {
+            movimiento.setRequiereDevolucion(false);
+            movimiento.setDevuelto(false);
+        }
+    }
+
+    private DepositoTrabajador obtenerOCrearTrabajador(MovimientoDepositoForm form) {
+        if (form.getTrabajadorId() != null) {
+            return trabajadorRepository.findById(form.getTrabajadorId()).orElse(null);
+        }
+        if (!StringUtils.hasText(form.getTrabajadorNombre())) {
+            return null;
+        }
+        return trabajadorRepository.findByNombreIgnoreCase(form.getTrabajadorNombre().trim())
+                .orElseGet(() -> {
+                    DepositoTrabajador trabajador = new DepositoTrabajador();
+                    trabajador.setNombre(form.getTrabajadorNombre().trim());
+                    return trabajadorRepository.save(trabajador);
+                });
+    }
+
+    private void recalcularStockItem(DepositoItem item) {
+        BigDecimal stock = BigDecimal.ZERO;
+        for (MovimientoDeposito movimiento : movimientoRepository.findByItemIdOrderByFechaAscIdAsc(item.getId())) {
+            BigDecimal anterior = stock;
+            stock = calcularStockResultante(stock, movimiento.getTipo(), valorSeguro(movimiento.getCantidad()));
+            movimiento.setStockAnterior(anterior);
+            movimiento.setStockResultante(stock);
+            movimientoRepository.save(movimiento);
+        }
+        item.setStockActual(stock);
+        itemRepository.save(item);
     }
 }
