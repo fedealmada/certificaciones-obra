@@ -19,9 +19,11 @@
     <div class="page-navigation mb-3">
         <a th:href="@{/}"><i class="bi bi-house"></i> Inicio</a>
         <i class="bi bi-chevron-right"></i>
-        <a th:href="@{/oc}">Ordenes</a>
+        <a th:if="${desdeModuloEntregas}" th:href="@{/materiales}">Entregas</a>
+        <a th:unless="${desdeModuloEntregas}" th:href="@{/oc}">Ordenes</a>
         <i class="bi bi-chevron-right"></i>
-        <a th:href="@{/oc/{id}(id=${orden.id})}" th:text="'OC ' + ${orden.numero}">OC</a>
+        <a th:if="${desdeModuloEntregas}" th:href="@{/materiales/oc/{id}(id=${orden.id}, origen='entregas')}" th:text="'OC ' + ${orden.numero}">OC</a>
+        <a th:unless="${desdeModuloEntregas}" th:href="@{/oc/{id}(id=${orden.id})}" th:text="'OC ' + ${orden.numero}">OC</a>
         <i class="bi bi-chevron-right"></i>
         <span th:text="${modoEdicion ? 'Editar entrega' : 'Nueva entrega'}">Nueva entrega</span>
     </div>
@@ -34,7 +36,7 @@
         </div>
     </div>
     <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
-    <form method="post" th:action="${modoEdicion ? ('/materiales/oc/' + orden.id + '/recepciones/' + recepcionId) : ('/materiales/oc/' + orden.id + '/recepciones')}" th:object="${form}">
+    <form method="post" th:action="${modoEdicion ? ('/materiales/oc/' + orden.id + '/recepciones/' + recepcionId + (desdeModuloEntregas ? '?origen=entregas' : '')) : ('/materiales/oc/' + orden.id + '/recepciones' + (desdeModuloEntregas ? '?origen=entregas' : ''))}" th:object="${form}">
         <div class="row g-3 mb-4">
             <div class="col-md-3"><label class="form-label">Fecha</label><input class="form-control" type="date" th:field="*{fecha}" required></div>
             <div class="col-md-3"><label class="form-label">Remito</label><input class="form-control" th:field="*{remito}" placeholder="Opcional"></div>
@@ -58,7 +60,7 @@
         </table></div>
         <div class="d-flex gap-2">
             <button class="btn btn-primary" type="submit" th:disabled="${itemsResumen.isEmpty()}" th:text="${modoEdicion ? 'Guardar cambios' : 'Guardar'}">Guardar</button>
-            <a class="btn btn-outline-secondary" th:href="${modoEdicion ? ('/materiales/oc/' + orden.id + '/recepciones/' + recepcionId) : ('/oc/' + orden.id)}">Cancelar</a>
+            <a class="btn btn-outline-secondary" th:href="${modoEdicion ? ('/materiales/oc/' + orden.id + '/recepciones/' + recepcionId + (desdeModuloEntregas ? '?origen=entregas' : '')) : (desdeModuloEntregas ? ('/materiales/oc/' + orden.id + '?origen=entregas') : ('/oc/' + orden.id))}">Cancelar</a>
         </div>
     </form>
 </main>

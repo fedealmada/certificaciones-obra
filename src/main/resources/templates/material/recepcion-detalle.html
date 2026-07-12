@@ -29,18 +29,20 @@
         <div class="work-action-kicker">Entrega / viaje</div>
         <h2 th:text="${accionTitulo ?: '¡Entrega agregada!'}">¡Entrega agregada!</h2>
         <p th:text="${accionMensaje ?: 'El envio quedo registrado correctamente.'}">El envio quedo registrado correctamente.</p>
-        <a class="work-action-link" th:href="@{/oc/{id}(id=${orden.id})} + '#entregas'">Ver entregas de la OC</a>
+        <a class="work-action-link" th:href="${desdeModuloEntregas ? ('/materiales/oc/' + orden.id + '?origen=entregas') : ('/oc/' + orden.id + '#entregas')}">Ver entregas de la OC</a>
     </div>
 </div>
 <main class="container cert-detail-page">
     <div class="page-navigation mb-3">
         <a th:href="@{/}"><i class="bi bi-house"></i> Inicio</a>
         <i class="bi bi-chevron-right"></i>
-        <a th:href="@{/oc}">Ordenes</a>
+        <a th:if="${desdeModuloEntregas}" th:href="@{/materiales}">Entregas</a>
+        <a th:unless="${desdeModuloEntregas}" th:href="@{/oc}">Ordenes</a>
         <i class="bi bi-chevron-right"></i>
-        <a th:href="@{/oc/{id}(id=${orden.id})}" th:text="'OC ' + ${orden.numero}">OC</a>
+        <a th:if="${desdeModuloEntregas}" th:href="@{/materiales/oc/{id}(id=${orden.id}, origen='entregas')}" th:text="'OC ' + ${orden.numero}">OC</a>
+        <a th:unless="${desdeModuloEntregas}" th:href="@{/oc/{id}(id=${orden.id})}" th:text="'OC ' + ${orden.numero}">OC</a>
         <i class="bi bi-chevron-right"></i>
-        <a th:href="@{/materiales/oc/{id}(id=${orden.id})}">Entregas</a>
+        <a th:href="${desdeModuloEntregas ? ('/materiales/oc/' + orden.id + '?origen=entregas') : ('/materiales/oc/' + orden.id)}">Entregas</a>
         <i class="bi bi-chevron-right"></i>
         <span th:text="'Viaje ' + ${numeroRecepcion}">Viaje</span>
     </div>
@@ -56,9 +58,9 @@
             </div>
         </div>
         <div class="document-actions">
-            <a class="btn btn-primary" th:href="@{/materiales/oc/{id}/recepciones/nueva(id=${orden.id})}"><i class="bi bi-plus-lg"></i> Nueva entrega</a>
-            <a class="btn btn-outline-primary" th:href="@{/materiales/oc/{ocId}/recepciones/{id}/editar(ocId=${orden.id}, id=${recepcion.id})}"><i class="bi bi-pencil-square"></i> Editar</a>
-            <a class="btn btn-outline-primary" th:href="@{/oc/{id}(id=${orden.id})} + '#entregas'"><i class="bi bi-truck"></i> Ver OC</a>
+            <a class="btn btn-primary" th:href="@{/materiales/oc/{id}/recepciones/nueva(id=${orden.id}, origen=${origen})}"><i class="bi bi-plus-lg"></i> Nueva entrega</a>
+            <a class="btn btn-outline-primary" th:href="@{/materiales/oc/{ocId}/recepciones/{id}/editar(ocId=${orden.id}, id=${recepcion.id}, origen=${origen})}"><i class="bi bi-pencil-square"></i> Editar</a>
+            <a class="btn btn-outline-primary" th:href="${desdeModuloEntregas ? ('/materiales/oc/' + orden.id + '?origen=entregas') : ('/oc/' + orden.id + '#entregas')}"><i class="bi bi-truck"></i> Ver entregas</a>
             <form method="post" th:action="@{/materiales/oc/{ocId}/recepciones/{id}/eliminar(ocId=${orden.id}, id=${recepcion.id})}" onsubmit="return confirm('Eliminar esta entrega?');">
                 <button class="btn btn-outline-danger" type="submit"><i class="bi bi-trash"></i> Eliminar</button>
             </form>
@@ -72,7 +74,7 @@
         </div>
         <nav class="cert-switcher-nav" aria-label="Navegar recepciones">
             <a th:each="entrega, estado : ${recepcionesOrden}"
-               th:href="@{/materiales/oc/{ocId}/recepciones/{id}(ocId=${orden.id}, id=${entrega.id})}"
+               th:href="@{/materiales/oc/{ocId}/recepciones/{id}(ocId=${orden.id}, id=${entrega.id}, origen=${origen})}"
                th:classappend="${entrega.id.equals(recepcion.id)} ? ' is-active' : ''"
                th:attr="aria-current=${entrega.id.equals(recepcion.id)} ? 'page' : null"
                th:text="${estado.count}">
