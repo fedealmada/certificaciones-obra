@@ -37,13 +37,13 @@
             <td th:text="${#temporals.format(orden.fecha, 'dd/MM/yyyy')}"></td>
             <td th:text="${orden.proveedorEntidad?.nombre ?: '-'}"></td>
             <td class="text-end" th:text="${viajesPorOrden.getOrDefault(orden.id, 0)}">0</td>
-            <td class="text-end" th:text="${#numbers.formatDecimal(previstoPorOrden.getOrDefault(orden.id, T(java.math.BigDecimal).ZERO), 1, 'POINT', 2, 'COMMA')}">0,00</td>
-            <td class="text-end fw-semibold" th:text="${#numbers.formatDecimal(recibidoPorOrden.getOrDefault(orden.id, T(java.math.BigDecimal).ZERO), 1, 'POINT', 2, 'COMMA')}">0,00</td>
-            <td class="text-end" th:text="${#numbers.formatDecimal(pendientePorOrden.getOrDefault(orden.id, T(java.math.BigDecimal).ZERO), 1, 'POINT', 2, 'COMMA')}">0,00</td>
+            <td class="text-end" th:text="${#numbers.formatDecimal(previstoPorOrden.getOrDefault(orden.id, cero), 1, 'POINT', 2, 'COMMA')}">0,00</td>
+            <td class="text-end fw-semibold" th:text="${#numbers.formatDecimal(recibidoPorOrden.getOrDefault(orden.id, cero), 1, 'POINT', 2, 'COMMA')}">0,00</td>
+            <td class="text-end" th:text="${#numbers.formatDecimal(pendientePorOrden.getOrDefault(orden.id, cero), 1, 'POINT', 2, 'COMMA')}">0,00</td>
             <td>
-                <div class="oc-progress-number" th:text="${#numbers.formatDecimal(avancePorOrden.getOrDefault(orden.id, T(java.math.BigDecimal).ZERO), 1, 'POINT', 2, 'COMMA')} + ' %'">0,00 %</div>
+                <div class="oc-progress-number" th:text="${#numbers.formatDecimal(avancePorOrden.getOrDefault(orden.id, cero), 1, 'POINT', 2, 'COMMA')} + ' %'">0,00 %</div>
                 <div class="progress progress-thin oc-progress">
-                    <div class="progress-bar" th:data-progress="${avancePorOrden.getOrDefault(orden.id, T(java.math.BigDecimal).ZERO) > 100 ? 100 : avancePorOrden.getOrDefault(orden.id, T(java.math.BigDecimal).ZERO)}"></div>
+                    <div class="progress-bar" th:data-progress="${avancePorOrden.getOrDefault(orden.id, cero) > 100 ? 100 : avancePorOrden.getOrDefault(orden.id, cero)}"></div>
                 </div>
             </td>
             <td>

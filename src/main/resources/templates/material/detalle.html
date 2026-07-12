@@ -82,12 +82,12 @@
             <td th:text="${#strings.isEmpty(recepcion.remito) ? 'Sin remito' : recepcion.remito}"></td>
             <td th:text="${recepcion.observacion}"></td>
             <td class="text-end" th:text="${recepcion.items.size()}"></td>
-            <td class="text-end fw-semibold" th:text="${#numbers.formatDecimal(cantidadesPorRecepcion.getOrDefault(recepcion.id, T(java.math.BigDecimal).ZERO), 1, 'POINT', 2, 'COMMA')}">0,00</td>
-            <td class="text-end" th:text="${#numbers.formatDecimal(importesPorRecepcion.getOrDefault(recepcion.id, T(java.math.BigDecimal).ZERO), 1, 'POINT', 2, 'COMMA')}">0,00</td>
+            <td class="text-end fw-semibold" th:text="${#numbers.formatDecimal(cantidadesPorRecepcion.getOrDefault(recepcion.id, cero), 1, 'POINT', 2, 'COMMA')}">0,00</td>
+            <td class="text-end" th:text="${#numbers.formatDecimal(importesPorRecepcion.getOrDefault(recepcion.id, cero), 1, 'POINT', 2, 'COMMA')}">0,00</td>
             <td>
-                <div class="oc-progress-number" th:text="${#numbers.formatDecimal(avancesPorRecepcion.getOrDefault(recepcion.id, T(java.math.BigDecimal).ZERO), 1, 'POINT', 2, 'COMMA')} + ' %'">0,00 %</div>
+                <div class="oc-progress-number" th:text="${#numbers.formatDecimal(avancesPorRecepcion.getOrDefault(recepcion.id, cero), 1, 'POINT', 2, 'COMMA')} + ' %'">0,00 %</div>
                 <div class="progress progress-thin oc-progress">
-                    <div class="progress-bar" th:data-progress="${avancesPorRecepcion.getOrDefault(recepcion.id, T(java.math.BigDecimal).ZERO) > 100 ? 100 : avancesPorRecepcion.getOrDefault(recepcion.id, T(java.math.BigDecimal).ZERO)}"></div>
+                    <div class="progress-bar" th:data-progress="${avancesPorRecepcion.getOrDefault(recepcion.id, cero) > 100 ? 100 : avancesPorRecepcion.getOrDefault(recepcion.id, cero)}"></div>
                 </div>
             </td>
             <td>

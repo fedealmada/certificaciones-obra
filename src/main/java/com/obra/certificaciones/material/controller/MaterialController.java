@@ -43,6 +43,7 @@ public class MaterialController {
         model.addAttribute("recibidoPorOrden", totalesPorOrden(resumenesPorOrden, "recibido"));
         model.addAttribute("pendientePorOrden", totalesPorOrden(resumenesPorOrden, "pendiente"));
         model.addAttribute("avancePorOrden", avancesPorOrden(resumenesPorOrden));
+        model.addAttribute("cero", BigDecimal.ZERO);
         return "material/lista";
     }
 
@@ -58,6 +59,7 @@ public class MaterialController {
         model.addAttribute("importesPorRecepcion", importesPorRecepcion(recepciones));
         model.addAttribute("avancesPorRecepcion", avancesPorRecepcion(recepciones));
         model.addAttribute("estadosPorRecepcion", estadosPorRecepcion(recepciones, itemsResumen));
+        model.addAttribute("cero", BigDecimal.ZERO);
         return "material/detalle";
     }
 
