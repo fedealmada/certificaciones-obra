@@ -179,7 +179,7 @@ public class ItemizadoExportService {
                 th, td { border: 1px solid #1f2933; padding: 5px; vertical-align: top; }
                 th { background: #18202a; color: #ffffff; font-weight: bold; }
                 .num { text-align: right; mso-number-format:"0.00"; }
-                .pct { text-align: right; mso-number-format:"0.00"; }
+                .pct { text-align: right; mso-number-format:"0.00%"; }
                 .root td { background: #1d6b3a; color: #ffffff; font-weight: bold; }
                 .middle td { background: #dff1df; font-weight: bold; }
                 .leaf td { background: #fff7cc; font-weight: bold; }
@@ -207,7 +207,7 @@ public class ItemizadoExportService {
                 .append(celdaFormula(sumarReferencias("K", rubrosRaiz), "num"))
                 .append(celdaFormula(sumarReferencias("L", rubrosRaiz), "num"))
                 .append(celdaFormula("K" + totalRow + "+L" + totalRow, "num"))
-                .append(tieneRubros ? celdaFormula(formulaPorcentaje("O" + totalRow, "K" + totalRow), "pct") : celdaNumeroPlano(BigDecimal.ZERO))
+                .append(tieneRubros ? celdaFormula(formulaPorcentaje("O" + totalRow, "K" + totalRow), "pct") : celdaPorcentajePlano(BigDecimal.ZERO))
                 .append(celdaFormula(sumarReferencias("O", rubrosRaiz), "num"))
                 .append(celdaFormula(formulaSaldo("K" + totalRow, "O" + totalRow), "num"))
                 .append(celda(""))
@@ -258,6 +258,15 @@ public class ItemizadoExportService {
         return "<td class=\"num\" x:num=\"" + escaparHtml(numero) + "\">" + escaparHtml(numero) + "</td>";
     }
 
+    private String celdaPorcentajePlano(BigDecimal valor) {
+        if (valor == null) {
+            return "<td class=\"pct\"></td>";
+        }
+        BigDecimal porcentaje = valor.divide(BigDecimal.valueOf(100), 8, java.math.RoundingMode.HALF_UP);
+        String numero = porcentaje.stripTrailingZeros().toPlainString();
+        return "<td class=\"pct\" x:num=\"" + escaparHtml(numero) + "\">" + escaparHtml(numero) + "</td>";
+    }
+
     private String celdaFormula(String formula, String clase) {
         String formulaExcel = "=" + formula;
         return "<td class=\"" + escaparHtml(clase) + "\" x:fmla=\"" + escaparHtml(formulaExcel) + "\">"
@@ -286,7 +295,7 @@ public class ItemizadoExportService {
     }
 
     private String formulaPorcentaje(String certificado, String total) {
-        return "IFERROR(" + certificado + "/" + total + "*100,0)";
+        return "IFERROR(" + certificado + "/" + total + ",0)";
     }
 
     private String formulaSaldo(String total, String certificado) {
@@ -346,8 +355,8 @@ public class ItemizadoExportService {
                     .append(celdaNumeroPlano(importeManoObra))
                     .append(celdaFormula(tokenItemL, "num"))
                     .append(celdaFormula("K" + itemRow + "+L" + itemRow, "num"))
-                    .append(celdaNumeroPlano(avanceItem))
-                    .append(celdaFormula("K" + itemRow + "*N" + itemRow + "/100", "num"))
+                    .append(celdaPorcentajePlano(avanceItem))
+                    .append(celdaFormula("K" + itemRow + "*N" + itemRow, "num"))
                     .append(celdaFormula(formulaSaldo("K" + itemRow, "O" + itemRow), "num"))
                     .append(celda(estadoAvance(avanceItem)))
                     .append("</tr>");
