@@ -51,13 +51,33 @@
             </div>
         </div>
     <div class="table-responsive"><table class="table table-hover align-middle document-table oc-list-table" id="delivery-table" data-no-resize="true">
-        <thead><tr><th>Numero OC</th><th>Fecha</th><th>Proveedor</th><th class="text-end">Viajes</th><th class="text-end">Previsto</th><th class="text-end">Recibido</th><th class="text-end">Pendiente</th><th>Avance</th><th>Estado</th><th class="text-end">Acciones</th></tr></thead>
+        <thead>
+        <tr>
+            <th><button class="table-sort-button" type="button" data-sort="numero" data-type="number">Numero OC <i class="bi bi-arrow-down-up"></i></button></th>
+            <th><button class="table-sort-button" type="button" data-sort="fecha" data-type="date">Fecha <i class="bi bi-arrow-down-up"></i></button></th>
+            <th><button class="table-sort-button" type="button" data-sort="proveedor" data-type="text">Proveedor <i class="bi bi-arrow-down-up"></i></button></th>
+            <th class="text-end"><button class="table-sort-button justify-content-end" type="button" data-sort="viajes" data-type="number">Viajes <i class="bi bi-arrow-down-up"></i></button></th>
+            <th class="text-end"><button class="table-sort-button justify-content-end" type="button" data-sort="previsto" data-type="number">Previsto <i class="bi bi-arrow-down-up"></i></button></th>
+            <th class="text-end"><button class="table-sort-button justify-content-end" type="button" data-sort="recibido" data-type="number">Recibido <i class="bi bi-arrow-down-up"></i></button></th>
+            <th class="text-end"><button class="table-sort-button justify-content-end" type="button" data-sort="pendiente" data-type="number">Pendiente <i class="bi bi-arrow-down-up"></i></button></th>
+            <th><button class="table-sort-button" type="button" data-sort="avance" data-type="number">Avance <i class="bi bi-arrow-down-up"></i></button></th>
+            <th><button class="table-sort-button" type="button" data-sort="estado" data-type="text">Estado <i class="bi bi-arrow-down-up"></i></button></th>
+            <th class="text-end">Acciones</th>
+        </tr>
+        </thead>
         <tbody>
         <tr class="delivery-click-row"
             th:each="orden : ${ordenes}"
             th:data-href="@{/materiales/oc/{id}(id=${orden.id}, origen='entregas')}"
             th:data-numero="${orden.numero}"
             th:data-proveedor="${orden.proveedorEntidad?.nombre ?: '-'}"
+            th:data-fecha="${orden.fecha}"
+            th:data-viajes="${viajesPorOrden.getOrDefault(orden.id, 0)}"
+            th:data-previsto="${previstoPorOrden.getOrDefault(orden.id, cero)}"
+            th:data-recibido="${recibidoPorOrden.getOrDefault(orden.id, cero)}"
+            th:data-pendiente="${pendientePorOrden.getOrDefault(orden.id, cero)}"
+            th:data-avance="${avancePorOrden.getOrDefault(orden.id, cero)}"
+            th:data-estado="${estadosPorOrden.get(orden.id) != null ? estadosPorOrden.get(orden.id).name() : 'PENDIENTE'}"
             tabindex="0"
             role="link">
             <td><a class="cert-row-link" th:href="@{/materiales/oc/{id}(id=${orden.id}, origen='entregas')}" th:text="${orden.numero}">OC</a></td>
@@ -88,15 +108,34 @@
     </section>
 </main>
 <script>
-const deliveryRows = Array.from(document.querySelectorAll('#delivery-table tbody tr[data-numero]'));
+const deliveryTable = document.querySelector('#delivery-table');
+const deliveryRows = Array.from(deliveryTable.querySelectorAll('tbody tr[data-numero]'));
 const deliveryVisibleCount = document.querySelector('#delivery-visible-count');
 const deliveryEmptyFilterRow = document.querySelector('.delivery-empty-filter-row');
 const deliveryFilterIndicator = document.querySelector('#delivery-filter-indicator');
 const deliveryStorageKey = 'obraControl.entregas.filters';
 const deliverySearch = document.querySelector('#delivery-search');
+let currentDeliverySort = { key: 'fecha', direction: 'desc', type: 'date' };
 
 function normalizeDeliveryText(value) {
     return (value || '').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+}
+
+function numberDeliveryValue(value) {
+    const normalized = (value || '').toString().replace(/[^\d.,-]/g, '').replace(',', '.');
+    const parsed = Number.parseFloat(normalized);
+    return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function deliverySortValue(row, key, type) {
+    const value = row.dataset[key] || '';
+    if (type === 'number') {
+        return numberDeliveryValue(value);
+    }
+    if (type === 'date') {
+        return value;
+    }
+    return normalizeDeliveryText(value);
 }
 
 function hasActiveDeliveryFilters() {
@@ -145,6 +184,31 @@ function clearDeliveryFilters() {
     applyDeliveryFilters();
 }
 
+function applyDeliverySort(key, type, toggleDirection) {
+    const direction = toggleDirection ? (currentDeliverySort.key === key && currentDeliverySort.direction === 'asc' ? 'desc' : 'asc') : currentDeliverySort.direction;
+    currentDeliverySort = { key, direction, type };
+    const body = deliveryTable.querySelector('tbody');
+    const sortedRows = [...deliveryRows].sort((a, b) => {
+        const left = deliverySortValue(a, key, type);
+        const right = deliverySortValue(b, key, type);
+        const comparison = type === 'text' ? left.localeCompare(right, 'es') : (left > right ? 1 : (left < right ? -1 : 0));
+        return direction === 'asc' ? comparison : -comparison;
+    });
+
+    sortedRows.forEach(row => body.appendChild(row));
+    body.appendChild(deliveryEmptyFilterRow);
+
+    document.querySelectorAll('#delivery-table .table-sort-button').forEach(button => {
+        const active = button.dataset.sort === key;
+        button.classList.toggle('is-active', active);
+        const icon = button.querySelector('i');
+        icon.className = active
+            ? (direction === 'asc' ? 'bi bi-sort-up' : 'bi bi-sort-down')
+            : 'bi bi-arrow-down-up';
+    });
+    applyDeliveryFilters();
+}
+
 document.querySelectorAll('.oc-progress .progress-bar').forEach(progressFill => {
     const target = Number.parseFloat(String(progressFill.dataset.progress || '0').replace(',', '.'));
     const safeTarget = Number.isFinite(target) ? Math.max(0, Math.min(100, target)) : 0;
@@ -175,8 +239,12 @@ deliverySearch.addEventListener('input', () => {
     applyDeliveryFilters();
 });
 
+document.querySelectorAll('#delivery-table .table-sort-button').forEach(button => {
+    button.addEventListener('click', () => applyDeliverySort(button.dataset.sort, button.dataset.type, true));
+});
+
 restoreDeliveryFilters();
-applyDeliveryFilters();
+applyDeliverySort(currentDeliverySort.key, currentDeliverySort.type, false);
 </script>
 </body>
 </html>
