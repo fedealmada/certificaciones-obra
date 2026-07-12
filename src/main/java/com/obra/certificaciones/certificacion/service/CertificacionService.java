@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,6 +55,7 @@ public class CertificacionService {
         validarOrdenCertificable(ordenCompra);
         NuevaCertificacionForm form = new NuevaCertificacionForm();
         form.setNumero((int) certificacionRepository.countByOrdenCompraId(ordenCompraId) + 1);
+        form.setFecha(fechaOrden(ordenCompra));
         itemsCertificables(ordenCompra).forEach(item -> {
             ItemNuevaCertificacionForm itemForm = new ItemNuevaCertificacionForm();
             itemForm.setItemOrdenCompraId(item.getId());
@@ -219,6 +221,10 @@ public class CertificacionService {
 
     private BigDecimal porcentajeSeguro(ItemNuevaCertificacionForm itemForm) {
         return itemForm.getPorcentajeActual() == null ? BigDecimal.ZERO : itemForm.getPorcentajeActual();
+    }
+
+    private LocalDate fechaOrden(OrdenCompra ordenCompra) {
+        return ordenCompra.getFecha() == null ? LocalDate.now() : ordenCompra.getFecha();
     }
 
     private Map<Long, ItemOrdenCompra> itemsCertificablesPorId(OrdenCompra ordenCompra) {

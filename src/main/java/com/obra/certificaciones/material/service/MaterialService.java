@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -107,6 +108,7 @@ public class MaterialService {
         RecepcionMaterialForm form = new RecepcionMaterialForm();
         OrdenCompra ordenCompra = ordenCompraService.obtener(ordenCompraId);
         validarOrdenConEntregas(ordenCompra);
+        form.setFecha(fechaOrden(ordenCompra));
         itemsRecepcionables(ordenCompra).forEach(item -> {
             ItemRecepcionMaterialForm itemForm = new ItemRecepcionMaterialForm();
             itemForm.setItemOrdenCompraId(item.getId());
@@ -229,6 +231,10 @@ public class MaterialService {
 
     private BigDecimal cantidadSegura(BigDecimal valor) {
         return valor == null ? BigDecimal.ZERO : valor;
+    }
+
+    private LocalDate fechaOrden(OrdenCompra ordenCompra) {
+        return ordenCompra.getFecha() == null ? LocalDate.now() : ordenCompra.getFecha();
     }
 
     private void validarOrdenConEntregas(OrdenCompra ordenCompra) {
