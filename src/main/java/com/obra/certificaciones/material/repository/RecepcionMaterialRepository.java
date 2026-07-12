@@ -14,8 +14,15 @@ public interface RecepcionMaterialRepository extends JpaRepository<RecepcionMate
     @EntityGraph(attributePaths = {"ordenCompra", "items", "items.itemOrdenCompra"})
     Optional<RecepcionMaterial> findById(Long id);
 
-    @EntityGraph(attributePaths = {"items", "items.itemOrdenCompra"})
-    List<RecepcionMaterial> findByOrdenCompraIdOrderByFechaAscIdAsc(Long ordenCompraId);
+    @Query("""
+            select distinct recepcion
+            from RecepcionMaterial recepcion
+            left join fetch recepcion.items item
+            left join fetch item.itemOrdenCompra
+            where recepcion.ordenCompra.id = :ordenCompraId
+            order by recepcion.fecha asc, recepcion.id asc
+            """)
+    List<RecepcionMaterial> findByOrdenCompraIdOrderByFechaAscIdAsc(@Param("ordenCompraId") Long ordenCompraId);
 
     long countByOrdenCompraId(Long ordenCompraId);
 
