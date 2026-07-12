@@ -48,7 +48,7 @@ public class MaterialController {
 
     @GetMapping("/oc/{ordenCompraId}/recepciones/nueva")
     public String nuevaRecepcion(@PathVariable Long ordenCompraId, Model model) {
-        cargarFormulario(ordenCompraId, materialService.crearForm(ordenCompraId), model);
+        cargarFormulario(ordenCompraId, null, materialService.crearForm(ordenCompraId), false, model);
         return "material/form";
     }
 
@@ -65,7 +65,34 @@ public class MaterialController {
             return "redirect:/materiales/oc/" + ordenCompraId + "/recepciones/" + recepcion.getId();
         } catch (IllegalArgumentException ex) {
             model.addAttribute("error", ex.getMessage());
-            cargarFormulario(ordenCompraId, form, model);
+            cargarFormulario(ordenCompraId, null, form, false, model);
+            return "material/form";
+        }
+    }
+
+    @GetMapping("/oc/{ordenCompraId}/recepciones/{recepcionId}/editar")
+    public String editarRecepcion(@PathVariable Long ordenCompraId,
+                                  @PathVariable Long recepcionId,
+                                  Model model) {
+        cargarFormulario(ordenCompraId, recepcionId, materialService.crearFormEdicion(ordenCompraId, recepcionId), true, model);
+        return "material/form";
+    }
+
+    @PostMapping("/oc/{ordenCompraId}/recepciones/{recepcionId}")
+    public String actualizarRecepcion(@PathVariable Long ordenCompraId,
+                                      @PathVariable Long recepcionId,
+                                      @ModelAttribute("form") RecepcionMaterialForm form,
+                                      Model model,
+                                      RedirectAttributes redirectAttributes) {
+        try {
+            RecepcionMaterial recepcion = materialService.actualizar(ordenCompraId, recepcionId, form);
+            redirectAttributes.addFlashAttribute("accionCompletada", true);
+            redirectAttributes.addFlashAttribute("accionTitulo", "Entrega actualizada");
+            redirectAttributes.addFlashAttribute("accionMensaje", "Los cambios del viaje quedaron guardados correctamente.");
+            return "redirect:/materiales/oc/" + ordenCompraId + "/recepciones/" + recepcion.getId();
+        } catch (IllegalArgumentException ex) {
+            model.addAttribute("error", ex.getMessage());
+            cargarFormulario(ordenCompraId, recepcionId, form, true, model);
             return "material/form";
         }
     }
@@ -99,12 +126,16 @@ public class MaterialController {
         return "redirect:/materiales/oc/" + ordenCompraId;
     }
 
-    private void cargarFormulario(Long ordenCompraId, RecepcionMaterialForm form, Model model) {
+    private void cargarFormulario(Long ordenCompraId, Long recepcionId, RecepcionMaterialForm form, boolean modoEdicion, Model model) {
         OrdenCompra orden = ordenCompraService.obtener(ordenCompraId);
-        var itemsResumen = materialService.calcularResumenItems(ordenCompraId);
+        var itemsResumen = modoEdicion
+                ? materialService.calcularResumenItemsParaEdicion(ordenCompraId, recepcionId)
+                : materialService.calcularResumenItems(ordenCompraId);
         model.addAttribute("orden", orden);
         cargarResumenMateriales(itemsResumen, model);
         model.addAttribute("form", form);
+        model.addAttribute("modoEdicion", modoEdicion);
+        model.addAttribute("recepcionId", recepcionId);
     }
 
     private void cargarResumenMateriales(List<ItemMaterialResumen> itemsResumen, Model model) {

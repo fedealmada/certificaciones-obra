@@ -234,6 +234,7 @@
                     <td class="text-end" th:text="${recepcion.items.size()}">0</td>
                     <td class="text-end action-cell">
                         <a class="btn btn-sm btn-outline-primary table-icon-action" th:href="@{/materiales/oc/{ocId}/recepciones/{id}(ocId=${orden.id}, id=${recepcion.id})}" title="Ver entrega" aria-label="Ver entrega"><i class="bi bi-eye"></i></a>
+                        <a class="btn btn-sm btn-outline-secondary table-icon-action" th:href="@{/materiales/oc/{ocId}/recepciones/{id}/editar(ocId=${orden.id}, id=${recepcion.id})}" title="Editar entrega" aria-label="Editar entrega"><i class="bi bi-pencil-square"></i></a>
                         <form method="post" th:action="@{/materiales/oc/{ocId}/recepciones/{id}/eliminar(ocId=${orden.id}, id=${recepcion.id})}" onsubmit="return confirm('Eliminar esta entrega?');"><button class="btn btn-sm btn-outline-danger table-icon-action" type="submit" title="Eliminar entrega" aria-label="Eliminar entrega"><i class="bi bi-trash"></i></button></form>
                     </td>
                 </tr>
