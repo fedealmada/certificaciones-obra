@@ -21,6 +21,8 @@ public class InicioController {
     public String inicio(Model model) {
         List<ModuloSistema> modulos = configuracionService.modulosActivos();
         model.addAttribute("modulos", modulos);
+        model.addAttribute("obraNombre", "Obra activa");
+        model.addAttribute("obraPeriodo", "Seguimiento general");
         model.addAttribute("areas", List.of(
                 new AreaTrabajo(
                         "Administracion",

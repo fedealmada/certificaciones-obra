@@ -28,7 +28,10 @@
             <h1>Deposito de obra</h1>
             <div class="text-muted">Stock disponible, ubicaciones y movimientos de entradas, salidas y devoluciones.</div>
         </div>
-        <a class="btn btn-primary" th:href="@{/deposito/nuevo}"><i class="bi bi-plus-lg"></i> Nuevo insumo</a>
+        <div class="document-actions">
+            <a class="btn btn-outline-secondary" th:href="@{/deposito/personas}"><i class="bi bi-people"></i> Personas</a>
+            <a class="btn btn-primary" th:href="@{/deposito/nuevo}"><i class="bi bi-plus-lg"></i> Nuevo insumo</a>
+        </div>
     </div>
 
     <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
@@ -38,6 +41,34 @@
         <div class="metric-card"><div class="metric-head"><div class="metric-label">Bajo minimo</div><i class="bi bi-exclamation-triangle"></i></div><div class="metric-value" th:text="${bajoStock}">0</div><small>Revisar reposicion</small></div>
         <div class="metric-card"><div class="metric-head"><div class="metric-label">Unidades totales</div><i class="bi bi-clipboard-data"></i></div><div class="metric-value metric-value-sm" th:text="${#numbers.formatDecimal(totalUnidades, 1, 'POINT', 2, 'COMMA')}">0,00</div><small>Suma simple de stock</small></div>
         <div class="metric-card"><div class="metric-head"><div class="metric-label">Por devolver</div><i class="bi bi-arrow-return-left"></i></div><div class="metric-value" th:text="${devolucionesPendientes.size()}">0</div><small>Prestamos pendientes</small></div>
+        <div class="metric-card"><div class="metric-head"><div class="metric-label">Personas activas</div><i class="bi bi-people"></i></div><div class="metric-value" th:text="${trabajadores.size()}">0</div><small>Registradas para entregas</small></div>
+    </div>
+
+    <div class="deposito-focus-grid mb-3" th:if="${!itemsBajoStock.isEmpty() || !devolucionesPendientes.isEmpty()}">
+        <section class="panel-section deposito-focus-card" th:if="${!itemsBajoStock.isEmpty()}">
+            <div class="section-title-row">
+                <h2 class="h5 mb-0"><i class="bi bi-exclamation-triangle"></i> Stock a revisar</h2>
+                <span class="section-total-pill" th:text="${itemsBajoStock.size()} + ' insumos'">0 insumos</span>
+            </div>
+            <div class="deposito-alert-list">
+                <a th:each="item : ${itemsBajoStock}" th:href="@{/deposito/{id}/movimiento(id=${item.id})}">
+                    <span><strong th:text="${item.nombre}">Insumo</strong><small th:text="${item.ubicacion ?: 'Sin ubicacion'}">Ubicacion</small></span>
+                    <b th:text="${#numbers.formatDecimal(item.stockActual, 1, 'POINT', 2, 'COMMA') + ' / ' + #numbers.formatDecimal(item.stockMinimo, 1, 'POINT', 2, 'COMMA')}">0 / 0</b>
+                </a>
+            </div>
+        </section>
+        <section class="panel-section deposito-focus-card" th:if="${!devolucionesPendientes.isEmpty()}">
+            <div class="section-title-row">
+                <h2 class="h5 mb-0"><i class="bi bi-arrow-return-left"></i> Prestamos pendientes</h2>
+                <span class="section-total-pill" th:text="${devolucionesPendientes.size()} + ' pendientes'">0 pendientes</span>
+            </div>
+            <div class="deposito-alert-list">
+                <a th:each="mov, iter : ${devolucionesPendientes}" th:if="${iter.index < 5}" th:href="@{/deposito/movimientos/{id}(id=${mov.id})}">
+                    <span><strong th:text="${mov.item.nombre}">Insumo</strong><small th:text="${mov.trabajadorNombre ?: (mov.responsable ?: 'Sin persona')}">Persona</small></span>
+                    <b th:text="${#numbers.formatDecimal(mov.cantidad, 1, 'POINT', 2, 'COMMA')}">0</b>
+                </a>
+            </div>
+        </section>
     </div>
 
     <section class="panel-section mb-3">

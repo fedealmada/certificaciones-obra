@@ -2,6 +2,7 @@ package com.obra.certificaciones.deposito.controller;
 
 import com.obra.certificaciones.deposito.dto.MovimientoDepositoForm;
 import com.obra.certificaciones.deposito.entity.DepositoItem;
+import com.obra.certificaciones.deposito.entity.DepositoTrabajador;
 import com.obra.certificaciones.deposito.entity.TipoInsumoDeposito;
 import com.obra.certificaciones.deposito.entity.TipoMovimientoDeposito;
 import com.obra.certificaciones.deposito.service.DepositoService;
@@ -27,6 +28,8 @@ public class DepositoController {
         model.addAttribute("items", items);
         model.addAttribute("movimientos", depositoService.movimientosRecientes());
         model.addAttribute("devolucionesPendientes", depositoService.devolucionesPendientes());
+        model.addAttribute("itemsBajoStock", depositoService.itemsBajoStock());
+        model.addAttribute("trabajadores", depositoService.listarTrabajadoresActivos());
         model.addAttribute("totalItems", items.stream().filter(DepositoItem::isActivo).count());
         model.addAttribute("bajoStock", depositoService.contarBajoStock());
         model.addAttribute("totalUnidades", depositoService.totalUnidades());
@@ -66,6 +69,43 @@ public class DepositoController {
         depositoService.eliminarItem(id);
         redirectAttributes.addFlashAttribute("success", "Insumo eliminado o desactivado correctamente.");
         return "redirect:/deposito";
+    }
+
+    @GetMapping("/personas")
+    public String personas(Model model) {
+        model.addAttribute("personas", depositoService.listarTrabajadores());
+        model.addAttribute("persona", new DepositoTrabajador());
+        return "deposito/personas";
+    }
+
+    @GetMapping("/personas/{id}/editar")
+    public String editarPersona(@PathVariable Long id, Model model) {
+        model.addAttribute("personas", depositoService.listarTrabajadores());
+        model.addAttribute("persona", depositoService.obtenerTrabajador(id));
+        return "deposito/personas";
+    }
+
+    @PostMapping("/personas")
+    public String guardarPersona(@ModelAttribute("persona") DepositoTrabajador persona,
+                                 Model model,
+                                 RedirectAttributes redirectAttributes) {
+        try {
+            depositoService.guardarTrabajador(persona);
+            redirectAttributes.addFlashAttribute("success", "Persona guardada correctamente.");
+            return "redirect:/deposito/personas";
+        } catch (IllegalArgumentException ex) {
+            model.addAttribute("error", ex.getMessage());
+            model.addAttribute("personas", depositoService.listarTrabajadores());
+            model.addAttribute("persona", persona);
+            return "deposito/personas";
+        }
+    }
+
+    @PostMapping("/personas/{id}/desactivar")
+    public String desactivarPersona(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        depositoService.desactivarTrabajador(id);
+        redirectAttributes.addFlashAttribute("success", "Persona desactivada correctamente.");
+        return "redirect:/deposito/personas";
     }
 
     @GetMapping("/{id}/movimiento")

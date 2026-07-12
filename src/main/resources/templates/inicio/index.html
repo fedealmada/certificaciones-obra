@@ -16,26 +16,44 @@
 <body>
 <div th:replace="~{fragments/layout :: navbar}"></div>
 <main class="container">
-    <section class="home-hero mb-4">
+    <section class="home-hero home-worksite-hero mb-4">
         <div class="home-hero-copy">
             <div class="home-hero-topline">
                 <div>
                     <div class="document-kicker">Centro de obra</div>
-                    <h1>ObraControl</h1>
+                    <h1 th:text="${obraNombre}">Obra activa</h1>
                 </div>
                 <span class="home-status-pill"><i class="bi bi-lightning-charge-fill"></i> Panel activo</span>
             </div>
-            <p>Elegi primero el tipo de tarea: administracion, produccion de obra o panol. Cada area reune sus herramientas para que no quede todo mezclado.</p>
+            <p th:text="${obraPeriodo + ' / Elegi un area de trabajo para continuar: administracion, produccion de obra o panol.'}">Elegi un area de trabajo para continuar.</p>
             <div class="home-hero-actions">
+                <a class="btn btn-primary" th:if="${configuracion.activo('modulo.dashboard')}" th:href="@{/dashboard}"><i class="bi bi-grid-1x2"></i> Ver tablero</a>
                 <a class="btn btn-primary" th:if="${configuracion.activo('modulo.oc')}" th:href="@{/oc/nueva}"><i class="bi bi-plus-lg"></i> Nueva OC</a>
                 <a class="btn btn-outline-secondary" th:if="${configuracion.activo('modulo.deposito')}" th:href="@{/deposito}"><i class="bi bi-boxes"></i> Abrir panol</a>
-                <a class="btn btn-outline-secondary" th:if="${configuracion.activo('modulo.importarCertificados')}" th:href="@{/certificaciones/importar}"><i class="bi bi-clipboard-check"></i> Importar certificados</a>
             </div>
         </div>
         <div class="home-hero-stats">
             <div><span>OC</span><strong th:text="${reporte.cantidadOrdenes}">0</strong></div>
             <div><span>Certificados</span><strong th:text="${reporte.cantidadCertificaciones}">0</strong></div>
             <div><span>Avance</span><strong th:text="${reporte.porcentajeCertificado} + '%'">0%</strong></div>
+        </div>
+    </section>
+
+    <section class="home-workflow-strip mb-3">
+        <div>
+            <i class="bi bi-1-circle"></i>
+            <span>Obra</span>
+            <strong th:text="${obraNombre}">Obra activa</strong>
+        </div>
+        <div>
+            <i class="bi bi-2-circle"></i>
+            <span>Area</span>
+            <strong>Administracion / Obra / Panol</strong>
+        </div>
+        <div>
+            <i class="bi bi-3-circle"></i>
+            <span>Tarea</span>
+            <strong>OC, entregas, stock o reportes</strong>
         </div>
     </section>
 
@@ -52,6 +70,11 @@
                 <a th:each="modulo : ${area.modulos()}" th:href="${modulo.url()}">
                     <span><i th:class="${'bi ' + modulo.icono()}"></i></span>
                     <strong th:text="${modulo.nombre()}">Modulo</strong>
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+                <a th:if="${area.tono() == 'deposito'}" th:href="@{/deposito/personas}">
+                    <span><i class="bi bi-person-badge"></i></span>
+                    <strong>Personas</strong>
                     <i class="bi bi-chevron-right"></i>
                 </a>
             </div>

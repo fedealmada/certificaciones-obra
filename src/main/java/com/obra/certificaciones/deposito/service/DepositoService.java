@@ -55,6 +55,38 @@ public class DepositoService {
     }
 
     @Transactional(readOnly = true)
+    public List<DepositoTrabajador> listarTrabajadores() {
+        return trabajadorRepository.findAllByOrderByActivoDescNombreAsc();
+    }
+
+    @Transactional(readOnly = true)
+    public DepositoTrabajador obtenerTrabajador(Long id) {
+        return trabajadorRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("No existe la persona de deposito " + id));
+    }
+
+    @Transactional
+    public DepositoTrabajador guardarTrabajador(DepositoTrabajador trabajador) {
+        validarTrabajador(trabajador);
+        if (trabajador.getId() == null) {
+            trabajador.setNombre(trabajador.getNombre().trim());
+            return trabajadorRepository.save(trabajador);
+        }
+        DepositoTrabajador existente = obtenerTrabajador(trabajador.getId());
+        existente.setNombre(trabajador.getNombre().trim());
+        existente.setSector(trabajador.getSector());
+        existente.setActivo(trabajador.isActivo());
+        return trabajadorRepository.save(existente);
+    }
+
+    @Transactional
+    public void desactivarTrabajador(Long id) {
+        DepositoTrabajador trabajador = obtenerTrabajador(id);
+        trabajador.setActivo(false);
+        trabajadorRepository.save(trabajador);
+    }
+
+    @Transactional(readOnly = true)
     public List<MovimientoDeposito> devolucionesPendientes() {
         return movimientoRepository.findByTipoAndRequiereDevolucionTrueAndDevueltoFalseOrderByFechaAscIdAsc(TipoMovimientoDeposito.SALIDA);
     }
@@ -242,6 +274,14 @@ public class DepositoService {
     }
 
     @Transactional(readOnly = true)
+    public List<DepositoItem> itemsBajoStock() {
+        return listarItems().stream()
+                .filter(DepositoItem::isActivo)
+                .filter(DepositoItem::bajoStock)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
     public BigDecimal totalUnidades() {
         return listarItems().stream()
                 .filter(DepositoItem::isActivo)
@@ -261,6 +301,19 @@ public class DepositoService {
         }
         if (valorSeguro(item.getStockMinimo()).compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("El stock minimo no puede ser negativo.");
+        }
+    }
+
+    private void validarTrabajador(DepositoTrabajador trabajador) {
+        if (!StringUtils.hasText(trabajador.getNombre())) {
+            throw new IllegalArgumentException("El nombre de la persona es obligatorio.");
+        }
+        String nombre = trabajador.getNombre().trim();
+        boolean duplicado = trabajador.getId() == null
+                ? trabajadorRepository.existsByNombreIgnoreCase(nombre)
+                : trabajadorRepository.existsByNombreIgnoreCaseAndIdNot(nombre, trabajador.getId());
+        if (duplicado) {
+            throw new IllegalArgumentException("Ya existe una persona con ese nombre.");
         }
     }
 
