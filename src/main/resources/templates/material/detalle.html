@@ -77,7 +77,7 @@
         <tbody>
         <tr th:each="recepcion : ${recepciones}">
             <td th:text="${#temporals.format(recepcion.fecha, 'dd/MM/yyyy')}"></td>
-            <td th:text="${recepcion.remito}"></td>
+            <td th:text="${#strings.isEmpty(recepcion.remito) ? 'Sin remito' : recepcion.remito}"></td>
             <td th:text="${recepcion.observacion}"></td>
             <td th:text="${recepcion.items.size()}"></td>
             <td class="text-end action-cell"><a class="btn btn-sm btn-outline-primary table-icon-action" th:href="@{/materiales/oc/{ocId}/recepciones/{id}(ocId=${orden.id}, id=${recepcion.id})}" title="Ver recepcion" aria-label="Ver recepcion"><i class="bi bi-eye"></i></a><form method="post" th:action="@{/materiales/oc/{ocId}/recepciones/{id}/eliminar(ocId=${orden.id}, id=${recepcion.id})}" onsubmit="return confirm('Eliminar esta recepcion?');"><button class="btn btn-sm btn-outline-danger table-icon-action" type="submit" title="Eliminar recepcion" aria-label="Eliminar recepcion"><i class="bi bi-trash"></i></button></form></td>

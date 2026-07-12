@@ -30,14 +30,14 @@
         <div>
             <div class="document-kicker">Recepcion de entregas</div>
             <h1 th:text="'Nueva recepcion - OC ' + ${orden.numero}">Nueva recepcion</h1>
-            <div class="text-muted">Carga remito, fecha y cantidades recibidas o viajes realizados.</div>
+            <div class="text-muted">Carga fecha, cantidades recibidas o viajes realizados. El remito puede quedar en blanco.</div>
         </div>
     </div>
     <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
     <form method="post" th:action="@{/materiales/oc/{id}/recepciones(id=${orden.id})}" th:object="${form}">
         <div class="row g-3 mb-4">
             <div class="col-md-3"><label class="form-label">Fecha</label><input class="form-control" type="date" th:field="*{fecha}" required></div>
-            <div class="col-md-3"><label class="form-label">Remito</label><input class="form-control" th:field="*{remito}" required></div>
+            <div class="col-md-3"><label class="form-label">Remito</label><input class="form-control" th:field="*{remito}" placeholder="Opcional"></div>
             <div class="col-md-6"><label class="form-label">Observacion</label><input class="form-control" th:field="*{observacion}"></div>
         </div>
         <div class="table-responsive mb-4"><table class="table align-middle">

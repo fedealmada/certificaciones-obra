@@ -203,9 +203,6 @@ public class MaterialService {
         if (form.getFecha() == null) {
             throw new IllegalArgumentException("La fecha de recepcion es obligatoria.");
         }
-        if (!StringUtils.hasText(form.getRemito())) {
-            throw new IllegalArgumentException("El remito es obligatorio.");
-        }
         for (ItemRecepcionMaterialForm itemForm : form.getItems()) {
             ItemOrdenCompra itemOrdenCompra = itemOrdenCompraRepository.findById(itemForm.getItemOrdenCompraId())
                     .orElseThrow(() -> new EntityNotFoundException("No existe el item " + itemForm.getItemOrdenCompraId()));

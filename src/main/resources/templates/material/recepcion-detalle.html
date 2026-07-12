@@ -25,13 +25,13 @@
         <i class="bi bi-chevron-right"></i>
         <a th:href="@{/materiales/oc/{id}(id=${orden.id})}">Entregas</a>
         <i class="bi bi-chevron-right"></i>
-        <span th:text="'Recepcion ' + ${recepcion.remito}">Recepcion</span>
+        <span th:text="${#strings.isEmpty(recepcion.remito) ? 'Recepcion sin remito' : 'Recepcion ' + recepcion.remito}">Recepcion</span>
     </div>
 
     <div class="document-header mb-4">
         <div>
             <div class="document-kicker">Remito / viaje</div>
-            <h1 th:text="'Recepcion ' + ${recepcion.remito}">Recepcion</h1>
+            <h1 th:text="${#strings.isEmpty(recepcion.remito) ? 'Recepcion sin remito' : 'Recepcion ' + recepcion.remito}">Recepcion</h1>
             <div class="text-muted" th:text="'OC ' + ${orden.numero} + ' - ' + ${#temporals.format(recepcion.fecha, 'dd/MM/yyyy')}"></div>
         </div>
     </div>
