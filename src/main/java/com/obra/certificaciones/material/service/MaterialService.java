@@ -13,6 +13,7 @@ import com.obra.certificaciones.oc.entity.ItemOrdenCompra;
 import com.obra.certificaciones.oc.entity.OrdenCompra;
 import com.obra.certificaciones.oc.repository.ItemOrdenCompraRepository;
 import com.obra.certificaciones.oc.service.OrdenCompraService;
+import com.obra.certificaciones.obra.entity.Obra;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -35,8 +36,8 @@ public class MaterialService {
     private final ItemRecepcionMaterialRepository itemRecepcionMaterialRepository;
 
     @Transactional(readOnly = true)
-    public List<OrdenCompra> listarOrdenesConMateriales() {
-        return ordenCompraService.listar(null, null, null).stream()
+    public List<OrdenCompra> listarOrdenesConMateriales(Obra obra) {
+        return ordenCompraService.listar(obra, null, null, null).stream()
                 .filter(OrdenCompra::usaSeguimientoEntregas)
                 .toList();
     }

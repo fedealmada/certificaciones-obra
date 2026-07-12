@@ -6,6 +6,9 @@ import com.obra.certificaciones.deposito.entity.DepositoTrabajador;
 import com.obra.certificaciones.deposito.entity.TipoInsumoDeposito;
 import com.obra.certificaciones.deposito.entity.TipoMovimientoDeposito;
 import com.obra.certificaciones.deposito.service.DepositoService;
+import com.obra.certificaciones.obra.entity.Obra;
+import com.obra.certificaciones.obra.service.ObraService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,18 +24,20 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequiredArgsConstructor
 public class DepositoController {
     private final DepositoService depositoService;
+    private final ObraService obraService;
 
     @GetMapping
-    public String listar(Model model) {
-        var items = depositoService.listarItems();
+    public String listar(Model model, HttpSession session) {
+        Obra obra = obraService.obraActiva(session);
+        var items = depositoService.listarItems(obra);
         model.addAttribute("items", items);
-        model.addAttribute("movimientos", depositoService.movimientosRecientes());
-        model.addAttribute("devolucionesPendientes", depositoService.devolucionesPendientes());
-        model.addAttribute("itemsBajoStock", depositoService.itemsBajoStock());
+        model.addAttribute("movimientos", depositoService.movimientosRecientes(obra));
+        model.addAttribute("devolucionesPendientes", depositoService.devolucionesPendientes(obra));
+        model.addAttribute("itemsBajoStock", depositoService.itemsBajoStock(obra));
         model.addAttribute("trabajadores", depositoService.listarTrabajadoresActivos());
         model.addAttribute("totalItems", items.stream().filter(DepositoItem::isActivo).count());
-        model.addAttribute("bajoStock", depositoService.contarBajoStock());
-        model.addAttribute("totalUnidades", depositoService.totalUnidades());
+        model.addAttribute("bajoStock", depositoService.contarBajoStock(obra));
+        model.addAttribute("totalUnidades", depositoService.totalUnidades(obra));
         return "deposito/lista";
     }
 
@@ -51,9 +56,9 @@ public class DepositoController {
     }
 
     @PostMapping("/items")
-    public String guardar(@ModelAttribute("item") DepositoItem item, Model model, RedirectAttributes redirectAttributes) {
+    public String guardar(@ModelAttribute("item") DepositoItem item, Model model, HttpSession session, RedirectAttributes redirectAttributes) {
         try {
-            depositoService.guardarItem(item);
+            depositoService.guardarItem(item, obraService.obraActiva(session));
             redirectAttributes.addFlashAttribute("success", "Insumo guardado correctamente.");
             return "redirect:/deposito";
         } catch (IllegalArgumentException ex) {

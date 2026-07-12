@@ -15,8 +15,10 @@ import com.obra.certificaciones.oc.entity.ModoSeguimientoOrden;
 import com.obra.certificaciones.oc.entity.OrdenCompra;
 import com.obra.certificaciones.oc.repository.ItemOrdenCompraRepository;
 import com.obra.certificaciones.oc.service.OrdenCompraService;
+import com.obra.certificaciones.obra.service.ObraService;
 import com.obra.certificaciones.proveedor.service.ProveedorService;
 import com.obra.certificaciones.rubro.service.RubroService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -48,13 +50,15 @@ public class OrdenCompraController {
     private final MaterialService materialService;
     private final CategoriaOrdenService categoriaOrdenService;
     private final AlertaSistemaService alertaSistemaService;
+    private final ObraService obraService;
 
     @GetMapping
     public String listar(@RequestParam(required = false) String proveedor,
                          @RequestParam(required = false) Long categoriaId,
                          @RequestParam(required = false) String rubro,
+                         HttpSession session,
                          Model model) {
-        List<OrdenCompra> ordenes = ordenCompraService.listar(proveedor, categoriaId, rubro);
+        List<OrdenCompra> ordenes = ordenCompraService.listar(obraService.obraActiva(session), proveedor, categoriaId, rubro);
         model.addAttribute("ordenes", ordenes);
         model.addAttribute("certificadosPorOrden", certificacionService.contarPorOrdenes(ordenes.stream()
                 .map(OrdenCompra::getId)
@@ -103,10 +107,10 @@ public class OrdenCompraController {
     }
 
     @PostMapping
-    public String guardar(@ModelAttribute("form") OrdenCompraForm form, Model model, RedirectAttributes redirectAttributes) {
+    public String guardar(@ModelAttribute("form") OrdenCompraForm form, Model model, HttpSession session, RedirectAttributes redirectAttributes) {
         try {
             boolean esNueva = form.getId() == null;
-            OrdenCompra ordenCompra = ordenCompraService.guardar(form);
+            OrdenCompra ordenCompra = ordenCompraService.guardar(form, obraService.obraActiva(session));
             redirectAttributes.addFlashAttribute("accionCompletada", true);
             redirectAttributes.addFlashAttribute("accionTitulo", "¡Terminaste!");
             redirectAttributes.addFlashAttribute("accionMensaje", esNueva

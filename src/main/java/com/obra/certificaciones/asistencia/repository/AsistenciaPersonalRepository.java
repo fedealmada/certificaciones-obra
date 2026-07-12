@@ -8,9 +8,11 @@ import java.util.List;
 import java.util.Optional;
 
 public interface AsistenciaPersonalRepository extends JpaRepository<AsistenciaPersonal, Long> {
-    List<AsistenciaPersonal> findByFechaOrderByEmpresaAscTrabajadorNombreAsc(LocalDate fecha);
+    List<AsistenciaPersonal> findByObraIdAndFechaOrderByEmpresaAscTrabajadorNombreAsc(Long obraId, LocalDate fecha);
 
-    List<AsistenciaPersonal> findTop80ByOrderByFechaDescIdDesc();
+    List<AsistenciaPersonal> findTop80ByObraIdOrderByFechaDescIdDesc(Long obraId);
 
-    Optional<AsistenciaPersonal> findByFechaAndTrabajadorId(LocalDate fecha, Long trabajadorId);
+    Optional<AsistenciaPersonal> findByObraIdAndFechaAndTrabajadorId(Long obraId, LocalDate fecha, Long trabajadorId);
+
+    List<AsistenciaPersonal> findByObraIsNull();
 }

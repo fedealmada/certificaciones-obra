@@ -6,6 +6,7 @@ import com.obra.certificaciones.asistencia.entity.AsistenciaPersonal;
 import com.obra.certificaciones.asistencia.repository.AsistenciaPersonalRepository;
 import com.obra.certificaciones.deposito.entity.DepositoTrabajador;
 import com.obra.certificaciones.deposito.repository.DepositoTrabajadorRepository;
+import com.obra.certificaciones.obra.entity.Obra;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,19 +30,19 @@ public class AsistenciaService {
     private final DepositoTrabajadorRepository trabajadorRepository;
 
     @Transactional(readOnly = true)
-    public List<AsistenciaPersonal> listarPorFecha(LocalDate fecha) {
-        return asistenciaRepository.findByFechaOrderByEmpresaAscTrabajadorNombreAsc(fecha == null ? LocalDate.now() : fecha);
+    public List<AsistenciaPersonal> listarPorFecha(Obra obra, LocalDate fecha) {
+        return asistenciaRepository.findByObraIdAndFechaOrderByEmpresaAscTrabajadorNombreAsc(obra.getId(), fecha == null ? LocalDate.now() : fecha);
     }
 
     @Transactional(readOnly = true)
-    public List<AsistenciaPersonal> recientes() {
-        return asistenciaRepository.findTop80ByOrderByFechaDescIdDesc();
+    public List<AsistenciaPersonal> recientes(Obra obra) {
+        return asistenciaRepository.findTop80ByObraIdOrderByFechaDescIdDesc(obra.getId());
     }
 
     @Transactional(readOnly = true)
-    public Map<Long, AsistenciaPersonal> mapaPorTrabajador(LocalDate fecha) {
+    public Map<Long, AsistenciaPersonal> mapaPorTrabajador(Obra obra, LocalDate fecha) {
         Map<Long, AsistenciaPersonal> mapa = new LinkedHashMap<>();
-        for (AsistenciaPersonal asistencia : listarPorFecha(fecha)) {
+        for (AsistenciaPersonal asistencia : listarPorFecha(obra, fecha)) {
             if (asistencia.getTrabajadorId() != null) {
                 mapa.put(asistencia.getTrabajadorId(), asistencia);
             }
@@ -56,23 +57,25 @@ public class AsistenciaService {
     }
 
     @Transactional
-    public AsistenciaPersonal guardar(AsistenciaForm form) {
+    public AsistenciaPersonal guardar(AsistenciaForm form, Obra obra) {
         validar(form);
         AsistenciaPersonal asistencia = form.getId() == null ? new AsistenciaPersonal() : obtener(form.getId());
+        asistencia.setObra(obra);
         aplicar(asistencia, form);
         return asistenciaRepository.save(asistencia);
     }
 
     @Transactional
-    public AsistenciaPersonal marcarEntrada(Long trabajadorId, LocalDate fecha) {
+    public AsistenciaPersonal marcarEntrada(Long trabajadorId, LocalDate fecha, Obra obra) {
         DepositoTrabajador trabajador = trabajadorRepository.findById(trabajadorId)
                 .orElseThrow(() -> new EntityNotFoundException("No existe la persona " + trabajadorId));
         LocalDate fechaSegura = fecha == null ? LocalDate.now() : fecha;
-        Optional<AsistenciaPersonal> existente = asistenciaRepository.findByFechaAndTrabajadorId(fechaSegura, trabajadorId);
+        Optional<AsistenciaPersonal> existente = asistenciaRepository.findByObraIdAndFechaAndTrabajadorId(obra.getId(), fechaSegura, trabajadorId);
         if (existente.isPresent()) {
             return existente.get();
         }
         AsistenciaPersonal asistencia = new AsistenciaPersonal();
+        asistencia.setObra(obra);
         asistencia.setFecha(fechaSegura);
         asistencia.setTrabajadorId(trabajador.getId());
         asistencia.setTrabajadorNombre(trabajador.getNombre());

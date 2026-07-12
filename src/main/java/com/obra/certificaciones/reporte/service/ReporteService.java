@@ -11,6 +11,7 @@ import com.obra.certificaciones.oc.entity.CategoriaItem;
 import com.obra.certificaciones.oc.entity.ItemOrdenCompra;
 import com.obra.certificaciones.oc.entity.OrdenCompra;
 import com.obra.certificaciones.oc.repository.OrdenCompraRepository;
+import com.obra.certificaciones.obra.entity.Obra;
 import com.obra.certificaciones.reporte.dto.EvolucionMensualGasto;
 import com.obra.certificaciones.reporte.dto.GastoMensualItem;
 import com.obra.certificaciones.reporte.dto.GraficoDato;
@@ -45,7 +46,7 @@ public class ReporteService {
     private final MaterialService materialService;
 
     @Transactional(readOnly = true)
-    public ReporteGeneral generarGeneral() {
+    public ReporteGeneral generarGeneral(Obra obra) {
         BigDecimal totalManoObra = BigDecimal.ZERO;
         BigDecimal totalMateriales = BigDecimal.ZERO;
         BigDecimal totalOtros = BigDecimal.ZERO;
@@ -63,7 +64,7 @@ public class ReporteService {
         Map<String, BigDecimal> totalMaterialPorProveedor = new LinkedHashMap<>();
         Map<String, BigDecimal> pendientePorMaterial = new LinkedHashMap<>();
 
-        List<OrdenCompra> ordenes = ordenCompraRepository.findAll();
+        List<OrdenCompra> ordenes = ordenesDeObra(obra);
         List<OrdenCompra> ordenesEntrega = ordenes.stream()
                 .filter(OrdenCompra::usaSeguimientoEntregas)
                 .toList();
@@ -150,7 +151,7 @@ public class ReporteService {
 
         return new ReporteGeneral(
                 ordenes.size(),
-                certificacionRepository.count(),
+                certificacionRepository.countByOrdenCompraObraId(obra.getId()),
                 totalManoObra,
                 totalMateriales,
                 totalOtros,
@@ -181,12 +182,12 @@ public class ReporteService {
     }
 
     @Transactional(readOnly = true)
-    public ReporteMensual generarMensual(int anio, int mes) {
-        return generarMensual(anio, mes, null);
+    public ReporteMensual generarMensual(Obra obra, int anio, int mes) {
+        return generarMensual(obra, anio, mes, null);
     }
 
     @Transactional(readOnly = true)
-    public ReporteMensual generarMensual(int anio, int mes, Long categoriaId) {
+    public ReporteMensual generarMensual(Obra obra, int anio, int mes, Long categoriaId) {
         YearMonth periodo = YearMonth.of(anio, mes);
         BigDecimal totalManoObra = BigDecimal.ZERO;
         BigDecimal totalMateriales = BigDecimal.ZERO;
@@ -196,7 +197,7 @@ public class ReporteService {
         List<GastoMensualItem> itemsReporte = new ArrayList<>();
         Set<Long> ordenesIncluidas = new HashSet<>();
 
-        for (OrdenCompra orden : ordenCompraRepository.findAll()) {
+        for (OrdenCompra orden : ordenesDeObra(obra)) {
             if (orden.getFecha() == null || !YearMonth.from(orden.getFecha()).equals(periodo)) {
                 continue;
             }
@@ -263,8 +264,8 @@ public class ReporteService {
     }
 
     @Transactional(readOnly = true)
-    public List<EvolucionMensualGasto> generarEvolucionMensual(Long categoriaId) {
-        List<OrdenCompra> ordenes = ordenCompraRepository.findAll();
+    public List<EvolucionMensualGasto> generarEvolucionMensual(Obra obra, Long categoriaId) {
+        List<OrdenCompra> ordenes = ordenesDeObra(obra);
         YearMonth inicio = ordenes.stream()
                 .map(OrdenCompra::getFecha)
                 .filter(fecha -> fecha != null)
@@ -317,6 +318,10 @@ public class ReporteService {
             anterior = total;
         }
         return evolucion;
+    }
+
+    private List<OrdenCompra> ordenesDeObra(Obra obra) {
+        return ordenCompraRepository.buscarConFiltros(obra.getId(), null, null, null);
     }
 
     private boolean coincideCategoria(ItemOrdenCompra item, Long categoriaId) {

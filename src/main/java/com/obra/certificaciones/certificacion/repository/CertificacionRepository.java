@@ -16,6 +16,7 @@ public interface CertificacionRepository extends JpaRepository<Certificacion, Lo
 
     List<Certificacion> findByOrdenCompraIdOrderByFechaAscIdAsc(Long ordenCompraId);
     long countByOrdenCompraId(Long ordenCompraId);
+    long countByOrdenCompraObraId(Long obraId);
     boolean existsByOrdenCompraIdAndNumero(Long ordenCompraId, Integer numero);
 
     @Query("""

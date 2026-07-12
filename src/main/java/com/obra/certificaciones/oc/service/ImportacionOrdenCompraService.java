@@ -13,6 +13,7 @@ import com.obra.certificaciones.oc.entity.ItemOrdenCompra;
 import com.obra.certificaciones.oc.entity.ModoSeguimientoOrden;
 import com.obra.certificaciones.oc.entity.OrdenCompra;
 import com.obra.certificaciones.oc.repository.OrdenCompraRepository;
+import com.obra.certificaciones.obra.entity.Obra;
 import com.obra.certificaciones.proveedor.entity.Proveedor;
 import com.obra.certificaciones.proveedor.repository.ProveedorRepository;
 import com.obra.certificaciones.rubro.entity.Rubro;
@@ -110,7 +111,7 @@ public class ImportacionOrdenCompraService {
     }
 
     @Transactional
-    public OrdenCompra importar(ImportacionOrdenCompraForm form) {
+    public OrdenCompra importar(ImportacionOrdenCompraForm form, Obra obra) {
         validar(form);
         List<ImportacionOrdenCompraItemForm> itemsImportados = finalizarItems(form.getItems(), form.getNumero());
         OrdenCompraForm ordenForm = new OrdenCompraForm();
@@ -124,18 +125,18 @@ public class ImportacionOrdenCompraService {
                 .filter(item -> StringUtils.hasText(item.getDetalle()) || StringUtils.hasText(item.getItem()))
                 .map(item -> convertirItem(item, form))
                 .toList());
-        return ordenCompraService.guardar(ordenForm);
+        return ordenCompraService.guardar(ordenForm, obra);
     }
 
     @Transactional
-    public List<OrdenCompra> importarLote(ImportacionOrdenCompraLoteForm lote) {
+    public List<OrdenCompra> importarLote(ImportacionOrdenCompraLoteForm lote, Obra obra) {
         if (lote == null || lote.getOrdenes() == null || lote.getOrdenes().isEmpty()) {
             throw new IllegalArgumentException("No hay ordenes para importar.");
         }
         List<OrdenCompra> importadas = new ArrayList<>();
         for (ImportacionOrdenCompraForm form : lote.getOrdenes()) {
             if (form.isSeleccionado()) {
-                importadas.add(importar(form));
+                importadas.add(importar(form, obra));
             }
         }
         if (importadas.isEmpty()) {

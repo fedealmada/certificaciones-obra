@@ -10,6 +10,7 @@ import com.obra.certificaciones.deposito.repository.DepositoItemRepository;
 import com.obra.certificaciones.deposito.repository.DepositoTrabajadorRepository;
 import com.obra.certificaciones.deposito.repository.MovimientoDepositoRepository;
 import com.obra.certificaciones.material.entity.ItemRecepcionMaterial;
+import com.obra.certificaciones.obra.entity.Obra;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -33,6 +34,11 @@ public class DepositoService {
     }
 
     @Transactional(readOnly = true)
+    public List<DepositoItem> listarItems(Obra obra) {
+        return itemRepository.findByObraIdOrderByActivoDescNombreAsc(obra.getId());
+    }
+
+    @Transactional(readOnly = true)
     public List<DepositoItem> listarItemsActivos() {
         return itemRepository.findAllByOrderByActivoDescNombreAsc().stream()
                 .filter(DepositoItem::isActivo)
@@ -40,8 +46,20 @@ public class DepositoService {
     }
 
     @Transactional(readOnly = true)
+    public List<DepositoItem> listarItemsActivos(Obra obra) {
+        return listarItems(obra).stream()
+                .filter(DepositoItem::isActivo)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
     public List<MovimientoDeposito> movimientosRecientes() {
         return movimientoRepository.findTop12ByOrderByFechaDescIdDesc();
+    }
+
+    @Transactional(readOnly = true)
+    public List<MovimientoDeposito> movimientosRecientes(Obra obra) {
+        return movimientoRepository.findTop12ByItemObraIdOrderByFechaDescIdDesc(obra.getId());
     }
 
     @Transactional(readOnly = true)
@@ -93,6 +111,11 @@ public class DepositoService {
     }
 
     @Transactional(readOnly = true)
+    public List<MovimientoDeposito> devolucionesPendientes(Obra obra) {
+        return movimientoRepository.findByItemObraIdAndTipoAndRequiereDevolucionTrueAndDevueltoFalseOrderByFechaAscIdAsc(obra.getId(), TipoMovimientoDeposito.SALIDA);
+    }
+
+    @Transactional(readOnly = true)
     public DepositoItem obtener(Long id) {
         return itemRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("No existe el insumo de deposito " + id));
@@ -121,6 +144,12 @@ public class DepositoService {
         existente.setObservacion(item.getObservacion());
         existente.setActivo(item.isActivo());
         return itemRepository.save(existente);
+    }
+
+    @Transactional
+    public DepositoItem guardarItem(DepositoItem item, Obra obra) {
+        item.setObra(obra);
+        return guardarItem(item);
     }
 
     @Transactional
@@ -275,8 +304,24 @@ public class DepositoService {
     }
 
     @Transactional(readOnly = true)
+    public long contarBajoStock(Obra obra) {
+        return listarItems(obra).stream()
+                .filter(DepositoItem::isActivo)
+                .filter(DepositoItem::bajoStock)
+                .count();
+    }
+
+    @Transactional(readOnly = true)
     public List<DepositoItem> itemsBajoStock() {
         return listarItems().stream()
+                .filter(DepositoItem::isActivo)
+                .filter(DepositoItem::bajoStock)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<DepositoItem> itemsBajoStock(Obra obra) {
+        return listarItems(obra).stream()
                 .filter(DepositoItem::isActivo)
                 .filter(DepositoItem::bajoStock)
                 .toList();
@@ -290,13 +335,26 @@ public class DepositoService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
+    @Transactional(readOnly = true)
+    public BigDecimal totalUnidades(Obra obra) {
+        return listarItems(obra).stream()
+                .filter(DepositoItem::isActivo)
+                .map(item -> valorSeguro(item.getStockActual()))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
     private void validarItem(DepositoItem item) {
         if (!StringUtils.hasText(item.getNombre())) {
             throw new IllegalArgumentException("El nombre del insumo es obligatorio.");
         }
-        boolean duplicado = item.getId() == null
-                ? itemRepository.existsByNombreIgnoreCase(item.getNombre())
-                : itemRepository.existsByNombreIgnoreCaseAndIdNot(item.getNombre(), item.getId());
+        Long obraId = item.getObra() == null ? null : item.getObra().getId();
+        boolean duplicado = obraId == null
+                ? (item.getId() == null
+                    ? itemRepository.existsByNombreIgnoreCase(item.getNombre())
+                    : itemRepository.existsByNombreIgnoreCaseAndIdNot(item.getNombre(), item.getId()))
+                : (item.getId() == null
+                    ? itemRepository.existsByNombreIgnoreCaseAndObraId(item.getNombre(), obraId)
+                    : itemRepository.existsByNombreIgnoreCaseAndObraIdAndIdNot(item.getNombre(), obraId, item.getId()));
         if (duplicado) {
             throw new IllegalArgumentException("Ya existe un insumo con ese nombre en deposito.");
         }

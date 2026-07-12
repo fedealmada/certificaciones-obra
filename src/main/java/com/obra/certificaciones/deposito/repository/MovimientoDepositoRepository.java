@@ -20,12 +20,18 @@ public interface MovimientoDepositoRepository extends JpaRepository<MovimientoDe
     List<MovimientoDeposito> findTop12ByOrderByFechaDescIdDesc();
 
     @EntityGraph(attributePaths = {"item"})
+    List<MovimientoDeposito> findTop12ByItemObraIdOrderByFechaDescIdDesc(Long obraId);
+
+    @EntityGraph(attributePaths = {"item"})
     List<MovimientoDeposito> findTop80ByItemIdOrderByFechaDescIdDesc(Long itemId);
 
     List<MovimientoDeposito> findByItemIdOrderByFechaAscIdAsc(Long itemId);
 
     @EntityGraph(attributePaths = {"item"})
     List<MovimientoDeposito> findByTipoAndRequiereDevolucionTrueAndDevueltoFalseOrderByFechaAscIdAsc(TipoMovimientoDeposito tipo);
+
+    @EntityGraph(attributePaths = {"item"})
+    List<MovimientoDeposito> findByItemObraIdAndTipoAndRequiereDevolucionTrueAndDevueltoFalseOrderByFechaAscIdAsc(Long obraId, TipoMovimientoDeposito tipo);
 
     boolean existsByItemId(Long itemId);
 

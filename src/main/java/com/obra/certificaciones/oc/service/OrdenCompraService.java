@@ -12,6 +12,7 @@ import com.obra.certificaciones.oc.entity.ModoSeguimientoOrden;
 import com.obra.certificaciones.oc.entity.OrdenCompra;
 import com.obra.certificaciones.oc.repository.ItemOrdenCompraRepository;
 import com.obra.certificaciones.oc.repository.OrdenCompraRepository;
+import com.obra.certificaciones.obra.entity.Obra;
 import com.obra.certificaciones.proveedor.entity.Proveedor;
 import com.obra.certificaciones.proveedor.repository.ProveedorRepository;
 import com.obra.certificaciones.rubro.entity.Rubro;
@@ -37,13 +38,13 @@ public class OrdenCompraService {
     private final CategoriaOrdenRepository categoriaOrdenRepository;
 
     @Transactional(readOnly = true)
-    public List<OrdenCompra> listar(String proveedor, Long categoriaId, String rubro) {
-        return ordenCompraRepository.buscarConFiltros(normalizar(proveedor), categoriaId, normalizar(rubro));
+    public List<OrdenCompra> listar(Obra obra, String proveedor, Long categoriaId, String rubro) {
+        return ordenCompraRepository.buscarConFiltros(obra.getId(), normalizar(proveedor), categoriaId, normalizar(rubro));
     }
 
     @Transactional(readOnly = true)
-    public List<OrdenCompra> listarPorTipoCategoria(CategoriaItem categoria) {
-        return ordenCompraRepository.buscarPorTipoCategoria(categoria);
+    public List<OrdenCompra> listarPorTipoCategoria(Obra obra, CategoriaItem categoria) {
+        return ordenCompraRepository.buscarPorTipoCategoria(obra.getId(), categoria);
     }
 
     @Transactional(readOnly = true)
@@ -53,10 +54,11 @@ public class OrdenCompraService {
     }
 
     @Transactional
-    public OrdenCompra guardar(OrdenCompraForm form) {
+    public OrdenCompra guardar(OrdenCompraForm form, Obra obra) {
         OrdenCompra ordenCompra = form.getId() == null ? new OrdenCompra() : obtener(form.getId());
         validarItemsEliminados(ordenCompra, form);
         validarOrdenCompra(form);
+        ordenCompra.setObra(obra);
         ordenCompra.setNumero(form.getNumero());
         ordenCompra.setFecha(form.getFecha());
         ordenCompra.setFechaVigencia(form.getFechaVigencia());

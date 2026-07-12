@@ -5,8 +5,10 @@ import com.obra.certificaciones.oc.dto.ImportacionOrdenCompraForm;
 import com.obra.certificaciones.oc.dto.ImportacionOrdenCompraLoteForm;
 import com.obra.certificaciones.oc.entity.OrdenCompra;
 import com.obra.certificaciones.oc.service.ImportacionOrdenCompraService;
+import com.obra.certificaciones.obra.service.ObraService;
 import com.obra.certificaciones.proveedor.service.ProveedorService;
 import com.obra.certificaciones.rubro.service.RubroService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,6 +30,7 @@ public class ImportacionOrdenCompraController {
     private final ProveedorService proveedorService;
     private final CategoriaOrdenService categoriaOrdenService;
     private final RubroService rubroService;
+    private final ObraService obraService;
 
     @GetMapping
     public String importar(Model model) {
@@ -56,9 +59,10 @@ public class ImportacionOrdenCompraController {
     @PostMapping
     public String confirmar(@ModelAttribute("lote") ImportacionOrdenCompraLoteForm lote,
                             Model model,
+                            HttpSession session,
                             RedirectAttributes redirectAttributes) {
         try {
-            List<OrdenCompra> ordenes = importacionService.importarLote(lote);
+            List<OrdenCompra> ordenes = importacionService.importarLote(lote, obraService.obraActiva(session));
             redirectAttributes.addFlashAttribute("accionCompletada", true);
             redirectAttributes.addFlashAttribute("accionTitulo", "Importacion lista");
             redirectAttributes.addFlashAttribute("accionMensaje", ordenes.size() == 1

@@ -1,6 +1,7 @@
 package com.obra.certificaciones.oc.entity;
 
 import com.obra.certificaciones.certificacion.entity.Certificacion;
+import com.obra.certificaciones.obra.entity.Obra;
 import com.obra.certificaciones.proveedor.entity.Proveedor;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -36,6 +37,9 @@ public class OrdenCompra {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Proveedor proveedorEntidad;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Obra obra;
 
     @OneToMany(mappedBy = "ordenCompra", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemOrdenCompra> items = new ArrayList<>();

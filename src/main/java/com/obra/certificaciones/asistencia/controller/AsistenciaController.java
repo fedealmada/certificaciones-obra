@@ -3,6 +3,8 @@ package com.obra.certificaciones.asistencia.controller;
 import com.obra.certificaciones.asistencia.dto.AsistenciaForm;
 import com.obra.certificaciones.asistencia.service.AsistenciaService;
 import com.obra.certificaciones.deposito.service.DepositoService;
+import com.obra.certificaciones.obra.service.ObraService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
@@ -24,12 +26,15 @@ import java.util.stream.IntStream;
 public class AsistenciaController {
     private final AsistenciaService asistenciaService;
     private final DepositoService depositoService;
+    private final ObraService obraService;
 
     @GetMapping
     public String listar(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha,
-                         Model model) {
+                         Model model,
+                         HttpSession session) {
         LocalDate fechaSeleccionada = fecha == null ? LocalDate.now() : fecha;
-        var asistencias = asistenciaService.listarPorFecha(fechaSeleccionada);
+        var obra = obraService.obraActiva(session);
+        var asistencias = asistenciaService.listarPorFecha(obra, fechaSeleccionada);
         model.addAttribute("fecha", fechaSeleccionada);
         model.addAttribute("fechaAnterior", fechaSeleccionada.minusDays(1));
         model.addAttribute("fechaSiguiente", fechaSeleccionada.plusDays(1));
@@ -38,10 +43,10 @@ public class AsistenciaController {
                 .toList());
         model.addAttribute("asistencias", asistencias);
         model.addAttribute("personas", depositoService.listarTrabajadoresActivos());
-        model.addAttribute("asistenciaPorTrabajador", asistenciaService.mapaPorTrabajador(fechaSeleccionada));
+        model.addAttribute("asistenciaPorTrabajador", asistenciaService.mapaPorTrabajador(obra, fechaSeleccionada));
         model.addAttribute("resumenEmpresas", asistenciaService.resumenPorEmpresa(asistencias));
         model.addAttribute("totalHoras", asistenciaService.totalHoras(asistencias));
-        model.addAttribute("recientes", asistenciaService.recientes());
+        model.addAttribute("recientes", asistenciaService.recientes(obra));
         return "asistencia/lista";
     }
 
@@ -63,9 +68,10 @@ public class AsistenciaController {
     @PostMapping
     public String guardar(@ModelAttribute("form") AsistenciaForm form,
                           Model model,
-                          RedirectAttributes redirectAttributes) {
+                          RedirectAttributes redirectAttributes,
+                          HttpSession session) {
         try {
-            var asistencia = asistenciaService.guardar(form);
+            var asistencia = asistenciaService.guardar(form, obraService.obraActiva(session));
             redirectAttributes.addFlashAttribute("success", "Asistencia guardada correctamente.");
             return "redirect:/asistencia?fecha=" + asistencia.getFecha();
         } catch (IllegalArgumentException ex) {
@@ -78,8 +84,9 @@ public class AsistenciaController {
     @PostMapping("/entrada")
     public String marcarEntrada(@RequestParam Long trabajadorId,
                                 @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha,
-                                RedirectAttributes redirectAttributes) {
-        asistenciaService.marcarEntrada(trabajadorId, fecha);
+                                RedirectAttributes redirectAttributes,
+                                HttpSession session) {
+        asistenciaService.marcarEntrada(trabajadorId, fecha, obraService.obraActiva(session));
         redirectAttributes.addFlashAttribute("success", "Entrada registrada.");
         return "redirect:/asistencia?fecha=" + fecha;
     }

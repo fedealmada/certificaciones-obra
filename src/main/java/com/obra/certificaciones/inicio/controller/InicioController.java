@@ -2,7 +2,9 @@ package com.obra.certificaciones.inicio.controller;
 
 import com.obra.certificaciones.configuracion.dto.ModuloSistema;
 import com.obra.certificaciones.configuracion.service.ConfiguracionSistemaService;
+import com.obra.certificaciones.obra.service.ObraService;
 import com.obra.certificaciones.reporte.service.ReporteService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,12 +18,14 @@ import java.util.Set;
 public class InicioController {
     private final ConfiguracionSistemaService configuracionService;
     private final ReporteService reporteService;
+    private final ObraService obraService;
 
     @GetMapping("/")
-    public String inicio(Model model) {
+    public String inicio(Model model, HttpSession session) {
+        var obra = obraService.obraActiva(session);
         List<ModuloSistema> modulos = configuracionService.modulosActivos();
         model.addAttribute("modulos", modulos);
-        model.addAttribute("obraPeriodo", "Seguimiento general");
+        model.addAttribute("obraPeriodo", obra.getNombre());
         model.addAttribute("areas", List.of(
                 new AreaTrabajo(
                         "Administracion",
@@ -70,7 +74,7 @@ public class InicioController {
                         ).contains(modulo.clave())).toList()
                 )
         ));
-        model.addAttribute("reporte", reporteService.generarGeneral());
+        model.addAttribute("reporte", reporteService.generarGeneral(obra));
         return "inicio/index";
     }
 

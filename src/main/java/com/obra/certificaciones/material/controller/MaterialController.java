@@ -12,6 +12,8 @@ import com.obra.certificaciones.material.service.MaterialService;
 import com.obra.certificaciones.material.dto.EstadoRecepcionMaterial;
 import com.obra.certificaciones.oc.entity.OrdenCompra;
 import com.obra.certificaciones.oc.service.OrdenCompraService;
+import com.obra.certificaciones.obra.service.ObraService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -37,10 +39,11 @@ public class MaterialController {
     private final MaterialService materialService;
     private final OrdenCompraService ordenCompraService;
     private final DepositoService depositoService;
+    private final ObraService obraService;
 
     @GetMapping
-    public String listar(Model model) {
-        List<OrdenCompra> ordenes = materialService.listarOrdenesConMateriales();
+    public String listar(Model model, HttpSession session) {
+        List<OrdenCompra> ordenes = materialService.listarOrdenesConMateriales(obraService.obraActiva(session));
         Map<Long, List<ItemMaterialResumen>> resumenesPorOrden = new HashMap<>();
         ordenes.forEach(orden -> resumenesPorOrden.put(orden.getId(), materialService.calcularResumenItems(orden.getId())));
         model.addAttribute("ordenes", ordenes);
@@ -184,10 +187,11 @@ public class MaterialController {
                                          @RequestParam(required = false) String origen,
                                          @ModelAttribute("form") IngresoDepositoRecepcionForm form,
                                          Model model,
+                                         HttpSession session,
                                          RedirectAttributes redirectAttributes) {
         ItemRecepcionMaterial itemRecepcion = obtenerItemRecepcionValido(ordenCompraId, recepcionId, itemRecepcionId);
         try {
-            DepositoItem itemDeposito = obtenerOCrearInsumoDeposito(form, itemRecepcion);
+            DepositoItem itemDeposito = obtenerOCrearInsumoDeposito(form, itemRecepcion, session);
             depositoService.registrarEntradaDesdeRecepcion(itemRecepcion, itemDeposito, form.getCantidad(), form.getResponsable(), form.getDestino(), form.getObservacion());
             redirectAttributes.addFlashAttribute("accionCompletada", true);
             redirectAttributes.addFlashAttribute("accionTitulo", "Ingreso al deposito");
@@ -366,12 +370,12 @@ public class MaterialController {
         model.addAttribute("recepcion", itemRecepcion.getRecepcionMaterial());
         model.addAttribute("itemRecepcion", itemRecepcion);
         model.addAttribute("form", form);
-        model.addAttribute("insumosDeposito", depositoService.listarItemsActivos());
+        model.addAttribute("insumosDeposito", depositoService.listarItemsActivos(itemRecepcion.getRecepcionMaterial().getOrdenCompra().getObra()));
         model.addAttribute("origen", origen);
         model.addAttribute("desdeModuloEntregas", esOrigenEntregas(origen));
     }
 
-    private DepositoItem obtenerOCrearInsumoDeposito(IngresoDepositoRecepcionForm form, ItemRecepcionMaterial itemRecepcion) {
+    private DepositoItem obtenerOCrearInsumoDeposito(IngresoDepositoRecepcionForm form, ItemRecepcionMaterial itemRecepcion, HttpSession session) {
         if (form.getDepositoItemId() != null) {
             return depositoService.obtener(form.getDepositoItemId());
         }
@@ -383,7 +387,7 @@ public class MaterialController {
         nuevo.setUnidad(itemRecepcion.getItemOrdenCompra().getUnidad());
         nuevo.setTipo(TipoInsumoDeposito.CONSUMIBLE);
         nuevo.setObservacion("Creado desde recepcion OC " + itemRecepcion.getRecepcionMaterial().getOrdenCompra().getNumero());
-        return depositoService.guardarItem(nuevo);
+        return depositoService.guardarItem(nuevo, obraService.obraActiva(session));
     }
 
     private String nombreSugeridoDeposito(ItemRecepcionMaterial itemRecepcion) {
