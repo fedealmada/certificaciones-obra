@@ -141,7 +141,7 @@ public class CertificacionCalculoService {
     public List<ItemOrdenCompraResumen> calcularResumenItems(List<ItemOrdenCompra> itemsOrdenCompra, Map<Long, BigDecimal> acumuladosPorItem) {
         return itemsOrdenCompra.stream()
                 .map(item -> {
-                    BigDecimal acumulado = item.getCategoria() == CategoriaItem.MANO_OBRA
+                    BigDecimal acumulado = esItemCertificable(item)
                             ? acumuladosPorItem.getOrDefault(item.getId(), BigDecimal.ZERO)
                             : BigDecimal.ZERO;
                     BigDecimal montoAcumulado = calcularMonto(item.getImporte(), acumulado);
@@ -192,7 +192,7 @@ public class CertificacionCalculoService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         for (ItemOrdenCompra item : itemsOrdenCompra) {
-            if (item.getCategoria() != CategoriaItem.MANO_OBRA) {
+            if (!esItemCertificable(item)) {
                 continue;
             }
             BigDecimal importe = item.getImporte() == null ? BigDecimal.ZERO : item.getImporte();
@@ -217,6 +217,10 @@ public class CertificacionCalculoService {
 
     private BigDecimal importeSeguro(ItemOrdenCompra item) {
         return item.getImporte() == null ? BigDecimal.ZERO : item.getImporte();
+    }
+
+    public boolean esItemCertificable(ItemOrdenCompra item) {
+        return item.getCategoria() != CategoriaItem.MATERIAL;
     }
 
     private EstadoItemCertificacion calcularEstado(BigDecimal porcentajeAcumulado) {

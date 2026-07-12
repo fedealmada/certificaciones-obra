@@ -7,7 +7,6 @@ import com.obra.certificaciones.certificacion.dto.OrdenImportadaVista;
 import com.obra.certificaciones.certificacion.entity.Certificacion;
 import com.obra.certificaciones.certificacion.entity.ItemCertificacion;
 import com.obra.certificaciones.certificacion.repository.CertificacionRepository;
-import com.obra.certificaciones.oc.entity.CategoriaItem;
 import com.obra.certificaciones.oc.entity.ItemOrdenCompra;
 import com.obra.certificaciones.oc.entity.OrdenCompra;
 import com.obra.certificaciones.oc.repository.OrdenCompraRepository;
@@ -226,7 +225,7 @@ public class ImportacionCertificacionesService {
                     .toList();
         }
 
-        BigDecimal totalContratado = totalManoObra(ordenCompra);
+        BigDecimal totalContratado = totalCertificable(ordenCompra);
         BigDecimal totalAcumulado = acumuladoInicial(ordenCompra, items, ordenParseada, despuesDeImportar);
         List<CertificadoImportadoVista> certificados = new ArrayList<>();
 
@@ -261,9 +260,9 @@ public class ImportacionCertificacionesService {
                 .count();
     }
 
-    private BigDecimal totalManoObra(OrdenCompra ordenCompra) {
+    private BigDecimal totalCertificable(OrdenCompra ordenCompra) {
         return ordenCompra.getItems().stream()
-                .filter(item -> item.getCategoria() == CategoriaItem.MANO_OBRA)
+                .filter(calculoService::esItemCertificable)
                 .map(item -> item.getImporte() == null ? BigDecimal.ZERO : item.getImporte())
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
@@ -320,7 +319,7 @@ public class ImportacionCertificacionesService {
     private Map<String, ItemOrdenCompra> itemsPorCodigo(OrdenCompra ordenCompra) {
         Map<String, ItemOrdenCompra> items = new LinkedHashMap<>();
         ordenCompra.getItems().stream()
-                .filter(item -> item.getCategoria() == CategoriaItem.MANO_OBRA)
+                .filter(calculoService::esItemCertificable)
                 .forEach(item -> items.put(item.getItem(), item));
         return items;
     }

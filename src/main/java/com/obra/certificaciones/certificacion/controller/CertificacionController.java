@@ -6,7 +6,6 @@ import com.obra.certificaciones.certificacion.entity.Certificacion;
 import com.obra.certificaciones.certificacion.service.CertificacionCalculoService;
 import com.obra.certificaciones.certificacion.service.CertificacionExportService;
 import com.obra.certificaciones.certificacion.service.CertificacionService;
-import com.obra.certificaciones.oc.entity.CategoriaItem;
 import com.obra.certificaciones.oc.entity.ItemOrdenCompra;
 import com.obra.certificaciones.oc.entity.OrdenCompra;
 import com.obra.certificaciones.oc.service.OrdenCompraService;
@@ -90,7 +89,7 @@ public class CertificacionController {
                 ? Map.of()
                 : calculoService.porcentajesPosterioresPorItem(ordenCompraId, certificacionId);
         List<ItemNuevaCertificacionVista> itemsCertificables = orden.getItems().stream()
-                .filter(item -> item.getCategoria() == CategoriaItem.MANO_OBRA)
+                .filter(calculoService::esItemCertificable)
                 .map(item -> {
                     BigDecimal actual = porcentajesActualesForm.getOrDefault(item.getId(), BigDecimal.ZERO);
                     BigDecimal anterior = anteriores.getOrDefault(item.getId(), BigDecimal.ZERO);

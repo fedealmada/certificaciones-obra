@@ -106,7 +106,7 @@
                 <td class="text-end"><span class="acumulado-estimado" th:text="${vista.porcentajeAnterior + vista.porcentajeActual} + ' %'"></span></td>
                 <td class="text-end"><span class="monto-estimado">0,00</span></td>
             </tr>
-            <tr th:if="${itemsCertificables.isEmpty()}"><td colspan="7" class="text-center text-muted py-4">Esta OC no tiene items de mano de obra.</td></tr>
+            <tr th:if="${itemsCertificables.isEmpty()}"><td colspan="7" class="text-center text-muted py-4">Esta OC no tiene items certificables.</td></tr>
             </tbody>
         </table></div>
         <div class="cert-summary mb-4">

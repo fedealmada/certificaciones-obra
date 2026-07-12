@@ -149,16 +149,19 @@ public class OrdenCompraController {
         model.addAttribute("itemsResumen", itemsResumen);
         model.addAttribute("certificaciones", certificadosResumen);
         model.addAttribute("totalManoObra", totalPorCategoria(ordenCompra, CategoriaItem.MANO_OBRA));
+        model.addAttribute("totalCertificable", totalCertificable(ordenCompra));
         model.addAttribute("totalMateriales", totalPorCategoria(ordenCompra, CategoriaItem.MATERIAL));
         model.addAttribute("totalOtros", totalPorCategoria(ordenCompra, CategoriaItem.OTRO));
         BigDecimal totalCertificado = itemsResumen.stream()
+                .filter(resumen -> calculoService.esItemCertificable(resumen.itemOrdenCompra()))
                 .map(resumen -> resumen.montoAcumulado() == null ? BigDecimal.ZERO : resumen.montoAcumulado())
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         BigDecimal saldoOc = itemsResumen.stream()
+                .filter(resumen -> calculoService.esItemCertificable(resumen.itemOrdenCompra()))
                 .map(resumen -> resumen.saldoPendiente() == null ? BigDecimal.ZERO : resumen.saldoPendiente())
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-        BigDecimal totalManoObra = totalPorCategoria(ordenCompra, CategoriaItem.MANO_OBRA);
-        BigDecimal porcentajeAvanceOc = porcentaje(totalCertificado, totalManoObra);
+        BigDecimal totalCertificable = totalCertificable(ordenCompra);
+        BigDecimal porcentajeAvanceOc = porcentaje(totalCertificado, totalCertificable);
         boolean ordenMaterial = ordenCompra.usaSeguimientoEntregas();
         boolean ordenCertificable = ordenCompra.usaSeguimientoCertificacion();
         boolean ordenSoloRegistro = ordenCompra.usaSoloRegistro();
@@ -214,6 +217,13 @@ public class OrdenCompraController {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
+    private BigDecimal totalCertificable(OrdenCompra ordenCompra) {
+        return ordenCompra.getItems().stream()
+                .filter(calculoService::esItemCertificable)
+                .map(item -> item.getImporte() == null ? BigDecimal.ZERO : item.getImporte())
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
     private BigDecimal porcentaje(BigDecimal valor, BigDecimal total) {
         if (valor == null || total == null || total.compareTo(BigDecimal.ZERO) <= 0) {
             return BigDecimal.ZERO;
@@ -227,19 +237,23 @@ public class OrdenCompraController {
                 .toList());
         Map<Long, BigDecimal> avances = new HashMap<>();
         for (OrdenCompra orden : ordenes) {
+            if (!orden.usaSeguimientoCertificacion()) {
+                avances.put(orden.getId(), BigDecimal.ZERO);
+                continue;
+            }
             Map<Long, BigDecimal> acumuladosItems = acumuladosPorOrden.getOrDefault(orden.getId(), Map.of());
-            BigDecimal totalManoObra = BigDecimal.ZERO;
+            BigDecimal totalCertificable = BigDecimal.ZERO;
             BigDecimal totalCertificado = BigDecimal.ZERO;
             for (ItemOrdenCompra item : orden.getItems()) {
-                if (item.getCategoria() != CategoriaItem.MANO_OBRA) {
+                if (!calculoService.esItemCertificable(item)) {
                     continue;
                 }
                 BigDecimal importe = item.getImporte() == null ? BigDecimal.ZERO : item.getImporte();
                 BigDecimal acumulado = acumuladosItems.getOrDefault(item.getId(), BigDecimal.ZERO);
-                totalManoObra = totalManoObra.add(importe);
+                totalCertificable = totalCertificable.add(importe);
                 totalCertificado = totalCertificado.add(calculoService.calcularMonto(importe, acumulado));
             }
-            avances.put(orden.getId(), porcentaje(totalCertificado, totalManoObra));
+            avances.put(orden.getId(), porcentaje(totalCertificado, totalCertificable));
         }
         return avances;
     }

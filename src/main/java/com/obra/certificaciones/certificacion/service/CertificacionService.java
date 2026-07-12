@@ -5,10 +5,8 @@ import com.obra.certificaciones.certificacion.dto.NuevaCertificacionForm;
 import com.obra.certificaciones.certificacion.entity.Certificacion;
 import com.obra.certificaciones.certificacion.entity.ItemCertificacion;
 import com.obra.certificaciones.certificacion.repository.CertificacionRepository;
-import com.obra.certificaciones.oc.entity.CategoriaItem;
 import com.obra.certificaciones.oc.entity.ItemOrdenCompra;
 import com.obra.certificaciones.oc.entity.OrdenCompra;
-import com.obra.certificaciones.oc.repository.ItemOrdenCompraRepository;
 import com.obra.certificaciones.oc.service.OrdenCompraService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +24,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CertificacionService {
     private final CertificacionRepository certificacionRepository;
-    private final ItemOrdenCompraRepository itemOrdenCompraRepository;
     private final OrdenCompraService ordenCompraService;
     private final CertificacionCalculoService calculoService;
 
@@ -57,7 +54,7 @@ public class CertificacionService {
         validarOrdenCertificable(ordenCompra);
         NuevaCertificacionForm form = new NuevaCertificacionForm();
         form.setNumero((int) certificacionRepository.countByOrdenCompraId(ordenCompraId) + 1);
-        itemOrdenCompraRepository.findByOrdenCompraIdAndCategoriaOrderById(ordenCompraId, CategoriaItem.MANO_OBRA).forEach(item -> {
+        itemsCertificables(ordenCompra).forEach(item -> {
             ItemNuevaCertificacionForm itemForm = new ItemNuevaCertificacionForm();
             itemForm.setItemOrdenCompraId(item.getId());
             itemForm.setPorcentajeActual(BigDecimal.ZERO);
@@ -81,7 +78,7 @@ public class CertificacionService {
         form.setNumero(certificacion.getNumero());
         form.setFecha(certificacion.getFecha());
         form.setObservacion(certificacion.getObservacion());
-        itemOrdenCompraRepository.findByOrdenCompraIdAndCategoriaOrderById(ordenCompraId, CategoriaItem.MANO_OBRA).forEach(item -> {
+        itemsCertificables(certificacion.getOrdenCompra()).forEach(item -> {
             ItemNuevaCertificacionForm itemForm = new ItemNuevaCertificacionForm();
             itemForm.setItemOrdenCompraId(item.getId());
             itemForm.setPorcentajeActual(porcentajesActuales.getOrDefault(item.getId(), BigDecimal.ZERO));
@@ -94,7 +91,7 @@ public class CertificacionService {
     public Certificacion guardar(Long ordenCompraId, NuevaCertificacionForm form) {
         OrdenCompra ordenCompra = ordenCompraService.obtener(ordenCompraId);
         validarOrdenCertificable(ordenCompra);
-        Map<Long, ItemOrdenCompra> itemsPorId = itemsManoObraPorId(ordenCompra);
+        Map<Long, ItemOrdenCompra> itemsPorId = itemsCertificablesPorId(ordenCompra);
         Map<Long, BigDecimal> acumuladosPorItem = calculoService.porcentajesAcumuladosPorItem(ordenCompraId);
         Certificacion certificacion = new Certificacion();
         certificacion.setOrdenCompra(ordenCompra);
@@ -129,7 +126,7 @@ public class CertificacionService {
         validarCertificacionDeOrden(ordenCompraId, certificacion);
         OrdenCompra ordenCompra = ordenCompraService.obtener(ordenCompraId);
         validarOrdenCertificable(ordenCompra);
-        Map<Long, ItemOrdenCompra> itemsPorId = itemsManoObraPorId(ordenCompra);
+        Map<Long, ItemOrdenCompra> itemsPorId = itemsCertificablesPorId(ordenCompra);
 
         Map<Long, BigDecimal> porcentajesEditados = new HashMap<>();
         for (ItemNuevaCertificacionForm itemForm : form.getItems()) {
@@ -181,8 +178,8 @@ public class CertificacionService {
         if (!itemOrdenCompra.getOrdenCompra().getId().equals(ordenCompraId)) {
             throw new IllegalArgumentException("El item " + itemOrdenCompra.getItem() + " no pertenece a esta orden de compra.");
         }
-        if (itemOrdenCompra.getCategoria() != CategoriaItem.MANO_OBRA) {
-            throw new IllegalArgumentException("Solo se pueden certificar items de mano de obra.");
+        if (!calculoService.esItemCertificable(itemOrdenCompra)) {
+            throw new IllegalArgumentException("Solo se pueden certificar items que no sean materiales.");
         }
 
         BigDecimal porcentajeActual = porcentajeSeguro(itemForm);
@@ -224,10 +221,15 @@ public class CertificacionService {
         return itemForm.getPorcentajeActual() == null ? BigDecimal.ZERO : itemForm.getPorcentajeActual();
     }
 
-    private Map<Long, ItemOrdenCompra> itemsManoObraPorId(OrdenCompra ordenCompra) {
-        return ordenCompra.getItems().stream()
-                .filter(item -> item.getCategoria() == CategoriaItem.MANO_OBRA)
+    private Map<Long, ItemOrdenCompra> itemsCertificablesPorId(OrdenCompra ordenCompra) {
+        return itemsCertificables(ordenCompra).stream()
                 .collect(Collectors.toMap(ItemOrdenCompra::getId, Function.identity()));
+    }
+
+    private List<ItemOrdenCompra> itemsCertificables(OrdenCompra ordenCompra) {
+        return ordenCompra.getItems().stream()
+                .filter(calculoService::esItemCertificable)
+                .toList();
     }
 
     private ItemOrdenCompra obtenerItemFormulario(Map<Long, ItemOrdenCompra> itemsPorId, ItemNuevaCertificacionForm itemForm) {

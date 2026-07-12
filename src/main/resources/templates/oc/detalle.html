@@ -104,7 +104,7 @@
                 <span>Total OC</span>
                 <strong th:text="${#numbers.formatDecimal(orden.total, 1, 'POINT', 2, 'COMMA')}">0,00</strong>
             </div>
-            <div class="ticket-summary-card" th:if="${ordenCertificable}"><span>Mano de obra</span><strong th:text="${#numbers.formatDecimal(totalManoObra, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
+            <div class="ticket-summary-card" th:if="${ordenCertificable}"><span>Base certificable</span><strong th:text="${#numbers.formatDecimal(totalCertificable, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
             <div class="ticket-summary-card" th:if="${ordenMaterial}"><span>Comprado</span><strong th:text="${#numbers.formatDecimal(totalMaterialCompradoCantidad, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
             <div class="ticket-summary-card" th:if="${ordenCertificable || ordenSoloRegistro}"><span>Materiales</span><strong th:text="${#numbers.formatDecimal(totalMateriales, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
             <div class="ticket-summary-card" th:if="${ordenMaterial}"><span>Recibido</span><strong th:text="${#numbers.formatDecimal(totalMaterialRecibidoCantidad, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
@@ -112,7 +112,7 @@
             <div class="ticket-summary-card is-certified" th:if="${ordenCertificable}"><span>Certificado</span><strong th:text="${#numbers.formatDecimal(totalCertificado, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
             <div class="ticket-summary-card is-certified" th:if="${ordenMaterial}"><span>Recepcionado</span><strong th:text="${#numbers.formatDecimal(porcentajeRecepcionOc, 1, 'POINT', 2, 'COMMA')} + ' %'">0,00 %</strong></div>
             <div class="ticket-summary-card is-balance" th:if="${ordenSoloRegistro}"><span>Control</span><strong>Registro</strong></div>
-            <div class="ticket-summary-card is-balance" th:if="${ordenCertificable}"><span>Saldo mano de obra</span><strong th:text="${#numbers.formatDecimal(saldoOc, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
+            <div class="ticket-summary-card is-balance" th:if="${ordenCertificable}"><span>Saldo certificable</span><strong th:text="${#numbers.formatDecimal(saldoOc, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
             <div class="ticket-summary-card is-balance" th:if="${ordenMaterial}"><span>Pendiente entrega</span><strong th:text="${#numbers.formatDecimal(totalMaterialPendienteCantidad, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
         </div>
 
@@ -122,7 +122,7 @@
                     <span>Avance acumulado certificado</span>
                     <strong th:text="${#numbers.formatDecimal(porcentajeAvanceOc, 1, 'POINT', 2, 'COMMA')} + ' %'">0,00 %</strong>
                 </div>
-                <small th:text="${#numbers.formatDecimal(totalCertificado, 1, 'POINT', 2, 'COMMA') + ' certificado de ' + #numbers.formatDecimal(totalManoObra, 1, 'POINT', 2, 'COMMA') + ' de mano de obra'}">0,00 certificado</small>
+                <small th:text="${#numbers.formatDecimal(totalCertificado, 1, 'POINT', 2, 'COMMA') + ' certificado de ' + #numbers.formatDecimal(totalCertificable, 1, 'POINT', 2, 'COMMA') + ' certificable'}">0,00 certificado</small>
             </div>
             <div class="oc-total-progress-track">
                 <div class="oc-total-progress-fill" th:data-progress="${porcentajeAvanceOcBarra}"></div>
