@@ -10,6 +10,7 @@ import com.obra.certificaciones.oc.dto.ImportacionOrdenCompraLoteForm;
 import com.obra.certificaciones.oc.dto.OrdenCompraForm;
 import com.obra.certificaciones.oc.entity.CategoriaItem;
 import com.obra.certificaciones.oc.entity.ItemOrdenCompra;
+import com.obra.certificaciones.oc.entity.ModoSeguimientoOrden;
 import com.obra.certificaciones.oc.entity.OrdenCompra;
 import com.obra.certificaciones.oc.repository.OrdenCompraRepository;
 import com.obra.certificaciones.proveedor.entity.Proveedor;
@@ -116,6 +117,7 @@ public class ImportacionOrdenCompraService {
         ordenForm.setNumero(form.getNumero());
         ordenForm.setFecha(form.getFecha());
         ordenForm.setFechaVigencia(form.getFechaVigencia());
+        ordenForm.setModoSeguimiento(modoSeguimientoImportado(form));
         ordenForm.setProveedorId(resolverProveedor(form));
         ordenForm.setObservacion(form.getObservacion());
         ordenForm.setItems(itemsImportados.stream()
@@ -567,6 +569,17 @@ public class ImportacionOrdenCompraService {
             return Optional.empty();
         }
         return categoriaOrdenRepository.findByTipoAndNombreIgnoreCaseOrderByActivoDescIdAsc(tipo, nombre.trim()).stream().findFirst();
+    }
+
+    private ModoSeguimientoOrden modoSeguimientoImportado(ImportacionOrdenCompraForm form) {
+        if (form.getCategoriaId() == null) {
+            return ModoSeguimientoOrden.CERTIFICACION;
+        }
+        return categoriaOrdenRepository.findById(form.getCategoriaId())
+                .map(CategoriaOrden::getTipo)
+                .filter(tipo -> tipo == CategoriaItem.MATERIAL)
+                .map(tipo -> ModoSeguimientoOrden.ENTREGA)
+                .orElse(ModoSeguimientoOrden.CERTIFICACION);
     }
 
     private void detectarOrdenExistente(ImportacionOrdenCompraForm form) {

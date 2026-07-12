@@ -1,6 +1,7 @@
 package com.obra.certificaciones.oc.dto;
 
 import com.obra.certificaciones.oc.entity.ItemOrdenCompra;
+import com.obra.certificaciones.oc.entity.ModoSeguimientoOrden;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -20,5 +21,6 @@ public class OrdenCompraForm {
     private LocalDate fechaVigencia;
     private Long proveedorId;
     private String observacion;
+    private ModoSeguimientoOrden modoSeguimiento = ModoSeguimientoOrden.CERTIFICACION;
     private List<ItemOrdenCompra> items = new ArrayList<>();
 }

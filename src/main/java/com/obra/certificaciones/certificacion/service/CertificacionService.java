@@ -53,6 +53,8 @@ public class CertificacionService {
 
     @Transactional(readOnly = true)
     public NuevaCertificacionForm crearForm(Long ordenCompraId) {
+        OrdenCompra ordenCompra = ordenCompraService.obtener(ordenCompraId);
+        validarOrdenCertificable(ordenCompra);
         NuevaCertificacionForm form = new NuevaCertificacionForm();
         form.setNumero((int) certificacionRepository.countByOrdenCompraId(ordenCompraId) + 1);
         itemOrdenCompraRepository.findByOrdenCompraIdAndCategoriaOrderById(ordenCompraId, CategoriaItem.MANO_OBRA).forEach(item -> {
@@ -68,6 +70,7 @@ public class CertificacionService {
     public NuevaCertificacionForm crearFormEdicion(Long ordenCompraId, Long certificacionId) {
         Certificacion certificacion = obtener(certificacionId);
         validarCertificacionDeOrden(ordenCompraId, certificacion);
+        validarOrdenCertificable(certificacion.getOrdenCompra());
 
         Map<Long, BigDecimal> porcentajesActuales = new HashMap<>();
         certificacion.getItems().forEach(item ->
@@ -90,6 +93,7 @@ public class CertificacionService {
     @Transactional
     public Certificacion guardar(Long ordenCompraId, NuevaCertificacionForm form) {
         OrdenCompra ordenCompra = ordenCompraService.obtener(ordenCompraId);
+        validarOrdenCertificable(ordenCompra);
         Map<Long, ItemOrdenCompra> itemsPorId = itemsManoObraPorId(ordenCompra);
         Map<Long, BigDecimal> acumuladosPorItem = calculoService.porcentajesAcumuladosPorItem(ordenCompraId);
         Certificacion certificacion = new Certificacion();
@@ -124,6 +128,7 @@ public class CertificacionService {
         Certificacion certificacion = obtener(certificacionId);
         validarCertificacionDeOrden(ordenCompraId, certificacion);
         OrdenCompra ordenCompra = ordenCompraService.obtener(ordenCompraId);
+        validarOrdenCertificable(ordenCompra);
         Map<Long, ItemOrdenCompra> itemsPorId = itemsManoObraPorId(ordenCompra);
 
         Map<Long, BigDecimal> porcentajesEditados = new HashMap<>();
@@ -206,6 +211,12 @@ public class CertificacionService {
     private void validarCertificacionDeOrden(Long ordenCompraId, Certificacion certificacion) {
         if (!certificacion.getOrdenCompra().getId().equals(ordenCompraId)) {
             throw new IllegalArgumentException("La certificacion no pertenece a esta orden de compra.");
+        }
+    }
+
+    private void validarOrdenCertificable(OrdenCompra ordenCompra) {
+        if (!ordenCompra.usaSeguimientoCertificacion()) {
+            throw new IllegalArgumentException("Esta orden de compra no esta configurada para certificaciones.");
         }
     }
 

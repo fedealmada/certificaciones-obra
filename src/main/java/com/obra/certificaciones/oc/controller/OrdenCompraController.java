@@ -11,6 +11,7 @@ import com.obra.certificaciones.material.service.MaterialService;
 import com.obra.certificaciones.oc.dto.OrdenCompraForm;
 import com.obra.certificaciones.oc.entity.CategoriaItem;
 import com.obra.certificaciones.oc.entity.ItemOrdenCompra;
+import com.obra.certificaciones.oc.entity.ModoSeguimientoOrden;
 import com.obra.certificaciones.oc.entity.OrdenCompra;
 import com.obra.certificaciones.oc.repository.ItemOrdenCompraRepository;
 import com.obra.certificaciones.oc.service.OrdenCompraService;
@@ -59,10 +60,12 @@ public class OrdenCompraController {
                 .map(OrdenCompra::getId)
                 .toList()));
         Map<Long, BigDecimal> avancesPorOrden = calcularAvancesOrdenes(ordenes);
-        Map<Long, Boolean> ordenesMateriales = calcularOrdenesMateriales(ordenes);
+        Map<Long, Boolean> ordenesMateriales = calcularOrdenesConEntregas(ordenes);
         model.addAttribute("avancesPorOrden", avancesPorOrden);
         model.addAttribute("ordenesCerradas", calcularOrdenesCerradas(avancesPorOrden));
         model.addAttribute("ordenesMateriales", ordenesMateriales);
+        model.addAttribute("ordenesCertificables", calcularOrdenesCertificables(ordenes));
+        model.addAttribute("ordenesSoloRegistro", calcularOrdenesSoloRegistro(ordenes));
         model.addAttribute("estadosEntregaPorOrden", materialService.calcularEstadosOrdenes(ordenes));
         model.addAttribute("viajesPorOrden", materialService.contarRecepcionesPorOrdenes(ordenesMateriales.entrySet().stream()
                 .filter(entry -> Boolean.TRUE.equals(entry.getValue()))
@@ -83,6 +86,7 @@ public class OrdenCompraController {
         model.addAttribute("rubros", rubroService.listarActivos());
         model.addAttribute("itemsManoObra", itemOrdenCompraRepository.findByCategoriaOrderByOrdenCompraNumeroAscIdAsc(CategoriaItem.MANO_OBRA));
         model.addAttribute("catalogoMateriales", materialCatalogoService.listarActivos());
+        model.addAttribute("modosSeguimiento", ModoSeguimientoOrden.values());
         return "oc/form";
     }
 
@@ -94,6 +98,7 @@ public class OrdenCompraController {
         model.addAttribute("rubros", rubroService.listarActivos());
         model.addAttribute("itemsManoObra", itemOrdenCompraRepository.findByCategoriaOrderByOrdenCompraNumeroAscIdAsc(CategoriaItem.MANO_OBRA));
         model.addAttribute("catalogoMateriales", materialCatalogoService.listarActivos());
+        model.addAttribute("modosSeguimiento", ModoSeguimientoOrden.values());
         return "oc/form";
     }
 
@@ -115,6 +120,7 @@ public class OrdenCompraController {
             model.addAttribute("rubros", rubroService.listarActivos());
             model.addAttribute("itemsManoObra", itemOrdenCompraRepository.findByCategoriaOrderByOrdenCompraNumeroAscIdAsc(CategoriaItem.MANO_OBRA));
             model.addAttribute("catalogoMateriales", materialCatalogoService.listarActivos());
+            model.addAttribute("modosSeguimiento", ModoSeguimientoOrden.values());
             model.addAttribute("error", ex.getMessage());
             return "oc/form";
         }
@@ -153,7 +159,9 @@ public class OrdenCompraController {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         BigDecimal totalManoObra = totalPorCategoria(ordenCompra, CategoriaItem.MANO_OBRA);
         BigDecimal porcentajeAvanceOc = porcentaje(totalCertificado, totalManoObra);
-        boolean ordenMaterial = esOrdenMaterial(ordenCompra);
+        boolean ordenMaterial = ordenCompra.usaSeguimientoEntregas();
+        boolean ordenCertificable = ordenCompra.usaSeguimientoCertificacion();
+        boolean ordenSoloRegistro = ordenCompra.usaSoloRegistro();
         List<ItemMaterialResumen> materialItemsResumen = ordenMaterial
                 ? materialService.calcularResumenItems(id)
                 : List.of();
@@ -170,6 +178,8 @@ public class OrdenCompraController {
         model.addAttribute("porcentajeAvanceOcBarra", porcentajeAvanceOc.min(BigDecimal.valueOf(100)));
         model.addAttribute("ordenCerrada", porcentajeAvanceOc.compareTo(BigDecimal.valueOf(100)) >= 0);
         model.addAttribute("ordenMaterial", ordenMaterial);
+        model.addAttribute("ordenCertificable", ordenCertificable);
+        model.addAttribute("ordenSoloRegistro", ordenSoloRegistro);
         model.addAttribute("estadoEntregaOrden", estadoEntregaOrden);
         model.addAttribute("totalMaterialCompradoCantidad", totalMaterialCompradoCantidad);
         model.addAttribute("totalMaterialRecibidoCantidad", totalMaterialRecibidoCantidad);
@@ -254,16 +264,28 @@ public class OrdenCompraController {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    private Map<Long, Boolean> calcularOrdenesMateriales(List<OrdenCompra> ordenes) {
+    private Map<Long, Boolean> calcularOrdenesConEntregas(List<OrdenCompra> ordenes) {
         Map<Long, Boolean> resultado = new HashMap<>();
         for (OrdenCompra orden : ordenes) {
-            resultado.put(orden.getId(), esOrdenMaterial(orden));
+            resultado.put(orden.getId(), orden.usaSeguimientoEntregas());
         }
         return resultado;
     }
 
-    private boolean esOrdenMaterial(OrdenCompra ordenCompra) {
-        return ordenCompra.getItems().stream().anyMatch(item -> item.getCategoria() == CategoriaItem.MATERIAL);
+    private Map<Long, Boolean> calcularOrdenesCertificables(List<OrdenCompra> ordenes) {
+        Map<Long, Boolean> resultado = new HashMap<>();
+        for (OrdenCompra orden : ordenes) {
+            resultado.put(orden.getId(), orden.usaSeguimientoCertificacion());
+        }
+        return resultado;
+    }
+
+    private Map<Long, Boolean> calcularOrdenesSoloRegistro(List<OrdenCompra> ordenes) {
+        Map<Long, Boolean> resultado = new HashMap<>();
+        for (OrdenCompra orden : ordenes) {
+            resultado.put(orden.getId(), orden.usaSoloRegistro());
+        }
+        return resultado;
     }
 
     private EstadoRecepcionMaterial estadoEntregaOrden(List<ItemMaterialResumen> resumenItems) {

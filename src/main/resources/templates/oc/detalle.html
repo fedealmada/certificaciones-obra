@@ -47,10 +47,12 @@
                       class="delivery-status-pill"
                       th:classappend="${estadoEntregaOrden.name() == 'COMPLETO' ? ' is-complete' : (estadoEntregaOrden.name() == 'PARCIAL' ? ' is-partial' : ' is-pending')}"
                       th:text="${estadoEntregaOrden.name() == 'COMPLETO' ? 'ENTREGA COMPLETA' : (estadoEntregaOrden.name() == 'PARCIAL' ? 'ENTREGA PARCIAL' : 'ENTREGA PENDIENTE')}">ENTREGA PENDIENTE</span>
-                <span th:unless="${ordenMaterial}"
+                <span th:if="${ordenCertificable}"
                       class="delivery-status-pill"
                       th:classappend="${ordenCerrada == true ? ' is-work-closed' : ' is-work-open'}"
                       th:text="${ordenCerrada == true ? 'CERRADA' : 'ABIERTA'}">ABIERTA</span>
+                <span th:if="${ordenSoloRegistro}"
+                      class="delivery-status-pill is-record-only">SOLO REGISTRO</span>
             </div>
             <div class="document-subtitle">
                 <a class="provider-inline-link"
@@ -63,7 +65,7 @@
         <div class="document-actions">
             <a class="btn btn-primary" th:if="${ordenMaterial}" th:href="@{/materiales/oc/{id}/recepciones/nueva(id=${orden.id})}"><i class="bi bi-truck"></i> Nueva recepcion</a>
             <a class="btn btn-outline-primary" th:if="${ordenMaterial}" th:href="@{/materiales/oc/{id}(id=${orden.id})}"><i class="bi bi-box-seam"></i> Ver entregas</a>
-            <a class="btn btn-primary" th:unless="${ordenMaterial}" th:href="@{/oc/{id}/certificaciones/nueva(id=${orden.id})}"><i class="bi bi-plus-lg"></i> Nuevo Certificado</a>
+            <a class="btn btn-primary" th:if="${ordenCertificable}" th:href="@{/oc/{id}/certificaciones/nueva(id=${orden.id})}"><i class="bi bi-plus-lg"></i> Nuevo Certificado</a>
             <a class="btn btn-outline-secondary" th:href="@{/oc/{id}/editar(id=${orden.id})}"><i class="bi bi-pencil-square"></i> Editar OC</a>
             <form method="post" th:action="@{/oc/{id}/eliminar(id=${orden.id})}" onsubmit="return confirm('Eliminar esta orden de compra? Se eliminaran tambien sus items, certificados o recepciones asociadas.');">
                 <button class="btn btn-outline-danger" type="submit"><i class="bi bi-trash"></i> Eliminar OC</button>
@@ -91,6 +93,10 @@
                 <span>Items</span>
                 <strong th:text="${orden.items.size()}">0</strong>
             </div>
+            <div>
+                <span>Seguimiento</span>
+                <strong th:text="${orden.modoSeguimientoEfectivo.descripcion}">Certificable</strong>
+            </div>
         </div>
 
         <div class="ticket-summary-grid">
@@ -98,18 +104,19 @@
                 <span>Total OC</span>
                 <strong th:text="${#numbers.formatDecimal(orden.total, 1, 'POINT', 2, 'COMMA')}">0,00</strong>
             </div>
-            <div class="ticket-summary-card" th:unless="${ordenMaterial}"><span>Mano de obra</span><strong th:text="${#numbers.formatDecimal(totalManoObra, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
+            <div class="ticket-summary-card" th:if="${ordenCertificable}"><span>Mano de obra</span><strong th:text="${#numbers.formatDecimal(totalManoObra, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
             <div class="ticket-summary-card" th:if="${ordenMaterial}"><span>Comprado</span><strong th:text="${#numbers.formatDecimal(totalMaterialCompradoCantidad, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
-            <div class="ticket-summary-card" th:unless="${ordenMaterial}"><span>Materiales</span><strong th:text="${#numbers.formatDecimal(totalMateriales, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
+            <div class="ticket-summary-card" th:if="${ordenCertificable || ordenSoloRegistro}"><span>Materiales</span><strong th:text="${#numbers.formatDecimal(totalMateriales, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
             <div class="ticket-summary-card" th:if="${ordenMaterial}"><span>Recibido</span><strong th:text="${#numbers.formatDecimal(totalMaterialRecibidoCantidad, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
             <div class="ticket-summary-card"><span>Otros</span><strong th:text="${#numbers.formatDecimal(totalOtros, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
-            <div class="ticket-summary-card is-certified" th:unless="${ordenMaterial}"><span>Certificado</span><strong th:text="${#numbers.formatDecimal(totalCertificado, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
+            <div class="ticket-summary-card is-certified" th:if="${ordenCertificable}"><span>Certificado</span><strong th:text="${#numbers.formatDecimal(totalCertificado, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
             <div class="ticket-summary-card is-certified" th:if="${ordenMaterial}"><span>Recepcionado</span><strong th:text="${#numbers.formatDecimal(porcentajeRecepcionOc, 1, 'POINT', 2, 'COMMA')} + ' %'">0,00 %</strong></div>
-            <div class="ticket-summary-card is-balance" th:unless="${ordenMaterial}"><span>Saldo mano de obra</span><strong th:text="${#numbers.formatDecimal(saldoOc, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
+            <div class="ticket-summary-card is-balance" th:if="${ordenSoloRegistro}"><span>Control</span><strong>Registro</strong></div>
+            <div class="ticket-summary-card is-balance" th:if="${ordenCertificable}"><span>Saldo mano de obra</span><strong th:text="${#numbers.formatDecimal(saldoOc, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
             <div class="ticket-summary-card is-balance" th:if="${ordenMaterial}"><span>Pendiente entrega</span><strong th:text="${#numbers.formatDecimal(totalMaterialPendienteCantidad, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
         </div>
 
-        <div class="oc-total-progress" th:unless="${ordenMaterial}">
+        <div class="oc-total-progress" th:if="${ordenCertificable}">
             <div class="oc-total-progress-head">
                 <div>
                     <span>Avance acumulado certificado</span>
@@ -125,13 +132,23 @@
         <div class="oc-total-progress" th:if="${ordenMaterial}">
             <div class="oc-total-progress-head">
                 <div>
-                    <span>Recepcion acumulada de materiales</span>
+                    <span>Recepcion acumulada de entregas</span>
                     <strong th:text="${#numbers.formatDecimal(porcentajeRecepcionOc, 1, 'POINT', 2, 'COMMA')} + ' %'">0,00 %</strong>
                 </div>
                 <small th:text="${#numbers.formatDecimal(totalMaterialRecibidoCantidad, 1, 'POINT', 2, 'COMMA') + ' recibido de ' + #numbers.formatDecimal(totalMaterialCompradoCantidad, 1, 'POINT', 2, 'COMMA') + ' comprado'}">0,00 recibido</small>
             </div>
             <div class="oc-total-progress-track">
                 <div class="oc-total-progress-fill is-material" th:data-progress="${porcentajeRecepcionOcBarra}"></div>
+            </div>
+        </div>
+
+        <div class="oc-total-progress is-record-only-progress" th:if="${ordenSoloRegistro}">
+            <div class="oc-total-progress-head">
+                <div>
+                    <span>Orden asentada como registro</span>
+                    <strong>Sin certificacion ni entrega</strong>
+                </div>
+                <small>Usala para dejar constancia de una compra o servicio puntual.</small>
             </div>
         </div>
 
@@ -198,7 +215,7 @@
                   th:text="${estadoEntregaOrden.name() == 'COMPLETO' ? 'ENTREGA COMPLETA' : (estadoEntregaOrden.name() == 'PARCIAL' ? 'ENTREGA PARCIAL' : 'ENTREGA PENDIENTE')}">ENTREGA PENDIENTE</span>
         </div>
         <div class="p-3 d-flex flex-wrap gap-2 align-items-center justify-content-between">
-            <span class="text-muted">Esta OC es de materiales. Las cantidades se controlan por recepciones y viajes, no por certificados.</span>
+            <span class="text-muted">Esta OC se controla por recepciones, viajes o unidades recibidas, no por certificados.</span>
             <div class="d-flex flex-wrap gap-2">
                 <a class="btn btn-primary" th:href="@{/materiales/oc/{id}/recepciones/nueva(id=${orden.id})}"><i class="bi bi-plus-lg"></i> Nueva recepcion</a>
                 <a class="btn btn-outline-primary" th:href="@{/materiales/oc/{id}(id=${orden.id})}"><i class="bi bi-box-seam"></i> Ver entregas</a>
@@ -206,7 +223,7 @@
         </div>
     </section>
 
-    <section class="panel-section" id="certificados" th:unless="${ordenMaterial}">
+    <section class="panel-section" id="certificados" th:if="${ordenCertificable}">
         <div class="section-title-row">
             <h2 class="h5 mb-0"><i class="bi bi-check2-square"></i> Certificados realizados</h2>
             <span class="section-total-pill" th:text="${certificaciones.size()} + ' certificados'">0 certificados</span>
@@ -227,6 +244,14 @@
                 </tbody>
             </table>
         </div>
+    </section>
+
+    <section class="panel-section" th:if="${ordenSoloRegistro}">
+        <div class="section-title-row">
+            <h2 class="h5 mb-0"><i class="bi bi-journal-text"></i> Seguimiento administrativo</h2>
+            <span class="delivery-status-pill is-record-only">SOLO REGISTRO</span>
+        </div>
+        <div class="p-3 text-muted">Esta OC queda registrada para consulta, analisis de proveedor e importes, sin generar certificados ni recepciones.</div>
     </section>
 </main>
 <script>

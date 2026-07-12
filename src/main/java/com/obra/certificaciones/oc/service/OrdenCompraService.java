@@ -8,6 +8,7 @@ import com.obra.certificaciones.material.catalogo.repository.MaterialCatalogoRep
 import com.obra.certificaciones.oc.dto.OrdenCompraForm;
 import com.obra.certificaciones.oc.entity.CategoriaItem;
 import com.obra.certificaciones.oc.entity.ItemOrdenCompra;
+import com.obra.certificaciones.oc.entity.ModoSeguimientoOrden;
 import com.obra.certificaciones.oc.entity.OrdenCompra;
 import com.obra.certificaciones.oc.repository.ItemOrdenCompraRepository;
 import com.obra.certificaciones.oc.repository.OrdenCompraRepository;
@@ -59,6 +60,7 @@ public class OrdenCompraService {
         ordenCompra.setNumero(form.getNumero());
         ordenCompra.setFecha(form.getFecha());
         ordenCompra.setFechaVigencia(form.getFechaVigencia());
+        ordenCompra.setModoSeguimiento(form.getModoSeguimiento() == null ? ModoSeguimientoOrden.CERTIFICACION : form.getModoSeguimiento());
         aplicarProveedor(ordenCompra, form);
         ordenCompra.setObservacion(form.getObservacion());
 
@@ -99,6 +101,7 @@ public class OrdenCompraService {
         form.setNumero(ordenCompra.getNumero());
         form.setFecha(ordenCompra.getFecha());
         form.setFechaVigencia(ordenCompra.getFechaVigencia());
+        form.setModoSeguimiento(ordenCompra.getModoSeguimientoEfectivo());
         form.setProveedorId(ordenCompra.getProveedorEntidad() == null ? null : ordenCompra.getProveedorEntidad().getId());
         form.setObservacion(ordenCompra.getObservacion());
         ordenCompra.getItems().forEach(item -> {

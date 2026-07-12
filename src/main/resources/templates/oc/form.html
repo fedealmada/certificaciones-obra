@@ -61,7 +61,17 @@
                     <option th:each="proveedor : ${proveedores}" th:value="${proveedor.id}" th:text="${proveedor.nombre}"></option>
                 </select>
             </div>
-            <div class="col-12"><label class="form-label">Observacion</label><textarea class="form-control" rows="2" th:field="*{observacion}"></textarea></div>
+            <div class="col-md-4">
+                <label class="form-label">Seguimiento de la OC</label>
+                <select class="form-select" th:field="*{modoSeguimiento}">
+                    <option th:each="modo : ${modosSeguimiento}"
+                            th:value="${modo}"
+                            th:text="${modo.descripcion}"
+                            th:title="${modo.ayuda}"></option>
+                </select>
+                <div class="form-text">Define si se certifica, se controla por entregas/viajes o queda solo como registro.</div>
+            </div>
+            <div class="col-md-8"><label class="form-label">Observacion</label><textarea class="form-control" rows="2" th:field="*{observacion}"></textarea></div>
         </div>
         <div class="d-flex justify-content-between align-items-center mb-2"><h2 class="h4">Items</h2><button class="btn btn-outline-primary" type="button" onclick="agregarItem()">Agregar item</button></div>
         <select class="d-none" id="rubros-template">

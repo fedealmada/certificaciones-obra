@@ -2280,6 +2280,12 @@ h5 {
     color: #9b2d28;
 }
 
+.delivery-status-pill.is-record-only {
+    border-color: #c7ced8;
+    background: #f1f4f8;
+    color: #485465;
+}
+
 .oc-title-status-row .delivery-status-pill,
 .section-title-row .delivery-status-pill {
     width: auto;
@@ -5774,6 +5780,12 @@ h5 {
     border-color: rgba(80, 250, 123, 0.4);
     background: rgba(80, 250, 123, 0.14);
     color: #50fa7b;
+}
+
+:root[data-theme="dark"] .delivery-status-pill.is-record-only {
+    border-color: rgba(248, 248, 242, 0.26);
+    background: rgba(248, 248, 242, 0.1);
+    color: #f8f8f2;
 }
 
 :root[data-theme="dark"] .status-progress,

@@ -106,7 +106,7 @@
                     th:data-items="${orden.items.size()}"
                     th:data-importe="${orden.total}"
                     th:data-avance="${avancesPorOrden.get(orden.id)}"
-                    th:data-certificados="${ordenesMateriales.getOrDefault(orden.id, false) ? viajesPorOrden.getOrDefault(orden.id, 0) : certificadosPorOrden.getOrDefault(orden.id, 0)}">
+                    th:data-certificados="${ordenesSoloRegistro.getOrDefault(orden.id, false) ? 0 : (ordenesMateriales.getOrDefault(orden.id, false) ? viajesPorOrden.getOrDefault(orden.id, 0) : certificadosPorOrden.getOrDefault(orden.id, 0))}">
                     <td><span class="item-code-pill" th:text="${orden.numero}"></span></td>
                     <td th:text="${#temporals.format(orden.fecha, 'dd/MM/yyyy')}"></td>
                     <td th:text="${orden.proveedorEntidad?.nombre ?: '-'}"></td>
@@ -114,20 +114,26 @@
                     <td class="oc-list-rubros" th:text="${orden.items.isEmpty() ? '-' : #strings.listJoin(#sets.toSet(orden.items.![rubroEntidad != null ? rubroEntidad.nombreCompleto : '']), ', ')}"></td>
                     <td class="text-end" th:text="${orden.items.size()}"></td>
                     <td class="text-end fw-semibold" th:text="${#numbers.formatDecimal(orden.total, 1, 'POINT', 2, 'COMMA')}">0,00</td>
-                    <td class="text-end fw-semibold" th:text="${#numbers.formatDecimal(avancesPorOrden.get(orden.id), 1, 'POINT', 2, 'COMMA') + '%'}">0,00%</td>
+                    <td class="text-end fw-semibold">
+                        <span th:if="${ordenesCertificables.getOrDefault(orden.id, false)}" th:text="${#numbers.formatDecimal(avancesPorOrden.get(orden.id), 1, 'POINT', 2, 'COMMA') + '%'}">0,00%</span>
+                        <span th:unless="${ordenesCertificables.getOrDefault(orden.id, false)}" class="text-muted">-</span>
+                    </td>
                     <td class="text-end">
+                        <span th:if="${ordenesSoloRegistro.getOrDefault(orden.id, false)}"
+                              class="delivery-status-pill is-record-only">SOLO REGISTRO</span>
+                        <small th:if="${ordenesSoloRegistro.getOrDefault(orden.id, false)}" class="delivery-trip-count">sin seguimiento</small>
                         <a th:if="${ordenesMateriales.getOrDefault(orden.id, false)}"
                            class="delivery-status-pill"
                            th:classappend="${estadosEntregaPorOrden.get(orden.id).name() == 'COMPLETO' ? ' is-complete' : (estadosEntregaPorOrden.get(orden.id).name() == 'PARCIAL' ? ' is-partial' : ' is-pending')}"
                            th:href="@{/materiales/oc/{id}(id=${orden.id})}"
                            th:text="${estadosEntregaPorOrden.get(orden.id).name() == 'COMPLETO' ? 'ENTREGA COMPLETA' : (estadosEntregaPorOrden.get(orden.id).name() == 'PARCIAL' ? 'ENTREGA PARCIAL' : 'ENTREGA PENDIENTE')}">ENTREGA PENDIENTE</a>
                         <small th:if="${ordenesMateriales.getOrDefault(orden.id, false)}" class="delivery-trip-count" th:text="${viajesPorOrden.getOrDefault(orden.id, 0) == 1 ? '1 viaje' : viajesPorOrden.getOrDefault(orden.id, 0) + ' viajes'}">0 viajes</small>
-                        <a th:unless="${ordenesMateriales.getOrDefault(orden.id, false)}"
+                        <a th:if="${ordenesCertificables.getOrDefault(orden.id, false)}"
                            class="delivery-status-pill"
                            th:classappend="${ordenesCerradas.getOrDefault(orden.id, false) ? ' is-work-closed' : ' is-work-open'}"
                            th:href="@{/oc/{id}(id=${orden.id})} + '#certificados'"
                            th:text="${ordenesCerradas.getOrDefault(orden.id, false) ? 'CERRADA' : 'ABIERTA'}">ABIERTA</a>
-                        <small th:unless="${ordenesMateriales.getOrDefault(orden.id, false)}" class="delivery-trip-count" th:text="${certificadosPorOrden.getOrDefault(orden.id, 0) == 1 ? '1 certificado' : certificadosPorOrden.getOrDefault(orden.id, 0) + ' certificados'}">0 certificados</small>
+                        <small th:if="${ordenesCertificables.getOrDefault(orden.id, false)}" class="delivery-trip-count" th:text="${certificadosPorOrden.getOrDefault(orden.id, 0) == 1 ? '1 certificado' : certificadosPorOrden.getOrDefault(orden.id, 0) + ' certificados'}">0 certificados</small>
                     </td>
                     <td class="text-end action-cell">
                         <a class="btn btn-sm btn-outline-secondary table-icon-action" th:href="@{/oc/{id}/editar(id=${orden.id})}" title="Editar OC" aria-label="Editar OC"><i class="bi bi-pencil-square"></i></a>

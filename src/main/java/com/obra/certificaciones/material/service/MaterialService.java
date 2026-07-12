@@ -35,7 +35,9 @@ public class MaterialService {
 
     @Transactional(readOnly = true)
     public List<OrdenCompra> listarOrdenesConMateriales() {
-        return ordenCompraService.listarPorTipoCategoria(CategoriaItem.MATERIAL);
+        return ordenCompraService.listar(null, null, null).stream()
+                .filter(OrdenCompra::usaSeguimientoEntregas)
+                .toList();
     }
 
     @Transactional(readOnly = true)
@@ -82,7 +84,7 @@ public class MaterialService {
         Map<Long, Map<Long, BigDecimal>> recibidasPorOrden = cantidadesRecibidasPorOrdenes(ordenCompraIds);
         Map<Long, EstadoRecepcionMaterial> estados = new HashMap<>();
         for (OrdenCompra orden : ordenes) {
-            if (orden.getItems().stream().noneMatch(item -> item.getCategoria() == CategoriaItem.MATERIAL)) {
+            if (!orden.usaSeguimientoEntregas()) {
                 continue;
             }
             estados.put(orden.getId(), calcularEstadoOrden(resumenItems(orden.getItems(), recibidasPorOrden.getOrDefault(orden.getId(), Map.of()))));
@@ -103,19 +105,21 @@ public class MaterialService {
     @Transactional(readOnly = true)
     public RecepcionMaterialForm crearForm(Long ordenCompraId) {
         RecepcionMaterialForm form = new RecepcionMaterialForm();
-        itemOrdenCompraRepository.findByOrdenCompraIdAndCategoriaOrderById(ordenCompraId, CategoriaItem.MATERIAL)
-                .forEach(item -> {
-                    ItemRecepcionMaterialForm itemForm = new ItemRecepcionMaterialForm();
-                    itemForm.setItemOrdenCompraId(item.getId());
-                    itemForm.setCantidadRecibida(BigDecimal.ZERO);
-                    form.getItems().add(itemForm);
-                });
+        OrdenCompra ordenCompra = ordenCompraService.obtener(ordenCompraId);
+        validarOrdenConEntregas(ordenCompra);
+        itemsRecepcionables(ordenCompra).forEach(item -> {
+            ItemRecepcionMaterialForm itemForm = new ItemRecepcionMaterialForm();
+            itemForm.setItemOrdenCompraId(item.getId());
+            itemForm.setCantidadRecibida(BigDecimal.ZERO);
+            form.getItems().add(itemForm);
+        });
         return form;
     }
 
     @Transactional
     public RecepcionMaterial guardar(Long ordenCompraId, RecepcionMaterialForm form) {
         OrdenCompra ordenCompra = ordenCompraService.obtener(ordenCompraId);
+        validarOrdenConEntregas(ordenCompra);
         validarRecepcion(ordenCompraId, form);
 
         RecepcionMaterial recepcion = new RecepcionMaterial();
@@ -153,8 +157,11 @@ public class MaterialService {
 
     @Transactional(readOnly = true)
     public List<ItemMaterialResumen> calcularResumenItems(Long ordenCompraId) {
-        List<ItemOrdenCompra> items = itemOrdenCompraRepository.findByOrdenCompraIdAndCategoriaOrderById(ordenCompraId, CategoriaItem.MATERIAL);
-        return resumenItems(items, cantidadesRecibidasPorItem(ordenCompraId));
+        OrdenCompra ordenCompra = ordenCompraService.obtener(ordenCompraId);
+        if (!ordenCompra.usaSeguimientoEntregas()) {
+            return List.of();
+        }
+        return resumenItems(itemsRecepcionables(ordenCompra), cantidadesRecibidasPorItem(ordenCompraId));
     }
 
     @Transactional(readOnly = true)
@@ -164,7 +171,7 @@ public class MaterialService {
 
     private List<ItemMaterialResumen> resumenItems(List<ItemOrdenCompra> items, Map<Long, BigDecimal> recibidasPorItem) {
         return items.stream()
-                .filter(item -> item.getCategoria() == CategoriaItem.MATERIAL)
+                .filter(this::esItemRecepcionable)
                 .map(item -> {
                     BigDecimal comprada = cantidadSegura(item.getCantidad());
                     BigDecimal recibida = recibidasPorItem.getOrDefault(item.getId(), BigDecimal.ZERO);
@@ -205,8 +212,11 @@ public class MaterialService {
             if (!itemOrdenCompra.getOrdenCompra().getId().equals(ordenCompraId)) {
                 throw new IllegalArgumentException("El item no pertenece a esta orden de compra.");
             }
-            if (itemOrdenCompra.getCategoria() != CategoriaItem.MATERIAL) {
-                throw new IllegalArgumentException("Solo se pueden recibir items de materiales.");
+            if (!itemOrdenCompra.getOrdenCompra().usaSeguimientoEntregas()) {
+                throw new IllegalArgumentException("Esta orden de compra no esta configurada para entregas o viajes.");
+            }
+            if (!esItemRecepcionable(itemOrdenCompra)) {
+                throw new IllegalArgumentException("Solo se pueden recibir items que no sean mano de obra.");
             }
             BigDecimal cantidad = cantidadSegura(itemForm.getCantidadRecibida());
             if (cantidad.compareTo(BigDecimal.ZERO) < 0) {
@@ -222,6 +232,22 @@ public class MaterialService {
 
     private BigDecimal cantidadSegura(BigDecimal valor) {
         return valor == null ? BigDecimal.ZERO : valor;
+    }
+
+    private void validarOrdenConEntregas(OrdenCompra ordenCompra) {
+        if (!ordenCompra.usaSeguimientoEntregas()) {
+            throw new IllegalArgumentException("Esta orden de compra no esta configurada para entregas o viajes.");
+        }
+    }
+
+    private List<ItemOrdenCompra> itemsRecepcionables(OrdenCompra ordenCompra) {
+        return ordenCompra.getItems().stream()
+                .filter(this::esItemRecepcionable)
+                .toList();
+    }
+
+    private boolean esItemRecepcionable(ItemOrdenCompra item) {
+        return item.getCategoria() != CategoriaItem.MANO_OBRA;
     }
 
     private EstadoRecepcionMaterial calcularEstado(BigDecimal comprada, BigDecimal recibida) {
