@@ -28,6 +28,7 @@
             <a class="nav-link" th:if="${configuracion.activo('modulo.importarCertificados')}" th:href="@{/certificaciones/importar}" title="Certificados"><i class="bi bi-clipboard-check"></i><span>Certificados</span></a>
             <a class="nav-link" th:if="${configuracion.activo('modulo.itemizado')}" th:href="@{/itemizado}" title="Itemizado"><i class="bi bi-diagram-3"></i><span>Itemizado</span></a>
             <a class="nav-link" th:if="${configuracion.activo('modulo.materiales')}" th:href="@{/materiales}" title="Entregas"><i class="bi bi-truck"></i><span>Entregas</span></a>
+            <a class="nav-link" th:if="${configuracion.activo('modulo.deposito')}" th:href="@{/deposito}" title="Deposito"><i class="bi bi-boxes"></i><span>Deposito</span></a>
             <a class="nav-link" th:if="${configuracion.activo('modulo.catalogo')}" th:href="@{/catalogo-materiales}" title="Catalogo"><i class="bi bi-archive"></i><span>Catalogo</span></a>
             <a class="nav-link" th:if="${configuracion.activo('modulo.proveedores')}" th:href="@{/proveedores}" title="Proveedores"><i class="bi bi-people"></i><span>Proveedores</span></a>
             <a class="nav-link" th:if="${configuracion.activo('modulo.categorias')}" th:href="@{/categorias}" title="Categorias"><i class="bi bi-tags"></i><span>Categorias</span></a>

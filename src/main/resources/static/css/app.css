@@ -7457,6 +7457,28 @@ html[data-theme="dark"] body {
     color: #c4c9d4;
 }
 
+.deposito-table td:first-child strong {
+    display: block;
+    color: var(--app-ink);
+    font-size: 0.9rem;
+    font-weight: 760;
+}
+
+.deposito-muted {
+    display: block;
+    color: var(--app-muted);
+    font-size: 0.72rem;
+    font-weight: 650;
+}
+
+:root[data-theme="dark"] .deposito-table td:first-child strong {
+    color: #f5f7fb;
+}
+
+:root[data-theme="dark"] .deposito-muted {
+    color: #c4c9d4;
+}
+
 .interactive-table thead th:last-child,
 .oc-list-table th:last-child,
 .items-master-table th:last-child {
