@@ -22,18 +22,22 @@
         <div class="app-nav-links">
             <a class="nav-link" th:href="@{/}" title="Inicio"><i class="bi bi-house"></i><span>Inicio</span></a>
             <a class="nav-link" th:if="${configuracion.activo('modulo.dashboard')}" th:href="@{/dashboard}" title="Dashboard"><i class="bi bi-grid-1x2"></i><span>Dashboard</span></a>
+            <div class="app-nav-section"><span>Administracion</span></div>
             <a class="nav-link" th:if="${configuracion.activo('modulo.oc')}" th:href="@{/oc}" title="Ordenes"><i class="bi bi-receipt"></i><span>Ordenes</span></a>
             <a class="nav-link" th:if="${configuracion.activo('modulo.importarOc')}" th:href="@{/oc/importar}" title="Importar OC"><i class="bi bi-file-earmark-arrow-up"></i><span>Importar OC</span></a>
-            <a class="nav-link" th:if="${configuracion.activo('modulo.items')}" th:href="@{/items}" title="Items"><i class="bi bi-list-task"></i><span>Items</span></a>
             <a class="nav-link" th:if="${configuracion.activo('modulo.importarCertificados')}" th:href="@{/certificaciones/importar}" title="Certificados"><i class="bi bi-clipboard-check"></i><span>Certificados</span></a>
+            <a class="nav-link" th:if="${configuracion.activo('modulo.proveedores')}" th:href="@{/proveedores}" title="Proveedores"><i class="bi bi-people"></i><span>Proveedores</span></a>
+            <a class="nav-link" th:if="${configuracion.activo('modulo.reportes')}" th:href="@{/reportes}" title="Reportes"><i class="bi bi-bar-chart"></i><span>Reportes</span></a>
+            <div class="app-nav-section"><span>Obra</span></div>
             <a class="nav-link" th:if="${configuracion.activo('modulo.itemizado')}" th:href="@{/itemizado}" title="Itemizado"><i class="bi bi-diagram-3"></i><span>Itemizado</span></a>
+            <a class="nav-link" th:if="${configuracion.activo('modulo.items')}" th:href="@{/items}" title="Items"><i class="bi bi-list-task"></i><span>Items</span></a>
             <a class="nav-link" th:if="${configuracion.activo('modulo.materiales')}" th:href="@{/materiales}" title="Entregas"><i class="bi bi-truck"></i><span>Entregas</span></a>
+            <div class="app-nav-section"><span>Panol</span></div>
             <a class="nav-link" th:if="${configuracion.activo('modulo.deposito')}" th:href="@{/deposito}" title="Deposito"><i class="bi bi-boxes"></i><span>Deposito</span></a>
             <a class="nav-link" th:if="${configuracion.activo('modulo.catalogo')}" th:href="@{/catalogo-materiales}" title="Catalogo"><i class="bi bi-archive"></i><span>Catalogo</span></a>
-            <a class="nav-link" th:if="${configuracion.activo('modulo.proveedores')}" th:href="@{/proveedores}" title="Proveedores"><i class="bi bi-people"></i><span>Proveedores</span></a>
+            <div class="app-nav-section"><span>Config.</span></div>
             <a class="nav-link" th:if="${configuracion.activo('modulo.categorias')}" th:href="@{/categorias}" title="Categorias"><i class="bi bi-tags"></i><span>Categorias</span></a>
             <a class="nav-link" th:if="${configuracion.activo('modulo.rubros')}" th:href="@{/rubros}" title="Rubros"><i class="bi bi-folder2-open"></i><span>Rubros</span></a>
-            <a class="nav-link" th:if="${configuracion.activo('modulo.reportes')}" th:href="@{/reportes}" title="Reportes"><i class="bi bi-bar-chart"></i><span>Reportes</span></a>
             <a class="nav-link" th:href="@{/configuracion}" title="Configuracion"><i class="bi bi-gear"></i><span>Configuracion</span></a>
             <button class="nav-link theme-toggle-button" type="button" title="Modo oscuro" aria-label="Cambiar modo oscuro">
                 <i class="bi bi-moon-stars"></i><span>Modo oscuro</span>

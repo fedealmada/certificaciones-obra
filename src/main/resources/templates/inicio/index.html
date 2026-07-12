@@ -25,9 +25,10 @@
                 </div>
                 <span class="home-status-pill"><i class="bi bi-lightning-charge-fill"></i> Panel activo</span>
             </div>
-            <p>Accede rapido a compras, certificaciones, entregas, reportes e itemizado desde un solo lugar.</p>
+            <p>Elegi primero el tipo de tarea: administracion, produccion de obra o panol. Cada area reune sus herramientas para que no quede todo mezclado.</p>
             <div class="home-hero-actions">
                 <a class="btn btn-primary" th:if="${configuracion.activo('modulo.oc')}" th:href="@{/oc/nueva}"><i class="bi bi-plus-lg"></i> Nueva OC</a>
+                <a class="btn btn-outline-secondary" th:if="${configuracion.activo('modulo.deposito')}" th:href="@{/deposito}"><i class="bi bi-boxes"></i> Abrir panol</a>
                 <a class="btn btn-outline-secondary" th:if="${configuracion.activo('modulo.importarCertificados')}" th:href="@{/certificaciones/importar}"><i class="bi bi-clipboard-check"></i> Importar certificados</a>
             </div>
         </div>
@@ -38,27 +39,39 @@
         </div>
     </section>
 
-    <section class="home-module-grid">
-        <a class="home-module-card" th:each="modulo, iter : ${modulos}" th:href="${modulo.url()}" th:classappend="${' is-' + modulo.tono()}" th:style="${'animation-delay: ' + (iter.index * 55) + 'ms'}">
-            <span class="home-module-orbit">
-                <span class="home-module-icon"><i th:class="${'bi ' + modulo.icono()}"></i></span>
-            </span>
-            <span class="home-module-content">
-                <strong th:text="${modulo.nombre()}">Modulo</strong>
-                <small th:text="${modulo.descripcion()}">Descripcion</small>
-            </span>
-            <i class="bi bi-arrow-up-right home-module-arrow"></i>
-        </a>
-        <a class="home-module-card is-settings" th:href="@{/configuracion}" th:style="${'animation-delay: ' + (modulos.size() * 55) + 'ms'}">
-            <span class="home-module-orbit">
-                <span class="home-module-icon"><i class="bi bi-sliders"></i></span>
-            </span>
-            <span class="home-module-content">
-                <strong>Configuracion</strong>
-                <small>Activar modulos, alertas y comportamiento visual.</small>
-            </span>
-            <i class="bi bi-arrow-up-right home-module-arrow"></i>
-        </a>
+    <section class="home-area-grid">
+        <article class="home-area-card" th:each="area, areaIter : ${areas}" th:classappend="${' is-' + area.tono()}" th:if="${!area.modulos().isEmpty()}" th:style="${'animation-delay: ' + (areaIter.index * 80) + 'ms'}">
+            <div class="home-area-head">
+                <span class="home-area-icon"><i th:class="${'bi ' + area.icono()}"></i></span>
+                <div>
+                    <strong th:text="${area.nombre()}">Area</strong>
+                    <small th:text="${area.descripcion()}">Descripcion</small>
+                </div>
+            </div>
+            <div class="home-area-links">
+                <a th:each="modulo : ${area.modulos()}" th:href="${modulo.url()}">
+                    <span><i th:class="${'bi ' + modulo.icono()}"></i></span>
+                    <strong th:text="${modulo.nombre()}">Modulo</strong>
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </div>
+        </article>
+        <article class="home-area-card is-config" th:style="${'animation-delay: ' + (areas.size() * 80) + 'ms'}">
+            <div class="home-area-head">
+                <span class="home-area-icon"><i class="bi bi-gear"></i></span>
+                <div>
+                    <strong>Sistema</strong>
+                    <small>Activar modulos, alertas y comportamiento visual.</small>
+                </div>
+            </div>
+            <div class="home-area-links">
+                <a th:href="@{/configuracion}">
+                    <span><i class="bi bi-sliders"></i></span>
+                    <strong>Configuracion</strong>
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </div>
+        </article>
     </section>
 </main>
 </body>
