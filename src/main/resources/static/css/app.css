@@ -3678,15 +3678,19 @@ h5 {
     background: #f8fafc;
 }
 
-.cert-click-row {
+.cert-click-row,
+.delivery-click-row,
+tr[data-href][role="link"] {
     cursor: pointer;
 }
 
-.cert-click-row:hover td {
+.cert-click-row:hover td,
+.delivery-click-row:hover td {
     background: #fff8d4;
 }
 
-.cert-click-row:focus {
+.cert-click-row:focus,
+.delivery-click-row:focus {
     outline: 2px solid #8fb7e8;
     outline-offset: -2px;
 }
