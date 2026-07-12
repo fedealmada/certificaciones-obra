@@ -36,6 +36,13 @@
             <div class="metric-card"><div class="metric-head"><div class="metric-label">Saldo pendiente</div><i class="bi bi-cash-coin"></i></div><div class="metric-value metric-value-sm" th:text="${#numbers.formatDecimal(reporte.saldoPendiente, 1, 'POINT', 2, 'COMMA')}">0,00</div><small>Por certificar</small></div>
         </div>
 
+        <div class="dashboard-metric-grid">
+            <div class="metric-card"><div class="metric-head"><div class="metric-label">OC con entregas</div><i class="bi bi-truck"></i></div><div class="metric-value" th:text="${reporte.ordenesEntrega}">0</div><small>Seguimiento por viajes</small></div>
+            <div class="metric-card"><div class="metric-head"><div class="metric-label">Material recibido</div><i class="bi bi-box-seam"></i></div><div class="metric-value" th:text="${reporte.porcentajeMaterialRecibido} + '%'">0%</div><small>Recepcion valorizada</small></div>
+            <div class="metric-card"><div class="metric-head"><div class="metric-label">Pendiente entrega</div><i class="bi bi-hourglass-split"></i></div><div class="metric-value metric-value-sm" th:text="${#numbers.formatDecimal(reporte.materialPendienteEntrega, 1, 'POINT', 2, 'COMMA')}">0,00</div><small>Material aun no recibido</small></div>
+            <div class="metric-card"><div class="metric-head"><div class="metric-label">Entregas parciales</div><i class="bi bi-signpost-split"></i></div><div class="metric-value" th:text="${reporte.entregasParciales}">0</div><small>OC en movimiento</small></div>
+        </div>
+
     <section class="panel-section alert-panel mb-4" th:if="${configuracion.activo('alertas.dashboard') && !alertas.isEmpty()}">
         <div class="section-title-row">
             <h2 class="h5 mb-0"><i class="bi bi-shield-exclamation"></i> Alertas de control</h2>
@@ -118,6 +125,41 @@
         <div class="dashboard-chart-grid">
             <section class="panel-section chart-panel">
                 <div class="section-title-row">
+                    <h2 class="h5 mb-0"><i class="bi bi-truck"></i> Estado de entregas</h2>
+                    <span class="section-total-pill" th:text="${reporte.ordenesEntrega} + ' OC'">0 OC</span>
+                </div>
+                <div class="pie-chart-layout">
+                    <div class="pie-chart" th:style="'background-image: ' + ${reporte.estadosEntregasPieCss}">
+                        <div><strong th:text="${reporte.porcentajeMaterialRecibido} + '%'">0%</strong><span>recibido</span></div>
+                    </div>
+                    <div class="chart-legend">
+                        <div class="chart-legend-row" th:each="dato, iter : ${reporte.estadosEntregas}" th:classappend="${iter.index == 0 ? ' is-red' : (iter.index == 1 ? ' is-yellow' : ' is-green')}">
+                            <span class="legend-dot"></span>
+                            <span class="legend-name" th:text="${dato.nombre}">Estado</span>
+                            <strong th:text="${#numbers.formatDecimal(dato.valor, 1, 'POINT', 0, 'COMMA')}">0</strong>
+                            <small th:text="${dato.porcentaje} + '%'">0%</small>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section class="panel-section chart-panel">
+                <div class="section-title-row">
+                    <h2 class="h5 mb-0"><i class="bi bi-boxes"></i> Materiales pendientes</h2>
+                    <a class="btn btn-sm btn-outline-secondary" th:href="@{/materiales}"><i class="bi bi-truck"></i> Entregas</a>
+                </div>
+                <div class="bar-chart-list">
+                    <div class="bar-chart-row" th:each="dato : ${reporte.topMaterialesPendientes}">
+                        <div class="bar-chart-label"><span th:text="${dato.nombre}">Material</span><strong th:text="${#numbers.formatDecimal(dato.valor, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
+                        <div class="bar-track"><div class="bar-fill is-warning" th:style="'width: ' + ${dato.porcentaje} + '%'"></div></div>
+                    </div>
+                    <div class="empty-chart" th:if="${reporte.topMaterialesPendientes.isEmpty()}">No hay materiales pendientes de entrega.</div>
+                </div>
+            </section>
+        </div>
+
+        <div class="dashboard-chart-grid">
+            <section class="panel-section chart-panel">
+                <div class="section-title-row">
                     <h2 class="h5 mb-0"><i class="bi bi-bar-chart"></i> Top proveedores por monto</h2>
                     <a class="btn btn-sm btn-outline-secondary" th:href="@{/proveedores}"><i class="bi bi-person-lines-fill"></i> Proveedores</a>
                 </div>
@@ -131,6 +173,22 @@
             </section>
             <section class="panel-section chart-panel">
                 <div class="section-title-row">
+                    <h2 class="h5 mb-0"><i class="bi bi-box-seam"></i> Proveedores en materiales</h2>
+                    <a class="btn btn-sm btn-outline-secondary" th:href="@{/proveedores}"><i class="bi bi-person-lines-fill"></i> Proveedores</a>
+                </div>
+                <div class="bar-chart-list">
+                    <div class="bar-chart-row" th:each="dato : ${reporte.topProveedoresMateriales}">
+                        <div class="bar-chart-label"><span th:text="${dato.nombre}">Proveedor</span><strong th:text="${#numbers.formatDecimal(dato.valor, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
+                        <div class="bar-track"><div class="bar-fill is-secondary" th:style="'width: ' + ${dato.porcentaje} + '%'"></div></div>
+                    </div>
+                    <div class="empty-chart" th:if="${reporte.topProveedoresMateriales.isEmpty()}">Todavia no hay datos suficientes de materiales.</div>
+                </div>
+            </section>
+        </div>
+
+        <div class="dashboard-chart-grid">
+            <section class="panel-section chart-panel">
+                <div class="section-title-row">
                     <h2 class="h5 mb-0"><i class="bi bi-bar-chart-steps"></i> OCs de mayor importe</h2>
                     <a class="btn btn-sm btn-outline-secondary" th:href="@{/oc}"><i class="bi bi-receipt"></i> Ver OC</a>
                 </div>
@@ -140,6 +198,30 @@
                         <div class="bar-track"><div class="bar-fill is-secondary" th:style="'width: ' + ${dato.porcentaje} + '%'"></div></div>
                     </div>
                     <div class="empty-chart" th:if="${reporte.topOrdenes.isEmpty()}">Todavia no hay datos suficientes.</div>
+                </div>
+            </section>
+            <section class="panel-section chart-panel">
+                <div class="section-title-row">
+                    <h2 class="h5 mb-0"><i class="bi bi-clipboard-data"></i> Resumen de recepcion</h2>
+                    <span class="section-total-pill" th:text="${#numbers.formatDecimal(reporte.materialRecibidoEstimado, 1, 'POINT', 2, 'COMMA')}">0,00</span>
+                </div>
+                <div class="material-reception-summary">
+                    <div>
+                        <span>Recibido valorizado</span>
+                        <strong th:text="${#numbers.formatDecimal(reporte.materialRecibidoEstimado, 1, 'POINT', 2, 'COMMA')}">0,00</strong>
+                    </div>
+                    <div>
+                        <span>Pendiente valorizado</span>
+                        <strong th:text="${#numbers.formatDecimal(reporte.materialPendienteEntrega, 1, 'POINT', 2, 'COMMA')}">0,00</strong>
+                    </div>
+                    <div>
+                        <span>Completas</span>
+                        <strong th:text="${reporte.entregasCompletas}">0</strong>
+                    </div>
+                    <div>
+                        <span>Pendientes</span>
+                        <strong th:text="${reporte.entregasPendientes}">0</strong>
+                    </div>
                 </div>
             </section>
         </div>

@@ -221,6 +221,26 @@ public class MaterialService {
     }
 
     @Transactional(readOnly = true)
+    public Map<Long, List<ItemMaterialResumen>> calcularResumenOrdenes(List<OrdenCompra> ordenes) {
+        if (ordenes == null || ordenes.isEmpty()) {
+            return Map.of();
+        }
+        List<Long> ordenCompraIds = ordenes.stream()
+                .filter(OrdenCompra::usaSeguimientoEntregas)
+                .map(OrdenCompra::getId)
+                .toList();
+        Map<Long, Map<Long, BigDecimal>> recibidasPorOrden = cantidadesRecibidasPorOrdenes(ordenCompraIds);
+        Map<Long, List<ItemMaterialResumen>> resumenes = new HashMap<>();
+        for (OrdenCompra orden : ordenes) {
+            if (!orden.usaSeguimientoEntregas()) {
+                continue;
+            }
+            resumenes.put(orden.getId(), resumenItems(itemsRecepcionables(orden), recibidasPorOrden.getOrDefault(orden.getId(), Map.of())));
+        }
+        return resumenes;
+    }
+
+    @Transactional(readOnly = true)
     public List<ItemMaterialResumen> calcularResumenItemsParaEdicion(Long ordenCompraId, Long recepcionId) {
         OrdenCompra ordenCompra = ordenCompraService.obtener(ordenCompraId);
         if (!ordenCompra.usaSeguimientoEntregas()) {

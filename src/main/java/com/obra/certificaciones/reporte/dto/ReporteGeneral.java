@@ -15,11 +15,22 @@ public record ReporteGeneral(
         long itemsPendientes,
         long itemsEnEjecucion,
         long itemsTerminados,
+        long ordenesEntrega,
+        long entregasPendientes,
+        long entregasParciales,
+        long entregasCompletas,
+        BigDecimal materialRecibidoEstimado,
+        BigDecimal materialPendienteEntrega,
+        int porcentajeMaterialRecibido,
         List<GraficoDato> estadosItems,
         List<GraficoDato> importesPorTipo,
+        List<GraficoDato> estadosEntregas,
         List<GraficoDato> topProveedores,
         List<GraficoDato> topOrdenes,
+        List<GraficoDato> topMaterialesPendientes,
+        List<GraficoDato> topProveedoresMateriales,
         String estadosPieCss,
-        String importesPieCss
+        String importesPieCss,
+        String estadosEntregasPieCss
 ) {
 }

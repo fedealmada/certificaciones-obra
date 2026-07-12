@@ -7405,6 +7405,54 @@ html[data-theme="dark"] body {
     background: linear-gradient(90deg, #f5c94a 0%, #2f80ed 100%);
 }
 
+.bar-fill.is-warning {
+    background: linear-gradient(90deg, #f5a524 0%, #36b39d 100%);
+}
+
+.material-reception-summary {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.72rem;
+}
+
+.material-reception-summary div {
+    min-height: 5rem;
+    padding: 0.9rem;
+    border: 1px solid var(--app-line);
+    border-radius: 8px;
+    background: #ffffff;
+}
+
+.material-reception-summary span {
+    display: block;
+    color: var(--app-muted);
+    font-size: 0.72rem;
+    font-weight: 760;
+    text-transform: uppercase;
+}
+
+.material-reception-summary strong {
+    display: block;
+    margin-top: 0.45rem;
+    color: var(--app-ink);
+    font-size: 1.08rem;
+    font-weight: 780;
+    overflow-wrap: anywhere;
+}
+
+:root[data-theme="dark"] .material-reception-summary div {
+    background: #343847;
+    border-color: rgba(237, 241, 247, 0.13);
+}
+
+:root[data-theme="dark"] .material-reception-summary strong {
+    color: #f5f7fb;
+}
+
+:root[data-theme="dark"] .material-reception-summary span {
+    color: #c4c9d4;
+}
+
 .interactive-table thead th:last-child,
 .oc-list-table th:last-child,
 .items-master-table th:last-child {

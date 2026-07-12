@@ -4,6 +4,9 @@ import com.obra.certificaciones.certificacion.dto.EstadoItemCertificacion;
 import com.obra.certificaciones.certificacion.dto.ItemOrdenCompraResumen;
 import com.obra.certificaciones.certificacion.service.CertificacionCalculoService;
 import com.obra.certificaciones.certificacion.repository.CertificacionRepository;
+import com.obra.certificaciones.material.dto.EstadoRecepcionMaterial;
+import com.obra.certificaciones.material.dto.ItemMaterialResumen;
+import com.obra.certificaciones.material.service.MaterialService;
 import com.obra.certificaciones.oc.entity.CategoriaItem;
 import com.obra.certificaciones.oc.entity.ItemOrdenCompra;
 import com.obra.certificaciones.oc.entity.OrdenCompra;
@@ -39,6 +42,7 @@ public class ReporteService {
     private final OrdenCompraRepository ordenCompraRepository;
     private final CertificacionRepository certificacionRepository;
     private final CertificacionCalculoService calculoService;
+    private final MaterialService materialService;
 
     @Transactional(readOnly = true)
     public ReporteGeneral generarGeneral() {
@@ -49,13 +53,34 @@ public class ReporteService {
         long pendientes = 0;
         long enEjecucion = 0;
         long terminados = 0;
+        long entregasPendientes = 0;
+        long entregasParciales = 0;
+        long entregasCompletas = 0;
+        BigDecimal materialRecibidoEstimado = BigDecimal.ZERO;
+        BigDecimal materialPendienteEntrega = BigDecimal.ZERO;
         Map<String, BigDecimal> totalPorProveedor = new LinkedHashMap<>();
         Map<String, BigDecimal> totalPorOrden = new LinkedHashMap<>();
+        Map<String, BigDecimal> totalMaterialPorProveedor = new LinkedHashMap<>();
+        Map<String, BigDecimal> pendientePorMaterial = new LinkedHashMap<>();
 
         List<OrdenCompra> ordenes = ordenCompraRepository.findAll();
+        List<OrdenCompra> ordenesEntrega = ordenes.stream()
+                .filter(OrdenCompra::usaSeguimientoEntregas)
+                .toList();
+        Map<Long, EstadoRecepcionMaterial> estadosEntregaPorOrden = materialService.calcularEstadosOrdenes(ordenesEntrega);
+        Map<Long, List<ItemMaterialResumen>> resumenMaterialPorOrden = materialService.calcularResumenOrdenes(ordenesEntrega);
         Map<Long, Map<Long, BigDecimal>> acumuladosPorOrden = calculoService.porcentajesAcumuladosPorOrdenes(ordenes.stream()
                 .map(OrdenCompra::getId)
                 .toList());
+        for (EstadoRecepcionMaterial estado : estadosEntregaPorOrden.values()) {
+            if (estado == EstadoRecepcionMaterial.PENDIENTE) {
+                entregasPendientes++;
+            } else if (estado == EstadoRecepcionMaterial.PARCIAL) {
+                entregasParciales++;
+            } else if (estado == EstadoRecepcionMaterial.COMPLETO) {
+                entregasCompletas++;
+            }
+        }
         for (OrdenCompra orden : ordenes) {
             BigDecimal totalOrden = orden.getTotal();
             String proveedor = orden.getProveedorEntidad() == null ? "Sin proveedor" : orden.getProveedorEntidad().getNombre();
@@ -70,6 +95,7 @@ public class ReporteService {
                 CategoriaItem categoria = resumen.itemOrdenCompra().getCategoria();
                 if (categoria == CategoriaItem.MATERIAL) {
                     totalMateriales = totalMateriales.add(importe);
+                    totalMaterialPorProveedor.merge(proveedor, importe, BigDecimal::add);
                     continue;
                 }
                 if (categoria != CategoriaItem.MANO_OBRA) {
@@ -86,10 +112,22 @@ public class ReporteService {
                     terminados++;
                 }
             }
+            for (ItemMaterialResumen resumenMaterial : resumenMaterialPorOrden.getOrDefault(orden.getId(), List.of())) {
+                BigDecimal importe = valorSeguro(resumenMaterial.itemOrdenCompra().getImporte());
+                BigDecimal recibido = importe.multiply(resumenMaterial.porcentajeRecibido())
+                        .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+                BigDecimal pendiente = importe.subtract(recibido).max(BigDecimal.ZERO);
+                materialRecibidoEstimado = materialRecibidoEstimado.add(recibido);
+                materialPendienteEntrega = materialPendienteEntrega.add(pendiente);
+                if (pendiente.compareTo(BigDecimal.ZERO) > 0) {
+                    pendientePorMaterial.merge(nombreMaterial(resumenMaterial.itemOrdenCompra()), pendiente, BigDecimal::add);
+                }
+            }
         }
 
         BigDecimal saldoPendiente = totalManoObra.subtract(totalCertificado).max(BigDecimal.ZERO);
         BigDecimal totalGeneral = totalManoObra.add(totalMateriales).add(totalOtros);
+        BigDecimal totalMaterialEntrega = materialRecibidoEstimado.add(materialPendienteEntrega);
         List<GraficoDato> estadosItems = List.of(
                 new GraficoDato("Pendientes", BigDecimal.valueOf(pendientes), porcentaje(BigDecimal.valueOf(pendientes), BigDecimal.valueOf(pendientes + enEjecucion + terminados))),
                 new GraficoDato("En ejecucion", BigDecimal.valueOf(enEjecucion), porcentaje(BigDecimal.valueOf(enEjecucion), BigDecimal.valueOf(pendientes + enEjecucion + terminados))),
@@ -100,8 +138,15 @@ public class ReporteService {
                 new GraficoDato("Materiales", totalMateriales, porcentaje(totalMateriales, totalGeneral)),
                 new GraficoDato("Otros", totalOtros, porcentaje(totalOtros, totalGeneral))
         );
+        List<GraficoDato> estadosEntregas = List.of(
+                new GraficoDato("Pendientes", BigDecimal.valueOf(entregasPendientes), porcentaje(BigDecimal.valueOf(entregasPendientes), BigDecimal.valueOf(ordenesEntrega.size()))),
+                new GraficoDato("Parciales", BigDecimal.valueOf(entregasParciales), porcentaje(BigDecimal.valueOf(entregasParciales), BigDecimal.valueOf(ordenesEntrega.size()))),
+                new GraficoDato("Completas", BigDecimal.valueOf(entregasCompletas), porcentaje(BigDecimal.valueOf(entregasCompletas), BigDecimal.valueOf(ordenesEntrega.size())))
+        );
         List<GraficoDato> topProveedores = topBarras(totalPorProveedor, 5);
         List<GraficoDato> topOrdenes = topBarras(totalPorOrden, 5);
+        List<GraficoDato> topMaterialesPendientes = topBarras(pendientePorMaterial, 6);
+        List<GraficoDato> topProveedoresMateriales = topBarras(totalMaterialPorProveedor, 6);
 
         return new ReporteGeneral(
                 ordenes.size(),
@@ -115,12 +160,23 @@ public class ReporteService {
                 pendientes,
                 enEjecucion,
                 terminados,
+                ordenesEntrega.size(),
+                entregasPendientes,
+                entregasParciales,
+                entregasCompletas,
+                materialRecibidoEstimado,
+                materialPendienteEntrega,
+                porcentaje(materialRecibidoEstimado, totalMaterialEntrega),
                 estadosItems,
                 importesPorTipo,
+                estadosEntregas,
                 topProveedores,
                 topOrdenes,
+                topMaterialesPendientes,
+                topProveedoresMateriales,
                 pieCss(estadosItems, List.of("#d34b42", "#ffd21a", "#5aa142")),
-                pieCss(importesPorTipo, List.of("#2f80ed", "#ffd21a", "#5b6470"))
+                pieCss(importesPorTipo, List.of("#2f80ed", "#ffd21a", "#5b6470")),
+                pieCss(estadosEntregas, List.of("#d34b42", "#ffd21a", "#5aa142"))
         );
     }
 
@@ -275,6 +331,20 @@ public class ReporteService {
             return item.getCategoriaEntidad().getNombre();
         }
         return item.getCategoria() == null ? "Sin categoria" : item.getCategoria().getDescripcion();
+    }
+
+    private BigDecimal valorSeguro(BigDecimal valor) {
+        return valor == null ? BigDecimal.ZERO : valor;
+    }
+
+    private String nombreMaterial(ItemOrdenCompra item) {
+        if (item.getMaterialCatalogo() != null && item.getMaterialCatalogo().getNombre() != null) {
+            return item.getMaterialCatalogo().getNombre();
+        }
+        if (item.getDetalle() != null && !item.getDetalle().isBlank()) {
+            return item.getDetalle();
+        }
+        return item.getItem() == null ? "Material sin detalle" : item.getItem();
     }
 
     private String nombrePeriodo(YearMonth periodo) {
