@@ -210,19 +210,36 @@
         </div>
     </section>
 
-    <section class="panel-section mb-4" th:if="${ordenMaterial}">
+    <section class="panel-section mb-4" id="entregas" th:if="${ordenMaterial}">
         <div class="section-title-row">
             <h2 class="h5 mb-0"><i class="bi bi-truck"></i> Entregas mediante viajes</h2>
-            <span class="delivery-status-pill"
-                  th:classappend="${estadoEntregaOrden.name() == 'COMPLETO' ? ' is-complete' : (estadoEntregaOrden.name() == 'PARCIAL' ? ' is-partial' : ' is-pending')}"
-                  th:text="${estadoEntregaOrden.name() == 'COMPLETO' ? 'ENTREGA COMPLETA' : (estadoEntregaOrden.name() == 'PARCIAL' ? 'ENTREGA PARCIAL' : 'ENTREGA PENDIENTE')}">ENTREGA PENDIENTE</span>
+            <span class="section-total-pill" th:text="${recepciones.size() == 1 ? '1 viaje' : recepciones.size() + ' viajes'}">0 viajes</span>
         </div>
-        <div class="p-3 d-flex flex-wrap gap-2 align-items-center justify-content-between">
-            <span class="text-muted">Esta OC se controla por recepciones, viajes o unidades recibidas, no por certificados.</span>
-            <div class="d-flex flex-wrap gap-2">
-                <a class="btn btn-primary" th:href="@{/materiales/oc/{id}/recepciones/nueva(id=${orden.id})}"><i class="bi bi-plus-lg"></i> Nueva entrega</a>
-                <a class="btn btn-outline-primary" th:href="@{/materiales/oc/{id}(id=${orden.id})}"><i class="bi bi-box-seam"></i> Ver entregas</a>
-            </div>
+        <div class="p-3 d-flex flex-wrap gap-2 align-items-center justify-content-between border-bottom">
+            <span class="text-muted">Historial de recepciones, viajes o unidades recibidas para esta orden.</span>
+            <a class="btn btn-primary" th:href="@{/materiales/oc/{id}/recepciones/nueva(id=${orden.id})}"><i class="bi bi-plus-lg"></i> Nueva entrega</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle document-table">
+                <thead><tr><th>Viaje</th><th>Fecha</th><th>Remito</th><th>Observacion</th><th class="text-end">Items</th><th class="text-end">Acciones</th></tr></thead>
+                <tbody>
+                <tr class="delivery-click-row" th:each="recepcion, estado : ${recepciones}" th:data-href="@{/materiales/oc/{ocId}/recepciones/{id}(ocId=${orden.id}, id=${recepcion.id})}" tabindex="0" role="link">
+                    <td><a class="cert-row-link" th:href="@{/materiales/oc/{ocId}/recepciones/{id}(ocId=${orden.id}, id=${recepcion.id})}" th:text="${estado.count}">1</a></td>
+                    <td th:text="${#temporals.format(recepcion.fecha, 'dd/MM/yyyy')}"></td>
+                    <td>
+                        <span th:if="${#strings.isEmpty(recepcion.remito)}" class="text-muted">Sin remito</span>
+                        <span th:unless="${#strings.isEmpty(recepcion.remito)}" th:text="${recepcion.remito}">R-001</span>
+                    </td>
+                    <td th:text="${#strings.isEmpty(recepcion.observacion) ? '-' : recepcion.observacion}"></td>
+                    <td class="text-end" th:text="${recepcion.items.size()}">0</td>
+                    <td class="text-end action-cell">
+                        <a class="btn btn-sm btn-outline-primary table-icon-action" th:href="@{/materiales/oc/{ocId}/recepciones/{id}(ocId=${orden.id}, id=${recepcion.id})}" title="Ver entrega" aria-label="Ver entrega"><i class="bi bi-eye"></i></a>
+                        <form method="post" th:action="@{/materiales/oc/{ocId}/recepciones/{id}/eliminar(ocId=${orden.id}, id=${recepcion.id})}" onsubmit="return confirm('Eliminar esta entrega?');"><button class="btn btn-sm btn-outline-danger table-icon-action" type="submit" title="Eliminar entrega" aria-label="Eliminar entrega"><i class="bi bi-trash"></i></button></form>
+                    </td>
+                </tr>
+                <tr th:if="${recepciones.isEmpty()}"><td colspan="6" class="text-center text-muted py-4">Todavia no hay entregas registradas.</td></tr>
+                </tbody>
+            </table>
         </div>
     </section>
 
@@ -313,21 +330,21 @@ document.querySelectorAll('.oc-total-progress-fill, .oc-progress .progress-bar')
     }, delay);
 });
 
-document.querySelectorAll('.cert-click-row').forEach(row => {
-    const abrirCertificado = () => {
+document.querySelectorAll('.cert-click-row, .delivery-click-row').forEach(row => {
+    const abrirDetalle = () => {
         if (row.dataset.href) {
             window.location.href = row.dataset.href;
         }
     };
     row.addEventListener('click', event => {
         if (!event.target.closest('a, button, form')) {
-            abrirCertificado();
+            abrirDetalle();
         }
     });
     row.addEventListener('keydown', event => {
         if ((event.key === 'Enter' || event.key === ' ') && !event.target.closest('a, button, form')) {
             event.preventDefault();
-            abrirCertificado();
+            abrirDetalle();
         }
     });
 });

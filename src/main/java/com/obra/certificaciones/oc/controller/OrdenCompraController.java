@@ -175,6 +175,9 @@ public class OrdenCompraController {
         EstadoRecepcionMaterial estadoEntregaOrden = ordenMaterial
                 ? estadoEntregaOrden(materialItemsResumen)
                 : null;
+        var recepciones = ordenMaterial
+                ? materialService.listarRecepciones(id)
+                : List.of();
         model.addAttribute("totalCertificado", totalCertificado);
         model.addAttribute("saldoOc", saldoOc);
         model.addAttribute("porcentajeAvanceOc", porcentajeAvanceOc);
@@ -189,6 +192,7 @@ public class OrdenCompraController {
         model.addAttribute("totalMaterialPendienteCantidad", totalMaterialPendienteCantidad);
         model.addAttribute("porcentajeRecepcionOc", porcentajeRecepcionOc);
         model.addAttribute("porcentajeRecepcionOcBarra", porcentajeRecepcionOc.min(BigDecimal.valueOf(100)));
+        model.addAttribute("recepciones", recepciones);
         model.addAttribute("alertasOrden", alertaSistemaService.alertasOrden(id));
         return "oc/detalle";
     }
