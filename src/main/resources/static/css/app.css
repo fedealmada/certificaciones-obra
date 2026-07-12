@@ -8319,6 +8319,7 @@ html[data-theme="dark"] body {
 }
 
 .work-action-success .work-action-card {
+    position: relative;
     width: min(22rem, 100%);
     min-height: auto;
     gap: 0.52rem;
@@ -8326,6 +8327,32 @@ html[data-theme="dark"] body {
     background: #31ad4b;
     color: #ffffff;
     box-shadow: 0 24px 60px rgba(24, 32, 42, 0.28);
+}
+
+.work-action-close {
+    position: absolute;
+    top: 0.7rem;
+    right: 0.7rem;
+    width: 1.85rem;
+    height: 1.85rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255, 255, 255, 0.42);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.14);
+    color: #ffffff;
+    font-size: 0.8rem;
+    line-height: 1;
+    transition: background 140ms ease, transform 140ms ease, border-color 140ms ease;
+}
+
+.work-action-close:hover,
+.work-action-close:focus-visible {
+    border-color: rgba(255, 255, 255, 0.72);
+    background: rgba(255, 255, 255, 0.24);
+    color: #ffffff;
+    transform: scale(1.04);
 }
 
 .work-action-success .work-action-illustration {

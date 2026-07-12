@@ -20,6 +20,9 @@
      th:if="${accionCompletada}"
      aria-live="polite">
     <div class="work-action-card">
+        <button class="work-action-close" type="button" aria-label="Cerrar aviso" data-close-work-action>
+            <i class="bi bi-x-lg"></i>
+        </button>
         <div class="work-action-illustration work-action-illustration-green">
             <i class="bi bi-check-lg"></i>
         </div>
@@ -257,8 +260,18 @@
 <script>
 const successOverlay = document.querySelector('#oc-success-overlay');
 if (successOverlay) {
-    window.setTimeout(() => successOverlay.classList.add('is-leaving'), 1900);
-    window.setTimeout(() => successOverlay.remove(), 2500);
+    let successOverlayTimer;
+    let successOverlayRemoveTimer;
+    const closeSuccessOverlay = () => {
+        window.clearTimeout(successOverlayTimer);
+        window.clearTimeout(successOverlayRemoveTimer);
+        successOverlay.classList.add('is-leaving');
+        successOverlayRemoveTimer = window.setTimeout(() => successOverlay.remove(), 420);
+    };
+
+    successOverlayTimer = window.setTimeout(closeSuccessOverlay, 1450);
+    successOverlay.querySelector('[data-close-work-action]')?.addEventListener('click', closeSuccessOverlay);
+    successOverlay.querySelector('.work-action-link')?.addEventListener('click', closeSuccessOverlay);
 }
 
 document.querySelectorAll('.oc-total-progress-fill, .oc-progress .progress-bar').forEach((progressFill, index) => {
