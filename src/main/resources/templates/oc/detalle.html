@@ -263,6 +263,9 @@ if (successOverlay) {
     let successOverlayTimer;
     let successOverlayRemoveTimer;
     const closeSuccessOverlay = () => {
+        if (successOverlay.classList.contains('is-leaving')) {
+            return;
+        }
         window.clearTimeout(successOverlayTimer);
         window.clearTimeout(successOverlayRemoveTimer);
         successOverlay.classList.add('is-leaving');
