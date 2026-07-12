@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
+import java.util.stream.IntStream;
 
 @Controller
 @RequestMapping("/asistencia")
@@ -30,7 +31,14 @@ public class AsistenciaController {
         LocalDate fechaSeleccionada = fecha == null ? LocalDate.now() : fecha;
         var asistencias = asistenciaService.listarPorFecha(fechaSeleccionada);
         model.addAttribute("fecha", fechaSeleccionada);
+        model.addAttribute("fechaAnterior", fechaSeleccionada.minusDays(1));
+        model.addAttribute("fechaSiguiente", fechaSeleccionada.plusDays(1));
+        model.addAttribute("diasCalendario", IntStream.rangeClosed(-3, 3)
+                .mapToObj(dia -> fechaSeleccionada.plusDays(dia))
+                .toList());
         model.addAttribute("asistencias", asistencias);
+        model.addAttribute("personas", depositoService.listarTrabajadoresActivos());
+        model.addAttribute("asistenciaPorTrabajador", asistenciaService.mapaPorTrabajador(fechaSeleccionada));
         model.addAttribute("resumenEmpresas", asistenciaService.resumenPorEmpresa(asistencias));
         model.addAttribute("totalHoras", asistenciaService.totalHoras(asistencias));
         model.addAttribute("recientes", asistenciaService.recientes());
@@ -65,6 +73,22 @@ public class AsistenciaController {
             cargarFormulario(model, form, form.getId() != null);
             return "asistencia/form";
         }
+    }
+
+    @PostMapping("/entrada")
+    public String marcarEntrada(@RequestParam Long trabajadorId,
+                                @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha,
+                                RedirectAttributes redirectAttributes) {
+        asistenciaService.marcarEntrada(trabajadorId, fecha);
+        redirectAttributes.addFlashAttribute("success", "Entrada registrada.");
+        return "redirect:/asistencia?fecha=" + fecha;
+    }
+
+    @PostMapping("/{id}/salida")
+    public String marcarSalida(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        var asistencia = asistenciaService.marcarSalida(id);
+        redirectAttributes.addFlashAttribute("success", "Salida registrada.");
+        return "redirect:/asistencia?fecha=" + asistencia.getFecha();
     }
 
     @PostMapping("/{id}/eliminar")

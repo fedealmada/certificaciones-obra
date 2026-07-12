@@ -26,24 +26,40 @@
         <div>
             <div class="document-kicker">Personal de obra</div>
             <h1>Asistencia diaria</h1>
-            <div class="text-muted">Control de ingresos, empresas presentes y horas trabajadas.</div>
+            <div class="text-muted">Marca entradas y salidas con un click. La tabla queda como respaldo del dia.</div>
         </div>
         <div class="document-actions">
             <a class="btn btn-outline-secondary" th:href="@{/deposito/personas}"><i class="bi bi-people"></i> Personas</a>
-            <a class="btn btn-primary" th:href="@{/asistencia/nueva(fecha=${fecha})}"><i class="bi bi-plus-lg"></i> Registrar asistencia</a>
+            <a class="btn btn-primary" th:href="@{/asistencia/nueva(fecha=${fecha})}"><i class="bi bi-plus-lg"></i> Carga manual</a>
         </div>
     </div>
 
     <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
 
-    <form class="panel-section asistencia-filter mb-3" method="get" th:action="@{/asistencia}">
-        <div>
-            <label class="form-label">Fecha</label>
-            <input class="form-control" type="date" name="fecha" th:value="${fecha}">
+    <section class="asistencia-calendar panel-section mb-3">
+        <a class="asistencia-day-button" th:href="@{/asistencia(fecha=${fechaAnterior})}">
+            <i class="bi bi-chevron-left"></i>
+            <span>Anterior</span>
+        </a>
+        <form class="asistencia-date-picker" method="get" th:action="@{/asistencia}">
+            <label>Dia de trabajo</label>
+            <input type="date" name="fecha" th:value="${fecha}" onchange="this.form.submit()">
+            <strong th:text="${#temporals.format(fecha, 'dd/MM/yyyy')}">01/01/2026</strong>
+        </form>
+        <a class="asistencia-day-button" th:href="@{/asistencia(fecha=${fechaSiguiente})}">
+            <span>Siguiente</span>
+            <i class="bi bi-chevron-right"></i>
+        </a>
+        <a class="asistencia-today-button" th:href="@{/asistencia}"><i class="bi bi-calendar-day"></i> Hoy</a>
+        <div class="asistencia-week-strip">
+            <a th:each="dia : ${diasCalendario}"
+               th:href="@{/asistencia(fecha=${dia})}"
+               th:classappend="${dia.equals(fecha) ? ' is-active' : ''}">
+                <span th:text="${#temporals.format(dia, 'EEE')}">lun</span>
+                <strong th:text="${#temporals.format(dia, 'dd')}">01</strong>
+            </a>
         </div>
-        <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i> Ver dia</button>
-        <a class="btn btn-outline-secondary" th:href="@{/asistencia}"><i class="bi bi-calendar-day"></i> Hoy</a>
-    </form>
+    </section>
 
     <div class="dashboard-metric-grid mb-3">
         <div class="metric-card"><div class="metric-head"><div class="metric-label">Presentes</div><i class="bi bi-person-check"></i></div><div class="metric-value" th:text="${asistencias.size()}">0</div><small>Personas registradas</small></div>
@@ -51,6 +67,49 @@
         <div class="metric-card"><div class="metric-head"><div class="metric-label">Horas</div><i class="bi bi-clock-history"></i></div><div class="metric-value metric-value-sm" th:text="${#numbers.formatDecimal(totalHoras, 1, 'POINT', 2, 'COMMA')}">0,00</div><small>Total del dia</small></div>
         <div class="metric-card"><div class="metric-head"><div class="metric-label">Fecha</div><i class="bi bi-calendar3"></i></div><div class="metric-value metric-value-sm" th:text="${#temporals.format(fecha, 'dd/MM/yyyy')}">01/01/2026</div><small>Dia consultado</small></div>
     </div>
+
+    <section class="panel-section mb-3">
+        <div class="section-title-row">
+            <h2 class="h5 mb-0"><i class="bi bi-person-check"></i> Entrada y salida rapida</h2>
+            <span class="section-total-pill" th:text="${personas.size()} + ' personas'">0 personas</span>
+        </div>
+        <div class="asistencia-quick-grid">
+            <article class="asistencia-person-card"
+                     th:each="persona : ${personas}"
+                     th:with="registro=${asistenciaPorTrabajador.get(persona.id)}"
+                     th:classappend="${registro == null ? ' is-pending' : (registro.horaSalida == null ? ' is-inside' : ' is-done')}">
+                <div class="asistencia-person-main">
+                    <span class="asistencia-avatar"><i class="bi bi-person"></i></span>
+                    <div>
+                        <strong th:text="${persona.nombre}">Persona</strong>
+                        <small th:text="${(persona.empresa ?: 'Sin empresa') + ' / ' + (persona.sector ?: 'Sin sector')}">Empresa</small>
+                    </div>
+                </div>
+                <div class="asistencia-person-status">
+                    <span th:if="${registro == null}" class="delivery-status-pill is-pending">SIN ENTRADA</span>
+                    <span th:if="${registro != null && registro.horaSalida == null}" class="delivery-status-pill is-partial">EN OBRA</span>
+                    <span th:if="${registro != null && registro.horaSalida != null}" class="delivery-status-pill is-complete">COMPLETO</span>
+                    <small th:if="${registro != null}" th:text="${(registro.horaIngreso == null ? '--:--' : #temporals.format(registro.horaIngreso, 'HH:mm')) + ' / ' + (registro.horaSalida == null ? '--:--' : #temporals.format(registro.horaSalida, 'HH:mm'))}">--:-- / --:--</small>
+                </div>
+                <div class="asistencia-person-actions">
+                    <form th:if="${registro == null}" method="post" th:action="@{/asistencia/entrada}">
+                        <input type="hidden" name="fecha" th:value="${fecha}">
+                        <input type="hidden" name="trabajadorId" th:value="${persona.id}">
+                        <button class="btn btn-primary" type="submit"><i class="bi bi-box-arrow-in-right"></i> Entrada</button>
+                    </form>
+                    <form th:if="${registro != null && registro.horaSalida == null}" method="post" th:action="@{/asistencia/{id}/salida(id=${registro.id})}">
+                        <button class="btn btn-success" type="submit"><i class="bi bi-box-arrow-right"></i> Salida</button>
+                    </form>
+                    <a th:if="${registro != null}" class="btn btn-outline-secondary" th:href="@{/asistencia/{id}/editar(id=${registro.id})}"><i class="bi bi-pencil-square"></i></a>
+                </div>
+            </article>
+            <div class="asistencia-empty-people" th:if="${personas.isEmpty()}">
+                <i class="bi bi-person-plus"></i>
+                <span>No hay personas activas cargadas.</span>
+                <a class="btn btn-primary btn-sm" th:href="@{/deposito/personas}">Cargar personas</a>
+            </div>
+        </div>
+    </section>
 
     <div class="asistencia-grid mb-3">
         <section class="panel-section">

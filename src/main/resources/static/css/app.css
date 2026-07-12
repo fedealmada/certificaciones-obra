@@ -9043,6 +9043,110 @@ html[data-theme="dark"] body {
 }
 
 /* Attendance module */
+.asistencia-calendar {
+    display: grid;
+    grid-template-columns: auto minmax(18rem, 1fr) auto auto;
+    align-items: center;
+    gap: 0.65rem;
+}
+
+.asistencia-day-button,
+.asistencia-today-button,
+.asistencia-date-picker {
+    display: inline-flex;
+    align-items: center;
+    min-height: 3rem;
+    border: 1px solid var(--ui-line);
+    border-radius: 9px;
+    background: #ffffff;
+}
+
+.asistencia-day-button,
+.asistencia-today-button {
+    justify-content: center;
+    gap: 0.45rem;
+    padding: 0.55rem 0.75rem;
+    color: var(--ui-ink);
+    font-size: 0.76rem;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.asistencia-day-button:hover,
+.asistencia-day-button:focus,
+.asistencia-today-button:hover,
+.asistencia-today-button:focus {
+    border-color: #c8d5ff;
+    background: #f8fbff;
+    color: var(--ui-blue);
+}
+
+.asistencia-date-picker {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    gap: 0.7rem;
+    padding: 0.55rem 0.75rem;
+}
+
+.asistencia-date-picker label {
+    margin: 0;
+    color: var(--ui-muted);
+    font-size: 0.68rem;
+    font-weight: 740;
+    text-transform: uppercase;
+}
+
+.asistencia-date-picker input {
+    min-height: 2rem;
+    border: 1px solid var(--ui-line);
+    border-radius: 7px;
+    color: var(--ui-ink);
+    font-size: 0.76rem;
+}
+
+.asistencia-date-picker strong {
+    color: var(--ui-blue);
+    font-size: 0.82rem;
+}
+
+.asistencia-week-strip {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 0.42rem;
+}
+
+.asistencia-week-strip a {
+    display: grid;
+    place-items: center;
+    min-height: 3.15rem;
+    padding: 0.45rem;
+    border: 1px solid var(--ui-line);
+    border-radius: 9px;
+    background: #ffffff;
+    color: var(--ui-ink);
+    text-decoration: none;
+}
+
+.asistencia-week-strip a:hover,
+.asistencia-week-strip a:focus,
+.asistencia-week-strip a.is-active {
+    border-color: #c8d5ff;
+    background: var(--ui-blue-soft);
+    color: var(--ui-blue);
+}
+
+.asistencia-week-strip span {
+    font-size: 0.62rem;
+    font-weight: 760;
+    text-transform: uppercase;
+}
+
+.asistencia-week-strip strong {
+    font-size: 0.9rem;
+    font-weight: 800;
+}
+
 .asistencia-filter {
     display: flex;
     align-items: end;
@@ -9058,6 +9162,110 @@ html[data-theme="dark"] body {
     grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.42fr);
     gap: 0.9rem;
     align-items: start;
+}
+
+.asistencia-quick-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(19rem, 1fr));
+    gap: 0.7rem;
+}
+
+.asistencia-person-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.75rem;
+    align-items: center;
+    min-height: 8.2rem;
+    padding: 0.85rem;
+    border: 1px solid var(--ui-line);
+    border-radius: 10px;
+    background: #ffffff;
+}
+
+.asistencia-person-card.is-pending {
+    border-left: 4px solid #b91c1c;
+}
+
+.asistencia-person-card.is-inside {
+    border-left: 4px solid #d97706;
+    background: linear-gradient(135deg, rgba(255, 247, 237, 0.92), #ffffff 54%);
+}
+
+.asistencia-person-card.is-done {
+    border-left: 4px solid #1b8a5a;
+}
+
+.asistencia-person-main {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 0.7rem;
+    min-width: 0;
+}
+
+.asistencia-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.35rem;
+    height: 2.35rem;
+    border: 1px solid #c8d5ff;
+    border-radius: 8px;
+    background: var(--ui-blue-soft);
+    color: var(--ui-blue);
+}
+
+.asistencia-person-main strong,
+.asistencia-person-main small,
+.asistencia-person-status small {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.asistencia-person-main strong {
+    color: var(--ui-ink);
+    font-size: 0.86rem;
+    font-weight: 760;
+}
+
+.asistencia-person-main small,
+.asistencia-person-status small {
+    color: var(--ui-muted);
+    font-size: 0.7rem;
+}
+
+.asistencia-person-status {
+    display: grid;
+    justify-items: end;
+    gap: 0.25rem;
+}
+
+.asistencia-person-actions {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.45rem;
+}
+
+.asistencia-person-actions form {
+    margin: 0;
+}
+
+.asistencia-person-actions .btn {
+    min-width: 7.6rem;
+}
+
+.asistencia-empty-people {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    min-height: 6rem;
+    border: 1px dashed var(--ui-line);
+    border-radius: 10px;
+    color: var(--ui-muted);
 }
 
 .asistencia-recent-list {
@@ -9117,6 +9325,57 @@ html[data-theme="dark"] body {
     color: #eef2ff;
 }
 
+:root[data-theme="dark"] .asistencia-day-button,
+:root[data-theme="dark"] .asistencia-today-button,
+:root[data-theme="dark"] .asistencia-date-picker,
+:root[data-theme="dark"] .asistencia-week-strip a,
+:root[data-theme="dark"] .asistencia-person-card {
+    border-color: rgba(148, 163, 184, 0.18);
+    background: #202337;
+    color: #eef2ff;
+}
+
+:root[data-theme="dark"] .asistencia-person-card.is-inside {
+    background: linear-gradient(135deg, rgba(68, 71, 90, 0.9), #202337 58%);
+}
+
+:root[data-theme="dark"] .asistencia-date-picker input {
+    border-color: rgba(148, 163, 184, 0.24);
+    background: #282d45;
+    color: #eef2ff;
+}
+
+:root[data-theme="dark"] .asistencia-date-picker label,
+:root[data-theme="dark"] .asistencia-person-main small,
+:root[data-theme="dark"] .asistencia-person-status small,
+:root[data-theme="dark"] .asistencia-empty-people {
+    color: #c3cbe4;
+}
+
+:root[data-theme="dark"] .asistencia-date-picker strong,
+:root[data-theme="dark"] .asistencia-avatar,
+:root[data-theme="dark"] .asistencia-week-strip a:hover,
+:root[data-theme="dark"] .asistencia-week-strip a:focus,
+:root[data-theme="dark"] .asistencia-week-strip a.is-active {
+    color: #8be9fd;
+}
+
+:root[data-theme="dark"] .asistencia-week-strip a:hover,
+:root[data-theme="dark"] .asistencia-week-strip a:focus,
+:root[data-theme="dark"] .asistencia-week-strip a.is-active {
+    border-color: rgba(139, 233, 253, 0.34);
+    background: rgba(139, 233, 253, 0.1);
+}
+
+:root[data-theme="dark"] .asistencia-avatar {
+    border-color: rgba(139, 233, 253, 0.28);
+    background: rgba(139, 233, 253, 0.1);
+}
+
+:root[data-theme="dark"] .asistencia-person-main strong {
+    color: #eef2ff;
+}
+
 :root[data-theme="dark"] .asistencia-recent-list a:hover,
 :root[data-theme="dark"] .asistencia-recent-list a:focus {
     border-color: rgba(139, 233, 253, 0.34);
@@ -9134,12 +9393,39 @@ html[data-theme="dark"] body {
 
 @media (max-width: 1000px) {
     .asistencia-filter,
-    .asistencia-grid {
+    .asistencia-grid,
+    .asistencia-calendar {
         display: grid;
         grid-template-columns: 1fr;
     }
 
     .asistencia-filter > div {
         min-width: 0;
+    }
+
+    .asistencia-date-picker {
+        grid-template-columns: 1fr;
+    }
+
+    .asistencia-week-strip {
+        grid-template-columns: repeat(7, minmax(2.6rem, 1fr));
+        overflow-x: auto;
+    }
+
+    .asistencia-person-card {
+        grid-template-columns: 1fr;
+    }
+
+    .asistencia-person-status {
+        justify-items: start;
+    }
+
+    .asistencia-person-actions {
+        justify-content: stretch;
+    }
+
+    .asistencia-person-actions .btn,
+    .asistencia-person-actions form {
+        width: 100%;
     }
 }

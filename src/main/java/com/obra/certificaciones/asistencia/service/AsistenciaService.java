@@ -16,9 +16,11 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +39,17 @@ public class AsistenciaService {
     }
 
     @Transactional(readOnly = true)
+    public Map<Long, AsistenciaPersonal> mapaPorTrabajador(LocalDate fecha) {
+        Map<Long, AsistenciaPersonal> mapa = new LinkedHashMap<>();
+        for (AsistenciaPersonal asistencia : listarPorFecha(fecha)) {
+            if (asistencia.getTrabajadorId() != null) {
+                mapa.put(asistencia.getTrabajadorId(), asistencia);
+            }
+        }
+        return mapa;
+    }
+
+    @Transactional(readOnly = true)
     public AsistenciaPersonal obtener(Long id) {
         return asistenciaRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("No existe la asistencia " + id));
@@ -47,6 +60,40 @@ public class AsistenciaService {
         validar(form);
         AsistenciaPersonal asistencia = form.getId() == null ? new AsistenciaPersonal() : obtener(form.getId());
         aplicar(asistencia, form);
+        return asistenciaRepository.save(asistencia);
+    }
+
+    @Transactional
+    public AsistenciaPersonal marcarEntrada(Long trabajadorId, LocalDate fecha) {
+        DepositoTrabajador trabajador = trabajadorRepository.findById(trabajadorId)
+                .orElseThrow(() -> new EntityNotFoundException("No existe la persona " + trabajadorId));
+        LocalDate fechaSegura = fecha == null ? LocalDate.now() : fecha;
+        Optional<AsistenciaPersonal> existente = asistenciaRepository.findByFechaAndTrabajadorId(fechaSegura, trabajadorId);
+        if (existente.isPresent()) {
+            return existente.get();
+        }
+        AsistenciaPersonal asistencia = new AsistenciaPersonal();
+        asistencia.setFecha(fechaSegura);
+        asistencia.setTrabajadorId(trabajador.getId());
+        asistencia.setTrabajadorNombre(trabajador.getNombre());
+        asistencia.setEmpresa(trabajador.getEmpresa());
+        asistencia.setSector(trabajador.getSector());
+        asistencia.setHoraIngreso(LocalTime.now().withSecond(0).withNano(0));
+        asistencia.setHorasTrabajadas(BigDecimal.ZERO);
+        return asistenciaRepository.save(asistencia);
+    }
+
+    @Transactional
+    public AsistenciaPersonal marcarSalida(Long asistenciaId) {
+        AsistenciaPersonal asistencia = obtener(asistenciaId);
+        if (asistencia.getHoraIngreso() == null) {
+            asistencia.setHoraIngreso(LocalTime.now().withSecond(0).withNano(0));
+        }
+        asistencia.setHoraSalida(LocalTime.now().withSecond(0).withNano(0));
+        if (asistencia.getHoraSalida().isAfter(asistencia.getHoraIngreso())) {
+            long minutos = Duration.between(asistencia.getHoraIngreso(), asistencia.getHoraSalida()).toMinutes();
+            asistencia.setHorasTrabajadas(BigDecimal.valueOf(minutos).divide(BigDecimal.valueOf(60), 2, RoundingMode.HALF_UP));
+        }
         return asistenciaRepository.save(asistencia);
     }
 
