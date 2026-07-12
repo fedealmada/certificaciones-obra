@@ -70,7 +70,7 @@
             <strong th:text="${#temporals.format(certificacion.fecha, 'dd/MM/yyyy')}">01/01/2026</strong>
         </div>
         <div class="cert-meta-grid">
-            <div><span>Obra</span><strong>Terrazas de Quilmes</strong></div>
+            <div><span>Obra</span><strong th:text="${obraActiva.nombre}">Obra activa</strong></div>
             <div><span>Contratista / Proveedor</span><strong th:text="${orden.proveedorEntidad?.nombre ?: '-'}">Proveedor</strong></div>
             <div><span>OC</span><strong th:text="${orden.numero}">OC</strong></div>
             <div><span>Certificado Nro</span><strong th:text="${certificacion.numero}">1</strong></div>

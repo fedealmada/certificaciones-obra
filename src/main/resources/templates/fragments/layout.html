@@ -17,7 +17,7 @@
     <div class="app-nav-container">
         <a class="app-brand" th:href="@{/}" title="Inicio">
             <span class="app-brand-mark"><i class="bi bi-building-check"></i></span>
-            <span class="app-brand-text">ObraControl</span>
+            <span class="app-brand-text" th:text="${obraActiva.nombre}">ObraControl</span>
         </a>
         <div class="app-nav-links">
             <a class="nav-link" th:href="@{/}" title="Inicio"><i class="bi bi-house"></i><span>Inicio</span></a>
@@ -40,10 +40,14 @@
             <div class="app-nav-section"><span>Config.</span></div>
             <a class="nav-link" th:if="${configuracion.activo('modulo.categorias')}" th:href="@{/categorias}" title="Categorias"><i class="bi bi-tags"></i><span>Categorias</span></a>
             <a class="nav-link" th:if="${configuracion.activo('modulo.rubros')}" th:href="@{/rubros}" title="Rubros"><i class="bi bi-folder2-open"></i><span>Rubros</span></a>
+            <a class="nav-link" th:href="@{/obras}" title="Obras"><i class="bi bi-buildings"></i><span>Obras</span></a>
             <a class="nav-link" th:href="@{/configuracion}" title="Configuracion"><i class="bi bi-gear"></i><span>Configuracion</span></a>
             <button class="nav-link theme-toggle-button" type="button" title="Modo oscuro" aria-label="Cambiar modo oscuro">
                 <i class="bi bi-moon-stars"></i><span>Modo oscuro</span>
             </button>
+            <form class="sidebar-logout-form" method="post" th:action="@{/logout}">
+                <button class="nav-link" type="submit" title="Cerrar sesion"><i class="bi bi-box-arrow-left"></i><span>Cerrar sesion</span></button>
+            </form>
         </div>
     </div>
     <script>

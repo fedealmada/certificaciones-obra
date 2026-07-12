@@ -21,7 +21,7 @@
             <div class="home-hero-topline">
                 <div>
                     <div class="document-kicker">Centro de obra</div>
-                    <h1 th:text="${obraNombre}">Obra activa</h1>
+                    <h1 th:text="${obraActiva.nombre}">Obra activa</h1>
                 </div>
                 <span class="home-status-pill"><i class="bi bi-lightning-charge-fill"></i> Panel activo</span>
             </div>
@@ -43,7 +43,7 @@
         <div>
             <i class="bi bi-1-circle"></i>
             <span>Obra</span>
-            <strong th:text="${obraNombre}">Obra activa</strong>
+            <strong th:text="${obraActiva.nombre}">Obra activa</strong>
         </div>
         <div>
             <i class="bi bi-2-circle"></i>
