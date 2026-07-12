@@ -32,7 +32,7 @@
         <a class="work-action-link" th:href="@{/oc/{id}(id=${orden.id})} + '#entregas'">Ver entregas de la OC</a>
     </div>
 </div>
-<main class="container">
+<main class="container cert-detail-page">
     <div class="page-navigation mb-3">
         <a th:href="@{/}"><i class="bi bi-house"></i> Inicio</a>
         <i class="bi bi-chevron-right"></i>
@@ -42,27 +42,157 @@
         <i class="bi bi-chevron-right"></i>
         <a th:href="@{/materiales/oc/{id}(id=${orden.id})}">Entregas</a>
         <i class="bi bi-chevron-right"></i>
-        <span th:text="${#strings.isEmpty(recepcion.remito) ? 'Entrega sin remito' : 'Entrega ' + recepcion.remito}">Entrega</span>
+        <span th:text="'Viaje ' + ${numeroRecepcion}">Viaje</span>
     </div>
 
-    <div class="document-header mb-4">
-        <div>
-            <div class="document-kicker">Entrega / viaje</div>
-            <h1 th:text="${#strings.isEmpty(recepcion.remito) ? 'Entrega sin remito' : 'Entrega ' + recepcion.remito}">Entrega</h1>
-            <div class="text-muted" th:text="'OC ' + ${orden.numero} + ' - ' + ${#temporals.format(recepcion.fecha, 'dd/MM/yyyy')}"></div>
+    <div class="document-header cert-document-header mb-4">
+        <div class="document-title-block">
+            <div class="document-kicker">Recepcion de materiales</div>
+            <h1 th:text="'Viaje Nro ' + ${numeroRecepcion}">Viaje</h1>
+            <div class="document-subtitle">
+                <span th:text="'OC ' + ${orden.numero}">OC</span>
+                <span class="cert-title-separator">/</span>
+                <span th:text="${orden.proveedorEntidad?.nombre ?: '-'}">Proveedor</span>
+            </div>
+        </div>
+        <div class="document-actions">
+            <a class="btn btn-primary" th:href="@{/materiales/oc/{id}/recepciones/nueva(id=${orden.id})}"><i class="bi bi-plus-lg"></i> Nueva entrega</a>
+            <a class="btn btn-outline-primary" th:href="@{/oc/{id}(id=${orden.id})} + '#entregas'"><i class="bi bi-truck"></i> Ver OC</a>
+            <form method="post" th:action="@{/materiales/oc/{ocId}/recepciones/{id}/eliminar(ocId=${orden.id}, id=${recepcion.id})}" onsubmit="return confirm('Eliminar esta entrega?');">
+                <button class="btn btn-outline-danger" type="submit"><i class="bi bi-trash"></i> Eliminar</button>
+            </form>
         </div>
     </div>
-    <div class="table-responsive"><table class="table table-hover align-middle">
-        <thead><tr><th>Item</th><th>Detalle</th><th>Unidad</th><th class="text-end">Cantidad recibida</th></tr></thead>
-        <tbody>
-        <tr th:each="item : ${recepcion.items}">
-            <td th:text="${item.itemOrdenCompra.item}"></td>
-            <td th:text="${item.itemOrdenCompra.detalle}"></td>
-            <td th:text="${item.itemOrdenCompra.unidad}"></td>
-            <td class="text-end" th:text="${item.cantidadRecibida}"></td>
-        </tr>
-        </tbody>
-    </table></div>
+
+    <section class="cert-switcher mb-4" th:if="${#lists.size(recepcionesOrden) > 1}">
+        <div class="cert-switcher-copy">
+            <span>Recepciones de esta OC</span>
+            <strong th:text="'OC ' + ${orden.numero}">OC</strong>
+        </div>
+        <nav class="cert-switcher-nav" aria-label="Navegar recepciones">
+            <a th:each="entrega, estado : ${recepcionesOrden}"
+               th:href="@{/materiales/oc/{ocId}/recepciones/{id}(ocId=${orden.id}, id=${entrega.id})}"
+               th:classappend="${entrega.id.equals(recepcion.id)} ? ' is-active' : ''"
+               th:attr="aria-current=${entrega.id.equals(recepcion.id)} ? 'page' : null"
+               th:text="${estado.count}">
+                1
+            </a>
+        </nav>
+    </section>
+
+    <section class="cert-sheet cert-detail-sheet mb-4">
+        <div class="cert-sheet-title">
+            <div>
+                <span>Comprobante de recepcion</span>
+                <small th:text="'OC ' + ${orden.numero} + ' / Viaje ' + ${numeroRecepcion}">OC / Viaje</small>
+            </div>
+            <strong th:text="${#temporals.format(recepcion.fecha, 'dd/MM/yyyy')}">01/01/2026</strong>
+        </div>
+        <div class="cert-meta-grid">
+            <div><span>Obra</span><strong>Terrazas de Quilmes</strong></div>
+            <div><span>Proveedor</span><strong th:text="${orden.proveedorEntidad?.nombre ?: '-'}">Proveedor</strong></div>
+            <div><span>OC</span><strong th:text="${orden.numero}">OC</strong></div>
+            <div><span>Viaje Nro</span><strong th:text="${numeroRecepcion}">1</strong></div>
+            <div><span>Fecha OC</span><strong th:text="${#temporals.format(orden.fecha, 'dd/MM/yyyy')}">01/01/2026</strong></div>
+            <div><span>Fecha recepcion</span><strong th:text="${#temporals.format(recepcion.fecha, 'dd/MM/yyyy')}">01/01/2026</strong></div>
+            <div><span>Remito</span><strong th:text="${#strings.isEmpty(recepcion.remito) ? 'Sin remito' : recepcion.remito}">Sin remito</strong></div>
+            <div><span>Items recibidos</span><strong th:text="${recepcion.items.size()}">0</strong></div>
+        </div>
+        <div class="ticket-note cert-observation" th:if="${recepcion.observacion}">
+            <span>Observacion</span>
+            <strong th:text="${recepcion.observacion}">Observacion</strong>
+        </div>
+    </section>
+
+    <section class="cert-detail-summary mb-4">
+        <div class="cert-detail-summary-main">
+            <span>Recepcion de este viaje</span>
+            <strong th:text="${#numbers.formatDecimal(porcentajeRecepcionActual, 1, 'POINT', 2, 'COMMA')} + ' %'">0,00 %</strong>
+            <div class="cert-detail-progress-track">
+                <div class="cert-detail-progress-fill" th:style="'width: ' + ${porcentajeRecepcionActual > 100 ? 100 : porcentajeRecepcionActual} + '%'"></div>
+            </div>
+        </div>
+        <div><span>Cantidad prevista</span><strong th:text="${#numbers.formatDecimal(totalCompradoRecepcion, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
+        <div><span>Cantidad recibida</span><strong th:text="${#numbers.formatDecimal(totalRecibidoRecepcion, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
+        <div><span>Importe estimado</span><strong th:text="${#numbers.formatDecimal(importeRecibidoRecepcion, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
+        <div><span>Items incluidos</span><strong th:text="${recepcion.items.size()}">0</strong></div>
+    </section>
+
+    <div class="cert-table-title-row">
+        <div>
+            <div class="document-kicker">Detalle recepcion</div>
+            <h2>Items recibidos</h2>
+        </div>
+        <span th:text="${#lists.size(recepcion.items)} + ' items'">0 items</span>
+    </div>
+
+    <section class="cert-detail-table-wrap cert-items-panel">
+        <div class="cert-items-grid cert-items-head">
+            <div>Item</div>
+            <div>Detalle</div>
+            <div>Contratado</div>
+            <div>Recibido</div>
+            <div>Importe</div>
+        </div>
+
+        <article class="cert-items-grid cert-item-row" th:each="item : ${recepcion.items}">
+            <div class="cert-item-code" th:text="${item.itemOrdenCompra.item}"></div>
+            <div class="cert-item-detail">
+                <div>
+                    <strong th:text="${item.itemOrdenCompra.detalle}">Detalle</strong>
+                    <small th:if="${item.itemOrdenCompra.rubro != null}" th:text="${item.itemOrdenCompra.rubro}">Rubro</small>
+                </div>
+            </div>
+            <div>
+                <div class="cert-value-stack">
+                    <div>
+                        <span>Cantidad</span>
+                        <strong th:text="${#numbers.formatDecimal(item.itemOrdenCompra.cantidad, 1, 'POINT', 2, 'COMMA') + ' ' + (item.itemOrdenCompra.unidad ?: '')}">0,00</strong>
+                    </div>
+                    <div>
+                        <span>Unitario</span>
+                        <strong th:text="${#numbers.formatDecimal(item.itemOrdenCompra.precioUnitario, 1, 'POINT', 2, 'COMMA')}">0,00</strong>
+                    </div>
+                    <div class="is-total">
+                        <span>Total</span>
+                        <strong th:text="${#numbers.formatDecimal(item.itemOrdenCompra.importe, 1, 'POINT', 2, 'COMMA')}">0,00</strong>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="cert-value-stack cert-progress-stack">
+                    <div class="is-current">
+                        <span>Actual</span>
+                        <strong th:text="${#numbers.formatDecimal(item.cantidadRecibida, 1, 'POINT', 2, 'COMMA') + ' ' + (item.itemOrdenCompra.unidad ?: '')}">0,00</strong>
+                    </div>
+                    <div class="is-total">
+                        <span>Sobre item</span>
+                        <strong th:text="${#numbers.formatDecimal(porcentajesPorItemRecepcion.get(item.id), 1, 'POINT', 2, 'COMMA')} + ' %'">0,00 %</strong>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="cert-value-stack cert-progress-stack">
+                    <div class="is-current">
+                        <span>Recibido</span>
+                        <strong th:text="${#numbers.formatDecimal(importesPorItemRecepcion.get(item.id), 1, 'POINT', 2, 'COMMA')}">0,00</strong>
+                    </div>
+                    <div class="is-total">
+                        <span>Unidad</span>
+                        <strong th:text="${item.itemOrdenCompra.unidad ?: '-'}">und</strong>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <div class="cert-items-grid cert-items-total">
+            <div>Totales de la recepcion</div>
+            <div></div>
+            <div th:text="${#numbers.formatDecimal(totalCompradoRecepcion, 1, 'POINT', 2, 'COMMA')}">0,00</div>
+            <div th:text="${#numbers.formatDecimal(totalRecibidoRecepcion, 1, 'POINT', 2, 'COMMA') + ' recibido'}">0,00</div>
+            <div th:text="${#numbers.formatDecimal(importeRecibidoRecepcion, 1, 'POINT', 2, 'COMMA')}">0,00</div>
+        </div>
+    </section>
 </main>
 <script>
 const deliverySuccessOverlay = document.querySelector('#delivery-success-overlay');
