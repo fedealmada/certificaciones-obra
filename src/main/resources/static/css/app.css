@@ -7507,6 +7507,15 @@ html[data-theme="dark"] body {
     font-weight: 720;
 }
 
+.deposito-click-row {
+    cursor: pointer;
+}
+
+.deposito-click-row:focus {
+    outline: 2px solid #8fb7e8;
+    outline-offset: -2px;
+}
+
 :root[data-theme="dark"] .deposito-check {
     background: #343847;
     border-color: rgba(237, 241, 247, 0.13);

@@ -41,9 +41,8 @@
                 <div class="col-md-3"><label class="form-label">Fecha</label><input class="form-control" type="date" th:field="*{fecha}" required></div>
                 <div class="col-md-3"><label class="form-label">Tipo</label><select class="form-select" th:field="*{tipo}"><option th:each="tipo : ${tiposMovimiento}" th:value="${tipo}" th:text="${tipo.descripcion}"></option></select></div>
                 <div class="col-md-3"><label class="form-label">Cantidad</label><input class="form-control" type="number" step="0.01" min="0.01" th:field="*{cantidad}" required></div>
-                <div class="col-md-3"><label class="form-label">Responsable</label><input class="form-control" th:field="*{responsable}" placeholder="Quien retira o devuelve"></div>
-                <div class="col-md-4"><label class="form-label">Trabajador registrado</label><select class="form-select" th:field="*{trabajadorId}"><option value="">Sin trabajador</option><option th:each="trabajador : ${trabajadores}" th:value="${trabajador.id}" th:text="${trabajador.nombre}">Trabajador</option></select></div>
-                <div class="col-md-4"><label class="form-label">Nuevo trabajador</label><input class="form-control" th:field="*{trabajadorNombre}" placeholder="Ej: Juan Carlos"></div>
+                <div class="col-md-3"><label class="form-label">Registrado por</label><input class="form-control" th:field="*{responsable}" placeholder="Quien carga el movimiento"></div>
+                <div class="col-md-4"><label class="form-label">Persona / trabajador</label><input class="form-control" th:field="*{trabajadorNombre}" list="deposito-trabajadores" placeholder="Ej: Juan Carlos"><datalist id="deposito-trabajadores"><option th:each="trabajador : ${trabajadores}" th:value="${trabajador.nombre}"></option></datalist></div>
                 <div class="col-md-4"><label class="form-label">Destino / trabajo</label><input class="form-control" th:field="*{destino}" placeholder="Sector, frente, rubro o trabajo"></div>
                 <div class="col-md-8"><label class="form-label">Observacion</label><input class="form-control" th:field="*{observacion}" placeholder="Detalle del movimiento"></div>
                 <div class="col-md-4 d-flex align-items-end">

@@ -148,7 +148,6 @@ public class DepositoController {
         MovimientoDepositoForm form = new MovimientoDepositoForm();
         form.setTipo(TipoMovimientoDeposito.DEVOLUCION);
         form.setCantidad(movimiento.getCantidad());
-        form.setTrabajadorId(movimiento.getTrabajadorId());
         form.setTrabajadorNombre(movimiento.getTrabajadorNombre());
         form.setResponsable(movimiento.getResponsable());
         form.setDestino(movimiento.getDestino());

@@ -44,7 +44,7 @@
             <div><span>Stock anterior</span><strong th:text="${#numbers.formatDecimal(movimiento.stockAnterior, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
             <div><span>Stock resultante</span><strong th:text="${#numbers.formatDecimal(movimiento.stockResultante, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
             <div><span>Trabajador</span><strong th:text="${movimiento.trabajadorNombre ?: '-'}">-</strong></div>
-            <div><span>Responsable</span><strong th:text="${movimiento.responsable ?: '-'}">-</strong></div>
+            <div><span>Registrado por</span><strong th:text="${movimiento.responsable ?: '-'}">-</strong></div>
             <div><span>Destino</span><strong th:text="${movimiento.destino ?: '-'}">-</strong></div>
             <div><span>Origen</span><strong th:text="${movimiento.ordenCompraNumero == null ? '-' : 'OC ' + movimiento.ordenCompraNumero}">-</strong></div>
             <div><span>Devolucion</span><strong th:text="${movimiento.requiereDevolucion ? (movimiento.devuelto ? 'Devuelto' : 'Pendiente') : 'No aplica'}">No aplica</strong></div>
