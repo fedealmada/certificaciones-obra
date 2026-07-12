@@ -7250,6 +7250,7 @@ html[data-theme="dark"] body {
 :root[data-theme="dark"] .item-rubro-select,
 :root[data-theme="dark"] #item-search,
 :root[data-theme="dark"] #oc-search,
+:root[data-theme="dark"] #delivery-search,
 :root[data-theme="dark"] #oc-rubro-filter {
     background: #666b7b !important;
     border-color: #858c9f !important;
@@ -7259,6 +7260,7 @@ html[data-theme="dark"] body {
 :root[data-theme="dark"] .form-control::placeholder,
 :root[data-theme="dark"] #item-search::placeholder,
 :root[data-theme="dark"] #oc-search::placeholder,
+:root[data-theme="dark"] #delivery-search::placeholder,
 :root[data-theme="dark"] #oc-rubro-filter::placeholder {
     color: #f0f4fb !important;
     opacity: 0.86 !important;
@@ -8013,6 +8015,7 @@ html[data-theme="dark"] body {
 :root[data-theme="dark"] .item-rubro-select,
 :root[data-theme="dark"] #item-search,
 :root[data-theme="dark"] #oc-search,
+:root[data-theme="dark"] #delivery-search,
 :root[data-theme="dark"] #oc-rubro-filter {
     background: #3f4354 !important;
     border-color: #6272a4 !important;
@@ -8022,6 +8025,7 @@ html[data-theme="dark"] body {
 :root[data-theme="dark"] .form-control::placeholder,
 :root[data-theme="dark"] #item-search::placeholder,
 :root[data-theme="dark"] #oc-search::placeholder,
+:root[data-theme="dark"] #delivery-search::placeholder,
 :root[data-theme="dark"] #oc-rubro-filter::placeholder {
     color: #c7c9d9 !important;
     opacity: 1 !important;
@@ -8303,6 +8307,7 @@ html[data-theme="dark"] body {
 :root[data-theme="dark"] .item-rubro-select,
 :root[data-theme="dark"] #item-search,
 :root[data-theme="dark"] #oc-search,
+:root[data-theme="dark"] #delivery-search,
 :root[data-theme="dark"] #oc-rubro-filter,
 :root[data-theme="dark"] .itemizado-drag-help,
 :root[data-theme="dark"] .itemizado-drag-handle,
