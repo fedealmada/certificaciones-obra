@@ -15,6 +15,23 @@
 </head>
 <body>
 <div th:replace="~{fragments/layout :: navbar}"></div>
+<div class="work-action-overlay work-action-success"
+     id="delivery-success-overlay"
+     th:if="${accionCompletada}"
+     aria-live="polite">
+    <div class="work-action-card">
+        <button class="work-action-close" type="button" aria-label="Cerrar aviso" data-close-work-action>
+            <i class="bi bi-x-lg"></i>
+        </button>
+        <div class="work-action-illustration work-action-illustration-green">
+            <i class="bi bi-check-lg"></i>
+        </div>
+        <div class="work-action-kicker">Entrega / viaje</div>
+        <h2 th:text="${accionTitulo ?: '¡Entrega agregada!'}">¡Entrega agregada!</h2>
+        <p th:text="${accionMensaje ?: 'El envio quedo registrado correctamente.'}">El envio quedo registrado correctamente.</p>
+        <a class="work-action-link" th:href="@{/oc/{id}(id=${orden.id})} + '#entregas'">Ver entregas de la OC</a>
+    </div>
+</div>
 <main class="container">
     <div class="page-navigation mb-3">
         <a th:href="@{/}"><i class="bi bi-house"></i> Inicio</a>
@@ -47,5 +64,25 @@
         </tbody>
     </table></div>
 </main>
+<script>
+const deliverySuccessOverlay = document.querySelector('#delivery-success-overlay');
+if (deliverySuccessOverlay) {
+    let deliveryOverlayTimer;
+    let deliveryOverlayRemoveTimer;
+    const closeDeliveryOverlay = () => {
+        if (deliverySuccessOverlay.classList.contains('is-leaving')) {
+            return;
+        }
+        window.clearTimeout(deliveryOverlayTimer);
+        window.clearTimeout(deliveryOverlayRemoveTimer);
+        deliverySuccessOverlay.classList.add('is-leaving');
+        deliveryOverlayRemoveTimer = window.setTimeout(() => deliverySuccessOverlay.remove(), 420);
+    };
+
+    deliveryOverlayTimer = window.setTimeout(closeDeliveryOverlay, 1450);
+    deliverySuccessOverlay.querySelector('[data-close-work-action]')?.addEventListener('click', closeDeliveryOverlay);
+    deliverySuccessOverlay.querySelector('.work-action-link')?.addEventListener('click', closeDeliveryOverlay);
+}
+</script>
 </body>
 </html>

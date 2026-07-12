@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -51,9 +52,13 @@ public class MaterialController {
     @PostMapping("/oc/{ordenCompraId}/recepciones")
     public String guardarRecepcion(@PathVariable Long ordenCompraId,
                                    @ModelAttribute("form") RecepcionMaterialForm form,
-                                   Model model) {
+                                   Model model,
+                                   RedirectAttributes redirectAttributes) {
         try {
             RecepcionMaterial recepcion = materialService.guardar(ordenCompraId, form);
+            redirectAttributes.addFlashAttribute("accionCompletada", true);
+            redirectAttributes.addFlashAttribute("accionTitulo", "¡Entrega agregada!");
+            redirectAttributes.addFlashAttribute("accionMensaje", "El envio quedo registrado correctamente en la orden de compra.");
             return "redirect:/materiales/oc/" + ordenCompraId + "/recepciones/" + recepcion.getId();
         } catch (IllegalArgumentException ex) {
             model.addAttribute("error", ex.getMessage());
