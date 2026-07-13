@@ -9744,11 +9744,13 @@ html[data-theme="dark"] body {
     max-height: calc(100vh - 12rem);
     border: 1px solid var(--ui-line);
     border-radius: 8px;
+    overflow: auto;
 }
 
 .tablero-cert-table {
-    min-width: 86rem;
-    font-size: 0.72rem;
+    min-width: 168rem;
+    font-size: 0.66rem;
+    margin-bottom: 0;
 }
 
 .tablero-cert-table thead th {
@@ -9757,7 +9759,7 @@ html[data-theme="dark"] body {
     z-index: 2;
     background: #5a8f2a;
     color: #ffffff;
-    font-size: 0.64rem;
+    font-size: 0.58rem;
     font-weight: 820;
     text-transform: uppercase;
     white-space: nowrap;
@@ -9769,6 +9771,18 @@ html[data-theme="dark"] body {
     background: #ffffff;
     vertical-align: middle;
     border-color: #c5d4ba;
+    padding: 0.22rem 0.28rem;
+    white-space: nowrap;
+}
+
+.tablero-cert-table tfoot td {
+    position: sticky;
+    bottom: 0;
+    z-index: 3;
+    background: #5a8f2a;
+    color: #ffffff;
+    border-color: #376117;
+    padding: 0.3rem 0.35rem;
 }
 
 .tablero-cert-table tbody tr:nth-child(even) td {
@@ -9782,34 +9796,68 @@ html[data-theme="dark"] body {
 }
 
 .tablero-description-head {
-    min-width: 34rem;
+    min-width: 26rem;
 }
 
 .tablero-cert-table .form-control {
-    min-height: 1.95rem;
-    padding: 0.25rem 0.35rem;
-    border-radius: 6px;
-    font-size: 0.72rem;
+    min-height: 1.55rem;
+    padding: 0.13rem 0.25rem;
+    border-radius: 4px;
+    font-size: 0.66rem;
+    line-height: 1.15;
 }
 
 .tablero-description-input {
-    min-width: 36rem;
+    min-width: 26rem;
 }
 
 .tablero-number-input {
-    min-width: 7rem;
+    min-width: 6.4rem;
+    text-align: right;
+}
+
+.tablero-money-input {
+    min-width: 7.2rem;
     text-align: right;
 }
 
 .tablero-percent-input,
 .tablero-unit-input {
-    min-width: 4.8rem;
+    min-width: 4.2rem;
 }
 
 .tablero-code-input {
-    min-width: 6.2rem;
+    min-width: 5.2rem;
     font-weight: 700;
     text-align: center;
+}
+
+.tablero-sticky-code {
+    position: sticky;
+    left: 0;
+    z-index: 4;
+    min-width: 5.8rem;
+}
+
+.tablero-sticky-desc {
+    position: sticky;
+    left: 5.8rem;
+    z-index: 4;
+}
+
+.tablero-cert-table tbody .tablero-sticky-code,
+.tablero-cert-table tbody .tablero-sticky-desc {
+    background: inherit;
+}
+
+.tablero-cert-table thead .tablero-sticky-code,
+.tablero-cert-table thead .tablero-sticky-desc {
+    z-index: 5;
+}
+
+.tablero-cert-table tfoot .tablero-sticky-code,
+.tablero-cert-table tfoot .tablero-sticky-desc {
+    z-index: 5;
 }
 
 .tablero-group-row td {
@@ -9850,6 +9898,12 @@ html[data-theme="dark"] body {
 
 :root[data-theme="dark"] .tablero-cert-table tbody tr:nth-child(even) td {
     background: #1d2033;
+}
+
+:root[data-theme="dark"] .tablero-cert-table tfoot td {
+    background: #4f772d;
+    color: #eef2ff;
+    border-color: rgba(139, 233, 253, 0.16);
 }
 
 :root[data-theme="dark"] .tablero-group-row td {

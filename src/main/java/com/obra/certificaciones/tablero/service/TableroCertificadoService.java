@@ -140,7 +140,14 @@ public class TableroCertificadoService {
         item.setDescripcionTarea(datos.getDescripcionTarea());
         item.setUnidad(datos.getUnidad());
         item.setCantidad(valor(datos.getCantidad()));
+        item.setPrecioUnitario(valor(datos.getPrecioUnitario()));
+        item.setCostoManoObra(valor(datos.getCostoManoObra()));
+        item.setMaterialesAsignados(valor(datos.getMaterialesAsignados()));
+        item.setServicios(valor(datos.getServicios()));
+        item.setMaterialesSuministradosEmpresa(valor(datos.getMaterialesSuministradosEmpresa()));
         item.setMaterialesAdicionalesEtapa(valor(datos.getMaterialesAdicionalesEtapa()));
+        item.setCostoEstructuralPorcentaje(valor(datos.getCostoEstructuralPorcentaje()));
+        item.setBeneficioEmpresarialPorcentaje(valor(datos.getBeneficioEmpresarialPorcentaje()));
         item.setAvanceAnteriorPorcentaje(valor(datos.getAvanceAnteriorPorcentaje()));
         item.setAvanceCertificadoPorcentaje(valor(datos.getAvanceCertificadoPorcentaje()));
         item.setObservacion(datos.getObservacion());
