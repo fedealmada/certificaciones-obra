@@ -25,5 +25,11 @@ public interface ItemCertificacionRepository extends JpaRepository<ItemCertifica
             LocalDate hasta,
             CategoriaItem categoria);
 
+    @EntityGraph(attributePaths = {"certificacion", "certificacion.ordenCompra", "certificacion.ordenCompra.proveedorEntidad", "itemOrdenCompra", "itemOrdenCompra.rubroEntidad"})
+    List<ItemCertificacion> findByCertificacionOrdenCompraObraIdAndCertificacionFechaBeforeAndItemOrdenCompraCategoriaOrderByItemOrdenCompraIdAscCertificacionFechaAsc(
+            Long obraId,
+            LocalDate fecha,
+            CategoriaItem categoria);
+
     long countByItemOrdenCompraId(Long itemOrdenCompraId);
 }

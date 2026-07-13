@@ -9747,7 +9747,7 @@ html[data-theme="dark"] body {
 }
 
 .tablero-cert-table {
-    min-width: 176rem;
+    min-width: 96rem;
     font-size: 0.72rem;
 }
 
@@ -9755,17 +9755,34 @@ html[data-theme="dark"] body {
     position: sticky;
     top: 0;
     z-index: 2;
-    background: #eef2f7;
-    color: var(--ui-ink);
+    background: #5a8f2a;
+    color: #ffffff;
     font-size: 0.64rem;
     font-weight: 820;
     text-transform: uppercase;
     white-space: nowrap;
+    border-color: #376117;
+    text-align: center;
 }
 
 .tablero-cert-table td {
     background: #ffffff;
     vertical-align: middle;
+    border-color: #c5d4ba;
+}
+
+.tablero-cert-table tbody tr:nth-child(even) td {
+    background: #fbfcfa;
+}
+
+.tablero-cert-table .tablero-cert-group {
+    background: #4d8223;
+    color: #ffffff;
+    text-align: center;
+}
+
+.tablero-description-head {
+    min-width: 28rem;
 }
 
 .tablero-cert-table .form-control {
@@ -9776,7 +9793,7 @@ html[data-theme="dark"] body {
 }
 
 .tablero-description-input {
-    min-width: 20rem;
+    min-width: 30rem;
 }
 
 .tablero-number-input {
@@ -9797,6 +9814,18 @@ html[data-theme="dark"] body {
     color: var(--ui-blue);
 }
 
+.tablero-optional-column {
+    display: none;
+}
+
+.tablero-cert-table.is-showing-advanced {
+    min-width: 176rem;
+}
+
+.tablero-cert-table.is-showing-advanced .tablero-optional-column {
+    display: table-cell;
+}
+
 .tablero-actions-cell {
     display: flex;
     align-items: center;
@@ -9814,13 +9843,23 @@ html[data-theme="dark"] body {
 }
 
 :root[data-theme="dark"] .tablero-cert-table thead th {
-    background: #282d45;
+    background: #4f772d;
     color: #eef2ff;
+    border-color: rgba(139, 233, 253, 0.16);
+}
+
+:root[data-theme="dark"] .tablero-cert-table .tablero-cert-group {
+    background: #3f6623;
+    color: #ffffff;
 }
 
 :root[data-theme="dark"] .tablero-cert-table td {
     background: #202337;
     color: #eef2ff;
+}
+
+:root[data-theme="dark"] .tablero-cert-table tbody tr:nth-child(even) td {
+    background: #1d2033;
 }
 
 :root[data-theme="dark"] .tablero-group-row td {

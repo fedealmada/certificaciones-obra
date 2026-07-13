@@ -97,45 +97,65 @@
     <section class="panel-section tablero-table-panel">
         <div class="section-title-row">
             <h2 class="h5 mb-0"><i class="bi bi-table"></i> Items financieros</h2>
-            <span class="section-total-pill" th:text="${tablero.items.size()} + ' filas'">0 filas</span>
+            <div class="d-flex gap-2 align-items-center">
+                <button class="btn btn-sm btn-outline-secondary" type="button" data-tablero-columns-toggle><i class="bi bi-eye"></i> Datos internos</button>
+                <span class="section-total-pill" th:text="${tablero.items.size()} + ' filas'">0 filas</span>
+            </div>
         </div>
         <div class="text-muted small mb-2">La importacion toma solo items de mano de obra con certificaciones dentro del periodo del tablero. El avance cargado aca es independiente del avance real de obra y se puede ajustar por fila.</div>
         <div class="table-responsive tablero-table-scroll">
             <table class="table table-hover align-middle document-table tablero-cert-table">
                 <thead>
                 <tr>
-                    <th>ID</th><th>Contratista</th><th>Grupo</th><th>Rubro</th><th>Codigo tarea</th><th>Item</th><th>Descripcion</th><th>Unidad</th>
-                    <th>Cantidad</th><th>Precio unit.</th><th>Costo M.O</th><th>Materiales</th><th>Servicios</th><th>Mat. empresa</th>
-                    <th>Subtotal manual</th><th>Subtotal</th><th>Estruc. %</th><th>Estruc. $</th><th>Benef. %</th><th>Benef. $</th>
-                    <th>Estruc. + Benef.</th><th>Total tarea</th><th>Avance %</th><th>Certificado $</th><th>Acciones</th>
+                    <th rowspan="2">ID</th>
+                    <th rowspan="2" class="tablero-description-head">Descripcion tarea</th>
+                    <th rowspan="2">Unidad</th>
+                    <th rowspan="2">Cantidad</th>
+                    <th rowspan="2">Total tarea</th>
+                    <th rowspan="2">Mat. adic. etapa</th>
+                    <th class="tablero-cert-group" colspan="6" th:text="${tablero.nombre + ' - avance de obra'}">Certificado - avance de obra</th>
+                    <th rowspan="2">Acciones</th>
+                    <th rowspan="2" class="tablero-optional-column">Contratista</th>
+                    <th rowspan="2" class="tablero-optional-column">Grupo</th>
+                    <th rowspan="2" class="tablero-optional-column">Rubro</th>
+                    <th rowspan="2" class="tablero-optional-column">Codigo</th>
+                    <th rowspan="2" class="tablero-optional-column">Item</th>
+                    <th rowspan="2" class="tablero-optional-column">Precio unit.</th>
+                    <th rowspan="2" class="tablero-optional-column">Costo M.O</th>
+                    <th rowspan="2" class="tablero-optional-column">Materiales</th>
+                    <th rowspan="2" class="tablero-optional-column">Servicios</th>
+                    <th rowspan="2" class="tablero-optional-column">Mat. empresa</th>
+                    <th rowspan="2" class="tablero-optional-column">Subtotal manual</th>
+                    <th rowspan="2" class="tablero-optional-column">Subtotal</th>
+                    <th rowspan="2" class="tablero-optional-column">Estruc. %</th>
+                    <th rowspan="2" class="tablero-optional-column">Estruc. $</th>
+                    <th rowspan="2" class="tablero-optional-column">Benef. %</th>
+                    <th rowspan="2" class="tablero-optional-column">Benef. $</th>
+                    <th rowspan="2" class="tablero-optional-column">Estruc. + Benef.</th>
+                </tr>
+                <tr>
+                    <th>Anterior (%)</th>
+                    <th>Actual (%)</th>
+                    <th>Acum (%)</th>
+                    <th>Anterior ($)</th>
+                    <th>Actual ($)</th>
+                    <th>Acum ($)</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:each="fila : ${tablero.items}" th:classappend="${fila.grupo ? ' tablero-group-row' : ''}">
                     <td><strong th:text="${fila.grupo ? 'GRUPO' : fila.id}">1</strong></td>
-                    <td><input class="form-control form-control-sm" name="contratista" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.contratista}"></td>
-                    <td><input class="form-control form-control-sm" name="grupoNombre" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.grupoNombre}"></td>
-                    <td><input class="form-control form-control-sm" name="rubro" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.rubro}"></td>
-                    <td><input class="form-control form-control-sm" name="codigoTarea" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.codigoTarea}"></td>
-                    <td><input class="form-control form-control-sm" name="itemCodigo" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.itemCodigo}"></td>
                     <td><input class="form-control form-control-sm tablero-description-input" name="descripcionTarea" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.descripcionTarea}"></td>
                     <td><input class="form-control form-control-sm tablero-unit-input" name="unidad" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.unidad}"></td>
                     <td><input class="form-control form-control-sm tablero-number-input" type="number" step="0.01" name="cantidad" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.cantidad}"></td>
-                    <td><input class="form-control form-control-sm tablero-number-input" type="number" step="0.01" name="precioUnitario" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.precioUnitario}"></td>
-                    <td><input class="form-control form-control-sm tablero-number-input" type="number" step="0.01" name="costoManoObra" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.costoManoObra}"></td>
-                    <td><input class="form-control form-control-sm tablero-number-input" type="number" step="0.01" name="materialesAsignados" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.materialesAsignados}"></td>
-                    <td><input class="form-control form-control-sm tablero-number-input" type="number" step="0.01" name="servicios" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.servicios}"></td>
-                    <td><input class="form-control form-control-sm tablero-number-input" type="number" step="0.01" name="materialesSuministradosEmpresa" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.materialesSuministradosEmpresa}"></td>
-                    <td><input class="form-control form-control-sm tablero-number-input" type="number" step="0.01" name="subtotalManual" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.subtotalManual}" th:disabled="${!fila.grupo}"></td>
-                    <td class="text-end fw-semibold" th:text="${#numbers.formatDecimal(fila.costoSubtotal(), 1, 'POINT', 2, 'COMMA')}">0,00</td>
-                    <td><input class="form-control form-control-sm tablero-percent-input" type="number" step="0.01" name="costoEstructuralPorcentaje" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.costoEstructuralPorcentaje}"></td>
-                    <td class="text-end" th:text="${#numbers.formatDecimal(fila.costoEstructuralMonto(), 1, 'POINT', 2, 'COMMA')}">0,00</td>
-                    <td><input class="form-control form-control-sm tablero-percent-input" type="number" step="0.01" name="beneficioEmpresarialPorcentaje" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.beneficioEmpresarialPorcentaje}"></td>
-                    <td class="text-end" th:text="${#numbers.formatDecimal(fila.beneficioEmpresarialMonto(), 1, 'POINT', 2, 'COMMA')}">0,00</td>
-                    <td class="text-end" th:text="${#numbers.formatDecimal(fila.estructuraMasBeneficio(), 1, 'POINT', 2, 'COMMA')}">0,00</td>
                     <td class="text-end fw-bold" th:text="${#numbers.formatDecimal(fila.totalTarea(), 1, 'POINT', 2, 'COMMA')}">0,00</td>
+                    <td><input class="form-control form-control-sm tablero-number-input" type="number" step="0.01" name="materialesAdicionalesEtapa" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.materialesAdicionalesEtapa}"></td>
+                    <td><input class="form-control form-control-sm tablero-percent-input" type="number" step="0.01" name="avanceAnteriorPorcentaje" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.avanceAnteriorPorcentaje}"></td>
                     <td><input class="form-control form-control-sm tablero-percent-input" type="number" step="0.01" name="avanceCertificadoPorcentaje" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.avanceCertificadoPorcentaje}"></td>
+                    <td class="text-end" th:text="${#numbers.formatDecimal(fila.avanceAcumuladoPorcentaje(), 1, 'POINT', 2, 'COMMA') + '%'}">0,00%</td>
+                    <td class="text-end" th:text="${#numbers.formatDecimal(fila.montoAnterior(), 1, 'POINT', 2, 'COMMA')}">0,00</td>
                     <td class="text-end fw-bold" th:text="${#numbers.formatDecimal(fila.montoCertificado(), 1, 'POINT', 2, 'COMMA')}">0,00</td>
+                    <td class="text-end fw-bold" th:text="${#numbers.formatDecimal(fila.montoAcumulado(), 1, 'POINT', 2, 'COMMA')}">0,00</td>
                     <td class="tablero-actions-cell">
                         <form method="post" th:id="${'tablero-item-form-' + fila.id}" th:action="@{/tablero-certificados/{id}/items/{itemId}(id=${tablero.id},itemId=${fila.id})}"></form>
                         <button class="btn btn-sm btn-primary table-icon-action" th:attr="form=${'tablero-item-form-' + fila.id}" type="submit" title="Guardar fila" aria-label="Guardar fila"><i class="bi bi-save"></i></button>
@@ -143,12 +163,35 @@
                             <button class="btn btn-sm btn-outline-danger table-icon-action" type="submit" title="Eliminar fila" aria-label="Eliminar fila"><i class="bi bi-trash"></i></button>
                         </form>
                     </td>
+                    <td class="tablero-optional-column"><input class="form-control form-control-sm" name="contratista" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.contratista}"></td>
+                    <td class="tablero-optional-column"><input class="form-control form-control-sm" name="grupoNombre" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.grupoNombre}"></td>
+                    <td class="tablero-optional-column"><input class="form-control form-control-sm" name="rubro" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.rubro}"></td>
+                    <td class="tablero-optional-column"><input class="form-control form-control-sm" name="codigoTarea" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.codigoTarea}"></td>
+                    <td class="tablero-optional-column"><input class="form-control form-control-sm" name="itemCodigo" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.itemCodigo}"></td>
+                    <td class="tablero-optional-column"><input class="form-control form-control-sm tablero-number-input" type="number" step="0.01" name="precioUnitario" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.precioUnitario}"></td>
+                    <td class="tablero-optional-column"><input class="form-control form-control-sm tablero-number-input" type="number" step="0.01" name="costoManoObra" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.costoManoObra}"></td>
+                    <td class="tablero-optional-column"><input class="form-control form-control-sm tablero-number-input" type="number" step="0.01" name="materialesAsignados" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.materialesAsignados}"></td>
+                    <td class="tablero-optional-column"><input class="form-control form-control-sm tablero-number-input" type="number" step="0.01" name="servicios" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.servicios}"></td>
+                    <td class="tablero-optional-column"><input class="form-control form-control-sm tablero-number-input" type="number" step="0.01" name="materialesSuministradosEmpresa" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.materialesSuministradosEmpresa}"></td>
+                    <td class="tablero-optional-column"><input class="form-control form-control-sm tablero-number-input" type="number" step="0.01" name="subtotalManual" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.subtotalManual}" th:disabled="${!fila.grupo}"></td>
+                    <td class="tablero-optional-column text-end fw-semibold" th:text="${#numbers.formatDecimal(fila.costoSubtotal(), 1, 'POINT', 2, 'COMMA')}">0,00</td>
+                    <td class="tablero-optional-column"><input class="form-control form-control-sm tablero-percent-input" type="number" step="0.01" name="costoEstructuralPorcentaje" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.costoEstructuralPorcentaje}"></td>
+                    <td class="tablero-optional-column text-end" th:text="${#numbers.formatDecimal(fila.costoEstructuralMonto(), 1, 'POINT', 2, 'COMMA')}">0,00</td>
+                    <td class="tablero-optional-column"><input class="form-control form-control-sm tablero-percent-input" type="number" step="0.01" name="beneficioEmpresarialPorcentaje" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.beneficioEmpresarialPorcentaje}"></td>
+                    <td class="tablero-optional-column text-end" th:text="${#numbers.formatDecimal(fila.beneficioEmpresarialMonto(), 1, 'POINT', 2, 'COMMA')}">0,00</td>
+                    <td class="tablero-optional-column text-end" th:text="${#numbers.formatDecimal(fila.estructuraMasBeneficio(), 1, 'POINT', 2, 'COMMA')}">0,00</td>
                 </tr>
-                <tr th:if="${tablero.items.isEmpty()}"><td colspan="25" class="text-center text-muted py-4">Importa items de OC o agrega un item manual para comenzar.</td></tr>
+                <tr th:if="${tablero.items.isEmpty()}"><td colspan="31" class="text-center text-muted py-4">Importa items certificados del periodo o agrega un item manual para comenzar.</td></tr>
                 </tbody>
             </table>
         </div>
     </section>
 </main>
+<script>
+document.querySelector('[data-tablero-columns-toggle]')?.addEventListener('click', event => {
+    document.querySelector('.tablero-cert-table')?.classList.toggle('is-showing-advanced');
+    event.currentTarget.classList.toggle('active');
+});
+</script>
 </body>
 </html>

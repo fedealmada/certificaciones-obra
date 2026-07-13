@@ -47,9 +47,11 @@ public class TableroCertificadoItem {
     private BigDecimal materialesAsignados = BigDecimal.ZERO;
     private BigDecimal servicios = BigDecimal.ZERO;
     private BigDecimal materialesSuministradosEmpresa = BigDecimal.ZERO;
+    private BigDecimal materialesAdicionalesEtapa = BigDecimal.ZERO;
     private BigDecimal subtotalManual;
     private BigDecimal costoEstructuralPorcentaje = BigDecimal.valueOf(20);
     private BigDecimal beneficioEmpresarialPorcentaje = BigDecimal.valueOf(25);
+    private BigDecimal avanceAnteriorPorcentaje = BigDecimal.ZERO;
     private BigDecimal avanceCertificadoPorcentaje = BigDecimal.ZERO;
 
     @Column(length = 1200)
@@ -88,7 +90,22 @@ public class TableroCertificadoItem {
 
     @Transient
     public BigDecimal montoCertificado() {
-        return porcentaje(totalTarea(), avanceCertificadoPorcentaje);
+        return escalar(porcentaje(totalTarea(), avanceCertificadoPorcentaje).add(valor(materialesAdicionalesEtapa)));
+    }
+
+    @Transient
+    public BigDecimal avanceAcumuladoPorcentaje() {
+        return valor(avanceAnteriorPorcentaje).add(valor(avanceCertificadoPorcentaje));
+    }
+
+    @Transient
+    public BigDecimal montoAnterior() {
+        return porcentaje(totalTarea(), avanceAnteriorPorcentaje);
+    }
+
+    @Transient
+    public BigDecimal montoAcumulado() {
+        return escalar(porcentaje(totalTarea(), avanceAcumuladoPorcentaje()).add(valor(materialesAdicionalesEtapa)));
     }
 
     public void recalcularManoObra() {

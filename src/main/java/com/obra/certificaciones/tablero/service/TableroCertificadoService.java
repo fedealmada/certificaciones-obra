@@ -73,7 +73,21 @@ public class TableroCertificadoService {
                         desde,
                         hasta,
                         CategoriaItem.MANO_OBRA);
+        List<ItemCertificacion> certificacionesAnteriores = itemCertificacionRepository
+                .findByCertificacionOrdenCompraObraIdAndCertificacionFechaBeforeAndItemOrdenCompraCategoriaOrderByItemOrdenCompraIdAscCertificacionFechaAsc(
+                        tablero.getObra().getId(),
+                        desde,
+                        CategoriaItem.MANO_OBRA);
+
         Map<Long, ItemCertificadoPeriodo> itemsCertificados = new LinkedHashMap<>();
+        for (ItemCertificacion certificacion : certificacionesAnteriores) {
+            ItemOrdenCompra item = certificacion.getItemOrdenCompra();
+            if (item == null || item.getId() == null) {
+                continue;
+            }
+            itemsCertificados.computeIfAbsent(item.getId(), id -> new ItemCertificadoPeriodo(item))
+                    .sumarAnterior(valor(certificacion.getPorcentajeActual()));
+        }
         for (ItemCertificacion certificacion : certificaciones) {
             ItemOrdenCompra item = certificacion.getItemOrdenCompra();
             if (item == null || item.getId() == null) {
@@ -83,20 +97,25 @@ public class TableroCertificadoService {
                     .sumarAvance(valor(certificacion.getPorcentajeActual()));
         }
 
-        int agregados = 0;
-        int orden = siguienteOrden(tableroId);
+        int afectados = 0;
+        int[] orden = {siguienteOrden(tableroId)};
         for (ItemCertificadoPeriodo certificadoPeriodo : itemsCertificados.values()) {
             ItemOrdenCompra item = certificadoPeriodo.item();
-            if (itemRepository.existsByTableroIdAndItemOrdenCompraId(tableroId, item.getId())) {
+            if (certificadoPeriodo.avance.compareTo(BigDecimal.ZERO) <= 0) {
                 continue;
             }
-            TableroCertificadoItem fila = desdeItemOrdenCompra(item, orden++);
+            TableroCertificadoItem fila = itemRepository.findByTableroIdAndItemOrdenCompraId(tableroId, item.getId())
+                    .orElseGet(() -> {
+                        TableroCertificadoItem nuevo = desdeItemOrdenCompra(item, orden[0]++);
+                        tablero.agregarItem(nuevo);
+                        return nuevo;
+                    });
+            fila.setAvanceAnteriorPorcentaje(certificadoPeriodo.anterior);
             fila.setAvanceCertificadoPorcentaje(certificadoPeriodo.avance);
-            tablero.agregarItem(fila);
-            agregados++;
+            afectados++;
         }
         tableroRepository.save(tablero);
-        return agregados;
+        return afectados;
     }
 
     @Transactional
@@ -151,9 +170,11 @@ public class TableroCertificadoService {
         item.setMaterialesAsignados(valor(datos.getMaterialesAsignados()));
         item.setServicios(valor(datos.getServicios()));
         item.setMaterialesSuministradosEmpresa(valor(datos.getMaterialesSuministradosEmpresa()));
+        item.setMaterialesAdicionalesEtapa(valor(datos.getMaterialesAdicionalesEtapa()));
         item.setSubtotalManual(datos.getSubtotalManual());
         item.setCostoEstructuralPorcentaje(valor(datos.getCostoEstructuralPorcentaje()));
         item.setBeneficioEmpresarialPorcentaje(valor(datos.getBeneficioEmpresarialPorcentaje()));
+        item.setAvanceAnteriorPorcentaje(valor(datos.getAvanceAnteriorPorcentaje()));
         item.setAvanceCertificadoPorcentaje(valor(datos.getAvanceCertificadoPorcentaje()));
         item.setObservacion(datos.getObservacion());
         if (!item.isGrupo() && item.getCostoManoObra().compareTo(BigDecimal.ZERO) == 0) {
@@ -231,6 +252,7 @@ public class TableroCertificadoService {
 
     private static class ItemCertificadoPeriodo {
         private final ItemOrdenCompra item;
+        private BigDecimal anterior = BigDecimal.ZERO;
         private BigDecimal avance = BigDecimal.ZERO;
 
         private ItemCertificadoPeriodo(ItemOrdenCompra item) {
@@ -243,6 +265,10 @@ public class TableroCertificadoService {
 
         private void sumarAvance(BigDecimal avanceNuevo) {
             avance = avance.add(avanceNuevo);
+        }
+
+        private void sumarAnterior(BigDecimal avanceNuevo) {
+            anterior = anterior.add(avanceNuevo);
         }
     }
 }
