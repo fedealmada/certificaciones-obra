@@ -51,13 +51,24 @@
             <i class="bi bi-chevron-right"></i>
         </a>
         <a class="asistencia-today-button" th:href="@{/asistencia}"><i class="bi bi-calendar-day"></i> Hoy</a>
-        <div class="asistencia-week-strip">
-            <a th:each="dia : ${diasCalendario}"
-               th:href="@{/asistencia(fecha=${dia})}"
-               th:classappend="${dia.equals(fecha) ? ' is-active' : ''}">
-                <span th:text="${#temporals.format(dia, 'EEE')}">lun</span>
-                <strong th:text="${#temporals.format(dia, 'dd')}">01</strong>
-            </a>
+        <div class="asistencia-month-card">
+            <div class="asistencia-month-head">
+                <a th:href="@{/asistencia(fecha=${mesAnterior})}" title="Mes anterior" aria-label="Mes anterior"><i class="bi bi-chevron-left"></i></a>
+                <strong th:text="${#temporals.format(tituloMes, 'MMMM yyyy')}">julio 2026</strong>
+                <a th:href="@{/asistencia(fecha=${mesSiguiente})}" title="Mes siguiente" aria-label="Mes siguiente"><i class="bi bi-chevron-right"></i></a>
+            </div>
+            <div class="asistencia-month-weekdays">
+                <span>Lun</span><span>Mar</span><span>Mie</span><span>Jue</span><span>Vie</span><span>Sab</span><span>Dom</span>
+            </div>
+            <div class="asistencia-month-grid">
+                <span class="asistencia-month-empty" th:each="espacio : ${espaciosInicioMes}"></span>
+                <a th:each="dia : ${diasMes}"
+                   th:href="@{/asistencia(fecha=${dia.fecha()})}"
+                   th:classappend="${(dia.finDeSemana() ? ' is-weekend' : '') + (dia.seleccionado() ? ' is-selected' : '')}">
+                    <span th:text="${#temporals.format(dia.fecha(), 'EEE')}">lun</span>
+                    <strong th:text="${#temporals.format(dia.fecha(), 'dd')}">01</strong>
+                </a>
+            </div>
         </div>
     </section>
 
@@ -73,42 +84,48 @@
             <h2 class="h5 mb-0"><i class="bi bi-clock-history"></i> Carga manual del dia</h2>
             <span class="section-total-pill" th:text="${personas.size()} + ' personas'">0 personas</span>
         </div>
-        <div class="asistencia-quick-grid">
-            <article class="asistencia-person-card"
-                     th:each="persona : ${personas}"
-                     th:with="registro=${asistenciaPorTrabajador.get(persona.id)}"
-                     th:classappend="${registro == null || (registro.horaIngreso == null && registro.horaSalida == null) ? ' is-pending' : (registro.horaIngreso != null && registro.horaSalida != null ? ' is-done' : ' is-inside')}">
-                <div class="asistencia-person-main">
+        <div class="asistencia-entry-list">
+            <div class="asistencia-entry-head">
+                <span>Persona</span>
+                <span>Estado</span>
+                <span>Ingreso</span>
+                <span>Salida</span>
+                <span>Acciones</span>
+            </div>
+            <form class="asistencia-entry-row"
+                  th:each="persona : ${personas}"
+                  th:with="registro=${asistenciaPorTrabajador.get(persona.id)}"
+                  method="post"
+                  th:action="@{/asistencia}"
+                  th:classappend="${registro == null || (registro.horaIngreso == null && registro.horaSalida == null) ? ' is-absent' : (registro.horaIngreso != null && registro.horaSalida != null ? ' is-present' : ' is-partial')}">
+                <input type="hidden" name="id" th:value="${registro == null ? '' : registro.id}">
+                <input type="hidden" name="fecha" th:value="${fecha}">
+                <input type="hidden" name="trabajadorId" th:value="${persona.id}">
+                <div class="asistencia-entry-person">
                     <span class="asistencia-avatar"><i class="bi bi-person"></i></span>
-                    <div>
+                    <span>
                         <strong th:text="${persona.nombre}">Persona</strong>
                         <small th:text="${(persona.empresa ?: 'Sin empresa') + ' / ' + (persona.sector ?: 'Sin sector')}">Empresa</small>
-                    </div>
+                    </span>
                 </div>
-                <div class="asistencia-person-status">
+                <div>
                     <span th:if="${registro == null || (registro.horaIngreso == null && registro.horaSalida == null)}" class="delivery-status-pill is-pending">AUSENTE</span>
                     <span th:if="${registro != null && (registro.horaIngreso != null || registro.horaSalida != null) && !(registro.horaIngreso != null && registro.horaSalida != null)}" class="delivery-status-pill is-partial">INCOMPLETO</span>
                     <span th:if="${registro != null && registro.horaIngreso != null && registro.horaSalida != null}" class="delivery-status-pill is-complete">PRESENTE</span>
-                    <small th:if="${registro != null}" th:text="${(registro.horaIngreso == null ? '--:--' : #temporals.format(registro.horaIngreso, 'HH:mm')) + ' / ' + (registro.horaSalida == null ? '--:--' : #temporals.format(registro.horaSalida, 'HH:mm'))}">--:-- / --:--</small>
                 </div>
-                <div class="asistencia-person-actions">
-                    <form class="asistencia-inline-form" method="post" th:action="@{/asistencia}">
-                        <input type="hidden" name="id" th:value="${registro == null ? '' : registro.id}">
-                        <input type="hidden" name="fecha" th:value="${fecha}">
-                        <input type="hidden" name="trabajadorId" th:value="${persona.id}">
-                        <label>
-                            <span>Ingreso</span>
-                            <input class="form-control form-control-sm" type="time" name="horaIngreso" th:value="${registro == null || registro.horaIngreso == null ? '' : #temporals.format(registro.horaIngreso, 'HH:mm')}">
-                        </label>
-                        <label>
-                            <span>Salida</span>
-                            <input class="form-control form-control-sm" type="time" name="horaSalida" th:value="${registro == null || registro.horaSalida == null ? '' : #temporals.format(registro.horaSalida, 'HH:mm')}">
-                        </label>
-                        <button class="btn btn-primary btn-sm" type="submit"><i class="bi bi-save"></i> Guardar</button>
-                    </form>
-                    <a th:if="${registro != null}" class="btn btn-outline-secondary" th:href="@{/asistencia/{id}/editar(id=${registro.id})}"><i class="bi bi-pencil-square"></i></a>
+                <label class="asistencia-time-field">
+                    <span>Ingreso</span>
+                    <input class="form-control form-control-sm" type="time" name="horaIngreso" th:value="${registro == null || registro.horaIngreso == null ? '' : #temporals.format(registro.horaIngreso, 'HH:mm')}">
+                </label>
+                <label class="asistencia-time-field">
+                    <span>Salida</span>
+                    <input class="form-control form-control-sm" type="time" name="horaSalida" th:value="${registro == null || registro.horaSalida == null ? '' : #temporals.format(registro.horaSalida, 'HH:mm')}">
+                </label>
+                <div class="asistencia-entry-actions">
+                    <button class="btn btn-primary btn-sm" type="submit"><i class="bi bi-save"></i> Guardar</button>
+                    <a th:if="${registro != null}" class="btn btn-outline-secondary btn-sm table-icon-action" th:href="@{/asistencia/{id}/editar(id=${registro.id})}" title="Editar detalle" aria-label="Editar detalle"><i class="bi bi-pencil-square"></i></a>
                 </div>
-            </article>
+            </form>
             <div class="asistencia-empty-people" th:if="${personas.isEmpty()}">
                 <i class="bi bi-person-plus"></i>
                 <span>No hay personas activas cargadas.</span>

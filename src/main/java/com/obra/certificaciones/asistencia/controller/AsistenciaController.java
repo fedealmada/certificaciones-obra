@@ -17,7 +17,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.YearMonth;
+import java.util.List;
 import java.util.stream.IntStream;
 
 @Controller
@@ -36,6 +39,7 @@ public class AsistenciaController {
         var obra = obraService.obraActiva(session);
         var asistencias = asistenciaService.listarPorFecha(obra, fechaSeleccionada);
         var personas = depositoService.listarTrabajadoresActivos();
+        var asistenciaPorTrabajador = asistenciaService.mapaPorTrabajador(obra, fechaSeleccionada);
         long presentes = asistenciaService.contarPresentes(asistencias);
         long incompletos = asistenciaService.contarIncompletos(asistencias);
         model.addAttribute("fecha", fechaSeleccionada);
@@ -44,9 +48,14 @@ public class AsistenciaController {
         model.addAttribute("diasCalendario", IntStream.rangeClosed(-3, 3)
                 .mapToObj(dia -> fechaSeleccionada.plusDays(dia))
                 .toList());
+        model.addAttribute("diasMes", diasMes(fechaSeleccionada));
+        model.addAttribute("espaciosInicioMes", IntStream.range(0, espaciosInicioMes(fechaSeleccionada)).boxed().toList());
+        model.addAttribute("mesAnterior", fechaSeleccionada.minusMonths(1).withDayOfMonth(1));
+        model.addAttribute("mesSiguiente", fechaSeleccionada.plusMonths(1).withDayOfMonth(1));
+        model.addAttribute("tituloMes", fechaSeleccionada);
         model.addAttribute("asistencias", asistencias);
         model.addAttribute("personas", personas);
-        model.addAttribute("asistenciaPorTrabajador", asistenciaService.mapaPorTrabajador(obra, fechaSeleccionada));
+        model.addAttribute("asistenciaPorTrabajador", asistenciaPorTrabajador);
         model.addAttribute("resumenEmpresas", asistenciaService.resumenPorEmpresa(asistencias));
         model.addAttribute("totalHoras", asistenciaService.totalHoras(asistencias));
         model.addAttribute("presentes", presentes);
@@ -100,5 +109,24 @@ public class AsistenciaController {
         model.addAttribute("form", form);
         model.addAttribute("personas", depositoService.listarTrabajadoresActivos());
         model.addAttribute("modoEdicion", modoEdicion);
+    }
+
+    private List<DiaAsistencia> diasMes(LocalDate fecha) {
+        YearMonth mes = YearMonth.from(fecha);
+        return IntStream.rangeClosed(1, mes.lengthOfMonth())
+                .mapToObj(dia -> {
+                    LocalDate fechaDia = mes.atDay(dia);
+                    boolean finDeSemana = fechaDia.getDayOfWeek() == DayOfWeek.SATURDAY || fechaDia.getDayOfWeek() == DayOfWeek.SUNDAY;
+                    return new DiaAsistencia(fechaDia, finDeSemana, fechaDia.equals(fecha));
+                })
+                .toList();
+    }
+
+    private int espaciosInicioMes(LocalDate fecha) {
+        int valor = YearMonth.from(fecha).atDay(1).getDayOfWeek().getValue();
+        return valor - 1;
+    }
+
+    public record DiaAsistencia(LocalDate fecha, boolean finDeSemana, boolean seleccionado) {
     }
 }
