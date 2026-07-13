@@ -26,6 +26,7 @@
             <a class="nav-link" th:if="${configuracion.activo('modulo.oc')}" th:href="@{/oc}" title="Ordenes"><i class="bi bi-receipt"></i><span>Ordenes</span></a>
             <a class="nav-link" th:if="${configuracion.activo('modulo.importarOc')}" th:href="@{/oc/importar}" title="Importar OC"><i class="bi bi-file-earmark-arrow-up"></i><span>Importar OC</span></a>
             <a class="nav-link" th:if="${configuracion.activo('modulo.importarCertificados')}" th:href="@{/certificaciones/importar}" title="Certificados"><i class="bi bi-clipboard-check"></i><span>Certificados</span></a>
+            <a class="nav-link" th:if="${configuracion.activo('modulo.tableroCertificados')}" th:href="@{/tablero-certificados}" title="Tablero certificados"><i class="bi bi-table"></i><span>Tablero cert.</span></a>
             <a class="nav-link" th:if="${configuracion.activo('modulo.proveedores')}" th:href="@{/proveedores}" title="Proveedores"><i class="bi bi-people"></i><span>Proveedores</span></a>
             <a class="nav-link" th:if="${configuracion.activo('modulo.reportes')}" th:href="@{/reportes}" title="Reportes"><i class="bi bi-bar-chart"></i><span>Reportes</span></a>
             <div class="app-nav-section"><span>Obra</span></div>

@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Tablero de certificados</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script>
+    (() => {
+        const savedTheme = localStorage.getItem('obraControl.theme');
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.dataset.theme = savedTheme || (prefersDark ? 'dark' : 'light');
+    })();
+    </script>
+    <link th:href="@{/css/app.css}" rel="stylesheet">
+</head>
+<body>
+<div th:replace="~{fragments/layout :: navbar}"></div>
+<main class="container">
+    <div class="page-navigation mb-3">
+        <a th:href="@{/}"><i class="bi bi-house"></i> Inicio</a>
+        <i class="bi bi-chevron-right"></i>
+        <span>Tablero certificados</span>
+    </div>
+
+    <div class="document-header mb-4">
+        <div>
+            <div class="document-kicker">Gerencial / financiero</div>
+            <h1>Tablero de certificados</h1>
+            <div class="text-muted">Certificacion general por periodo, costos, estructura, beneficio y avance financiero.</div>
+        </div>
+    </div>
+
+    <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
+
+    <section class="panel-section mb-3">
+        <div class="section-title-row">
+            <h2 class="h5 mb-0"><i class="bi bi-plus-circle"></i> Crear tablero</h2>
+        </div>
+        <form class="row g-2 align-items-end" method="post" th:action="@{/tablero-certificados}">
+            <div class="col-md-5">
+                <label class="form-label">Nombre</label>
+                <input class="form-control" name="nombre" placeholder="Ej: Certificado general Julio 2026">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Desde</label>
+                <input class="form-control" type="date" name="fechaDesde">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Hasta</label>
+                <input class="form-control" type="date" name="fechaHasta">
+            </div>
+            <div class="col-md-1">
+                <button class="btn btn-primary w-100" type="submit"><i class="bi bi-plus-lg"></i></button>
+            </div>
+        </form>
+    </section>
+
+    <section class="panel-section">
+        <div class="section-title-row">
+            <h2 class="h5 mb-0"><i class="bi bi-table"></i> Tableros cargados</h2>
+            <span class="section-total-pill" th:text="${tableros.size()} + ' tableros'">0 tableros</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle document-table">
+                <thead><tr><th>Nombre</th><th>Periodo</th><th class="text-end">Items</th><th class="text-end">Total tarea</th><th class="text-end">Certificado</th><th class="text-end">Acciones</th></tr></thead>
+                <tbody>
+                <tr th:each="tablero : ${tableros}">
+                    <td><strong th:text="${tablero.nombre}">Tablero</strong></td>
+                    <td th:text="${#temporals.format(tablero.fechaDesde, 'dd/MM/yyyy') + ' - ' + #temporals.format(tablero.fechaHasta, 'dd/MM/yyyy')}">Periodo</td>
+                    <td class="text-end" th:text="${tablero.items.size()}">0</td>
+                    <td class="text-end" th:text="${#numbers.formatDecimal(tablero.totalTarea(), 1, 'POINT', 2, 'COMMA')}">0,00</td>
+                    <td class="text-end" th:text="${#numbers.formatDecimal(tablero.montoCertificado(), 1, 'POINT', 2, 'COMMA')}">0,00</td>
+                    <td class="text-end"><a class="btn btn-sm btn-outline-primary table-icon-action" th:href="@{/tablero-certificados/{id}(id=${tablero.id})}" title="Abrir tablero" aria-label="Abrir tablero"><i class="bi bi-box-arrow-up-right"></i></a></td>
+                </tr>
+                <tr th:if="${tableros.isEmpty()}"><td colspan="6" class="text-center text-muted py-4">Todavia no hay tableros creados.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+</body>
+</html>

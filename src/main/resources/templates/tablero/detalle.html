@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${tablero.nombre}">Tablero certificado</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script>
+    (() => {
+        const savedTheme = localStorage.getItem('obraControl.theme');
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.dataset.theme = savedTheme || (prefersDark ? 'dark' : 'light');
+    })();
+    </script>
+    <link th:href="@{/css/app.css}" rel="stylesheet">
+</head>
+<body>
+<div th:replace="~{fragments/layout :: navbar}"></div>
+<main class="container-fluid tablero-page">
+    <div class="page-navigation mb-3">
+        <a th:href="@{/}"><i class="bi bi-house"></i> Inicio</a>
+        <i class="bi bi-chevron-right"></i>
+        <a th:href="@{/tablero-certificados}">Tablero certificados</a>
+        <i class="bi bi-chevron-right"></i>
+        <span th:text="${tablero.nombre}">Tablero</span>
+    </div>
+
+    <div class="document-header mb-3">
+        <div>
+            <div class="document-kicker">Certificado general de obra</div>
+            <h1 th:text="${tablero.nombre}">Tablero</h1>
+            <div class="text-muted" th:text="${#temporals.format(tablero.fechaDesde, 'dd/MM/yyyy') + ' - ' + #temporals.format(tablero.fechaHasta, 'dd/MM/yyyy')}">Periodo</div>
+        </div>
+        <div class="document-actions">
+            <form method="post" th:action="@{/tablero-certificados/{id}/importar-items(id=${tablero.id})}">
+                <button class="btn btn-outline-primary" type="submit"><i class="bi bi-download"></i> Importar items OC</button>
+            </form>
+            <form method="post" th:action="@{/tablero-certificados/{id}/items/manual(id=${tablero.id})}">
+                <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-plus-lg"></i> Item manual</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
+
+    <div class="dashboard-metric-grid mb-3">
+        <div class="metric-card"><div class="metric-head"><div class="metric-label">Items</div><i class="bi bi-list-task"></i></div><div class="metric-value" th:text="${totales.cantidadItems()}">0</div><small>Filas del tablero</small></div>
+        <div class="metric-card"><div class="metric-head"><div class="metric-label">Subtotal</div><i class="bi bi-calculator"></i></div><div class="metric-value metric-value-sm" th:text="${#numbers.formatDecimal(totales.subtotal(), 1, 'POINT', 2, 'COMMA')}">0,00</div><small>MO + materiales + servicios</small></div>
+        <div class="metric-card"><div class="metric-head"><div class="metric-label">Total tarea</div><i class="bi bi-cash-stack"></i></div><div class="metric-value metric-value-sm" th:text="${#numbers.formatDecimal(totales.total(), 1, 'POINT', 2, 'COMMA')}">0,00</div><small>Subtotal + estructura + beneficio</small></div>
+        <div class="metric-card"><div class="metric-head"><div class="metric-label">Certificado</div><i class="bi bi-clipboard-check"></i></div><div class="metric-value metric-value-sm" th:text="${#numbers.formatDecimal(totales.certificado(), 1, 'POINT', 2, 'COMMA')}">0,00</div><small>Segun avance cargado</small></div>
+    </div>
+
+    <section class="panel-section mb-3">
+        <div class="section-title-row">
+            <h2 class="h5 mb-0"><i class="bi bi-sliders"></i> Datos del tablero</h2>
+        </div>
+        <form class="row g-2 align-items-end" method="post" th:action="@{/tablero-certificados/{id}(id=${tablero.id})}" th:object="${tablero}">
+            <div class="col-md-4">
+                <label class="form-label">Nombre</label>
+                <input class="form-control" th:field="*{nombre}">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Desde</label>
+                <input class="form-control" type="date" th:field="*{fechaDesde}">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Hasta</label>
+                <input class="form-control" type="date" th:field="*{fechaHasta}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Observacion</label>
+                <input class="form-control" th:field="*{observacion}">
+            </div>
+            <div class="col-md-1">
+                <button class="btn btn-primary w-100" type="submit"><i class="bi bi-save"></i></button>
+            </div>
+        </form>
+    </section>
+
+    <section class="panel-section mb-3">
+        <div class="section-title-row">
+            <h2 class="h5 mb-0"><i class="bi bi-folder-plus"></i> Agrupacion manual</h2>
+        </div>
+        <form class="row g-2 align-items-end" method="post" th:action="@{/tablero-certificados/{id}/grupos(id=${tablero.id})}">
+            <div class="col-md-10">
+                <label class="form-label">Nombre del grupo</label>
+                <input class="form-control" name="nombreGrupo" placeholder="Ej: Albañileria banios PB">
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-outline-primary w-100" type="submit"><i class="bi bi-plus-lg"></i> Grupo</button>
+            </div>
+        </form>
+    </section>
+
+    <section class="panel-section tablero-table-panel">
+        <div class="section-title-row">
+            <h2 class="h5 mb-0"><i class="bi bi-table"></i> Items financieros</h2>
+            <span class="section-total-pill" th:text="${tablero.items.size()} + ' filas'">0 filas</span>
+        </div>
+        <div class="table-responsive tablero-table-scroll">
+            <table class="table table-hover align-middle document-table tablero-cert-table">
+                <thead>
+                <tr>
+                    <th>ID</th><th>Contratista</th><th>Grupo</th><th>Rubro</th><th>Codigo tarea</th><th>Item</th><th>Descripcion</th><th>Unidad</th>
+                    <th>Cantidad</th><th>Precio unit.</th><th>Costo M.O</th><th>Materiales</th><th>Servicios</th><th>Mat. empresa</th>
+                    <th>Subtotal manual</th><th>Subtotal</th><th>Estruc. %</th><th>Estruc. $</th><th>Benef. %</th><th>Benef. $</th>
+                    <th>Estruc. + Benef.</th><th>Total tarea</th><th>Avance %</th><th>Certificado $</th><th>Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="fila : ${tablero.items}" th:classappend="${fila.grupo ? ' tablero-group-row' : ''}">
+                    <td><strong th:text="${fila.grupo ? 'GRUPO' : fila.id}">1</strong></td>
+                    <td><input class="form-control form-control-sm" name="contratista" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.contratista}"></td>
+                    <td><input class="form-control form-control-sm" name="grupoNombre" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.grupoNombre}"></td>
+                    <td><input class="form-control form-control-sm" name="rubro" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.rubro}"></td>
+                    <td><input class="form-control form-control-sm" name="codigoTarea" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.codigoTarea}"></td>
+                    <td><input class="form-control form-control-sm" name="itemCodigo" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.itemCodigo}"></td>
+                    <td><input class="form-control form-control-sm tablero-description-input" name="descripcionTarea" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.descripcionTarea}"></td>
+                    <td><input class="form-control form-control-sm tablero-unit-input" name="unidad" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.unidad}"></td>
+                    <td><input class="form-control form-control-sm tablero-number-input" type="number" step="0.01" name="cantidad" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.cantidad}"></td>
+                    <td><input class="form-control form-control-sm tablero-number-input" type="number" step="0.01" name="precioUnitario" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.precioUnitario}"></td>
+                    <td><input class="form-control form-control-sm tablero-number-input" type="number" step="0.01" name="costoManoObra" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.costoManoObra}"></td>
+                    <td><input class="form-control form-control-sm tablero-number-input" type="number" step="0.01" name="materialesAsignados" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.materialesAsignados}"></td>
+                    <td><input class="form-control form-control-sm tablero-number-input" type="number" step="0.01" name="servicios" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.servicios}"></td>
+                    <td><input class="form-control form-control-sm tablero-number-input" type="number" step="0.01" name="materialesSuministradosEmpresa" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.materialesSuministradosEmpresa}"></td>
+                    <td><input class="form-control form-control-sm tablero-number-input" type="number" step="0.01" name="subtotalManual" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.subtotalManual}" th:disabled="${!fila.grupo}"></td>
+                    <td class="text-end fw-semibold" th:text="${#numbers.formatDecimal(fila.costoSubtotal(), 1, 'POINT', 2, 'COMMA')}">0,00</td>
+                    <td><input class="form-control form-control-sm tablero-percent-input" type="number" step="0.01" name="costoEstructuralPorcentaje" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.costoEstructuralPorcentaje}"></td>
+                    <td class="text-end" th:text="${#numbers.formatDecimal(fila.costoEstructuralMonto(), 1, 'POINT', 2, 'COMMA')}">0,00</td>
+                    <td><input class="form-control form-control-sm tablero-percent-input" type="number" step="0.01" name="beneficioEmpresarialPorcentaje" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.beneficioEmpresarialPorcentaje}"></td>
+                    <td class="text-end" th:text="${#numbers.formatDecimal(fila.beneficioEmpresarialMonto(), 1, 'POINT', 2, 'COMMA')}">0,00</td>
+                    <td class="text-end" th:text="${#numbers.formatDecimal(fila.estructuraMasBeneficio(), 1, 'POINT', 2, 'COMMA')}">0,00</td>
+                    <td class="text-end fw-bold" th:text="${#numbers.formatDecimal(fila.totalTarea(), 1, 'POINT', 2, 'COMMA')}">0,00</td>
+                    <td><input class="form-control form-control-sm tablero-percent-input" type="number" step="0.01" name="avanceCertificadoPorcentaje" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.avanceCertificadoPorcentaje}"></td>
+                    <td class="text-end fw-bold" th:text="${#numbers.formatDecimal(fila.montoCertificado(), 1, 'POINT', 2, 'COMMA')}">0,00</td>
+                    <td class="tablero-actions-cell">
+                        <form method="post" th:id="${'tablero-item-form-' + fila.id}" th:action="@{/tablero-certificados/{id}/items/{itemId}(id=${tablero.id},itemId=${fila.id})}"></form>
+                        <button class="btn btn-sm btn-primary table-icon-action" th:attr="form=${'tablero-item-form-' + fila.id}" type="submit" title="Guardar fila" aria-label="Guardar fila"><i class="bi bi-save"></i></button>
+                        <form method="post" th:action="@{/tablero-certificados/{id}/items/{itemId}/eliminar(id=${tablero.id},itemId=${fila.id})}" onsubmit="return confirm('Eliminar esta fila del tablero?');">
+                            <button class="btn btn-sm btn-outline-danger table-icon-action" type="submit" title="Eliminar fila" aria-label="Eliminar fila"><i class="bi bi-trash"></i></button>
+                        </form>
+                    </td>
+                </tr>
+                <tr th:if="${tablero.items.isEmpty()}"><td colspan="25" class="text-center text-muted py-4">Importa items de OC o agrega un item manual para comenzar.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+</body>
+</html>

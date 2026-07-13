@@ -9731,6 +9731,112 @@ html[data-theme="dark"] body {
     }
 }
 
+/* Management certificate board */
+.tablero-page {
+    max-width: none;
+}
+
+.tablero-table-panel {
+    overflow: hidden;
+}
+
+.tablero-table-scroll {
+    max-height: calc(100vh - 12rem);
+    border: 1px solid var(--ui-line);
+    border-radius: 8px;
+}
+
+.tablero-cert-table {
+    min-width: 176rem;
+    font-size: 0.72rem;
+}
+
+.tablero-cert-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: #eef2f7;
+    color: var(--ui-ink);
+    font-size: 0.64rem;
+    font-weight: 820;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.tablero-cert-table td {
+    background: #ffffff;
+    vertical-align: middle;
+}
+
+.tablero-cert-table .form-control {
+    min-height: 1.95rem;
+    padding: 0.25rem 0.35rem;
+    border-radius: 6px;
+    font-size: 0.72rem;
+}
+
+.tablero-description-input {
+    min-width: 20rem;
+}
+
+.tablero-number-input {
+    min-width: 7.3rem;
+    text-align: right;
+}
+
+.tablero-percent-input,
+.tablero-unit-input {
+    min-width: 5.2rem;
+}
+
+.tablero-group-row td {
+    background: #f8fbff;
+}
+
+.tablero-group-row td:first-child strong {
+    color: var(--ui-blue);
+}
+
+.tablero-actions-cell {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.3rem;
+    min-width: 5.8rem;
+}
+
+.tablero-actions-cell form {
+    margin: 0;
+}
+
+:root[data-theme="dark"] .tablero-table-scroll {
+    border-color: rgba(148, 163, 184, 0.18);
+}
+
+:root[data-theme="dark"] .tablero-cert-table thead th {
+    background: #282d45;
+    color: #eef2ff;
+}
+
+:root[data-theme="dark"] .tablero-cert-table td {
+    background: #202337;
+    color: #eef2ff;
+}
+
+:root[data-theme="dark"] .tablero-group-row td {
+    background: #252b42;
+}
+
+:root[data-theme="dark"] .tablero-cert-table .form-control {
+    border-color: rgba(148, 163, 184, 0.24);
+    background: #282d45;
+    color: #eef2ff;
+}
+
+:root[data-theme="dark"] .tablero-group-row td:first-child strong {
+    color: #8be9fd;
+}
+
 /* Security and worksite selection */
 .sidebar-logout-form {
     margin: 0;
