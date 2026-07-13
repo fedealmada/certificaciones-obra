@@ -64,7 +64,7 @@ public class TableroCertificadoController {
     @PostMapping("/{id}/importar-items")
     public String importarItems(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         int agregados = tableroService.importarItemsCertificadosPeriodo(id);
-        redirectAttributes.addFlashAttribute("success", agregados + " items de mano de obra certificados en el periodo fueron sincronizados.");
+        redirectAttributes.addFlashAttribute("success", agregados + " items de mano de obra detectados en el periodo fueron agregados al tablero.");
         return "redirect:/tablero-certificados/" + id;
     }
 

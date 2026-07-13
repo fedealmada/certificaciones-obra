@@ -9747,7 +9747,7 @@ html[data-theme="dark"] body {
 }
 
 .tablero-cert-table {
-    min-width: 96rem;
+    min-width: 86rem;
     font-size: 0.72rem;
 }
 
@@ -9782,7 +9782,7 @@ html[data-theme="dark"] body {
 }
 
 .tablero-description-head {
-    min-width: 28rem;
+    min-width: 34rem;
 }
 
 .tablero-cert-table .form-control {
@@ -9793,37 +9793,27 @@ html[data-theme="dark"] body {
 }
 
 .tablero-description-input {
-    min-width: 30rem;
+    min-width: 36rem;
 }
 
 .tablero-number-input {
-    min-width: 7.3rem;
+    min-width: 7rem;
     text-align: right;
 }
 
 .tablero-percent-input,
 .tablero-unit-input {
-    min-width: 5.2rem;
+    min-width: 4.8rem;
+}
+
+.tablero-code-input {
+    min-width: 6.2rem;
+    font-weight: 700;
+    text-align: center;
 }
 
 .tablero-group-row td {
     background: #f8fbff;
-}
-
-.tablero-group-row td:first-child strong {
-    color: var(--ui-blue);
-}
-
-.tablero-optional-column {
-    display: none;
-}
-
-.tablero-cert-table.is-showing-advanced {
-    min-width: 176rem;
-}
-
-.tablero-cert-table.is-showing-advanced .tablero-optional-column {
-    display: table-cell;
 }
 
 .tablero-actions-cell {
