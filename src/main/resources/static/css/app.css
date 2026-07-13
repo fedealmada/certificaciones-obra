@@ -9253,6 +9253,28 @@ html[data-theme="dark"] body {
     margin: 0;
 }
 
+.asistencia-inline-form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(6.4rem, 1fr)) auto;
+    align-items: end;
+    gap: 0.45rem;
+    width: 100%;
+}
+
+.asistencia-inline-form label {
+    display: grid;
+    gap: 0.18rem;
+    margin: 0;
+    color: var(--ui-muted);
+    font-size: 0.66rem;
+    font-weight: 760;
+    text-transform: uppercase;
+}
+
+.asistencia-inline-form input {
+    min-height: 2rem;
+}
+
 .asistencia-person-actions .btn {
     min-width: 7.6rem;
 }
@@ -9345,7 +9367,14 @@ html[data-theme="dark"] body {
     color: #eef2ff;
 }
 
+:root[data-theme="dark"] .asistencia-inline-form input {
+    border-color: rgba(148, 163, 184, 0.24);
+    background: #282d45;
+    color: #eef2ff;
+}
+
 :root[data-theme="dark"] .asistencia-date-picker label,
+:root[data-theme="dark"] .asistencia-inline-form label,
 :root[data-theme="dark"] .asistencia-person-main small,
 :root[data-theme="dark"] .asistencia-person-status small,
 :root[data-theme="dark"] .asistencia-empty-people {
@@ -9427,6 +9456,14 @@ html[data-theme="dark"] body {
     .asistencia-person-actions .btn,
     .asistencia-person-actions form {
         width: 100%;
+    }
+
+    .asistencia-inline-form {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .asistencia-inline-form .btn {
+        grid-column: 1 / -1;
     }
 }
 

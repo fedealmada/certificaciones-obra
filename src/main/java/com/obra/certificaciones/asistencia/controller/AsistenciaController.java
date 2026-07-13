@@ -35,6 +35,9 @@ public class AsistenciaController {
         LocalDate fechaSeleccionada = fecha == null ? LocalDate.now() : fecha;
         var obra = obraService.obraActiva(session);
         var asistencias = asistenciaService.listarPorFecha(obra, fechaSeleccionada);
+        var personas = depositoService.listarTrabajadoresActivos();
+        long presentes = asistenciaService.contarPresentes(asistencias);
+        long incompletos = asistenciaService.contarIncompletos(asistencias);
         model.addAttribute("fecha", fechaSeleccionada);
         model.addAttribute("fechaAnterior", fechaSeleccionada.minusDays(1));
         model.addAttribute("fechaSiguiente", fechaSeleccionada.plusDays(1));
@@ -42,10 +45,13 @@ public class AsistenciaController {
                 .mapToObj(dia -> fechaSeleccionada.plusDays(dia))
                 .toList());
         model.addAttribute("asistencias", asistencias);
-        model.addAttribute("personas", depositoService.listarTrabajadoresActivos());
+        model.addAttribute("personas", personas);
         model.addAttribute("asistenciaPorTrabajador", asistenciaService.mapaPorTrabajador(obra, fechaSeleccionada));
         model.addAttribute("resumenEmpresas", asistenciaService.resumenPorEmpresa(asistencias));
         model.addAttribute("totalHoras", asistenciaService.totalHoras(asistencias));
+        model.addAttribute("presentes", presentes);
+        model.addAttribute("incompletos", incompletos);
+        model.addAttribute("ausentes", Math.max(0, personas.size() - presentes - incompletos));
         model.addAttribute("recientes", asistenciaService.recientes(obra));
         return "asistencia/lista";
     }
@@ -79,23 +85,6 @@ public class AsistenciaController {
             cargarFormulario(model, form, form.getId() != null);
             return "asistencia/form";
         }
-    }
-
-    @PostMapping("/entrada")
-    public String marcarEntrada(@RequestParam Long trabajadorId,
-                                @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha,
-                                RedirectAttributes redirectAttributes,
-                                HttpSession session) {
-        asistenciaService.marcarEntrada(trabajadorId, fecha, obraService.obraActiva(session));
-        redirectAttributes.addFlashAttribute("success", "Entrada registrada.");
-        return "redirect:/asistencia?fecha=" + fecha;
-    }
-
-    @PostMapping("/{id}/salida")
-    public String marcarSalida(@PathVariable Long id, RedirectAttributes redirectAttributes) {
-        var asistencia = asistenciaService.marcarSalida(id);
-        redirectAttributes.addFlashAttribute("success", "Salida registrada.");
-        return "redirect:/asistencia?fecha=" + asistencia.getFecha();
     }
 
     @PostMapping("/{id}/eliminar")

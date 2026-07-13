@@ -17,11 +17,9 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -66,41 +64,6 @@ public class AsistenciaService {
     }
 
     @Transactional
-    public AsistenciaPersonal marcarEntrada(Long trabajadorId, LocalDate fecha, Obra obra) {
-        DepositoTrabajador trabajador = trabajadorRepository.findById(trabajadorId)
-                .orElseThrow(() -> new EntityNotFoundException("No existe la persona " + trabajadorId));
-        LocalDate fechaSegura = fecha == null ? LocalDate.now() : fecha;
-        Optional<AsistenciaPersonal> existente = asistenciaRepository.findByObraIdAndFechaAndTrabajadorId(obra.getId(), fechaSegura, trabajadorId);
-        if (existente.isPresent()) {
-            return existente.get();
-        }
-        AsistenciaPersonal asistencia = new AsistenciaPersonal();
-        asistencia.setObra(obra);
-        asistencia.setFecha(fechaSegura);
-        asistencia.setTrabajadorId(trabajador.getId());
-        asistencia.setTrabajadorNombre(trabajador.getNombre());
-        asistencia.setEmpresa(trabajador.getEmpresa());
-        asistencia.setSector(trabajador.getSector());
-        asistencia.setHoraIngreso(LocalTime.now().withSecond(0).withNano(0));
-        asistencia.setHorasTrabajadas(BigDecimal.ZERO);
-        return asistenciaRepository.save(asistencia);
-    }
-
-    @Transactional
-    public AsistenciaPersonal marcarSalida(Long asistenciaId) {
-        AsistenciaPersonal asistencia = obtener(asistenciaId);
-        if (asistencia.getHoraIngreso() == null) {
-            asistencia.setHoraIngreso(LocalTime.now().withSecond(0).withNano(0));
-        }
-        asistencia.setHoraSalida(LocalTime.now().withSecond(0).withNano(0));
-        if (asistencia.getHoraSalida().isAfter(asistencia.getHoraIngreso())) {
-            long minutos = Duration.between(asistencia.getHoraIngreso(), asistencia.getHoraSalida()).toMinutes();
-            asistencia.setHorasTrabajadas(BigDecimal.valueOf(minutos).divide(BigDecimal.valueOf(60), 2, RoundingMode.HALF_UP));
-        }
-        return asistenciaRepository.save(asistencia);
-    }
-
-    @Transactional
     public void eliminar(Long id) {
         asistenciaRepository.delete(obtener(id));
     }
@@ -123,7 +86,7 @@ public class AsistenciaService {
 
     public List<AsistenciaEmpresaResumen> resumenPorEmpresa(List<AsistenciaPersonal> asistencias) {
         Map<String, ResumenMutable> resumen = new LinkedHashMap<>();
-        for (AsistenciaPersonal asistencia : asistencias) {
+        for (AsistenciaPersonal asistencia : asistencias.stream().filter(this::presente).toList()) {
             String empresa = StringUtils.hasText(asistencia.getEmpresa()) ? asistencia.getEmpresa() : "Sin empresa";
             ResumenMutable actual = resumen.computeIfAbsent(empresa, key -> new ResumenMutable());
             actual.personas++;
@@ -136,8 +99,20 @@ public class AsistenciaService {
 
     public BigDecimal totalHoras(List<AsistenciaPersonal> asistencias) {
         return asistencias.stream()
+                .filter(this::presente)
                 .map(asistencia -> valorSeguro(asistencia.getHorasTrabajadas()))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    public long contarPresentes(List<AsistenciaPersonal> asistencias) {
+        return asistencias.stream().filter(this::presente).count();
+    }
+
+    public long contarIncompletos(List<AsistenciaPersonal> asistencias) {
+        return asistencias.stream()
+                .filter(asistencia -> !presente(asistencia))
+                .filter(asistencia -> asistencia.getHoraIngreso() != null || asistencia.getHoraSalida() != null)
+                .count();
     }
 
     private void aplicar(AsistenciaPersonal asistencia, AsistenciaForm form) {
@@ -155,7 +130,8 @@ public class AsistenciaService {
 
     private DepositoTrabajador obtenerOCrearTrabajador(AsistenciaForm form) {
         if (form.getTrabajadorId() != null) {
-            return trabajadorRepository.findById(form.getTrabajadorId()).orElse(null);
+            return trabajadorRepository.findById(form.getTrabajadorId())
+                    .orElseThrow(() -> new EntityNotFoundException("No existe la persona " + form.getTrabajadorId()));
         }
         String nombre = form.getTrabajadorNombre().trim();
         return trabajadorRepository.findByNombreIgnoreCase(nombre)
@@ -169,25 +145,29 @@ public class AsistenciaService {
     }
 
     private BigDecimal calcularHoras(AsistenciaForm form) {
+        if (form.getHoraIngreso() == null || form.getHoraSalida() == null) {
+            return BigDecimal.ZERO;
+        }
         if (form.getHorasTrabajadas() != null && form.getHorasTrabajadas().compareTo(BigDecimal.ZERO) > 0) {
             return form.getHorasTrabajadas();
         }
-        if (form.getHoraIngreso() != null && form.getHoraSalida() != null && form.getHoraSalida().isAfter(form.getHoraIngreso())) {
-            long minutos = Duration.between(form.getHoraIngreso(), form.getHoraSalida()).toMinutes();
-            return BigDecimal.valueOf(minutos).divide(BigDecimal.valueOf(60), 2, RoundingMode.HALF_UP);
-        }
-        return BigDecimal.ZERO;
+        long minutos = Duration.between(form.getHoraIngreso(), form.getHoraSalida()).toMinutes();
+        return BigDecimal.valueOf(minutos).divide(BigDecimal.valueOf(60), 2, RoundingMode.HALF_UP);
     }
 
     private void validar(AsistenciaForm form) {
         if (form.getFecha() == null) {
             throw new IllegalArgumentException("La fecha es obligatoria.");
         }
-        if (!StringUtils.hasText(form.getTrabajadorNombre())) {
+        if (form.getTrabajadorId() == null && !StringUtils.hasText(form.getTrabajadorNombre())) {
             throw new IllegalArgumentException("La persona es obligatoria.");
         }
         if (form.getHorasTrabajadas() != null && form.getHorasTrabajadas().compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("Las horas no pueden ser negativas.");
+        }
+        if (form.getHorasTrabajadas() != null && form.getHorasTrabajadas().compareTo(BigDecimal.ZERO) > 0
+                && (form.getHoraIngreso() == null || form.getHoraSalida() == null)) {
+            throw new IllegalArgumentException("Para cargar horas trabajadas debe indicar ingreso y salida.");
         }
         if (form.getHoraIngreso() != null && form.getHoraSalida() != null && !form.getHoraSalida().isAfter(form.getHoraIngreso())) {
             throw new IllegalArgumentException("La hora de salida debe ser posterior a la hora de ingreso.");
@@ -200,6 +180,10 @@ public class AsistenciaService {
 
     private BigDecimal valorSeguro(BigDecimal valor) {
         return valor == null ? BigDecimal.ZERO : valor;
+    }
+
+    private boolean presente(AsistenciaPersonal asistencia) {
+        return asistencia.getHoraIngreso() != null && asistencia.getHoraSalida() != null;
     }
 
     private static class ResumenMutable {
