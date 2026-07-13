@@ -101,7 +101,13 @@
         </tr>
         <tr th:if="${recepciones.isEmpty()}"><td colspan="10" class="text-center text-muted py-4">Todavia no hay entregas registradas.</td></tr>
         </tbody>
-    </table></div></section>
+    </table></div>
+        <nav class="pagination-strip">
+            <a class="btn btn-sm btn-outline-secondary" th:classappend="${recepcionesPage.first ? ' disabled' : ''}" th:href="@{/materiales/oc/{id}(id=${orden.id}, origen=${origen}, page=${recepcionesPage.number - 1})}"><i class="bi bi-chevron-left"></i> Anterior</a>
+            <span th:text="${'Pagina ' + (recepcionesPage.totalPages == 0 ? 0 : recepcionesPage.number + 1) + ' de ' + recepcionesPage.totalPages + ' - mostrando ' + recepciones.size() + ' de ' + recepcionesPage.totalElements + ' - 25 por pagina'}">Pagina</span>
+            <a class="btn btn-sm btn-outline-secondary" th:classappend="${recepcionesPage.last ? ' disabled' : ''}" th:href="@{/materiales/oc/{id}(id=${orden.id}, origen=${origen}, page=${recepcionesPage.number + 1})}">Siguiente <i class="bi bi-chevron-right"></i></a>
+        </nav>
+    </section>
 </main>
 <script>
 document.querySelectorAll('.oc-progress .progress-bar').forEach(progressFill => {

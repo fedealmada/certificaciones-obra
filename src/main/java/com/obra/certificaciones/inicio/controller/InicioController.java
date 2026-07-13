@@ -49,6 +49,7 @@ public class InicioController {
                         modulos.stream().filter(modulo -> Set.of(
                                 "modulo.dashboard",
                                 "modulo.itemizado",
+                                "modulo.controlRubros",
                                 "modulo.items",
                                 "modulo.materiales",
                                 "modulo.asistencia"

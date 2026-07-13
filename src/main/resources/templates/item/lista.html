@@ -32,24 +32,24 @@
     </div>
 
     <section class="panel-section mb-3">
-        <div class="row g-2 align-items-end">
+        <form class="row g-2 align-items-end" id="item-filter-form" method="get" th:action="@{/items}">
             <div class="col-lg-7">
                 <label class="form-label">Buscar por detalle, OC, fecha, proveedor, rubro o categoria</label>
-                <input class="form-control" id="item-search" placeholder="Ej: ladrillos, revoque, 327, Miguel Muriel">
+                <input class="form-control" id="item-search" name="busqueda" th:value="${busqueda}" placeholder="Ej: ladrillos, revoque, 327, Miguel Muriel">
             </div>
             <div class="col-md-3">
                 <label class="form-label">Categoria</label>
-                <select class="form-select" id="item-category-filter">
+                <select class="form-select" id="item-category-filter" name="categoria">
                     <option value="">Todas</option>
-                    <option value="MANO_OBRA">Mano de obra</option>
-                    <option value="MATERIAL">Material</option>
-                    <option value="OTRO">Otros</option>
+                    <option value="MANO_OBRA" th:selected="${categoriaSeleccionada != null && categoriaSeleccionada.name() == 'MANO_OBRA'}">Mano de obra</option>
+                    <option value="MATERIAL" th:selected="${categoriaSeleccionada != null && categoriaSeleccionada.name() == 'MATERIAL'}">Material</option>
+                    <option value="OTRO" th:selected="${categoriaSeleccionada != null && categoriaSeleccionada.name() == 'OTRO'}">Otros</option>
                 </select>
             </div>
             <div class="col-md-2">
-                <button class="btn btn-outline-secondary w-100" type="button" onclick="limpiarBusquedaItems()"><i class="bi bi-x-lg"></i> Limpiar</button>
+                <button class="btn btn-outline-secondary w-100" type="button" onclick="window.location.href='/items'"><i class="bi bi-x-lg"></i> Limpiar</button>
             </div>
-        </div>
+        </form>
     </section>
 
     <div class="alert alert-success" th:if="${mensaje}" th:text="${mensaje}"></div>
@@ -58,8 +58,8 @@
         <div class="section-title-row">
             <h2 class="h5 mb-0"><i class="bi bi-list-task"></i> Items cargados</h2>
             <div class="section-title-actions">
-                <span class="filter-active-pill d-none" id="item-filter-indicator"><i class="bi bi-funnel-fill"></i> Filtro activo</span>
-                <span class="section-total-pill"><span id="item-visible-count" th:text="${items.size()}">0</span> <span>visibles</span></span>
+                <span th:class="${(busqueda != null && !#strings.isEmpty(busqueda)) || categoriaSeleccionada != null ? 'filter-active-pill' : 'filter-active-pill d-none'}" id="item-filter-indicator"><i class="bi bi-funnel-fill"></i> Filtro activo</span>
+                <span class="section-total-pill"><span id="item-visible-count" th:text="${itemsPage.totalElements}">0</span> <span>items</span></span>
             </div>
         </div>
         <div class="table-responsive">
@@ -115,6 +115,11 @@
                 </tbody>
             </table>
         </div>
+        <nav class="pagination-strip">
+            <a class="btn btn-sm btn-outline-secondary" th:classappend="${itemsPage.first ? ' disabled' : ''}" th:href="@{/items(page=${itemsPage.number - 1}, busqueda=${busqueda}, categoria=${categoriaSeleccionada})}"><i class="bi bi-chevron-left"></i> Anterior</a>
+            <span th:text="${'Pagina ' + (itemsPage.totalPages == 0 ? 0 : itemsPage.number + 1) + ' de ' + itemsPage.totalPages + ' - mostrando ' + items.size() + ' de ' + itemsPage.totalElements + ' - 25 por pagina'}">Pagina</span>
+            <a class="btn btn-sm btn-outline-secondary" th:classappend="${itemsPage.last ? ' disabled' : ''}" th:href="@{/items(page=${itemsPage.number + 1}, busqueda=${busqueda}, categoria=${categoriaSeleccionada})}">Siguiente <i class="bi bi-chevron-right"></i></a>
+        </nav>
     </section>
 </main>
 <script>
@@ -125,6 +130,7 @@ const itemEmptyFilterRow = document.querySelector('.items-empty-filter-row');
 const itemFilterIndicator = document.querySelector('#item-filter-indicator');
 const itemStorageKey = 'obraControl.items.filters';
 let itemCurrentSort = { key: 'fecha', direction: 'desc', type: 'date' };
+let itemSubmitTimer;
 
 function normalizeItemText(value) {
     return (value || '').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
@@ -204,17 +210,7 @@ function guardarFiltrosItems() {
     localStorage.setItem(itemStorageKey, JSON.stringify(state));
 }
 
-function restaurarFiltrosItems() {
-    const raw = localStorage.getItem(itemStorageKey);
-    if (!raw) return;
-    try {
-        const state = JSON.parse(raw);
-        document.querySelector('#item-search').value = state.busqueda || '';
-        document.querySelector('#item-category-filter').value = state.categoria || '';
-    } catch (error) {
-        localStorage.removeItem(itemStorageKey);
-    }
-}
+function restaurarFiltrosItems() { }
 
 function ordenarItems(key, type, toggleDirection) {
     const direction = toggleDirection ? (itemCurrentSort.key === key && itemCurrentSort.direction === 'asc' ? 'desc' : 'asc') : itemCurrentSort.direction;
@@ -244,21 +240,14 @@ function ordenarItems(key, type, toggleDirection) {
     });
 }
 
-function limpiarBusquedaItems() {
-    localStorage.removeItem(itemStorageKey);
-    document.querySelector('#item-search').value = '';
-    document.querySelector('#item-category-filter').value = '';
-    aplicarFiltroItems();
-}
+function limpiarBusquedaItems() { window.location.href = '/items'; }
 
-document.querySelector('#item-search').addEventListener('input', () => {
-    guardarFiltrosItems();
-    aplicarFiltroItems();
-});
-document.querySelector('#item-category-filter').addEventListener('change', () => {
-    guardarFiltrosItems();
-    aplicarFiltroItems();
-});
+const submitItemFilters = () => {
+    window.clearTimeout(itemSubmitTimer);
+    itemSubmitTimer = window.setTimeout(() => document.querySelector('#item-filter-form').submit(), 280);
+};
+document.querySelector('#item-search').addEventListener('input', submitItemFilters);
+document.querySelector('#item-category-filter').addEventListener('change', submitItemFilters);
 document.querySelectorAll('.item-rubro-select').forEach(select => {
     select.addEventListener('change', () => guardarRubroItem(select));
 });
@@ -306,9 +295,7 @@ async function guardarRubroItem(select) {
     }
 }
 
-restaurarFiltrosItems();
-ordenarItems(itemCurrentSort.key, itemCurrentSort.type, false);
-aplicarFiltroItems();
+// La pagina ya llega filtrada y paginada desde el servidor; ordenamos solo si el usuario lo pide.
 </script>
 </body>
 </html>

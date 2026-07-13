@@ -47,7 +47,7 @@
             <h2 class="h5 mb-0"><i class="bi bi-truck"></i> Ordenes con entregas</h2>
             <div class="section-title-actions">
                 <span class="filter-active-pill d-none" id="delivery-filter-indicator"><i class="bi bi-funnel-fill"></i> Filtro activo</span>
-                <span class="section-total-pill"><span id="delivery-visible-count" th:text="${ordenes.size()}">0</span> <span>visibles</span></span>
+                <span class="section-total-pill"><span id="delivery-visible-count" th:text="${ordenesPage.totalElements}">0</span> <span>ordenes</span></span>
             </div>
         </div>
     <div class="table-responsive"><table class="table table-hover align-middle document-table oc-list-table" id="delivery-table" data-no-resize="true">
@@ -105,6 +105,11 @@
         <tr class="delivery-empty-filter-row d-none"><td colspan="10" class="text-center text-muted py-4">No hay entregas que coincidan con la busqueda.</td></tr>
         </tbody>
     </table></div>
+        <nav class="pagination-strip">
+            <a class="btn btn-sm btn-outline-secondary" th:classappend="${ordenesPage.first ? ' disabled' : ''}" th:href="@{/materiales(page=${ordenesPage.number - 1})}"><i class="bi bi-chevron-left"></i> Anterior</a>
+            <span th:text="${'Pagina ' + (ordenesPage.totalPages == 0 ? 0 : ordenesPage.number + 1) + ' de ' + ordenesPage.totalPages + ' - mostrando ' + ordenes.size() + ' de ' + ordenesPage.totalElements + ' - 25 por pagina'}">Pagina</span>
+            <a class="btn btn-sm btn-outline-secondary" th:classappend="${ordenesPage.last ? ' disabled' : ''}" th:href="@{/materiales(page=${ordenesPage.number + 1})}">Siguiente <i class="bi bi-chevron-right"></i></a>
+        </nav>
     </section>
 </main>
 <script>
@@ -243,8 +248,7 @@ document.querySelectorAll('#delivery-table .table-sort-button').forEach(button =
     button.addEventListener('click', () => applyDeliverySort(button.dataset.sort, button.dataset.type, true));
 });
 
-restoreDeliveryFilters();
-applyDeliverySort(currentDeliverySort.key, currentDeliverySort.type, false);
+// La pagina ya llega paginada; ordenamos o filtramos en el navegador solo si el usuario lo pide.
 </script>
 </body>
 </html>

@@ -31,6 +31,7 @@
             <a class="nav-link" th:if="${configuracion.activo('modulo.reportes')}" th:href="@{/reportes}" title="Reportes"><i class="bi bi-bar-chart"></i><span>Reportes</span></a>
             <div class="app-nav-section"><span>Obra</span></div>
             <a class="nav-link" th:if="${configuracion.activo('modulo.itemizado')}" th:href="@{/itemizado}" title="Itemizado"><i class="bi bi-diagram-3"></i><span>Itemizado</span></a>
+            <a class="nav-link" th:if="${configuracion.activo('modulo.controlRubros')}" th:href="@{/control-rubros}" title="Control rubros"><i class="bi bi-clipboard-data"></i><span>Control rubros</span></a>
             <a class="nav-link" th:if="${configuracion.activo('modulo.items')}" th:href="@{/items}" title="Items"><i class="bi bi-list-task"></i><span>Items</span></a>
             <a class="nav-link" th:if="${configuracion.activo('modulo.materiales')}" th:href="@{/materiales}" title="Entregas"><i class="bi bi-truck"></i><span>Entregas</span></a>
             <a class="nav-link" th:if="${configuracion.activo('modulo.asistencia')}" th:href="@{/asistencia}" title="Asistencia"><i class="bi bi-person-check"></i><span>Asistencia</span></a>

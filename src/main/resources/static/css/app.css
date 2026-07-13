@@ -6100,10 +6100,9 @@ body {
     transform: translateZ(0);
     will-change: width, box-shadow;
     transition:
-        width 1.55s cubic-bezier(0.22, 1, 0.36, 1),
-        box-shadow 1.05s cubic-bezier(0.22, 1, 0.36, 1),
-        background-color 220ms ease,
-        border-color 220ms ease;
+        width 260ms ease,
+        background-color 150ms ease,
+        border-color 150ms ease;
 }
 
 .app-sidebar:hover,
@@ -6691,34 +6690,47 @@ main.container,
 
 /* Final dark-mode harmonization and soft theme switching */
 :root {
-    --theme-transition: 420ms cubic-bezier(0.22, 1, 0.36, 1);
+    --theme-transition: 150ms ease;
+    color-scheme: light;
 }
 
-html,
+:root[data-theme="dark"] {
+    color-scheme: dark;
+}
+
 body,
-body::before,
-body::after,
-body *:not(.oc-total-progress-fill):not(.cert-detail-progress-fill):not(.progress-bar):not(.bar-fill),
-body *::before,
-body *::after {
+.app-sidebar,
+.dashboard-body .app-topbar,
+.page-hero,
+.document-header,
+.panel-section,
+.metric-card,
+.ticket-shell,
+.table-responsive,
+.table,
+.table th,
+.table td,
+.form-control,
+.form-select,
+.btn,
+.nav-link,
+.status-pill,
+.delivery-status-pill,
+.home-module-card {
     transition:
         background-color var(--theme-transition),
         border-color var(--theme-transition),
-        color var(--theme-transition),
-        box-shadow var(--theme-transition),
-        fill var(--theme-transition),
-        stroke var(--theme-transition);
+        color var(--theme-transition);
 }
 
 @media (prefers-reduced-motion: reduce) {
-    html,
-    body,
-    body::before,
-    body::after,
-    body *,
-    body *::before,
-    body *::after {
-        transition: none !important;
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+        scroll-behavior: auto !important;
     }
 }
 
@@ -8334,7 +8346,7 @@ html[data-theme="dark"] body {
 :root[data-theme="dark"] .cert-import-actions {
     background: #282a36 !important;
     border-color: #44475a !important;
-    box-shadow: 0 18px 38px rgba(8, 9, 14, 0.32) !important;
+    box-shadow: 0 8px 18px rgba(8, 9, 14, 0.16) !important;
 }
 
 :root[data-theme="dark"] .metric-card,
@@ -10081,4 +10093,470 @@ html[data-theme="dark"] body {
     .obra-layout {
         grid-template-columns: 1fr;
     }
+}
+
+
+.pagination-strip {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding-top: 0.75rem;
+    color: var(--app-muted);
+    font-size: 0.82rem;
+}
+
+.pagination-strip .btn.disabled {
+    pointer-events: none;
+    opacity: 0.45;
+}
+
+/* Lightweight table rendering for the heavy operational views. */
+.oc-list-table tbody tr,
+.items-master-table tbody tr,
+.document-table tbody tr {
+    contain: paint;
+}
+
+.oc-list-table,
+.items-master-table,
+.oc-items-table,
+.document-table {
+    font-variant-numeric: tabular-nums;
+}
+
+.oc-items-table .progress-thin {
+    min-width: 90px;
+}
+
+
+.control-rubro-page .page-hero {
+    align-items: center;
+}
+
+.control-rubro-kpis {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.85rem;
+}
+
+.control-rubro-kpis .metric-card.is-danger {
+    border-color: #f2a29b;
+    background: #fff7f6;
+}
+
+.control-rubro-kpis .metric-card.is-ok {
+    border-color: #a8d8bd;
+    background: #f6fff9;
+}
+
+.control-rubro-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0;
+    border-top: 1px solid var(--ui-line);
+}
+
+.control-rubro-summary-grid div {
+    padding: 1rem;
+    border-right: 1px solid var(--ui-line);
+}
+
+.control-rubro-summary-grid div:last-child {
+    border-right: 0;
+}
+
+.control-rubro-summary-grid span {
+    display: block;
+    color: var(--ui-muted);
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.control-rubro-summary-grid strong {
+    display: block;
+    margin-top: 0.3rem;
+    font-size: 1.08rem;
+}
+
+.control-rubro-table {
+    table-layout: fixed;
+    font-size: 0.78rem;
+}
+
+.control-rubro-table th,
+.control-rubro-table td {
+    padding: 0.55rem 0.45rem;
+}
+
+.control-rubro-table th:nth-child(1),
+.control-rubro-table td:nth-child(1) { width: 5%; }
+.control-rubro-table th:nth-child(2),
+.control-rubro-table td:nth-child(2) { width: 18%; }
+.control-rubro-table th:nth-child(7),
+.control-rubro-table td:nth-child(7) { width: 11%; }
+.control-rubro-table th:nth-child(9),
+.control-rubro-table td:nth-child(9) { width: 8%; }
+.control-rubro-table th:nth-child(12),
+.control-rubro-table td:nth-child(12) { width: 8%; }
+
+.control-rubro-edit-cell form {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 2rem;
+    gap: 0.25rem;
+    align-items: center;
+}
+
+.control-rubro-edit-cell .form-control {
+    min-width: 0;
+    font-size: 0.76rem;
+    padding: 0.35rem 0.45rem;
+}
+
+.control-row-danger td {
+    background: #fff8f7;
+}
+
+.control-row-warning td {
+    background: #fffdf2;
+}
+
+:root[data-theme="dark"] .control-row-danger td {
+    background: rgba(255, 85, 85, 0.09) !important;
+}
+
+:root[data-theme="dark"] .control-row-warning td {
+    background: rgba(241, 196, 15, 0.1) !important;
+}
+
+:root[data-theme="dark"] .control-rubro-kpis .metric-card.is-danger,
+:root[data-theme="dark"] .control-rubro-kpis .metric-card.is-ok {
+    background: #282a36;
+}
+
+@media (max-width: 1100px) {
+    .control-rubro-kpis,
+    .control-rubro-summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 760px) {
+    .control-rubro-kpis,
+    .control-rubro-summary-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+.control-cost-sheet {
+    padding: 0;
+    overflow: hidden;
+    border-color: #1b1b1b;
+}
+
+.control-cost-title-row {
+    display: grid;
+    grid-template-columns: minmax(300px, 1.2fr) minmax(180px, 0.8fr);
+    border-bottom: 2px solid #1b1b1b;
+    background: #f4f6f8;
+    font-size: 0.82rem;
+    font-weight: 800;
+}
+
+.control-cost-title-row > div {
+    padding: 0.55rem 0.7rem;
+    border-right: 2px solid #1b1b1b;
+    text-align: center;
+}
+
+.control-cost-title-row > div:first-child {
+    text-align: left;
+}
+
+.control-cost-title-row > div:last-child {
+    border-right: 0;
+}
+
+.control-cost-table-wrap {
+    overflow-x: auto;
+}
+
+.control-cost-table {
+    width: 100%;
+    min-width: 560px;
+    border-collapse: collapse;
+    table-layout: fixed;
+    font-size: 0.78rem;
+    background: #ffffff;
+}
+
+.control-cost-table td,
+.control-cost-table th {
+    border: 1px solid #1b1b1b;
+    padding: 0.32rem 0.42rem;
+    line-height: 1.15;
+    color: #111827;
+}
+
+.control-cost-table .cost-code {
+    width: 9%;
+    text-align: center;
+    font-weight: 800;
+}
+
+.control-cost-table .cost-activity {
+    width: 52%;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.control-cost-table .cost-currency {
+    width: 8%;
+    text-align: center;
+    font-weight: 800;
+}
+
+.control-cost-table .cost-value {
+    width: 31%;
+    text-align: right;
+    font-weight: 700;
+    background: #f2f2f2;
+}
+
+.control-cost-table tr.is-parent-row .cost-activity,
+.control-cost-table tr.is-parent-row .cost-code {
+    background: #fafafa;
+}
+
+.control-cost-table tfoot td {
+    height: 2.2rem;
+    border-top: 2px solid #1b1b1b;
+    font-weight: 900;
+    background: #ffffff;
+}
+
+.control-cost-table tfoot td:last-child,
+.control-cost-table tfoot td:nth-child(3) {
+    background: #f2f2f2;
+}
+
+.control-rubro-table thead th {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+}
+
+:root[data-theme="dark"] .control-cost-sheet,
+:root[data-theme="dark"] .control-cost-table td,
+:root[data-theme="dark"] .control-cost-title-row > div {
+    border-color: #10131d !important;
+}
+
+:root[data-theme="dark"] .control-cost-title-row,
+:root[data-theme="dark"] .control-cost-table,
+:root[data-theme="dark"] .control-cost-table tfoot td {
+    background: #f8fafc !important;
+}
+
+:root[data-theme="dark"] .control-cost-table td,
+:root[data-theme="dark"] .control-cost-table tfoot td {
+    color: #111827 !important;
+}
+
+:root[data-theme="dark"] .control-cost-table .cost-value,
+:root[data-theme="dark"] .control-cost-table .cost-currency,
+:root[data-theme="dark"] .control-cost-table tfoot td:last-child,
+:root[data-theme="dark"] .control-cost-table tfoot td:nth-child(3) {
+    background: #eeeeee !important;
+}
+
+
+.control-rubro-planilla {
+    border-color: #8fae56;
+}
+
+.control-rubro-toolbar {
+    background: linear-gradient(90deg, #edf7d8 0%, #f7fbef 100%);
+    border-bottom-color: #8fae56;
+}
+
+.control-rubro-toolbar strong {
+    color: #26380f;
+}
+
+.control-rubro-toolbar > span {
+    background: #26380f;
+    color: #ffffff;
+}
+
+.control-rubro-excel {
+    border-color: #8fae56;
+}
+
+.control-rubro-excel thead th {
+    background: #dfeec4;
+    color: #1f2d10;
+    border-color: #8fae56;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+}
+
+.control-rubro-excel td {
+    border-color: #b7c88d;
+    font-size: 0.74rem;
+    vertical-align: middle;
+}
+
+.control-rubro-excel .control-col-item { width: 5%; }
+.control-rubro-excel .control-col-actividad { width: 19%; }
+.control-rubro-excel .control-col-money { width: 8.5%; }
+.control-rubro-excel .control-col-percent { width: 6.8%; }
+.control-rubro-excel .control-col-techo { width: 11%; }
+.control-rubro-excel .control-col-kpi { width: 9%; }
+
+.control-rubro-excel .control-rubro-root td {
+    background: #eef6dd;
+    font-weight: 800;
+}
+
+.control-rubro-excel .control-rubro-child td {
+    background: #ffffff;
+}
+
+.control-rubro-excel .control-rubro-child:nth-child(even) td {
+    background: #fbfdf7;
+}
+
+.control-rubro-code {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.4rem;
+    min-height: 1.55rem;
+    border: 1px solid #8fae56;
+    background: #f8fbef;
+    color: #24360f;
+    font-weight: 800;
+}
+
+.control-rubro-actividad {
+    text-transform: uppercase;
+    font-weight: 800;
+}
+
+.control-rubro-total {
+    background: #f3f8e8 !important;
+    font-weight: 900;
+}
+
+.control-rubro-edit-cell form {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 1.9rem;
+    gap: 0.25rem;
+    align-items: center;
+}
+
+.control-rubro-edit-cell .form-control {
+    min-width: 0;
+    height: 1.85rem;
+    padding: 0.2rem 0.35rem;
+    border-color: #a9bf75;
+    font-size: 0.72rem;
+    font-weight: 700;
+}
+
+.control-rubro-edit-cell .table-icon-action {
+    width: 1.85rem;
+    height: 1.85rem;
+    border-color: #8fae56;
+    color: #3c5d16;
+    background: #f8fbef;
+}
+
+.control-rubro-desvio.is-negative {
+    color: #a31621;
+    font-weight: 900;
+}
+
+.control-rubro-desvio.is-positive {
+    color: #2f6b2f;
+    font-weight: 800;
+}
+
+.control-rubro-kpi {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.32rem;
+    min-width: 7.4rem;
+    justify-content: center;
+    padding: 0.28rem 0.5rem;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    font-size: 0.68rem;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.control-rubro-kpi.is-ok {
+    background: #e8f7ed;
+    color: #146c2e;
+    border-color: #9ed7ae;
+}
+
+.control-rubro-kpi.is-warning {
+    background: #fff8dd;
+    color: #8a6400;
+    border-color: #f1d276;
+}
+
+.control-rubro-kpi.is-danger {
+    background: #fff0ef;
+    color: #a31621;
+    border-color: #efa09a;
+}
+
+.control-rubro-kpi.is-neutral {
+    background: #f1f3f5;
+    color: #667085;
+    border-color: #d8dde3;
+}
+
+.control-rubro-excel tfoot td {
+    background: #dfeec4;
+    color: #1f2d10;
+    border-color: #8fae56;
+    font-weight: 900;
+}
+
+:root[data-theme="dark"] .control-rubro-toolbar,
+:root[data-theme="dark"] .control-rubro-excel thead th,
+:root[data-theme="dark"] .control-rubro-excel tfoot td {
+    background: #334020 !important;
+    color: #f5ffd9 !important;
+    border-color: #6f8841 !important;
+}
+
+:root[data-theme="dark"] .control-rubro-excel td {
+    border-color: #4f6034 !important;
+}
+
+:root[data-theme="dark"] .control-rubro-excel .control-rubro-root td {
+    background: #2f3922 !important;
+}
+
+:root[data-theme="dark"] .control-rubro-excel .control-rubro-child td {
+    background: #282a36 !important;
+}
+
+:root[data-theme="dark"] .control-rubro-excel .control-rubro-child:nth-child(even) td {
+    background: #2d3040 !important;
+}
+
+:root[data-theme="dark"] .control-rubro-code,
+:root[data-theme="dark"] .control-rubro-total,
+:root[data-theme="dark"] .control-rubro-edit-cell .table-icon-action {
+    background: #334020 !important;
+    color: #f5ffd9 !important;
+    border-color: #6f8841 !important;
 }

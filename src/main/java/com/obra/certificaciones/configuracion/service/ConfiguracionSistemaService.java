@@ -28,6 +28,7 @@ public class ConfiguracionSistemaService {
                 new ModuloSistema("modulo.importarCertificados", "Importar certificados", "Pegar planillas y cargar avances automaticamente.", "/certificaciones/importar", "bi-clipboard-check", "blue"),
                 new ModuloSistema("modulo.tableroCertificados", "Tablero certificados", "Certificacion general, costos y avance financiero.", "/tablero-certificados", "bi-table", "blue"),
                 new ModuloSistema("modulo.itemizado", "Itemizado", "Arbol de rubros e itemizado general.", "/itemizado", "bi-diagram-3", "green"),
+                new ModuloSistema("modulo.controlRubros", "Control rubros", "Techos, incidencias y avance economico por rubro.", "/control-rubros", "bi-clipboard-data", "yellow"),
                 new ModuloSistema("modulo.asistencia", "Asistencia", "Control diario de personal, empresas y horas.", "/asistencia", "bi-person-check", "green"),
                 new ModuloSistema("modulo.proveedores", "Proveedores", "Contratistas, contactos y OC asociadas.", "/proveedores", "bi-person-lines-fill", "yellow"),
                 new ModuloSistema("modulo.categorias", "Categorias", "Categorias manuales para compras e items.", "/categorias", "bi-tags", "blue"),

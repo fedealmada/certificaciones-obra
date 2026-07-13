@@ -19,12 +19,18 @@ import com.obra.certificaciones.rubro.entity.Rubro;
 import com.obra.certificaciones.rubro.repository.RubroRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -43,8 +49,41 @@ public class OrdenCompraService {
     }
 
     @Transactional(readOnly = true)
+    public Page<OrdenCompra> listar(Obra obra, String proveedor, Long categoriaId, String rubro, Pageable pageable) {
+        return cargarDetallePagina(ordenCompraRepository.buscarIdsConFiltros(obra.getId(), normalizar(proveedor), categoriaId, normalizar(rubro), pageable));
+    }
+
+    @Transactional(readOnly = true)
     public List<OrdenCompra> listarPorTipoCategoria(Obra obra, CategoriaItem categoria) {
         return ordenCompraRepository.buscarPorTipoCategoria(obra.getId(), categoria);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<OrdenCompra> listarPorTipoCategoria(Obra obra, CategoriaItem categoria, Pageable pageable) {
+        return cargarDetallePagina(ordenCompraRepository.buscarIdsPorTipoCategoria(obra.getId(), categoria, pageable));
+    }
+
+    @Transactional(readOnly = true)
+    public Page<OrdenCompra> listarConSeguimientoEntregas(Obra obra, Pageable pageable) {
+        return cargarDetallePagina(ordenCompraRepository.buscarIdsConSeguimientoEntregas(
+                obra.getId(),
+                ModoSeguimientoOrden.ENTREGA,
+                CategoriaItem.MATERIAL,
+                pageable));
+    }
+
+    private Page<OrdenCompra> cargarDetallePagina(Page<Long> paginaBase) {
+        List<Long> ids = paginaBase.getContent();
+        if (ids.isEmpty()) {
+            return new PageImpl<>(List.of(), paginaBase.getPageable(), paginaBase.getTotalElements());
+        }
+        Map<Long, OrdenCompra> ordenesPorId = ordenCompraRepository.findByIdIn(ids).stream()
+                .collect(Collectors.toMap(OrdenCompra::getId, Function.identity()));
+        List<OrdenCompra> ordenes = ids.stream()
+                .map(ordenesPorId::get)
+                .filter(orden -> orden != null)
+                .toList();
+        return new PageImpl<>(ordenes, paginaBase.getPageable(), paginaBase.getTotalElements());
     }
 
     @Transactional(readOnly = true)

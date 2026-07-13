@@ -35,24 +35,24 @@
     </div>
 
     <section class="panel-section mb-3">
-        <form class="row g-2 align-items-end" id="oc-filter-form" onsubmit="return false;">
+        <form class="row g-2 align-items-end" id="oc-filter-form" method="get" th:action="@{/oc}">
             <div class="col-md-4">
                 <label class="form-label">Buscar OC o proveedor</label>
-                <input class="form-control live-filter" id="oc-search" data-filter="busqueda" placeholder="Ej: 450, Fedan, Sanitarios">
+                <input class="form-control live-filter" id="oc-search" name="proveedor" data-filter="busqueda" th:value="${proveedor}" placeholder="Ej: 450, Fedan, Sanitarios">
             </div>
             <div class="col-md-3">
                 <label class="form-label">Categoria</label>
-                <select class="form-select live-filter" id="oc-category-filter" data-filter="categoria">
+                <select class="form-select live-filter" id="oc-category-filter" name="categoriaId" data-filter="categoria">
                     <option value="">Todas</option>
                     <option th:each="cat : ${categorias}" th:value="${cat.id}" th:text="${cat.nombre}" th:selected="${cat.id == categoriaSeleccionada}"></option>
                 </select>
             </div>
             <div class="col-md-3">
                 <label class="form-label">Rubro</label>
-                <input class="form-control live-filter" id="oc-rubro-filter" data-filter="rubro" placeholder="Buscar rubro">
+                <input class="form-control live-filter" id="oc-rubro-filter" name="rubro" data-filter="rubro" th:value="${rubro}" placeholder="Buscar rubro">
             </div>
             <div class="col-md-2 d-flex gap-2">
-                <button class="btn btn-outline-secondary w-100" type="button" onclick="clearOcFilters()"><i class="bi bi-x-lg"></i> Limpiar</button>
+                <button class="btn btn-outline-secondary w-100" type="button" onclick="window.location.href='/oc'"><i class="bi bi-x-lg"></i> Limpiar</button>
             </div>
         </form>
     </section>
@@ -61,8 +61,8 @@
         <div class="section-title-row">
             <h2 class="h5 mb-0"><i class="bi bi-receipt"></i> Ordenes cargadas</h2>
             <div class="section-title-actions">
-                <span class="filter-active-pill d-none" id="oc-filter-indicator"><i class="bi bi-funnel-fill"></i> Filtro activo</span>
-                <span class="section-total-pill"><span id="oc-visible-count" th:text="${ordenes.size()}">0</span> <span>visibles</span></span>
+                <span th:class="${(proveedor != null && !#strings.isEmpty(proveedor)) || categoriaSeleccionada != null || (rubro != null && !#strings.isEmpty(rubro)) ? 'filter-active-pill' : 'filter-active-pill d-none'}" id="oc-filter-indicator"><i class="bi bi-funnel-fill"></i> Filtro activo</span>
+                <span class="section-total-pill"><span id="oc-visible-count" th:text="${ordenesPage.totalElements}">0</span> <span>ordenes</span></span>
             </div>
         </div>
         <div class="table-responsive">
@@ -147,6 +147,11 @@
                 </tbody>
             </table>
         </div>
+        <nav class="pagination-strip">
+            <a class="btn btn-sm btn-outline-secondary" th:classappend="${ordenesPage.first ? ' disabled' : ''}" th:href="@{/oc(page=${ordenesPage.number - 1}, proveedor=${proveedor}, categoriaId=${categoriaSeleccionada}, rubro=${rubro})}"><i class="bi bi-chevron-left"></i> Anterior</a>
+            <span th:text="${'Pagina ' + (ordenesPage.totalPages == 0 ? 0 : ordenesPage.number + 1) + ' de ' + ordenesPage.totalPages + ' - mostrando ' + ordenes.size() + ' de ' + ordenesPage.totalElements + ' - 25 por pagina'}">Pagina</span>
+            <a class="btn btn-sm btn-outline-secondary" th:classappend="${ordenesPage.last ? ' disabled' : ''}" th:href="@{/oc(page=${ordenesPage.number + 1}, proveedor=${proveedor}, categoriaId=${categoriaSeleccionada}, rubro=${rubro})}">Siguiente <i class="bi bi-chevron-right"></i></a>
+        </nav>
     </section>
 </main>
 <script>
@@ -157,6 +162,7 @@ const emptyFilterRow = document.querySelector('.oc-empty-filter-row');
 const ocFilterIndicator = document.querySelector('#oc-filter-indicator');
 const ocStorageKey = 'obraControl.oc.filters';
 let currentSort = { key: 'fecha', direction: 'desc', type: 'date' };
+let ocSubmitTimer;
 
 function normalizeText(value) {
     return (value || '').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
@@ -222,26 +228,9 @@ function saveOcFilters() {
     localStorage.setItem(ocStorageKey, JSON.stringify(state));
 }
 
-function restoreOcFilters() {
-    const raw = localStorage.getItem(ocStorageKey);
-    if (!raw) return;
-    try {
-        const state = JSON.parse(raw);
-        document.querySelector('[data-filter="busqueda"]').value = state.busqueda || '';
-        document.querySelector('[data-filter="rubro"]').value = state.rubro || '';
-        document.querySelector('[data-filter="categoria"]').value = state.categoria || '';
-    } catch (error) {
-        localStorage.removeItem(ocStorageKey);
-    }
-}
+function restoreOcFilters() { }
 
-function clearOcFilters() {
-    localStorage.removeItem(ocStorageKey);
-    document.querySelector('[data-filter="busqueda"]').value = '';
-    document.querySelector('[data-filter="rubro"]').value = '';
-    document.querySelector('[data-filter="categoria"]').value = '';
-    applyFilters();
-}
+function clearOcFilters() { window.location.href = '/oc'; }
 
 function applySort(key, type, toggleDirection) {
     const direction = toggleDirection ? (currentSort.key === key && currentSort.direction === 'asc' ? 'desc' : 'asc') : currentSort.direction;
@@ -268,14 +257,12 @@ function applySort(key, type, toggleDirection) {
 }
 
 document.querySelectorAll('.live-filter').forEach(field => {
-    field.addEventListener('input', () => {
-        saveOcFilters();
-        applyFilters();
-    });
-    field.addEventListener('change', () => {
-        saveOcFilters();
-        applyFilters();
-    });
+    const submitFilters = () => {
+        window.clearTimeout(ocSubmitTimer);
+        ocSubmitTimer = window.setTimeout(() => document.querySelector('#oc-filter-form').submit(), 280);
+    };
+    field.addEventListener('input', submitFilters);
+    field.addEventListener('change', submitFilters);
 });
 
 document.querySelectorAll('.table-sort-button').forEach(button => {
@@ -297,9 +284,7 @@ ocRows.forEach(row => {
     });
 });
 
-restoreOcFilters();
-applySort(currentSort.key, currentSort.type, false);
-applyFilters();
+// La pagina ya llega filtrada y paginada desde el servidor; ordenamos solo si el usuario lo pide.
 </script>
 </body>
 </html>

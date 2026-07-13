@@ -20,6 +20,9 @@ import com.obra.certificaciones.proveedor.service.ProveedorService;
 import com.obra.certificaciones.rubro.service.RubroService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -56,10 +59,18 @@ public class OrdenCompraController {
     public String listar(@RequestParam(required = false) String proveedor,
                          @RequestParam(required = false) Long categoriaId,
                          @RequestParam(required = false) String rubro,
+                         @RequestParam(defaultValue = "0") int page,
                          HttpSession session,
                          Model model) {
-        List<OrdenCompra> ordenes = ordenCompraService.listar(obraService.obraActiva(session), proveedor, categoriaId, rubro);
+        Page<OrdenCompra> ordenesPage = ordenCompraService.listar(
+                obraService.obraActiva(session),
+                proveedor,
+                categoriaId,
+                rubro,
+                PageRequest.of(Math.max(page, 0), 25, Sort.by(Sort.Direction.DESC, "fecha").and(Sort.by(Sort.Direction.DESC, "id"))));
+        List<OrdenCompra> ordenes = ordenesPage.getContent();
         model.addAttribute("ordenes", ordenes);
+        model.addAttribute("ordenesPage", ordenesPage);
         model.addAttribute("certificadosPorOrden", certificacionService.contarPorOrdenes(ordenes.stream()
                 .map(OrdenCompra::getId)
                 .toList()));
@@ -172,9 +183,17 @@ public class OrdenCompraController {
         List<ItemMaterialResumen> materialItemsResumen = ordenMaterial
                 ? materialService.calcularResumenItems(id)
                 : List.of();
+        Map<Long, ItemMaterialResumen> materialResumenPorItem = new HashMap<>();
+        materialItemsResumen.forEach(resumen -> materialResumenPorItem.put(resumen.itemOrdenCompra().getId(), resumen));
         BigDecimal totalMaterialCompradoCantidad = totalCantidadMaterial(materialItemsResumen, TipoCantidadMaterial.COMPRADA);
         BigDecimal totalMaterialRecibidoCantidad = totalCantidadMaterial(materialItemsResumen, TipoCantidadMaterial.RECIBIDA);
         BigDecimal totalMaterialPendienteCantidad = totalCantidadMaterial(materialItemsResumen, TipoCantidadMaterial.PENDIENTE);
+        BigDecimal totalMaterialRecibidoImporte = materialItemsResumen.stream()
+                .map(ItemMaterialResumen::montoRecibido)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal totalMaterialPendienteImporte = materialItemsResumen.stream()
+                .map(ItemMaterialResumen::montoPendiente)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
         BigDecimal porcentajeRecepcionOc = porcentaje(totalMaterialRecibidoCantidad, totalMaterialCompradoCantidad);
         EstadoRecepcionMaterial estadoEntregaOrden = ordenMaterial
                 ? estadoEntregaOrden(materialItemsResumen)
@@ -191,9 +210,12 @@ public class OrdenCompraController {
         model.addAttribute("ordenCertificable", ordenCertificable);
         model.addAttribute("ordenSoloRegistro", ordenSoloRegistro);
         model.addAttribute("estadoEntregaOrden", estadoEntregaOrden);
+        model.addAttribute("materialResumenPorItem", materialResumenPorItem);
         model.addAttribute("totalMaterialCompradoCantidad", totalMaterialCompradoCantidad);
         model.addAttribute("totalMaterialRecibidoCantidad", totalMaterialRecibidoCantidad);
         model.addAttribute("totalMaterialPendienteCantidad", totalMaterialPendienteCantidad);
+        model.addAttribute("totalMaterialRecibidoImporte", totalMaterialRecibidoImporte);
+        model.addAttribute("totalMaterialPendienteImporte", totalMaterialPendienteImporte);
         model.addAttribute("porcentajeRecepcionOc", porcentajeRecepcionOc);
         model.addAttribute("porcentajeRecepcionOcBarra", porcentajeRecepcionOc.min(BigDecimal.valueOf(100)));
         model.addAttribute("recepciones", recepciones);

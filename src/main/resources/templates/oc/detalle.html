@@ -178,9 +178,9 @@
         </div>
         <div class="table-responsive">
             <table class="table table-hover align-middle document-table oc-items-table">
-                <thead><tr><th>Item</th><th>Detalle</th><th>Categoria</th><th>Und</th><th class="text-end">Cant.</th><th class="text-end">$ Unit.</th><th class="text-end">$ Total</th><th class="text-end">Avance</th><th class="text-end">$ Cert.</th><th class="text-end">Saldo</th><th>Estado</th><th class="text-end">Accion</th></tr></thead>
+                <thead><tr><th>Item</th><th>Detalle</th><th>Categoria</th><th>Und</th><th class="text-end">Cant.</th><th class="text-end">$ Unit.</th><th class="text-end">$ Total</th><th class="text-end" th:text="${ordenMaterial ? 'Recepcion' : 'Avance'}">Avance</th><th class="text-end" th:text="${ordenMaterial ? 'Recibido' : '$ Cert.'}">$ Cert.</th><th class="text-end" th:text="${ordenMaterial ? 'Pendiente' : 'Saldo'}">Saldo</th><th>Estado</th><th class="text-end">Accion</th></tr></thead>
                 <tbody>
-                <tr th:each="resumen : ${itemsResumen}">
+                <tr th:each="resumen : ${itemsResumen}" th:with="materialResumen=${ordenMaterial ? materialResumenPorItem.get(resumen.itemOrdenCompra.id) : null}">
                     <td><span class="item-code-pill" th:text="${resumen.itemOrdenCompra.item}">450.1</span></td>
                     <td class="item-detail-cell">
                         <div class="item-detail-title" th:text="${resumen.itemOrdenCompra.detalle}"></div>
@@ -192,19 +192,22 @@
                     <td class="text-end" th:text="${#numbers.formatDecimal(resumen.itemOrdenCompra.precioUnitario, 1, 'POINT', 2, 'COMMA')}"></td>
                     <td class="text-end fw-semibold" th:text="${#numbers.formatDecimal(resumen.itemOrdenCompra.importe, 1, 'POINT', 2, 'COMMA')}"></td>
                     <td class="text-end">
-                        <div class="oc-progress-number" th:text="${resumen.porcentajeAcumulado} + ' %'">0 %</div>
+                        <div class="oc-progress-number" th:text="${ordenMaterial && materialResumen != null ? #numbers.formatDecimal(materialResumen.porcentajeRecibido(), 1, 'POINT', 2, 'COMMA') + ' %' : resumen.porcentajeAcumulado + ' %'}">0 %</div>
                         <div class="progress progress-thin oc-progress">
-                            <div class="progress-bar" th:data-progress="${resumen.porcentajeAcumulado > 100 ? 100 : resumen.porcentajeAcumulado}"></div>
+                            <div class="progress-bar" th:data-progress="${ordenMaterial && materialResumen != null ? materialResumen.porcentajeRecibido() : (resumen.porcentajeAcumulado > 100 ? 100 : resumen.porcentajeAcumulado)}"></div>
                         </div>
                     </td>
-                    <td class="text-end" th:text="${#numbers.formatDecimal(resumen.montoAcumulado, 1, 'POINT', 2, 'COMMA')}"></td>
-                    <td class="text-end" th:text="${#numbers.formatDecimal(resumen.saldoPendiente, 1, 'POINT', 2, 'COMMA')}"></td>
-                    <td><span class="status-pill" th:classappend="${resumen.estado.name() == 'TERMINADO' ? ' status-done' : (resumen.estado.name() == 'EN_EJECUCION' ? ' status-progress' : ' status-pending')}" th:text="${resumen.estado.descripcion}"></span></td>
+                    <td class="text-end" th:text="${ordenMaterial && materialResumen != null ? #numbers.formatDecimal(materialResumen.montoRecibido(), 1, 'POINT', 2, 'COMMA') : #numbers.formatDecimal(resumen.montoAcumulado, 1, 'POINT', 2, 'COMMA')}"></td>
+                    <td class="text-end" th:text="${ordenMaterial && materialResumen != null ? #numbers.formatDecimal(materialResumen.montoPendiente(), 1, 'POINT', 2, 'COMMA') : #numbers.formatDecimal(resumen.saldoPendiente, 1, 'POINT', 2, 'COMMA')}"></td>
+                    <td>
+                        <span th:if="${ordenMaterial && materialResumen != null}" class="status-pill" th:classappend="${materialResumen.estado().name() == 'COMPLETO' ? ' status-done' : (materialResumen.estado().name() == 'PARCIAL' ? ' status-progress' : ' status-pending')}" th:text="${materialResumen.estado().descripcion}"></span>
+                        <span th:unless="${ordenMaterial && materialResumen != null}" class="status-pill" th:classappend="${resumen.estado.name() == 'TERMINADO' ? ' status-done' : (resumen.estado.name() == 'EN_EJECUCION' ? ' status-progress' : ' status-pending')}" th:text="${resumen.estado.descripcion}"></span>
+                    </td>
                     <td class="text-end"><a class="btn btn-sm btn-outline-primary table-icon-action oc-history-button" th:href="@{/oc/{ocId}/items/{itemId}(ocId=${orden.id}, itemId=${resumen.itemOrdenCompra.id})}" title="Ver historial" aria-label="Ver historial"><i class="bi bi-clock-history"></i></a></td>
                 </tr>
                 </tbody>
                 <tfoot>
-                <tr><td colspan="6" class="text-end">Total orden</td><td class="text-end" th:text="${#numbers.formatDecimal(orden.total, 1, 'POINT', 2, 'COMMA')}">0,00</td><td></td><td class="text-end" th:text="${#numbers.formatDecimal(totalCertificado, 1, 'POINT', 2, 'COMMA')}">0,00</td><td class="text-end" th:text="${#numbers.formatDecimal(saldoOc, 1, 'POINT', 2, 'COMMA')}">0,00</td><td colspan="2"></td></tr>
+                <tr><td colspan="6" class="text-end" th:text="${ordenMaterial ? 'Total recibido' : 'Total orden'}">Total orden</td><td class="text-end" th:text="${#numbers.formatDecimal(orden.total, 1, 'POINT', 2, 'COMMA')}">0,00</td><td></td><td class="text-end" th:text="${#numbers.formatDecimal(ordenMaterial ? totalMaterialRecibidoImporte : totalCertificado, 1, 'POINT', 2, 'COMMA')}">0,00</td><td class="text-end" th:text="${#numbers.formatDecimal(ordenMaterial ? totalMaterialPendienteImporte : saldoOc, 1, 'POINT', 2, 'COMMA')}">0,00</td><td colspan="2"></td></tr>
                 </tfoot>
             </table>
         </div>

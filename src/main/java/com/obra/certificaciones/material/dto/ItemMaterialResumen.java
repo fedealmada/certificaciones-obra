@@ -21,4 +21,19 @@ public record ItemMaterialResumen(
                 : cantidadRecibida.multiply(BigDecimal.valueOf(100)).divide(cantidadComprada, 2, RoundingMode.HALF_UP);
         return porcentaje.min(BigDecimal.valueOf(100));
     }
+
+    public BigDecimal montoRecibido() {
+        return montoPorCantidad(cantidadRecibida);
+    }
+
+    public BigDecimal montoPendiente() {
+        return montoPorCantidad(cantidadPendiente);
+    }
+
+    private BigDecimal montoPorCantidad(BigDecimal cantidad) {
+        if (cantidad == null || itemOrdenCompra == null || itemOrdenCompra.getPrecioUnitario() == null) {
+            return BigDecimal.ZERO;
+        }
+        return cantidad.multiply(itemOrdenCompra.getPrecioUnitario());
+    }
 }

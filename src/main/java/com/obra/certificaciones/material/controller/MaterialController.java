@@ -15,6 +15,9 @@ import com.obra.certificaciones.oc.service.OrdenCompraService;
 import com.obra.certificaciones.obra.service.ObraService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,11 +45,17 @@ public class MaterialController {
     private final ObraService obraService;
 
     @GetMapping
-    public String listar(Model model, HttpSession session) {
-        List<OrdenCompra> ordenes = materialService.listarOrdenesConMateriales(obraService.obraActiva(session));
+    public String listar(@RequestParam(defaultValue = "0") int page,
+                         Model model,
+                         HttpSession session) {
+        Page<OrdenCompra> ordenesPage = materialService.listarOrdenesConMateriales(
+                obraService.obraActiva(session),
+                PageRequest.of(Math.max(page, 0), 25, Sort.by(Sort.Direction.DESC, "fecha").and(Sort.by(Sort.Direction.DESC, "id"))));
+        List<OrdenCompra> ordenes = ordenesPage.getContent();
         Map<Long, List<ItemMaterialResumen>> resumenesPorOrden = new HashMap<>();
         ordenes.forEach(orden -> resumenesPorOrden.put(orden.getId(), materialService.calcularResumenItems(orden.getId())));
         model.addAttribute("ordenes", ordenes);
+        model.addAttribute("ordenesPage", ordenesPage);
         model.addAttribute("viajesPorOrden", materialService.contarRecepcionesPorOrdenes(ordenes.stream().map(OrdenCompra::getId).toList()));
         model.addAttribute("estadosPorOrden", materialService.calcularEstadosOrdenes(ordenes));
         model.addAttribute("previstoPorOrden", totalesPorOrden(resumenesPorOrden, "comprado"));
@@ -60,13 +69,18 @@ public class MaterialController {
     @GetMapping("/oc/{ordenCompraId}")
     public String detalle(@PathVariable Long ordenCompraId,
                           @RequestParam(required = false) String origen,
+                          @RequestParam(defaultValue = "0") int page,
                           Model model) {
         OrdenCompra orden = ordenCompraService.obtener(ordenCompraId);
         var itemsResumen = materialService.calcularResumenItems(ordenCompraId);
-        List<RecepcionMaterial> recepciones = materialService.listarRecepciones(ordenCompraId);
+        Page<RecepcionMaterial> recepcionesPage = materialService.listarRecepciones(
+                ordenCompraId,
+                PageRequest.of(Math.max(page, 0), 25, Sort.by(Sort.Direction.DESC, "fecha").and(Sort.by(Sort.Direction.DESC, "id"))));
+        List<RecepcionMaterial> recepciones = recepcionesPage.getContent();
         model.addAttribute("orden", orden);
         cargarResumenMateriales(itemsResumen, model);
         model.addAttribute("recepciones", recepciones);
+        model.addAttribute("recepcionesPage", recepcionesPage);
         model.addAttribute("cantidadesPorRecepcion", cantidadesPorRecepcion(recepciones));
         model.addAttribute("importesPorRecepcion", importesPorRecepcion(recepciones));
         model.addAttribute("avancesPorRecepcion", avancesPorRecepcion(recepciones));

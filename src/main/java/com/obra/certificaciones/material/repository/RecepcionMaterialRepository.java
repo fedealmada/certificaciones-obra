@@ -1,6 +1,8 @@
 package com.obra.certificaciones.material.repository;
 
 import com.obra.certificaciones.material.entity.RecepcionMaterial;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -23,6 +25,20 @@ public interface RecepcionMaterialRepository extends JpaRepository<RecepcionMate
             order by recepcion.fecha asc, recepcion.id asc
             """)
     List<RecepcionMaterial> findByOrdenCompraIdOrderByFechaAscIdAsc(@Param("ordenCompraId") Long ordenCompraId);
+
+    @Query(value = """
+            select recepcion.id from RecepcionMaterial recepcion
+            where recepcion.ordenCompra.id = :ordenCompraId
+            order by recepcion.fecha desc, recepcion.id desc
+            """,
+            countQuery = """
+            select count(recepcion.id) from RecepcionMaterial recepcion
+            where recepcion.ordenCompra.id = :ordenCompraId
+            """)
+    Page<Long> buscarIdsPorOrdenCompra(@Param("ordenCompraId") Long ordenCompraId, Pageable pageable);
+
+    @EntityGraph(attributePaths = {"items", "items.itemOrdenCompra", "ordenCompra"})
+    List<RecepcionMaterial> findByIdIn(List<Long> ids);
 
     long countByOrdenCompraId(Long ordenCompraId);
 

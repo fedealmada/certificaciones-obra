@@ -4,8 +4,12 @@ import com.obra.certificaciones.oc.entity.CategoriaItem;
 import com.obra.certificaciones.oc.entity.ItemOrdenCompra;
 import com.obra.certificaciones.oc.repository.ItemOrdenCompraRepository;
 import com.obra.certificaciones.rubro.entity.Rubro;
+import com.obra.certificaciones.obra.service.ObraService;
 import com.obra.certificaciones.rubro.service.RubroService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -36,14 +40,27 @@ public class ItemController {
 
     private final ItemOrdenCompraRepository itemOrdenCompraRepository;
     private final RubroService rubroService;
+    private final ObraService obraService;
 
     @GetMapping("/items")
-    public String listar(Model model) {
-        List<ItemOrdenCompra> items = itemOrdenCompraRepository.findAllByOrderByIdAsc().stream()
+    public String listar(@RequestParam(required = false) String busqueda,
+                         @RequestParam(required = false) CategoriaItem categoria,
+                         @RequestParam(defaultValue = "0") int page,
+                         HttpSession session,
+                         Model model) {
+        Page<ItemOrdenCompra> itemsPage = itemOrdenCompraRepository.buscarItems(
+                obraService.obraActiva(session).getId(),
+                normalizar(busqueda),
+                categoria,
+                PageRequest.of(Math.max(page, 0), 25));
+        List<ItemOrdenCompra> items = itemsPage.getContent().stream()
                 .sorted(compararItems())
                 .toList();
         model.addAttribute("items", items);
+        model.addAttribute("itemsPage", itemsPage);
         model.addAttribute("rubros", rubroService.listarActivos());
+        model.addAttribute("busqueda", busqueda);
+        model.addAttribute("categoriaSeleccionada", categoria);
         return "item/lista";
     }
 
@@ -75,6 +92,10 @@ public class ItemController {
         return ResponseEntity.ok(Map.of(
                 "rubro", rubro == null ? "" : rubro.getNombreCompleto()
         ));
+    }
+
+    private String normalizar(String valor) {
+        return StringUtils.hasText(valor) ? valor : null;
     }
 
     private Rubro actualizarRubroItem(Long id, String rubroId) {

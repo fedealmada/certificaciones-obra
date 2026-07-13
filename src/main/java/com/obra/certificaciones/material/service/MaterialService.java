@@ -16,6 +16,9 @@ import com.obra.certificaciones.oc.service.OrdenCompraService;
 import com.obra.certificaciones.obra.entity.Obra;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -25,6 +28,8 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -43,6 +48,11 @@ public class MaterialService {
     }
 
     @Transactional(readOnly = true)
+    public Page<OrdenCompra> listarOrdenesConMateriales(Obra obra, Pageable pageable) {
+        return ordenCompraService.listarConSeguimientoEntregas(obra, pageable);
+    }
+
+    @Transactional(readOnly = true)
     public RecepcionMaterial obtenerRecepcion(Long id) {
         return recepcionMaterialRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("No existe la recepcion " + id));
@@ -57,6 +67,22 @@ public class MaterialService {
     @Transactional(readOnly = true)
     public List<RecepcionMaterial> listarRecepciones(Long ordenCompraId) {
         return recepcionMaterialRepository.findByOrdenCompraIdOrderByFechaAscIdAsc(ordenCompraId);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<RecepcionMaterial> listarRecepciones(Long ordenCompraId, Pageable pageable) {
+        Page<Long> paginaBase = recepcionMaterialRepository.buscarIdsPorOrdenCompra(ordenCompraId, pageable);
+        List<Long> ids = paginaBase.getContent();
+        if (ids.isEmpty()) {
+            return new PageImpl<>(List.of(), paginaBase.getPageable(), paginaBase.getTotalElements());
+        }
+        Map<Long, RecepcionMaterial> recepcionesPorId = recepcionMaterialRepository.findByIdIn(ids).stream()
+                .collect(Collectors.toMap(RecepcionMaterial::getId, Function.identity()));
+        List<RecepcionMaterial> recepciones = ids.stream()
+                .map(recepcionesPorId::get)
+                .filter(recepcion -> recepcion != null)
+                .toList();
+        return new PageImpl<>(recepciones, paginaBase.getPageable(), paginaBase.getTotalElements());
     }
 
     @Transactional(readOnly = true)
