@@ -63,6 +63,18 @@ public class TableroCertificadoService {
     }
 
     @Transactional
+    public void sincronizarAvanceAnterior(Long tableroId) {
+        TableroCertificado tablero = obtener(tableroId);
+        if (tablero.getObra() == null || tablero.getFechaDesde() == null) {
+            return;
+        }
+        tableroRepository.findFirstByObraIdAndFechaHastaLessThanEqualOrderByFechaHastaDescIdDesc(
+                        tablero.getObra().getId(),
+                        tablero.getFechaDesde())
+                .ifPresent(anterior -> aplicarAvanceAnterior(tablero, anterior));
+    }
+
+    @Transactional
     public int importarItemsCertificadosPeriodo(Long tableroId) {
         TableroCertificado tablero = obtener(tableroId);
         LocalDate desde = tablero.getFechaDesde() == null ? YearMonth.now().atDay(1) : tablero.getFechaDesde();
@@ -204,6 +216,31 @@ public class TableroCertificadoService {
 
     private BigDecimal valor(BigDecimal valor) {
         return valor == null ? BigDecimal.ZERO : valor;
+    }
+
+    private void aplicarAvanceAnterior(TableroCertificado tablero, TableroCertificado anterior) {
+        Map<String, BigDecimal> acumuladosPorClave = new LinkedHashMap<>();
+        for (TableroCertificadoItem itemAnterior : anterior.getItems()) {
+            claveItem(itemAnterior).forEach(clave ->
+                    acumuladosPorClave.putIfAbsent(clave, valor(itemAnterior.avanceAcumuladoPorcentaje())));
+        }
+        for (TableroCertificadoItem itemActual : tablero.getItems()) {
+            claveItem(itemActual).stream()
+                    .filter(acumuladosPorClave::containsKey)
+                    .findFirst()
+                    .ifPresent(clave -> itemActual.setAvanceAnteriorPorcentaje(acumuladosPorClave.get(clave)));
+        }
+    }
+
+    private List<String> claveItem(TableroCertificadoItem item) {
+        List<String> claves = new java.util.ArrayList<>();
+        if (item.getItemOrdenCompra() != null && item.getItemOrdenCompra().getId() != null) {
+            claves.add("oc-item:" + item.getItemOrdenCompra().getId());
+        }
+        if (StringUtils.hasText(item.getItemCodigo())) {
+            claves.add("codigo:" + item.getItemCodigo().trim().toLowerCase());
+        }
+        return claves;
     }
 
     @Transactional

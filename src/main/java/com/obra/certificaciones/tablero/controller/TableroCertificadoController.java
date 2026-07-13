@@ -46,6 +46,7 @@ public class TableroCertificadoController {
 
     @GetMapping("/{id}")
     public String detalle(@PathVariable Long id, Model model) {
+        tableroService.sincronizarAvanceAnterior(id);
         model.addAttribute("tablero", tableroService.obtener(id));
         model.addAttribute("totales", tableroService.totales(id));
         return "tablero/detalle";
@@ -64,6 +65,7 @@ public class TableroCertificadoController {
     @PostMapping("/{id}/importar-items")
     public String importarItems(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         int agregados = tableroService.importarItemsCertificadosPeriodo(id);
+        tableroService.sincronizarAvanceAnterior(id);
         redirectAttributes.addFlashAttribute("success", agregados + " items de mano de obra detectados en el periodo fueron agregados al tablero.");
         return "redirect:/tablero-certificados/" + id;
     }

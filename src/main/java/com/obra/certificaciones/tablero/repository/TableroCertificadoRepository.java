@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDate;
 
 public interface TableroCertificadoRepository extends JpaRepository<TableroCertificado, Long> {
     @EntityGraph(attributePaths = {"obra", "items", "items.itemOrdenCompra"})
@@ -14,4 +15,7 @@ public interface TableroCertificadoRepository extends JpaRepository<TableroCerti
     @Override
     @EntityGraph(attributePaths = {"obra", "items", "items.itemOrdenCompra"})
     Optional<TableroCertificado> findById(Long id);
+
+    @EntityGraph(attributePaths = {"obra", "items", "items.itemOrdenCompra"})
+    Optional<TableroCertificado> findFirstByObraIdAndFechaHastaLessThanEqualOrderByFechaHastaDescIdDesc(Long obraId, LocalDate fechaHasta);
 }

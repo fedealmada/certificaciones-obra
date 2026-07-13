@@ -138,7 +138,7 @@
                 <tbody>
                 <tr th:each="fila : ${tablero.items}" th:classappend="${fila.grupo ? ' tablero-group-row' : ''}">
                     <td class="tablero-sticky-code"><input class="form-control form-control-sm tablero-code-input" name="itemCodigo" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.grupo ? 'GRUPO' : fila.itemCodigo}" th:readonly="${fila.grupo}"></td>
-                    <td class="tablero-sticky-desc"><input class="form-control form-control-sm tablero-description-input" name="descripcionTarea" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.descripcionTarea}"></td>
+                    <td class="tablero-sticky-desc"><textarea class="form-control form-control-sm tablero-description-input" rows="1" name="descripcionTarea" th:attr="form=${'tablero-item-form-' + fila.id}" th:text="${fila.descripcionTarea}"></textarea></td>
                     <td><input class="form-control form-control-sm tablero-unit-input" name="unidad" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.unidad}"></td>
                     <td><input class="form-control form-control-sm tablero-number-input" type="number" step="0.01" name="cantidad" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.cantidad}"></td>
                     <td><input class="form-control form-control-sm tablero-money-input" type="number" step="0.01" name="precioUnitario" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.precioUnitario}"></td>
@@ -154,7 +154,7 @@
                     <td class="text-end" th:text="${#numbers.formatDecimal(fila.estructuraMasBeneficio(), 1, 'POINT', 2, 'COMMA')}">0,00</td>
                     <td class="text-end fw-bold" th:text="${#numbers.formatDecimal(fila.totalTarea(), 1, 'POINT', 2, 'COMMA')}">0,00</td>
                     <td><input class="form-control form-control-sm tablero-number-input" type="number" step="0.01" name="materialesAdicionalesEtapa" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.materialesAdicionalesEtapa}"></td>
-                    <td><input class="form-control form-control-sm tablero-percent-input" type="number" step="0.01" name="avanceAnteriorPorcentaje" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.avanceAnteriorPorcentaje}"></td>
+                    <td><input class="form-control form-control-sm tablero-percent-input" type="number" step="0.01" name="avanceAnteriorPorcentaje" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.avanceAnteriorPorcentaje}" readonly></td>
                     <td><input class="form-control form-control-sm tablero-percent-input" type="number" step="0.01" name="avanceCertificadoPorcentaje" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.avanceCertificadoPorcentaje}"></td>
                     <td class="text-end" th:text="${#numbers.formatDecimal(fila.avanceAcumuladoPorcentaje(), 1, 'POINT', 2, 'COMMA') + '%'}">0,00%</td>
                     <td class="text-end" th:text="${#numbers.formatDecimal(fila.montoAnterior(), 1, 'POINT', 2, 'COMMA')}">0,00</td>
