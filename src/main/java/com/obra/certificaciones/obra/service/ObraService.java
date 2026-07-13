@@ -78,7 +78,9 @@ public class ObraService {
     }
 
     private Obra primeraObra() {
-        return listarActivas().stream().findFirst().orElseGet(this::asegurarObraInicial);
+        return obraRepository.findByNombreIgnoreCase(OBRA_INICIAL)
+                .filter(Obra::isActiva)
+                .orElseGet(() -> listarActivas().stream().findFirst().orElseGet(this::asegurarObraInicial));
     }
 
     private void validar(Obra obra) {
