@@ -26,7 +26,7 @@
         <div>
             <div class="document-kicker">Gerencial / financiero</div>
             <h1>Tablero de certificados</h1>
-            <div class="text-muted">Certificacion general por periodo, costos, estructura, beneficio y avance financiero.</div>
+            <div class="text-muted">Certificacion general por periodo, costos, estructura, beneficio y avance financiero para presentar al cliente.</div>
         </div>
     </div>
 
@@ -70,7 +70,12 @@
                     <td class="text-end" th:text="${tablero.items.size()}">0</td>
                     <td class="text-end" th:text="${#numbers.formatDecimal(tablero.totalTarea(), 1, 'POINT', 2, 'COMMA')}">0,00</td>
                     <td class="text-end" th:text="${#numbers.formatDecimal(tablero.montoCertificado(), 1, 'POINT', 2, 'COMMA')}">0,00</td>
-                    <td class="text-end"><a class="btn btn-sm btn-outline-primary table-icon-action" th:href="@{/tablero-certificados/{id}(id=${tablero.id})}" title="Abrir tablero" aria-label="Abrir tablero"><i class="bi bi-box-arrow-up-right"></i></a></td>
+                    <td class="text-end action-cell">
+                        <a class="btn btn-sm btn-outline-primary table-icon-action" th:href="@{/tablero-certificados/{id}(id=${tablero.id})}" title="Abrir tablero" aria-label="Abrir tablero"><i class="bi bi-box-arrow-up-right"></i></a>
+                        <form method="post" th:action="@{/tablero-certificados/{id}/eliminar(id=${tablero.id})}" onsubmit="return confirm('Eliminar este tablero de certificados?');">
+                            <button class="btn btn-sm btn-outline-danger table-icon-action" type="submit" title="Eliminar tablero" aria-label="Eliminar tablero"><i class="bi bi-trash"></i></button>
+                        </form>
+                    </td>
                 </tr>
                 <tr th:if="${tableros.isEmpty()}"><td colspan="6" class="text-center text-muted py-4">Todavia no hay tableros creados.</td></tr>
                 </tbody>

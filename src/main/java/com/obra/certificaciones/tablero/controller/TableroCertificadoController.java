@@ -63,9 +63,16 @@ public class TableroCertificadoController {
 
     @PostMapping("/{id}/importar-items")
     public String importarItems(@PathVariable Long id, RedirectAttributes redirectAttributes) {
-        int agregados = tableroService.importarItemsDesdeOrdenes(id);
-        redirectAttributes.addFlashAttribute("success", agregados + " items agregados al tablero.");
+        int agregados = tableroService.importarItemsCertificadosPeriodo(id);
+        redirectAttributes.addFlashAttribute("success", agregados + " items de mano de obra certificados en el periodo fueron agregados.");
         return "redirect:/tablero-certificados/" + id;
+    }
+
+    @PostMapping("/{id}/eliminar")
+    public String eliminarTablero(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        tableroService.eliminarTablero(id);
+        redirectAttributes.addFlashAttribute("success", "Tablero eliminado correctamente.");
+        return "redirect:/tablero-certificados";
     }
 
     @PostMapping("/{id}/items/manual")

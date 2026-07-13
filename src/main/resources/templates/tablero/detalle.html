@@ -32,10 +32,13 @@
         </div>
         <div class="document-actions">
             <form method="post" th:action="@{/tablero-certificados/{id}/importar-items(id=${tablero.id})}">
-                <button class="btn btn-outline-primary" type="submit"><i class="bi bi-download"></i> Importar items OC</button>
+                <button class="btn btn-outline-primary" type="submit"><i class="bi bi-download"></i> Importar MO certificada</button>
             </form>
             <form method="post" th:action="@{/tablero-certificados/{id}/items/manual(id=${tablero.id})}">
                 <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-plus-lg"></i> Item manual</button>
+            </form>
+            <form method="post" th:action="@{/tablero-certificados/{id}/eliminar(id=${tablero.id})}" onsubmit="return confirm('Eliminar este tablero de certificados?');">
+                <button class="btn btn-outline-danger" type="submit"><i class="bi bi-trash"></i> Eliminar</button>
             </form>
         </div>
     </div>
@@ -96,6 +99,7 @@
             <h2 class="h5 mb-0"><i class="bi bi-table"></i> Items financieros</h2>
             <span class="section-total-pill" th:text="${tablero.items.size()} + ' filas'">0 filas</span>
         </div>
+        <div class="text-muted small mb-2">La importacion toma solo items de mano de obra con certificaciones dentro del periodo del tablero. El avance cargado aca es independiente del avance real de obra y se puede ajustar por fila.</div>
         <div class="table-responsive tablero-table-scroll">
             <table class="table table-hover align-middle document-table tablero-cert-table">
                 <thead>

@@ -1,10 +1,10 @@
 package com.obra.certificaciones.tablero.service;
 
+import com.obra.certificaciones.certificacion.entity.ItemCertificacion;
+import com.obra.certificaciones.certificacion.repository.ItemCertificacionRepository;
 import com.obra.certificaciones.obra.entity.Obra;
 import com.obra.certificaciones.oc.entity.CategoriaItem;
 import com.obra.certificaciones.oc.entity.ItemOrdenCompra;
-import com.obra.certificaciones.oc.entity.OrdenCompra;
-import com.obra.certificaciones.oc.repository.OrdenCompraRepository;
 import com.obra.certificaciones.tablero.entity.TableroCertificado;
 import com.obra.certificaciones.tablero.entity.TableroCertificadoItem;
 import com.obra.certificaciones.tablero.repository.TableroCertificadoItemRepository;
@@ -19,14 +19,16 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class TableroCertificadoService {
     private final TableroCertificadoRepository tableroRepository;
     private final TableroCertificadoItemRepository itemRepository;
-    private final OrdenCompraRepository ordenCompraRepository;
+    private final ItemCertificacionRepository itemCertificacionRepository;
 
     @Transactional(readOnly = true)
     public List<TableroCertificado> listar(Obra obra) {
@@ -61,20 +63,37 @@ public class TableroCertificadoService {
     }
 
     @Transactional
-    public int importarItemsDesdeOrdenes(Long tableroId) {
+    public int importarItemsCertificadosPeriodo(Long tableroId) {
         TableroCertificado tablero = obtener(tableroId);
-        List<OrdenCompra> ordenes = ordenCompraRepository.buscarConFiltros(tablero.getObra().getId(), null, null, null);
+        LocalDate desde = tablero.getFechaDesde() == null ? YearMonth.now().atDay(1) : tablero.getFechaDesde();
+        LocalDate hasta = tablero.getFechaHasta() == null ? YearMonth.now().atEndOfMonth() : tablero.getFechaHasta();
+        List<ItemCertificacion> certificaciones = itemCertificacionRepository
+                .findByCertificacionOrdenCompraObraIdAndCertificacionFechaBetweenAndItemOrdenCompraCategoriaOrderByItemOrdenCompraIdAscCertificacionFechaAsc(
+                        tablero.getObra().getId(),
+                        desde,
+                        hasta,
+                        CategoriaItem.MANO_OBRA);
+        Map<Long, ItemCertificadoPeriodo> itemsCertificados = new LinkedHashMap<>();
+        for (ItemCertificacion certificacion : certificaciones) {
+            ItemOrdenCompra item = certificacion.getItemOrdenCompra();
+            if (item == null || item.getId() == null) {
+                continue;
+            }
+            itemsCertificados.computeIfAbsent(item.getId(), id -> new ItemCertificadoPeriodo(item))
+                    .sumarAvance(valor(certificacion.getPorcentajeActual()));
+        }
+
         int agregados = 0;
         int orden = siguienteOrden(tableroId);
-        for (OrdenCompra ordenCompra : ordenes) {
-            for (ItemOrdenCompra item : ordenCompra.getItems()) {
-                if (item.getId() == null || itemRepository.existsByTableroIdAndItemOrdenCompraId(tableroId, item.getId())) {
-                    continue;
-                }
-                TableroCertificadoItem fila = desdeItemOrdenCompra(item, orden++);
-                tablero.agregarItem(fila);
-                agregados++;
+        for (ItemCertificadoPeriodo certificadoPeriodo : itemsCertificados.values()) {
+            ItemOrdenCompra item = certificadoPeriodo.item();
+            if (itemRepository.existsByTableroIdAndItemOrdenCompraId(tableroId, item.getId())) {
+                continue;
             }
+            TableroCertificadoItem fila = desdeItemOrdenCompra(item, orden++);
+            fila.setAvanceCertificadoPorcentaje(certificadoPeriodo.avance);
+            tablero.agregarItem(fila);
+            agregados++;
         }
         tableroRepository.save(tablero);
         return agregados;
@@ -92,7 +111,7 @@ public class TableroCertificadoService {
         item.setPrecioUnitario(BigDecimal.ZERO);
         item.setSubtotalManual(BigDecimal.ZERO);
         item.setCostoEstructuralPorcentaje(BigDecimal.valueOf(20));
-        item.setBeneficioEmpresarialPorcentaje(BigDecimal.valueOf(25));
+        item.setBeneficioEmpresarialPorcentaje(BigDecimal.valueOf(40));
         item.setOrdenFila(siguienteOrden(tableroId));
         tablero.agregarItem(item);
         tableroRepository.save(tablero);
@@ -108,7 +127,7 @@ public class TableroCertificadoService {
         item.setCantidad(BigDecimal.ONE);
         item.setPrecioUnitario(BigDecimal.ZERO);
         item.setCostoEstructuralPorcentaje(BigDecimal.valueOf(20));
-        item.setBeneficioEmpresarialPorcentaje(BigDecimal.valueOf(25));
+        item.setBeneficioEmpresarialPorcentaje(BigDecimal.valueOf(40));
         item.setOrdenFila(siguienteOrden(tableroId));
         tablero.agregarItem(item);
         tableroRepository.save(tablero);
@@ -180,7 +199,7 @@ public class TableroCertificadoService {
             fila.setServicios(importe);
         }
         fila.setCostoEstructuralPorcentaje(BigDecimal.valueOf(20));
-        fila.setBeneficioEmpresarialPorcentaje(BigDecimal.valueOf(25));
+        fila.setBeneficioEmpresarialPorcentaje(BigDecimal.valueOf(40));
         return fila;
     }
 
@@ -195,6 +214,11 @@ public class TableroCertificadoService {
         return valor == null ? BigDecimal.ZERO : valor;
     }
 
+    @Transactional
+    public void eliminarTablero(Long id) {
+        tableroRepository.delete(obtener(id));
+    }
+
     public record TotalesTablero(
             int cantidadItems,
             BigDecimal subtotal,
@@ -203,5 +227,22 @@ public class TableroCertificadoService {
             BigDecimal total,
             BigDecimal certificado
     ) {
+    }
+
+    private static class ItemCertificadoPeriodo {
+        private final ItemOrdenCompra item;
+        private BigDecimal avance = BigDecimal.ZERO;
+
+        private ItemCertificadoPeriodo(ItemOrdenCompra item) {
+            this.item = item;
+        }
+
+        private ItemOrdenCompra item() {
+            return item;
+        }
+
+        private void sumarAvance(BigDecimal avanceNuevo) {
+            avance = avance.add(avanceNuevo);
+        }
     }
 }
