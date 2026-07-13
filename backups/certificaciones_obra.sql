@@ -1,204 +1,234 @@
--- phpMyAdmin SQL Dump
--- version 5.2.1
--- https://www.phpmyadmin.net/
+-- MariaDB dump 10.19  Distrib 10.4.27-MariaDB, for Win64 (AMD64)
 --
--- Servidor: 127.0.0.1
--- Tiempo de generación: 09-07-2026 a las 18:35:34
--- Versión del servidor: 10.4.32-MariaDB
--- Versión de PHP: 8.0.30
-
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-START TRANSACTION;
-SET time_zone = "+00:00";
-
+-- Host: localhost    Database: certificaciones_obra
+-- ------------------------------------------------------
+-- Server version	10.4.27-MariaDB
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Base de datos: `certificaciones_obra`
+-- Table structure for table `asistencia_personal`
 --
 
--- --------------------------------------------------------
+DROP TABLE IF EXISTS `asistencia_personal`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `asistencia_personal` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `empresa` varchar(255) DEFAULT NULL,
+  `fecha` date DEFAULT NULL,
+  `hora_ingreso` time(6) DEFAULT NULL,
+  `hora_salida` time(6) DEFAULT NULL,
+  `horas_trabajadas` decimal(38,2) DEFAULT NULL,
+  `observacion` varchar(1200) DEFAULT NULL,
+  `sector` varchar(255) DEFAULT NULL,
+  `trabajador_id` bigint(20) DEFAULT NULL,
+  `trabajador_nombre` varchar(500) DEFAULT NULL,
+  `obra_id` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK6erwlmtmogthyy3r5crpu4f2n` (`obra_id`),
+  CONSTRAINT `FK6erwlmtmogthyy3r5crpu4f2n` FOREIGN KEY (`obra_id`) REFERENCES `obra` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Estructura de tabla para la tabla `categoria_orden`
+-- Dumping data for table `asistencia_personal`
 --
 
+LOCK TABLES `asistencia_personal` WRITE;
+/*!40000 ALTER TABLE `asistencia_personal` DISABLE KEYS */;
+/*!40000 ALTER TABLE `asistencia_personal` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `categoria_orden`
+--
+
+DROP TABLE IF EXISTS `categoria_orden`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `categoria_orden` (
-  `id` bigint(20) NOT NULL,
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `activo` bit(1) NOT NULL,
   `nombre` varchar(255) DEFAULT NULL,
-  `tipo` varchar(50) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `tipo` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Volcado de datos para la tabla `categoria_orden`
+-- Dumping data for table `categoria_orden`
 --
 
-INSERT INTO `categoria_orden` (`id`, `activo`, `nombre`, `tipo`) VALUES
-(1, b'1', 'Mano de obra', 'MANO_OBRA'),
-(2, b'1', 'Material', 'MATERIAL'),
-(3, b'1', 'Servicio', 'OTRO'),
-(4, b'1', 'EPP', 'OTRO');
-
--- --------------------------------------------------------
+LOCK TABLES `categoria_orden` WRITE;
+/*!40000 ALTER TABLE `categoria_orden` DISABLE KEYS */;
+INSERT INTO `categoria_orden` VALUES (1,'','Mano de obra','MANO_OBRA'),(2,'','Material','MATERIAL'),(3,'','Servicio','OTRO'),(4,'','EPP','OTRO');
+/*!40000 ALTER TABLE `categoria_orden` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
--- Estructura de tabla para la tabla `certificacion`
+-- Table structure for table `certificacion`
 --
 
+DROP TABLE IF EXISTS `certificacion`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `certificacion` (
-  `id` bigint(20) NOT NULL,
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `fecha` date DEFAULT NULL,
   `numero` int(11) DEFAULT NULL,
   `observacion` varchar(255) DEFAULT NULL,
-  `orden_compra_id` bigint(20) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `orden_compra_id` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK8v5msi0r4n594mi7gm7qb3c5x` (`orden_compra_id`),
+  CONSTRAINT `FK8v5msi0r4n594mi7gm7qb3c5x` FOREIGN KEY (`orden_compra_id`) REFERENCES `orden_compra` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=252 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Volcado de datos para la tabla `certificacion`
+-- Dumping data for table `certificacion`
 --
 
-INSERT INTO `certificacion` (`id`, `fecha`, `numero`, `observacion`, `orden_compra_id`) VALUES
-(1, '2025-08-05', 1, 'Carga automatica desde planilla OC 317', 128),
-(2, '2025-08-29', 2, 'Carga automatica desde planilla OC 317', 128),
-(3, '2025-09-15', 3, 'Carga automatica desde planilla OC 317', 128),
-(4, '2025-09-26', 4, 'Carga automatica desde planilla OC 317', 128),
-(5, '2025-10-28', 5, 'Carga automatica desde planilla OC 317', 128),
-(6, '2025-12-05', 6, 'Carga automatica desde planilla OC 317', 128),
-(7, '2026-01-19', 7, 'Carga automatica desde planilla OC 317', 128),
-(8, '2026-02-02', 8, 'Carga automatica desde planilla OC 317', 128),
-(9, '2026-03-16', 9, 'Carga automatica desde planilla OC 317', 128),
-(10, '2026-03-27', 10, 'Carga automatica desde planilla OC 317', 128),
-(11, '2026-04-10', 11, 'Carga automatica desde planilla OC 317', 128),
-(12, '2026-04-27', 12, 'Carga automatica desde planilla OC 317', 128),
-(13, '2026-05-26', 13, 'Carga automatica desde planilla OC 317', 128),
-(14, '2026-06-19', 14, 'Carga automatica desde planilla OC 317', 128),
-(15, '2026-07-06', 15, 'Carga automatica desde planilla OC 317', 128),
-(16, '2025-10-13', 1, 'Carga automatica desde planilla OC 340', 114),
-(17, '2025-12-03', 2, 'Carga automatica desde planilla OC 340', 114),
-(18, '2025-12-22', 3, 'Carga automatica desde planilla OC 340', 114),
-(19, '2025-12-05', 1, 'Carga automatica desde planilla OC 345', 109),
-(20, '2026-01-19', 1, 'Carga automatica desde planilla OC 383', 94),
-(21, '2026-02-02', 2, 'Carga automatica desde planilla OC 383', 94),
-(22, '2026-02-13', 3, 'Carga automatica desde planilla OC 383', 94),
-(23, '2026-03-03', 4, 'Carga automatica desde planilla OC 383', 94),
-(24, '2026-06-19', 1, 'Importado desde planilla pegada', 2),
-(25, '2026-07-02', 2, 'Importado desde planilla pegada', 2);
-
--- --------------------------------------------------------
+LOCK TABLES `certificacion` WRITE;
+/*!40000 ALTER TABLE `certificacion` DISABLE KEYS */;
+INSERT INTO `certificacion` VALUES (1,'2025-08-05',1,'Carga automatica desde planilla OC 317',128),(2,'2025-08-29',2,'Carga automatica desde planilla OC 317',128),(3,'2025-09-15',3,'Carga automatica desde planilla OC 317',128),(4,'2025-09-26',4,'Carga automatica desde planilla OC 317',128),(5,'2025-10-28',5,'Carga automatica desde planilla OC 317',128),(6,'2025-12-05',6,'Carga automatica desde planilla OC 317',128),(7,'2026-01-19',7,'Carga automatica desde planilla OC 317',128),(8,'2026-02-02',8,'Carga automatica desde planilla OC 317',128),(9,'2026-03-16',9,'Carga automatica desde planilla OC 317',128),(10,'2026-03-27',10,'Carga automatica desde planilla OC 317',128),(11,'2026-04-10',11,'Carga automatica desde planilla OC 317',128),(12,'2026-04-27',12,'Carga automatica desde planilla OC 317',128),(13,'2026-05-26',13,'Carga automatica desde planilla OC 317',128),(14,'2026-06-19',14,'Carga automatica desde planilla OC 317',128),(15,'2026-07-06',15,'Carga automatica desde planilla OC 317',128),(19,'2025-12-05',1,'Carga automatica desde planilla OC 345',109),(20,'2026-01-19',1,'Carga automatica desde planilla OC 383',94),(21,'2026-02-02',2,'Carga automatica desde planilla OC 383',94),(22,'2026-02-13',3,'Carga automatica desde planilla OC 383',94),(23,'2026-03-03',4,'Carga automatica desde planilla OC 383',94),(24,'2026-06-19',1,'Importado desde planilla pegada',2),(25,'2026-07-02',2,'Importado desde planilla pegada',2),(26,'2026-02-13',4,'Importado desde planilla pegada',96),(27,'2026-02-27',5,'Importado desde planilla pegada',96),(28,'2026-03-16',6,'Importado desde planilla pegada',96),(29,'2026-03-27',7,'Importado desde planilla pegada',96),(30,'2026-04-10',8,'Importado desde planilla pegada',96),(31,'2026-04-24',9,'Importado desde planilla pegada',96),(32,'2025-11-07',1,'',96),(33,'2025-11-20',2,'',96),(34,'2025-12-19',3,'',96),(35,'2026-05-11',1,'Importado desde planilla pegada',24),(36,'2026-05-21',2,'Importado desde planilla pegada',24),(37,'2026-06-05',3,'Importado desde planilla pegada',24),(38,'2026-06-19',4,'Importado desde planilla pegada',24),(39,'2026-07-02',5,'Importado desde planilla pegada',24),(40,'2026-04-10',1,'Importado desde planilla pegada',32),(41,'2026-04-24',2,'Importado desde planilla pegada',32),(42,'2026-05-21',3,'Importado desde planilla pegada',32),(43,'2026-02-27',1,'Importado desde planilla pegada',40),(44,'2026-03-16',2,'Importado desde planilla pegada',40),(45,'2026-03-27',3,'Importado desde planilla pegada',40),(46,'2026-04-10',4,'Importado desde planilla pegada',40),(47,'2026-04-24',5,'Importado desde planilla pegada',40),(48,'2026-05-11',6,'Importado desde planilla pegada',40),(49,'2026-05-21',7,'Importado desde planilla pegada',40),(50,'2026-06-05',8,'Importado desde planilla pegada',40),(51,'2026-01-30',1,'Importado desde planilla pegada',64),(52,'2026-01-05',1,'Importado desde planilla pegada',71),(53,'2026-01-16',2,'Importado desde planilla pegada',71),(54,'2026-01-30',3,'Importado desde planilla pegada',71),(55,'2026-02-13',4,'Importado desde planilla pegada',71),(56,'2026-03-27',5,'Importado desde planilla pegada',71),(57,'2026-04-10',6,'Importado desde planilla pegada',71),(58,'2025-12-03',1,'Importado desde planilla pegada',78),(59,'2025-12-18',2,'Importado desde planilla pegada',78),(60,'2026-01-16',3,'Importado desde planilla pegada',78),(61,'2026-02-13',4,'Importado desde planilla pegada',78),(62,'2026-03-16',5,'Importado desde planilla pegada',78),(63,'2026-03-27',6,'Importado desde planilla pegada',78),(64,'2026-06-05',7,'Importado desde planilla pegada',78),(65,'2026-07-02',8,'Importado desde planilla pegada',78),(66,'2025-11-20',1,'Importado desde planilla pegada',79),(67,'2026-01-16',2,'Importado desde planilla pegada',79),(68,'2025-10-13',1,'Importado desde planilla pegada',103),(69,'2025-10-27',2,'Importado desde planilla pegada',103),(70,'2025-11-07',1,'Importado desde planilla pegada',95),(71,'2025-11-20',2,'Importado desde planilla pegada',95),(72,'2025-12-03',3,'Importado desde planilla pegada',95),(73,'2025-12-18',4,'Importado desde planilla pegada',95),(74,'2026-01-16',5,'Importado desde planilla pegada',95),(75,'2026-01-30',6,'Importado desde planilla pegada',95),(76,'2025-02-13',7,'Importado desde planilla pegada',95),(77,'2026-02-27',8,'Importado desde planilla pegada',95),(78,'2026-03-27',9,'Importado desde planilla pegada',95),(79,'2026-04-10',10,'Importado desde planilla pegada',95),(80,'2026-07-02',11,'Importado desde planilla pegada',95),(81,'2025-09-15',1,'Importado desde planilla pegada',113),(82,'2025-09-26',2,'Importado desde planilla pegada',113),(83,'2025-10-13',3,'Importado desde planilla pegada',113),(84,'2025-10-27',4,'Importado desde planilla pegada',113),(85,'2025-11-07',5,'Importado desde planilla pegada',113),(86,'2025-12-03',6,'Importado desde planilla pegada',113),(87,'2025-12-19',7,'Importado desde planilla pegada',113),(88,'2026-05-21',8,'Importado desde planilla pegada',113),(89,'2026-07-02',9,'Importado desde planilla pegada',113),(90,'2025-07-21',1,'Importado desde planilla pegada',140),(91,'2025-08-01',2,'Importado desde planilla pegada',140),(92,'2025-08-15',3,'Importado desde planilla pegada',140),(93,'2025-08-29',4,'Importado desde planilla pegada',140),(94,'2025-09-15',5,'Importado desde planilla pegada',140),(95,'2025-09-26',6,'Importado desde planilla pegada',140),(96,'2025-07-08',1,'Importado desde planilla pegada',178),(97,'2025-10-27',2,'Importado desde planilla pegada',178),(98,'2025-05-26',1,'Importado desde planilla pegada',177),(99,'2025-05-27',2,'Importado desde planilla pegada',177),(100,'2025-06-10',3,'Importado desde planilla pegada',177),(101,'2025-06-24',4,'Importado desde planilla pegada',177),(102,'2025-07-08',5,'Importado desde planilla pegada',177),(103,'2025-02-21',1,'',199),(104,'2026-11-07',1,'',92),(105,'2025-11-20',2,'',92),(106,'2025-08-21',1,'Importado desde planilla pegada',121),(107,'2025-08-29',2,'Importado desde planilla pegada',121),(108,'2025-09-15',3,'Importado desde planilla pegada',121),(109,'2025-09-26',4,'Importado desde planilla pegada',121),(110,'2025-10-13',5,'Importado desde planilla pegada',121),(111,'2025-10-27',6,'Importado desde planilla pegada',121),(112,'2025-12-19',7,'Importado desde planilla pegada',121),(113,'2026-02-02',8,'Importado desde planilla pegada',121),(114,'2026-02-13',9,'Importado desde planilla pegada',121),(115,'2026-02-27',10,'Importado desde planilla pegada',121),(116,'2026-03-16',11,'Importado desde planilla pegada',121),(117,'2026-03-27',12,'Importado desde planilla pegada',121),(118,'2025-05-12',1,'Importado desde planilla pegada',172),(119,'2025-05-26',2,'',172),(120,'2025-06-10',3,'',172),(121,'2025-06-24',4,'',172),(122,'2025-07-08',5,'',172),(123,'2025-05-27',1,'',168),(124,'2025-06-24',2,'',168),(125,'2025-05-12',1,'',179),(126,'2025-06-11',2,'',179),(127,'2025-06-24',3,'',179),(128,'2025-04-04',1,'',185),(129,'2025-03-18',1,'',188),(130,'2025-04-24',2,'',188),(131,'2025-03-18',1,'',189),(132,'2025-04-14',2,'',189),(133,'2025-04-28',3,'',189),(134,'2026-05-11',1,'Importado desde planilla pegada',13),(135,'2026-05-26',2,'Importado desde planilla pegada',13),(136,'2026-06-19',3,'Importado desde planilla pegada',13),(137,'2026-07-06',4,'Importado desde planilla pegada',13),(138,'2026-06-05',1,'Importado desde planilla pegada',6),(139,'2026-03-16',1,'Importado desde planilla pegada',38),(140,'2026-03-27',2,'Importado desde planilla pegada',38),(141,'2026-04-10',3,'Importado desde planilla pegada',38),(142,'2026-04-27',4,'Importado desde planilla pegada',38),(145,'2025-04-22',1,'Importado desde planilla pegada',184),(146,'2025-02-21',1,'Importado desde planilla pegada',200),(147,'2025-02-14',1,'Importado desde planilla pegada',205),(148,'2025-03-07',1,'Importado desde planilla pegada',196),(149,'2025-03-18',2,'Importado desde planilla pegada',196),(150,'2025-04-14',3,'Importado desde planilla pegada',196),(151,'2025-05-22',1,'',163),(152,'2025-06-25',1,'Importado desde planilla pegada',149),(153,'2025-07-08',2,'Importado desde planilla pegada',149),(154,'2025-07-21',3,'Importado desde planilla pegada',149),(155,'2025-08-04',4,'Importado desde planilla pegada',149),(156,'2025-08-18',5,'Importado desde planilla pegada',149),(157,'2025-08-29',6,'Importado desde planilla pegada',149),(158,'2025-09-15',7,'Importado desde planilla pegada',149),(159,'2025-09-26',8,'Importado desde planilla pegada',149),(160,'2025-10-13',9,'Importado desde planilla pegada',149),(161,'2025-10-28',10,'Importado desde planilla pegada',149),(162,'2025-11-21',11,'Importado desde planilla pegada',149),(163,'2025-12-05',12,'Importado desde planilla pegada',149),(164,'2025-12-22',13,'Importado desde planilla pegada',149),(165,'2026-01-19',14,'Importado desde planilla pegada',149),(166,'2026-02-02',15,'Importado desde planilla pegada',149),(167,'2026-02-13',16,'Importado desde planilla pegada',149),(168,'2026-03-03',17,'Importado desde planilla pegada',149),(169,'2026-03-16',18,'Importado desde planilla pegada',149),(170,'2026-03-27',19,'Importado desde planilla pegada',149),(171,'2026-04-10',20,'Importado desde planilla pegada',149),(172,'2026-04-27',21,'Importado desde planilla pegada',149),(173,'2026-05-11',22,'Importado desde planilla pegada',149),(174,'2026-05-26',23,'Importado desde planilla pegada',149),(175,'2026-06-19',24,'Importado desde planilla pegada',149),(176,'2026-07-06',25,'Importado desde planilla pegada',149),(177,'2025-05-22',1,'',175),(178,'2025-10-28',1,'Importado desde planilla pegada',101),(179,'2025-11-21',2,'Importado desde planilla pegada',101),(180,'2025-12-05',3,'Importado desde planilla pegada',101),(181,'2025-12-22',4,'Importado desde planilla pegada',101),(182,'2026-01-19',5,'Importado desde planilla pegada',101),(183,'2026-02-02',6,'Importado desde planilla pegada',101),(184,'2026-03-03',7,'Importado desde planilla pegada',101),(185,'2026-03-16',8,'Importado desde planilla pegada',101),(186,'2026-03-27',9,'Importado desde planilla pegada',101),(187,'2026-04-10',10,'Importado desde planilla pegada',101),(188,'2026-04-27',11,'Importado desde planilla pegada',101),(189,'2026-05-11',12,'Importado desde planilla pegada',101),(190,'2026-05-26',13,'Importado desde planilla pegada',101),(191,'2026-06-19',14,'Importado desde planilla pegada',101),(192,'2026-07-06',15,'Importado desde planilla pegada',101),(193,'2025-10-13',1,'Importado desde planilla pegada',114),(194,'2025-12-03',2,'Importado desde planilla pegada',114),(195,'2025-12-22',3,'Importado desde planilla pegada',114),(196,'2025-02-14',1,'',117),(197,'2025-07-03',1,'Importado desde planilla pegada',144),(198,'2025-07-08',2,'Importado desde planilla pegada',144),(199,'2025-07-23',3,'Importado desde planilla pegada',144),(200,'2025-08-04',4,'Importado desde planilla pegada',144),(201,'2025-08-18',5,'Importado desde planilla pegada',144),(202,'2025-09-01',6,'Importado desde planilla pegada',144),(203,'2025-09-15',7,'Importado desde planilla pegada',144),(204,'2025-09-29',8,'Importado desde planilla pegada',144),(205,'2025-10-07',9,'Importado desde planilla pegada',144),(206,'2025-10-08',1,'',102),(207,'2025-10-27',1,'',99),(208,'2025-11-07',2,'',99),(209,'2025-11-07',1,'',210),(210,'2025-11-25',2,'',210),(211,'2025-12-08',3,'',210),(212,'2025-12-22',4,'',210),(213,'2025-01-06',5,'',210),(214,'2026-01-07',1,'',66),(215,'2026-01-19',2,'',66),(216,'2026-02-02',3,'',66),(217,'2026-02-13',4,'',66),(218,'2025-03-02',5,'',66),(219,'2026-03-02',1,'',43),(220,'2026-03-16',2,'',43),(221,'2026-03-30',3,'',43),(222,'2026-04-13',4,'',43),(223,'2026-04-27',5,'',43),(224,'2026-04-28',1,'Importado desde planilla pegada',14),(225,'2026-05-11',2,'Importado desde planilla pegada',14),(226,'2026-05-25',3,'Importado desde planilla pegada',14),(227,'2026-06-05',4,'Importado desde planilla pegada',14),(228,'2026-06-22',5,'Importado desde planilla pegada',14),(229,'2026-06-25',1,'',211),(230,'2026-07-07',2,'',211),(231,'2026-05-11',1,'',12),(232,'2026-07-03',2,'',12),(233,'2026-04-13',1,'',33),(234,'2026-04-27',2,'',33),(235,'2026-03-16',1,'',35),(236,'2026-07-02',1,'',212),(237,'2026-04-13',1,'',25),(238,'2026-04-27',2,'',25),(239,'2026-06-05',3,'',25),(240,'2026-01-07',1,'',65),(241,'2026-02-03',2,'',65),(242,'2026-03-17',3,'',65),(243,'2026-01-06',1,'',75),(244,'2025-11-25',1,'',97),(245,'2026-12-16',1,'',82),(246,'2026-01-06',2,'',82),(247,'2026-02-02',3,'',82),(248,'2026-01-06',1,'',84),(249,'2026-02-02',2,'',84),(250,'2025-12-16',1,'',111),(251,'2026-07-03',2,'',111);
+/*!40000 ALTER TABLE `certificacion` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
--- Estructura de tabla para la tabla `configuracion_sistema`
+-- Table structure for table `configuracion_sistema`
 --
 
+DROP TABLE IF EXISTS `configuracion_sistema`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `configuracion_sistema` (
   `clave` varchar(255) NOT NULL,
-  `activo` bit(1) NOT NULL
+  `activo` bit(1) NOT NULL,
+  PRIMARY KEY (`clave`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Volcado de datos para la tabla `configuracion_sistema`
+-- Dumping data for table `configuracion_sistema`
 --
 
-INSERT INTO `configuracion_sistema` (`clave`, `activo`) VALUES
-('alertas.dashboard', b'1'),
-('alertas.oc', b'1'),
-('modulo.catalogo', b'1'),
-('modulo.categorias', b'1'),
-('modulo.dashboard', b'1'),
-('modulo.importarCertificados', b'1'),
-('modulo.importarOc', b'1'),
-('modulo.itemizado', b'1'),
-('modulo.items', b'1'),
-('modulo.materiales', b'1'),
-('modulo.oc', b'1'),
-('modulo.proveedores', b'1'),
-('modulo.reportes', b'1'),
-('modulo.rubros', b'1');
-
--- --------------------------------------------------------
+LOCK TABLES `configuracion_sistema` WRITE;
+/*!40000 ALTER TABLE `configuracion_sistema` DISABLE KEYS */;
+INSERT INTO `configuracion_sistema` VALUES ('alertas.dashboard','\0'),('alertas.oc','\0'),('modulo.catalogo',''),('modulo.categorias',''),('modulo.dashboard',''),('modulo.importarCertificados',''),('modulo.importarOc',''),('modulo.itemizado',''),('modulo.items',''),('modulo.materiales',''),('modulo.oc',''),('modulo.proveedores',''),('modulo.reportes',''),('modulo.rubros','');
+/*!40000 ALTER TABLE `configuracion_sistema` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
--- Estructura de tabla para la tabla `item_certificacion`
+-- Table structure for table `deposito_item`
 --
 
+DROP TABLE IF EXISTS `deposito_item`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `deposito_item` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `activo` bit(1) NOT NULL,
+  `categoria` varchar(255) DEFAULT NULL,
+  `nombre` varchar(600) DEFAULT NULL,
+  `observacion` varchar(1200) DEFAULT NULL,
+  `stock_actual` decimal(38,2) DEFAULT NULL,
+  `stock_minimo` decimal(38,2) DEFAULT NULL,
+  `tipo` enum('CONSUMIBLE','EPP','HERRAMIENTA','OTRO') DEFAULT NULL,
+  `ubicacion` varchar(255) DEFAULT NULL,
+  `unidad` varchar(255) DEFAULT NULL,
+  `obra_id` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FKnhr6y2nwlj9s99r7uw83esvyv` (`obra_id`),
+  CONSTRAINT `FKnhr6y2nwlj9s99r7uw83esvyv` FOREIGN KEY (`obra_id`) REFERENCES `obra` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `deposito_item`
+--
+
+LOCK TABLES `deposito_item` WRITE;
+/*!40000 ALTER TABLE `deposito_item` DISABLE KEYS */;
+INSERT INTO `deposito_item` VALUES (1,'','Materiales','Pastina junta acha x 5 kg','Creado desde recepcion OC 522',5.00,0.00,'CONSUMIBLE','0','und',1);
+/*!40000 ALTER TABLE `deposito_item` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `deposito_trabajador`
+--
+
+DROP TABLE IF EXISTS `deposito_trabajador`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `deposito_trabajador` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `activo` bit(1) NOT NULL,
+  `nombre` varchar(500) DEFAULT NULL,
+  `sector` varchar(255) DEFAULT NULL,
+  `empresa` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `deposito_trabajador`
+--
+
+LOCK TABLES `deposito_trabajador` WRITE;
+/*!40000 ALTER TABLE `deposito_trabajador` DISABLE KEYS */;
+INSERT INTO `deposito_trabajador` VALUES (1,'','Juan Carlos',NULL,NULL),(2,'','Antonio Gomez Tineo','Jefe de obra','Simende'),(3,'','Maximo Bogado','Ayudante','Simende'),(4,'\0','Mario Romero','Ayudante','Simende'),(5,'','Federico Almada','Administrativo','Simende'),(6,'','Miguel Muriel','Capataz','Grupo Muriel'),(7,'','Juan Muriel','Albañil','Grupo Muriel');
+/*!40000 ALTER TABLE `deposito_trabajador` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `item_certificacion`
+--
+
+DROP TABLE IF EXISTS `item_certificacion`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `item_certificacion` (
-  `id` bigint(20) NOT NULL,
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `porcentaje_actual` decimal(38,2) DEFAULT NULL,
   `certificacion_id` bigint(20) DEFAULT NULL,
-  `item_orden_compra_id` bigint(20) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `item_orden_compra_id` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FKsm8lnil2mrk0drxbst234t3k6` (`certificacion_id`),
+  KEY `FKaan68xur1an6dxksfsc1vf71` (`item_orden_compra_id`),
+  CONSTRAINT `FKaan68xur1an6dxksfsc1vf71` FOREIGN KEY (`item_orden_compra_id`) REFERENCES `item_orden_compra` (`id`),
+  CONSTRAINT `FKsm8lnil2mrk0drxbst234t3k6` FOREIGN KEY (`certificacion_id`) REFERENCES `certificacion` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=453 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Volcado de datos para la tabla `item_certificacion`
+-- Dumping data for table `item_certificacion`
 --
 
-INSERT INTO `item_certificacion` (`id`, `porcentaje_actual`, `certificacion_id`, `item_orden_compra_id`) VALUES
-(1, 8.33, 1, 361),
-(2, 7.75, 2, 361),
-(3, 4.46, 3, 361),
-(4, 5.00, 4, 361),
-(5, 6.25, 5, 361),
-(6, 6.93, 6, 361),
-(7, 1.75, 7, 361),
-(8, 6.83, 8, 361),
-(9, 10.07, 9, 361),
-(10, 12.18, 10, 361),
-(11, 1.75, 11, 361),
-(12, 15.16, 12, 361),
-(13, 1.85, 13, 361),
-(14, 7.72, 14, 361),
-(15, 3.97, 15, 361),
-(16, 100.00, 16, 314),
-(17, 0.00, 16, 315),
-(18, 100.00, 16, 316),
-(19, 100.00, 16, 317),
-(20, 100.00, 16, 318),
-(21, 100.00, 16, 319),
-(22, 100.00, 16, 320),
-(23, 0.00, 17, 314),
-(24, 46.38, 17, 315),
-(25, 0.00, 17, 316),
-(26, 0.00, 17, 317),
-(27, 0.00, 17, 318),
-(28, 0.00, 17, 319),
-(29, 0.00, 17, 320),
-(30, 0.00, 18, 314),
-(31, 43.33, 18, 315),
-(32, 0.00, 18, 316),
-(33, 0.00, 18, 317),
-(34, 0.00, 18, 318),
-(35, 0.00, 18, 319),
-(36, 0.00, 18, 320),
-(37, 100.00, 19, 301),
-(38, 100.00, 19, 302),
-(39, 100.00, 19, 300),
-(40, 20.00, 20, 257),
-(41, 21.96, 21, 257),
-(42, 53.37, 22, 257),
-(43, 4.67, 23, 257),
-(44, 100.00, 24, 2),
-(45, 100.00, 24, 3),
-(46, 100.00, 24, 4),
-(47, 15.00, 24, 5),
-(48, 100.00, 24, 6),
-(49, 25.00, 24, 9),
-(50, 70.00, 24, 10),
-(51, 85.00, 25, 5),
-(52, 25.00, 25, 9);
-
--- --------------------------------------------------------
+LOCK TABLES `item_certificacion` WRITE;
+/*!40000 ALTER TABLE `item_certificacion` DISABLE KEYS */;
+INSERT INTO `item_certificacion` VALUES (1,8.33,1,361),(2,7.75,2,361),(3,4.46,3,361),(4,5.00,4,361),(5,6.25,5,361),(6,6.93,6,361),(7,1.75,7,361),(8,6.83,8,361),(9,10.07,9,361),(10,12.18,10,361),(11,1.75,11,361),(12,15.16,12,361),(13,1.85,13,361),(14,7.72,14,361),(15,3.97,15,361),(37,100.00,19,301),(38,100.00,19,302),(39,100.00,19,300),(40,20.00,20,257),(41,21.96,21,257),(42,53.37,22,257),(43,4.67,23,257),(44,100.00,24,2),(45,100.00,24,3),(46,100.00,24,4),(47,15.00,24,5),(48,100.00,24,6),(49,25.00,24,9),(50,70.00,24,10),(51,85.00,25,5),(52,25.00,25,9),(53,18.75,26,270),(54,12.50,26,271),(55,6.25,27,270),(56,12.50,27,271),(57,32.34,28,270),(58,29.11,28,271),(61,20.16,30,270),(62,23.39,30,271),(65,40.00,32,264),(66,85.00,32,266),(67,100.00,32,267),(68,40.00,32,268),(69,26.67,33,264),(70,15.00,33,266),(71,60.00,33,268),(72,33.33,34,264),(73,17.86,34,265),(74,82.14,29,265),(75,12.50,29,270),(76,12.50,29,271),(77,3.57,31,269),(78,10.00,31,270),(79,10.00,31,271),(80,100.00,35,54),(81,100.00,35,58),(82,100.00,35,59),(83,100.00,35,60),(84,100.00,35,61),(85,42.86,35,63),(86,46.82,35,64),(87,100.00,35,55),(88,100.00,35,56),(89,14.29,36,65),(90,100.00,36,57),(91,28.57,37,63),(92,15.39,37,65),(93,14.29,38,63),(94,15.39,38,65),(95,14.28,39,63),(96,100.00,39,66),(97,37.50,40,84),(98,54.71,41,79),(99,42.50,41,84),(100,20.00,42,84),(101,100.00,43,103),(102,100.00,43,106),(103,100.00,43,107),(104,25.00,43,113),(105,100.00,44,109),(106,15.00,44,113),(107,100.00,44,105),(108,60.00,45,110),(109,25.00,45,113),(110,20.00,45,104),(111,100.00,46,108),(112,40.00,46,110),(113,35.00,46,113),(114,25.00,47,111),(115,25.00,47,112),(116,10.00,48,111),(117,8.00,48,112),(118,40.00,49,111),(119,27.00,49,112),(120,25.00,50,112),(121,100.00,51,181),(122,100.00,51,182),(123,100.00,51,183),(124,100.00,51,184),(125,45.24,52,195),(126,13.16,52,196),(127,12.12,52,197),(128,90.00,52,200),(129,90.00,52,201),(130,29.76,53,195),(131,36.84,53,196),(132,27.88,53,197),(133,100.00,53,198),(134,100.00,53,199),(135,10.00,53,200),(136,30.00,54,196),(137,35.00,54,197),(138,10.00,54,201),(139,90.00,54,203),(140,25.00,55,197),(141,25.00,56,195),(142,20.00,56,196),(143,10.00,57,203),(144,50.00,58,219),(145,50.00,58,220),(146,40.18,59,219),(147,50.00,60,220),(148,9.82,61,219),(149,3.57,62,221),(150,35.71,63,222),(151,60.00,64,221),(152,36.43,65,221),(153,80.00,66,223),(154,20.00,67,223),(159,100.00,69,288),(165,9.09,74,258),(166,18.57,74,259),(167,9.09,75,258),(169,10.00,77,259),(170,9.10,78,258),(171,9.01,79,258),(172,9.17,80,258),(173,30.00,81,307),(174,100.00,81,309),(175,70.00,82,307),(176,18.42,82,308),(177,20.00,82,310),(178,9.21,83,308),(179,25.00,83,310),(180,50.00,83,311),(181,45.00,84,310),(182,40.00,84,311),(183,10.00,85,311),(184,100.00,86,312),(185,10.00,87,310),(186,100.00,87,313),(187,36.12,88,308),(188,24.90,89,308),(189,100.00,90,405),(190,26.94,90,407),(191,100.00,90,408),(192,25.00,90,410),(193,25.00,90,411),(194,28.56,90,413),(195,100.00,91,406),(196,8.31,91,407),(197,25.00,91,410),(198,75.00,91,411),(199,14.29,91,412),(200,70.00,91,413),(201,10.00,92,407),(202,28.68,93,407),(203,17.86,93,410),(204,14.29,93,412),(205,18.71,94,407),(206,16.08,94,410),(207,7.36,95,407),(208,100.00,95,409),(209,16.06,95,410),(210,71.42,95,412),(211,1.44,95,413),(212,49.87,96,508),(213,20.07,97,508),(214,8.10,98,503),(215,8.37,98,504),(216,7.00,98,505),(217,28.00,98,506),(218,8.00,98,507),(219,77.00,99,503),(220,7.50,99,505),(221,14.90,100,503),(222,91.63,100,504),(223,85.50,100,505),(224,22.00,100,506),(225,20.00,100,507),(226,26.20,101,506),(227,23.80,102,506),(228,72.00,102,507),(229,100.00,103,615),(230,90.00,104,255),(231,10.00,105,255),(232,100.00,68,283),(233,100.00,68,284),(234,100.00,68,285),(235,100.00,68,286),(236,100.00,68,287),(237,36.36,70,258),(238,100.00,70,261),(239,100.00,70,262),(240,100.00,70,263),(241,29.00,71,259),(242,20.00,71,260),(243,31.00,72,259),(244,14.00,72,260),(245,11.43,73,259),(246,16.67,73,260),(247,18.18,76,258),(248,16.18,76,260),(249,100.00,106,333),(250,50.00,106,344),(251,22.39,106,348),(252,50.00,106,349),(253,100.00,106,350),(254,100.00,106,351),(255,100.00,106,336),(256,100.00,106,337),(257,20.00,106,340),(258,100.00,106,341),(259,50.00,107,344),(260,21.43,107,345),(261,14.29,107,335),(262,55.00,107,340),(263,50.00,108,345),(264,77.61,108,348),(265,20.00,108,340),(266,21.43,109,345),(267,7.14,110,345),(268,50.00,110,349),(269,28.57,110,335),(270,5.00,110,340),(271,5.36,111,346),(272,100.00,111,347),(273,14.29,111,335),(274,70.00,111,338),(275,3.73,111,342),(276,7.29,112,339),(277,35.71,112,342),(278,5.36,112,343),(279,14.28,113,335),(280,50.00,114,334),(281,30.00,114,338),(282,19.82,114,339),(283,10.72,115,346),(284,28.57,115,335),(285,17.34,116,339),(286,83.92,117,346),(287,37.30,118,493),(288,26.93,119,492),(289,3.99,120,493),(290,73.07,121,492),(291,26.95,121,493),(292,31.76,122,493),(293,93.30,123,480),(294,100.00,124,478),(295,100.00,124,479),(296,6.70,124,480),(297,76.88,125,509),(298,7.40,126,509),(299,15.72,127,509),(300,100.00,128,534),(301,30.00,129,550),(302,70.00,130,550),(303,45.00,131,551),(304,50.00,132,551),(305,5.00,133,551),(306,46.80,134,29),(307,1.00,135,29),(308,0.62,136,29),(309,51.58,137,29),(310,100.00,138,18),(311,100.00,138,19),(312,16.58,139,98),(313,54.13,140,98),(314,18.41,141,98),(315,10.88,142,98),(320,100.00,145,533),(321,100.00,145,532),(322,100.00,146,616),(323,100.00,147,643),(324,100.00,147,642),(325,100.00,147,641),(326,45.00,148,592),(327,45.00,149,592),(328,10.00,150,592),(329,100.00,151,471),(330,2.28,152,443),(331,5.01,153,443),(332,3.53,154,443),(333,3.29,155,443),(334,4.94,156,443),(335,4.53,157,443),(336,6.15,158,443),(337,2.03,159,443),(338,5.29,160,443),(339,2.57,161,443),(340,4.88,162,443),(341,1.97,163,443),(342,3.90,164,443),(343,1.65,165,443),(344,5.95,166,443),(345,8.55,167,443),(346,7.02,168,443),(347,3.73,169,443),(348,9.80,170,443),(349,2.18,171,443),(350,5.44,172,443),(351,3.23,173,443),(352,0.99,174,443),(353,0.89,175,443),(354,0.20,176,443),(355,50.00,177,497),(356,3.01,178,281),(357,60.84,178,280),(358,1.97,179,281),(359,4.80,179,280),(360,2.10,180,281),(361,20.83,180,280),(362,3.42,181,281),(363,13.53,181,280),(364,0.42,182,281),(365,3.77,183,281),(366,5.52,184,281),(367,2.10,185,281),(368,4.47,186,281),(369,1.83,187,281),(370,4.32,188,281),(371,2.37,189,281),(372,1.24,190,281),(373,0.49,191,281),(374,38.80,192,281),(375,100.00,193,320),(376,100.00,193,319),(377,100.00,193,318),(378,100.00,193,317),(379,100.00,193,316),(380,100.00,193,314),(381,46.38,194,315),(382,43.33,195,315),(383,100.00,196,324),(384,100.00,196,325),(385,100.00,196,326),(386,12.50,197,423),(387,6.25,198,423),(388,12.50,199,423),(389,12.50,200,423),(390,14.58,201,423),(391,12.50,202,423),(392,12.50,203,423),(393,12.50,204,423),(394,4.17,205,423),(395,100.00,206,282),(396,75.00,207,274),(397,25.00,208,274),(398,12.50,209,660),(399,25.00,210,660),(400,25.00,211,660),(401,25.00,212,660),(402,12.50,213,660),(403,13.09,214,186),(404,25.00,215,186),(405,25.00,216,186),(406,25.00,217,186),(407,11.91,218,186),(409,12.50,220,119),(410,13.63,219,119),(411,25.00,221,119),(412,25.00,222,119),(413,23.87,223,119),(414,1.25,224,30),(415,28.88,225,30),(416,28.88,226,30),(417,18.50,227,30),(419,22.49,228,30),(420,10.63,229,661),(421,50.00,230,661),(422,25.00,231,28),(423,25.00,232,28),(424,50.00,233,86),(425,50.00,234,86),(426,100.00,235,90),(427,33.33,236,662),(431,33.33,237,62),(432,33.33,238,62),(433,33.34,239,62),(434,33.33,240,185),(435,33.33,241,185),(436,33.34,242,185),(437,100.00,243,210),(438,100.00,244,272),(439,7.14,245,226),(440,7.41,245,227),(441,7.14,246,226),(442,7.41,246,227),(443,7.14,247,226),(444,7.41,247,227),(445,7.14,248,233),(446,7.41,248,236),(447,7.14,249,233),(448,7.41,249,236),(449,22.00,250,305),(450,22.00,250,665),(451,18.00,251,305),(452,18.00,251,665);
+/*!40000 ALTER TABLE `item_certificacion` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
--- Estructura de tabla para la tabla `item_orden_compra`
+-- Table structure for table `item_orden_compra`
 --
 
+DROP TABLE IF EXISTS `item_orden_compra`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `item_orden_compra` (
-  `id` bigint(20) NOT NULL,
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `cantidad` decimal(38,2) DEFAULT NULL,
   `categoria` varchar(50) DEFAULT NULL,
   `detalle` varchar(2000) DEFAULT NULL,
@@ -211,1898 +241,378 @@ CREATE TABLE `item_orden_compra` (
   `rubro_entidad_id` bigint(20) DEFAULT NULL,
   `item_mano_obra_vinculado_id` bigint(20) DEFAULT NULL,
   `material_catalogo_id` bigint(20) DEFAULT NULL,
-  `categoria_entidad_id` bigint(20) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `categoria_entidad_id` bigint(20) DEFAULT NULL,
+  `orden_itemizado` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FKd4b1br1r65wu48fs51mayg6p0` (`orden_compra_id`),
+  KEY `FKc5asj1kltwnfxmn2s41tw3yq1` (`rubro_entidad_id`),
+  KEY `FK7btyocgqsdk2mygngmjvfcjtc` (`item_mano_obra_vinculado_id`),
+  KEY `FKxnf5yy585nb5nf4d0xcnl38g` (`material_catalogo_id`),
+  KEY `FKmaxlqym62g6tqr83nypuoxofa` (`categoria_entidad_id`),
+  CONSTRAINT `FK7btyocgqsdk2mygngmjvfcjtc` FOREIGN KEY (`item_mano_obra_vinculado_id`) REFERENCES `item_orden_compra` (`id`),
+  CONSTRAINT `FKc5asj1kltwnfxmn2s41tw3yq1` FOREIGN KEY (`rubro_entidad_id`) REFERENCES `rubro` (`id`),
+  CONSTRAINT `FKd4b1br1r65wu48fs51mayg6p0` FOREIGN KEY (`orden_compra_id`) REFERENCES `orden_compra` (`id`),
+  CONSTRAINT `FKmaxlqym62g6tqr83nypuoxofa` FOREIGN KEY (`categoria_entidad_id`) REFERENCES `categoria_orden` (`id`),
+  CONSTRAINT `FKxnf5yy585nb5nf4d0xcnl38g` FOREIGN KEY (`material_catalogo_id`) REFERENCES `material_catalogo` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=672 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Volcado de datos para la tabla `item_orden_compra`
+-- Dumping data for table `item_orden_compra`
 --
 
-INSERT INTO `item_orden_compra` (`id`, `cantidad`, `categoria`, `detalle`, `importe`, `item`, `precio_unitario`, `rubro`, `unidad`, `orden_compra_id`, `rubro_entidad_id`, `item_mano_obra_vinculado_id`, `material_catalogo_id`, `categoria_entidad_id`) VALUES
-(1, 6.00, 'MATERIAL', 'PUENTE ADHERENTE PAMAX X 28 KG', 784200.00, '449.1', 130700.00, '1 - REVOQUE EXTERIOR', 'un', 1, 1, NULL, 1, 2),
-(2, 38.68, 'MANO_OBRA', 'Construcción de Contrapiso en balcon de P1 y Techo de balcones Fachadas Este y Oeste.', 773600.00, '450.1', 20000.00, '2 - ALBAÑILERÍA GENERAL', 'm2', 2, 2, NULL, NULL, 1),
-(3, 38.68, 'MANO_OBRA', 'Construcción de Carpeta en bal con de P1 y Techo de balcones Fachadas: Este y Oeste.', 696240.00, '450.2', 18000.00, '2 - ALBAÑILERÍA GENERAL', 'm2', 2, 2, NULL, NULL, 1),
-(4, 1.00, 'MANO_OBRA', 'Colocación de CORROTEX en: Techos de balcones y Techo del nivel N-15. Incluye co rte de barras sobran tes en techo de sala de maquin as.', 200000.00, '450.3', 200000.00, '2 - ALBAÑILERÍA GENERAL', 'sg', 2, 2, NULL, NULL, 1),
-(5, 14.00, 'MANO_OBRA', 'Amure de Embudos en Azotea (N- 15). Incluye laimpe rmeabilización con Protex Seal 77 y venda.', 700000.00, '450.4', 50000.00, '2 - ALBAÑILERÍA GENERAL', 'und', 2, 2, NULL, NULL, 1),
-(6, 16.00, 'MANO_OBRA', 'Amure de Caños 110 en Losa de piso de la Cocina en los pisos P13 y P14', 640000.00, '450.5', 40000.00, '2 - ALBAÑILERÍA GENERAL', 'und', 2, 2, NULL, NULL, 1),
-(7, 52.56, 'MANO_OBRA', 'Construcción de paredes en la baulera externa al D pto. del encargado.', 1314000.00, '450.6', 25000.00, '2 - ALBAÑILERÍA GENERAL', 'm2', 2, 2, NULL, NULL, 1),
-(8, 182.64, 'MANO_OBRA', 'Revoque con Mapei 3en1, en paredes de: Cocinas de los pisos: P13 y P14.', 3287520.00, '450.7', 18000.00, '2 - ALBAÑILERÍA GENERAL', 'm2', 2, 2, NULL, NULL, 1),
-(9, 632.64, 'MANO_OBRA', 'Revoque con Mapei 3en1, en paredes de: Baños de lo s pisos: P3 , P4, P13 y P14.', 11387520.00, '450.8', 18000.00, '2 - ALBAÑILERÍA GENERAL', 'm2', 2, 2, NULL, NULL, 1),
-(10, 17.00, 'MANO_OBRA', 'Colocación de tejuelas en Bal con de piso 2 - Fachada Este. Incluye colocación d e la pastina y el se llador.', 935000.00, '450.9', 55000.00, '2 - ALBAÑILERÍA GENERAL', 'm2', 2, 2, NULL, NULL, 1),
-(12, 1.00, 'MATERIAL', 'Contactor 3x 32A 2+2 24Vca 5 0/60Hz EC MON TERO', 42412.32, '544.2', 42412.32, '3 - MANTENIMIENTO', 'und', 3, 3, NULL, 3, 2),
-(13, 30.00, 'MATERIAL', 'HORMIGON RDC 300', 3590700.00, '448.1', 119690.00, '4 - CARPETAS Y CONTRAPISOS', 'und', 4, 4, NULL, 4, 2),
-(14, 30.00, 'MATERIAL', 'BOMBEO DE HORMIGON RDC 300', 123030.00, '448.2', 4101.00, '4 - CARPETAS Y CONTRAPISOS', 'und', 4, 4, NULL, 5, 2),
-(15, 1.00, 'MATERIAL', 'BOMBA DE ARRASTRE HORMIGON', 451079.00, '448.3', 451079.00, '4 - CARPETAS Y CONTRAPISOS', 'und', 4, 4, NULL, 6, 2),
-(16, 141.52, 'MATERIAL', 'ZOCALOS PLAIN BLANCO MATE COD', 951979.57, '014.1', 6726.82, '5 - JUNTA DE DILATACIÓN', 'und', 5, 5, NULL, 7, 2),
-(17, 25.00, 'MATERIAL', 'CONTRAMARCO SQUARE BCO.MATE 5', 186900.25, '014.2', 7476.01, '5 - JUNTA DE DILATACIÓN', 'und', 5, 5, NULL, 8, 2),
-(18, 247.77, 'MANO_OBRA', 'Revoque de espesor 6mm, aplicado a toda la superficie del Tramo 1 de la Fachada Oeste. Incluye la colocación de Adherente en toda el área', 4162536.00, '443.1', 16800.00, '6 - REPARACIÓN DE REVOQUE Y BUÑAS', 'M2', 6, 325, NULL, NULL, 1),
-(19, 82.52, 'MANO_OBRA', 'Picar y hacer Buña, tanto en la Fachada Oeste como en la Este', 990240.00, '443.2', 12000.00, '6 - REPARACIÓN DE REVOQUE Y BUÑAS', 'ML', 6, 325, NULL, NULL, 1),
-(20, 4.00, 'MATERIAL', 'TUBO LEDs 18W BLF 220V 1.2M', 11504.12, '536.1', 2876.03, '3 - MANTENIMIENTO', 'und', 7, 3, NULL, 9, 2),
-(21, 1.00, 'OTRO', 'ESTUDIO TOMOGRAFICO DE VIGAS CO', 17320000.00, '539.1', 17320000.00, '7 - TOMOGRAFÍA DE HORMIGÓN', 'und', 8, 7, NULL, NULL, 3),
-(22, 1.00, 'MATERIAL', 'Bomba de arrastre hormigón', 451079.00, '444.1', 451079.00, '4 - CARPETAS Y CONTRAPISOS', 'und', 9, 4, NULL, 10, 2),
-(23, 20.00, 'MATERIAL', 'Hormigón RDC 300', 2393800.00, '444.2', 119690.00, '4 - CARPETAS Y CONTRAPISOS', 'und', 9, 4, NULL, 11, 2),
-(24, 20.00, 'MATERIAL', 'Bombeo de hormigon RDC 300', 82020.00, '444.3', 4101.00, '4 - CARPETAS Y CONTRAPISOS', 'und', 9, 4, NULL, 5, 2),
-(25, 2240.00, 'MATERIAL', 'INTOMAP 3 EN 1 AR BAGS X 25 KG', 17565788.80, '030.1', 7841.87, '1 - REVOQUE EXTERIOR', 'und', 10, 1, NULL, 12, 2),
-(26, 7.00, 'MATERIAL', 'Pastina junta acha x 5 kg', 88030.88, '522.1', 12575.84, '8 - COLOCACIÓN DE TEJUELA', 'und', 11, 8, NULL, 13, 2),
-(27, 1.00, 'MATERIAL', 'Fletes', 8000.00, '522.2', 8000.00, '8 - COLOCACIÓN DE TEJUELA', 'und', 11, 8, NULL, 14, 2),
-(28, 4.00, 'OTRO', 'Alquiler de volquetes', 400000.00, '438.1', 100000.00, '9 - Sin rubro', 'und', 12, 9, NULL, NULL, 3),
-(29, 250.00, 'MANO_OBRA', 'Enchapado de paredes exteriores en fachadas', 3500000.00, '439.1', 14000.00, '10 - ENCHAPADO EXTERNO', 'm2', 13, 10, NULL, NULL, 1),
-(30, 1.00, 'OTRO', 'Servicio de Seg. e Higiene', 3000000.00, '440.1', 3000000.00, '9 - Sin rubro', 'und', 14, 9, NULL, NULL, 3),
-(31, 35.00, 'MATERIAL', 'Hormigon RDC 300', 3791095.00, '518.1', 108317.00, '4 - CARPETAS Y CONTRAPISOS', 'und', 15, 4, NULL, 4, 2),
-(32, 35.00, 'MATERIAL', 'Bombeo de Hormigón RDC 300', 129885.00, '518.2', 3711.00, '4 - CARPETAS Y CONTRAPISOS', 'und', 15, 4, NULL, 15, 2),
-(33, 1.00, 'MATERIAL', 'Bomba de arrastre hormigón', 408216.00, '518.3', 408216.00, '4 - CARPETAS Y CONTRAPISOS', 'und', 15, 4, NULL, 10, 2),
-(34, 8.00, 'MATERIAL', 'Arena fina', 287087.44, '029.1', 35885.93, '11 - MAMPOSTERÍA', 'und', 16, 11, NULL, 16, 2),
-(35, 432.00, 'MATERIAL', 'Ladrillos huecos 12x18x33', 271680.05, '029.2', 628.89, '11 - MAMPOSTERÍA', 'und', 16, 11, NULL, 17, 2),
-(36, 648.00, 'MATERIAL', 'Ladrillos huecos 8x18x33', 345759.84, '029.3', 533.58, '11 - MAMPOSTERÍA', 'und', 16, 11, NULL, 18, 2),
-(37, 4.00, 'MATERIAL', 'Mallas fibra de vidrio 5x5 rol 90grs revoque', 152083.44, '029.4', 38020.86, '1 - REVOQUE EXTERIOR', 'und', 16, 1, NULL, 19, 2),
-(38, 4.00, 'MATERIAL', 'Látex interior blanco x 20 l', 254292.08, '436.1', 63573.02, '12 - MATERIALES', 'und', 17, 12, NULL, 20, 2),
-(39, 1.00, 'MATERIAL', 'Sellador fijador al agua x 20l', 35501.36, '436.2', 35501.36, '13 - AISLACIONES E IMPERMEABILIZACIONES', 'und', 17, 13, NULL, 21, 2),
-(40, 50.00, 'MATERIAL', 'LIJA AL AGUA 150 DOBLE A', 23117.50, '436.3', 462.35, '2 - ALBAÑILERÍA GENERAL', 'und', 17, 2, NULL, 22, 2),
-(41, 5.00, 'MATERIAL', 'ROLLO CARTON CORRUGADO', 56067.75, '436.4', 11213.55, '2 - ALBAÑILERÍA GENERAL', 'und', 17, 2, NULL, 23, 2),
-(42, 5.00, 'MATERIAL', 'CINTA PAPEL AZUL 5CM ANCHO', 11722.30, '436.5', 2344.46, '3 - MANTENIMIENTO', 'und', 17, 3, NULL, 24, 2),
-(43, 1.00, 'MATERIAL', 'TERSUAVE ENDUIDO INT. X 10 LTS .', 24768.60, '436.6', 24768.60, '3 - MANTENIMIENTO', 'und', 17, 3, NULL, 25, 2),
-(44, 10.00, 'MATERIAL', 'CEPILLO ALAMBRE', 29805.00, '436.7', 2980.50, '2 - ALBAÑILERÍA GENERAL', 'und', 17, 2, NULL, 26, 2),
-(45, 10.00, 'MATERIAL', 'PINCELETAS No 42', 64145.50, '436.8', 6414.55, '2 - ALBAÑILERÍA GENERAL', 'und', 17, 2, NULL, 27, 2),
-(46, 1120.00, 'MATERIAL', 'INTOMAP 3 EN 1 AR BAGS X 25 KG', 8782905.60, '028.1', 7841.88, '1 - REVOQUE EXTERIOR', 'und', 18, 1, NULL, 12, 2),
-(47, 3.84, 'MATERIAL', 'Porcelanato Vite Granza ivori', 103126.81, '013.1', 26855.94, '14 - COLOCACIÓN DE PORCELANATO', 'und', 19, 14, NULL, 28, 2),
-(48, 10.00, 'MATERIAL', 'Protex corrotex bicomponente X', 176349.50, '027.1', 17634.95, '15 - PATOLOGÍAS', 'und', 20, 15, NULL, 29, 2),
-(49, 5.00, 'MATERIAL', 'MECHA COPA DIAMANTADA SIN CERA', 22996.60, '434.1', 4599.32, '16 - COLOCACIÓN DE DURLOCK', 'und', 21, 16, NULL, 30, 2),
-(50, 100.00, 'MANO_OBRA', 'Latex en paredes, techos y cielorasos en el Departamento Modelo', 1340000.00, '432.1', 13400.00, '17 - PINTURA', 'und', 22, 17, NULL, NULL, 1),
-(51, 5.00, 'MATERIAL', 'Placas durlock standard 9,5 mm', 53408.35, '513.1', 10681.67, '16 - COLOCACIÓN DE DURLOCK', 'und', 23, 16, NULL, 31, 2),
-(52, 1000.00, 'MATERIAL', 'Tornillo T1 punta mecha', 23830.00, '513.2', 23.83, '16 - COLOCACIÓN DE DURLOCK', 'und', 23, 16, NULL, 32, 2),
-(53, 1.00, 'MATERIAL', 'Fletes', 20661.15, '513.3', 20661.15, '18 - FLETES', 'und', 23, 18, NULL, 14, 2),
-(54, 6.40, 'MANO_OBRA', 'Quitar y reponer Porcelanato en el baño Principal. Incluye recuperación de porcelanato y limpieza la pared.', 500000.00, '435.1', 78125.00, '9 - Sin rubro', 'm2', 24, 9, NULL, NULL, 1),
-(55, 1.00, 'MANO_OBRA', 'Bajar mugre del edificio y limpieza de zona del balancín 1', 900000.00, '435.10', 900000.00, '9 - Sin rubro', 'SG', 24, 9, NULL, NULL, 1),
-(56, 1.00, 'MANO_OBRA', 'Receptaculo de ducha, carpeta, colocación de porcelanato y zocalo de marmol.', 600000.00, '435.11', 600000.00, '9 - Sin rubro', 'SG', 24, 9, NULL, NULL, 1),
-(57, 1.00, 'MANO_OBRA', 'Colocación de Niveles en Terrazas para colocación de pendientes en tarraza. incluye fajas.', 1500000.00, '435.12', 1500000.00, '9 - Sin rubro', 'SG', 24, 9, NULL, NULL, 1),
-(58, 1.00, 'MANO_OBRA', 'Tapar caños de electricidad y Aires Acondicionado en Dpto Modelo', 300000.00, '435.2', 300000.00, '9 - Sin rubro', 'SG', 24, 9, NULL, NULL, 1),
-(59, 1.00, 'MANO_OBRA', 'Sacar dos (02) cerámicas en baño secundario rotas por personal de Enercon en caja de luz y revocar mocheta de dormitorio 3', 300000.00, '435.3', 300000.00, '9 - Sin rubro', 'SG', 24, 9, NULL, NULL, 1),
-(60, 1.00, 'MANO_OBRA', 'Sacar agua de los pisos 11-12-13-14 debido a fuerte lluvia que inundó el edificio', 300000.00, '435.4', 300000.00, '9 - Sin rubro', 'SG', 24, 9, NULL, NULL, 1),
-(61, 15.00, 'MANO_OBRA', 'Tapado de cañerias electricas sobre losa en 3 Dptos. mas Palier del Pis: 2 y en los  Pisos 3, 4 y 5 en los 4 dptos y Palier.', 1500000.00, '435.5', 100000.00, '9 - Sin rubro', 'Und.', 24, 9, NULL, NULL, 1),
-(62, 3.00, 'OTRO', 'INSPECCION Y CERTIFICACION MEN ASCENSOR', 570000.00, '433.1', 190000.00, '19 - ASCENSOR', 'und', 25, 19, NULL, NULL, 3),
-(63, 154.00, 'MANO_OBRA', 'Colocación de mochetas y Bajada de dinteles a medida de puertas, Pisos: 1,9, 10, 11, 12 , 13 y 14', 6930000.00, '435.6', 45000.00, '9 - Sin rubro', 'Und.', 24, 315, NULL, NULL, 1),
-(64, 22.00, 'MANO_OBRA', 'Colocación de Porcelanato en balcón Fachada Oeste y Palier del piso 2.', 770000.00, '435.7', 35000.00, '9 - Sin rubro', 'M2', 24, 9, NULL, NULL, 1),
-(65, 14.00, 'MANO_OBRA', 'Carpeta Niveladora y de Terminación Rodillada en escalera principal, desde subsuelo a piso15', 8400000.00, '435.8', 600000.00, '9 - Sin rubro', 'PISO', 24, 9, NULL, NULL, 1),
-(66, 1.00, 'MANO_OBRA', 'Construcción de mochetas de puertas de entrada a los Dptos  y ascensor en palier del piso 2. Incluye revoque y encuadre.', 1500000.00, '435.9', 1500000.00, '9 - Sin rubro', 'SG', 24, 315, NULL, NULL, 1),
-(67, 1.00, 'MATERIAL', 'PROTEX SUPERLIGANTE X TAMBOR 200', 917463.21, '025.1', 917463.21, '2 - ALBAÑILERÍA GENERAL', 'und', 26, 2, NULL, 33, 2),
-(68, 2.00, 'MATERIAL', 'PROTEX IMPRIMACION S LATA X 25', 32467.40, '025.2', 16233.70, '13 - AISLACIONES E IMPERMEABILIZACIONES', 'und', 26, 13, NULL, 34, 2),
-(69, 1.62, 'MATERIAL', 'CERAMICA RECTIFICADA BLANCA SA', 59720.91, '012.1', 36864.76, '14 - COLOCACIÓN DE PORCELANATO', 'und', 27, 14, NULL, 35, 2),
-(70, 15.00, 'MATERIAL', 'LAMPARA FOCO LED 15 W', 47268.60, '500.4', 3151.24, '3 - MANTENIMIENTO', 'und', 28, 3, NULL, 36, 2),
-(71, 4.00, 'MATERIAL', 'WD-40 LUBRICANTE 432CC', 14231.40, '500.3', 3557.85, '3 - MANTENIMIENTO', 'und', 28, 3, NULL, 37, 2),
-(72, 5.00, 'MATERIAL', 'SILICONA NEUTRA TRANSPARENTE', 31321.10, '500.2', 6264.22, '13 - AISLACIONES E IMPERMEABILIZACIONES', 'und', 28, 13, NULL, 38, 2),
-(73, 5.00, 'MATERIAL', 'SILICONA ACETICA TRANSPARENTE', 26051.25, '500.1', 5210.25, '13 - AISLACIONES E IMPERMEABILIZACIONES', 'und', 28, 13, NULL, 39, 2),
-(74, 1.00, 'MATERIAL', 'ZOCALO DE CUARZO GRIS', 80000.00, '428.1', 80000.00, '20 - COLOCACIÓN DE ZOCALOS', 'und', 29, 20, NULL, 40, 2),
-(75, 648.00, 'MATERIAL', 'Ladrillos huecos 8 x 18 x 33', 299201.04, '24.2', 461.73, '11 - MAMPOSTERÍA', 'und', 30, 11, NULL, 41, 2),
-(76, 432.00, 'MATERIAL', 'Ladrillos huecos 12 x 18 x 33', 255532.32, '24.1', 591.51, '11 - MAMPOSTERÍA', 'und', 30, 11, NULL, 42, 2),
-(77, 960.00, 'MATERIAL', 'INTOMAP 3 EN 1 AR BAGS X 25 KG', 7632000.00, '23.1', 7950.00, '1 - REVOQUE EXTERIOR', 'und', 31, 1, NULL, 12, 2),
-(78, 53.00, 'MANO_OBRA', 'Retiro de Membrana existente en el techo del local de exhibición, demoler carpeta, bajar escombros. retirar toda la madera. (Local 1)', 795000.00, '424.1', 15000.00, '21 - LOCALES COMERCIALES', 'm2', 32, 21, NULL, NULL, 1),
-(79, 1279.64, 'MANO_OBRA', 'Limpieza e Hidrolavado general del techo de los Locales Comerciales. Incluye bajar suciedad, toda la madera y residuos de la superficie del techo.', 1919466.60, '424.2', 1500.00, '21 - LOCALES COMERCIALES', 'm2', 32, 21, NULL, NULL, 1),
-(80, 494.86, 'MANO_OBRA', 'Impermeabilización en losa de techo con dos (02) manos de protex seal 77', 2969160.00, '424.3', 6000.00, '21 - LOCALES COMERCIALES', 'm2', 32, 21, NULL, NULL, 1),
-(81, 494.86, 'MANO_OBRA', 'Construcción de contrapiso con pendiente, Utilizando material tipo RDC, que resista intemperie en techo, según proyecto:', 7422900.00, '424.4', 15000.00, '21 - LOCALES COMERCIALES', 'm2', 32, 21, NULL, NULL, 1),
-(82, 72.92, 'MANO_OBRA', 'Relleno con cascote en el desnivel  dentro de los locales. Esp.est= 12 cm. Tapar caño de desague cloacal', 875024.64, '424.5', 12000.00, '21 - LOCALES COMERCIALES', 'm3', 32, 21, NULL, NULL, 1),
-(83, 494.86, 'MANO_OBRA', 'Colocación de contrapiso Carpeta RDC dentro de locales . Fratazado total.  Espesor a definir', 5938320.00, '424.6', 12000.00, '21 - LOCALES COMERCIALES', 'm2', 32, 21, NULL, NULL, 1),
-(84, 8.00, 'MANO_OBRA', 'Construcción de muro para la ventilación de los baños de cada local. Incluye: Babeta con protex Seal 77 y vendas en la union losa-ladrllo y losa de techo.', 2400000.00, '424.7', 300000.00, '21 - LOCALES COMERCIALES', 'und', 32, 21, NULL, NULL, 1),
-(85, 8.00, 'MANO_OBRA', 'Nivelar escalera de hormigon con carpeta rodillada niveladora, sin nariz', 3200000.00, '424.8', 400000.00, '21 - LOCALES COMERCIALES', 'und', 32, 21, NULL, NULL, 1),
-(86, 4.00, 'OTRO', 'Alquiler de volquetes', 400000.00, '423.1', 100000.00, '22 - SERVICIO', 'und', 33, 22, NULL, NULL, 3),
-(87, 2.00, 'MATERIAL', 'SELLADOR X 5 LITROS', 480801.36, '491.3', 240400.68, '13 - AISLACIONES E IMPERMEABILIZACIONES', 'und', 34, 13, NULL, 43, 2),
-(88, 5.00, 'MATERIAL', 'PASTINA JUNTA ANCHA X 5KG NEGR', 75941.05, '491.2', 15188.21, '23 - COLOCACIÓN DE TEJUELAS', 'und', 34, 23, NULL, 44, 2),
-(89, 17.66, 'MATERIAL', 'TEJUELA NEGRA LISA', 610210.57, '491.1', 34553.26, '23 - COLOCACIÓN DE TEJUELAS', 'und', 34, 23, NULL, 45, 2),
-(90, 4.00, 'OTRO', 'Alquiler de volquetes', 320000.00, '422.1', 80000.00, '22 - SERVICIO', 'und', 35, 22, NULL, NULL, 3),
-(91, 2.00, 'MATERIAL', 'PUENTE ADHERENTE TAMBOR POR 20', 1917498.26, '22.4', 958749.13, '23 - COLOCACIÓN DE TEJUELAS', 'und', 36, 23, NULL, 46, 2),
-(92, 1000.00, 'MATERIAL', 'Ladrillos comunes', 222610.00, '22.3', 222.61, '11 - MAMPOSTERÍA', 'und', 36, 11, NULL, 47, 2),
-(93, 432.00, 'MATERIAL', 'Ladrillos huecos 12 x 18 x 33', 293734.08, '22.2', 679.94, '11 - MAMPOSTERÍA', 'und', 36, 11, NULL, 42, 2),
-(94, 8.00, 'MATERIAL', 'Arena fina', 288226.96, '22.1', 36028.37, '11 - MAMPOSTERÍA', 'm3', 36, 11, NULL, 48, 2),
-(95, 35.00, 'MATERIAL', 'HORMIGON RDC 300', 3610565.00, '480.3', 103159.00, '4 - CARPETAS Y CONTRAPISOS', 'und', 37, 4, NULL, 4, 2),
-(96, 35.00, 'MATERIAL', 'BOMBEO DE HORMIGON RDC 300', 123690.00, '480.2', 3534.00, '4 - CARPETAS Y CONTRAPISOS', 'und', 37, 4, NULL, 5, 2),
-(97, 1.00, 'MATERIAL', 'BOMBA DE ARRASTRE HORMIGON', 388776.00, '480.1', 388776.00, '4 - CARPETAS Y CONTRAPISOS', 'und', 37, 4, NULL, 6, 2),
-(98, 350.00, 'MANO_OBRA', 'ENCHAPADO DE PAREDES EXTERNAS DEL EDIFICIO', 4900000.00, '419.1', 14000.00, '10 - ENCHAPADO EXTERNO', 'und', 38, 10, NULL, NULL, 1),
-(99, 1.00, 'MATERIAL', 'Fletes', 29600.00, '11.4', 29600.00, '18 - FLETES', 'und', 39, 18, NULL, 14, 2),
-(100, 21.60, 'MATERIAL', 'PORCELANATO LISCIO IVORY 1.20X', 705111.91, '11.3', 32644.07, '14 - COLOCACIÓN DE PORCELANATO', 'm2', 39, 14, NULL, 49, 2),
-(101, 21.60, 'MATERIAL', 'PORCELANATO LISCIO IVORY 1.20X', 705111.91, '11.2', 32644.07, '14 - COLOCACIÓN DE PORCELANATO', 'm2', 39, 14, NULL, 49, 2),
-(102, 5.76, 'MATERIAL', 'PORCELANATO VITE GRANZA IVORI', 188029.84, '11.1', 32644.07, '14 - COLOCACIÓN DE PORCELANATO', 'm2', 39, 14, NULL, 50, 2),
-(103, 77.36, 'MANO_OBRA', 'Construcción de Carpeta en Balcones de Fachada Oeste: P2, P12, P13 Y P14 - Fachada Este: P1, P3, P4 Y P5', 1392480.00, '410.1', 18000.00, '24 - CONTRAPISOS Y CARPETAS', 'm2', 40, 24, NULL, NULL, 1),
-(104, 3.00, 'MANO_OBRA', 'Colocación de Carpeta niveladora en escalones del Módulo de Escaleras, desde PB a P2. NO Incluye: Soldar bordes a grampas,', 1290000.00, '410.10', 430000.00, '24 - CONTRAPISOS Y CARPETAS', 'piso', 40, 24, NULL, NULL, 1),
-(105, 1.00, 'MANO_OBRA', 'Amurar Puerta Principal de Dpto. Modelo', 130000.00, '410.11', 130000.00, '11 - MAMPOSTERÍA', 'und', 40, 315, NULL, NULL, 1),
-(106, 1.00, 'MANO_OBRA', 'Reposición de Porcelanatos y Cerámicas en Dpto: Piso de Sala Comedor-Dpto Modelo y en pared de Baño exterior, por ajuste en el pto. de agua fría/caliente de la Bañera. Incluye: Corte de dos (02) cerámicas con amoladora para evitar daños en las piezs aledañas.', 400000.00, '410.2', 400000.00, '25 - REVESTIMIENTOS', 'gl', 40, 25, NULL, NULL, 1),
-(107, 9.00, 'MANO_OBRA', 'Cateo de Vigas, Columnas y Losas de techo. Implica la demolición de 09 cateos más hasta llegar a las barras principales y los estribos para su estudio del soporte de los elementos estructurales (Etapa II).', 720000.00, '410.3', 80000.00, '26 - ESTRUCTURA', 'und', 40, 321, NULL, NULL, 1),
-(108, 18.00, 'MANO_OBRA', 'Reparación de cada una de las roturas realizadas en la estructura principal del edificio, tanto en la etapa I y la etapa II. Incluye la colocación de Protex Corrotex y la reposición del hormigpon demolido con mortero PROTEX REP', 900000.00, '410.4', 50000.00, '26 - ESTRUCTURA', 'und', 40, 319, NULL, NULL, 1),
-(109, 28.00, 'MANO_OBRA', 'Hilada de ladrllos comúnes en mocheta de las cocina de los Dptos A y B, en todo el edificio.', 980000.00, '410.5', 35000.00, '11 - MAMPOSTERÍA', 'und', 40, 315, NULL, NULL, 1),
-(110, 67.62, 'MANO_OBRA', 'Impermeabilización de la unión de las paredes de la ducha con la losa del piso de las duchas de los Dptos A y B de todo el edificio. Incluye la colocación de malla entre la pared y losa de la bañera y 02 manos de protex seal 77 a una altura de 25 cm.', 1352400.00, '410.6', 20000.00, '27 - IMPERMEABILIZACIONES', 'm2', 40, 27, NULL, NULL, 1),
-(111, 365.28, 'MANO_OBRA', 'Revoque de paredes en Cocina, para Cuatro (04) pisos: P4-P5-P6-P7. Incluye amurar las cañerias de la plomería y la electricidad.', 6575040.00, '410.7', 18000.00, '28 - REVOQUES', 'm2', 40, 323, NULL, NULL, 1),
-(112, 632.64, 'MANO_OBRA', 'Revoque de paredes en Baños. Para Cuatro (04) pisos:P4-P5-P6-P7 . Incluye amurar las cañerias de la plomería y la electricidad.', 11387520.00, '410.8', 18000.00, '28 - REVOQUES', 'm2', 40, 323, NULL, NULL, 1),
-(113, 318.77, 'MANO_OBRA', 'Demolición de contrapiso del piso 1. Incluye bajar escombros a P.B.', 2868930.00, '410.9', 9000.00, '29 - DEMOLICIONES', 'm2', 40, 318, NULL, NULL, 1),
-(114, 20.00, 'MATERIAL', 'DISCO CORTE HIERRO 7 ́ ́ 1.6 MM', 48000.00, '484.7', 2400.00, '3 - MANTENIMIENTO', 'und', 41, 3, NULL, 51, 2),
-(115, 30.00, 'MATERIAL', 'DISCO CORTE ACERO 230X 1.9X22.', 119400.00, '484.6', 3980.00, '3 - MANTENIMIENTO', 'und', 41, 3, NULL, 52, 2),
-(116, 5.00, 'MATERIAL', 'CEPILLO ALAMBRE P/AMOL D BANCO MOLA SKIL 350 W', 72500.00, '484.5', 14500.00, '3 - MANTENIMIENTO', 'und', 41, 3, NULL, 53, 2),
-(117, 4.00, 'MATERIAL', 'CAMARA DE INSPECCION PLASTICA', 4354.56, '483.2', 1088.64, '9 - Sin rubro', 'und', 42, 9, NULL, 54, 2),
-(118, 4.00, 'MATERIAL', 'JABALINA AC-COBRE 1.5 MTS 1/2\"', 38892.08, '483.1', 9723.02, '9 - Sin rubro', 'und', 42, 9, NULL, 55, 2),
-(119, 100.00, 'OTRO', 'Servicio de Seg. e Higiene', 3300000.00, '414.1', 33000.00, '9 - Sin rubro', 'und', 43, 9, NULL, NULL, 3),
-(120, 5.00, 'MATERIAL', 'ESTOPA DE LIMPIEZA POR BOLSA', 7897.05, '19.6', 1579.41, '14 - COLOCACIÓN DE PORCELANATO', 'und', 44, 14, NULL, 56, 2),
-(121, 1600.00, 'MATERIAL', 'INTOMAP 3 EN 1 AR BAGS X 25 KG', 10521600.00, '19.5', 6576.00, '30 - REVOQUE INTERIOR', 'und', 44, 30, NULL, 12, 2),
-(122, 1.00, 'MATERIAL', 'KLAUKOL ALTA PERFORMANCE X 1KG COLOR GRIS ARTICO', 4796.57, '19.4', 4796.57, '14 - COLOCACIÓN DE PORCELANATO', 'und', 44, 14, NULL, 57, 2),
-(123, 1.00, 'MATERIAL', 'KLAUKOL ALTA PERFORMANCE X1KG COLOR GRIS PLOMO', 4796.57, '19.3', 4796.57, '14 - COLOCACIÓN DE PORCELANATO', 'und', 44, 14, NULL, 58, 2),
-(124, 10.00, 'MATERIAL', 'Clavos punta parís 2 y 1/2\"', 37231.90, '19.2', 3723.19, '2 - ALBAÑILERÍA GENERAL', 'und', 44, 2, NULL, 59, 2),
-(125, 15.00, 'MATERIAL', 'Alambre de fardo x kg', 44347.50, '19.1', 2956.50, '2 - ALBAÑILERÍA GENERAL', 'und', 44, 2, NULL, 60, 2),
-(126, 40.00, 'MATERIAL', 'PROTEX 216 X KG', 5944680.00, '481.2', 148617.00, '13 - AISLACIONES E IMPERMEABILIZACIONES', 'und', 45, 13, NULL, 61, 2),
-(127, 15.00, 'MATERIAL', 'PROTEX FIJATEX PLUS CARTUCHO', 779280.00, '481.1', 51952.00, '13 - AISLACIONES E IMPERMEABILIZACIONES', 'und', 45, 13, NULL, 62, 2),
-(128, 57.00, 'MATERIAL', 'PROTEX SEAL 77 FLEX BI COMPONE', 2588826.00, '480.1', 45418.00, '13 - AISLACIONES E IMPERMEABILIZACIONES', 'und', 46, 13, NULL, 63, 2),
-(129, 1.00, 'OTRO', 'Alquiler de volquetes', 80000.00, '406.1', 80000.00, '9 - Sin rubro', 'und', 47, 9, NULL, NULL, 3),
-(130, 1.00, 'MATERIAL', 'DESAGUE AGUA 2 EN 1 ATRIM DA60', 162808.26, '9.1', 162808.26, '13 - AISLACIONES E IMPERMEABILIZACIONES', 'und', 48, 13, NULL, 64, 2),
-(131, 2.00, 'MATERIAL', 'B 10 PLUS EXTRACTOR DE AIRE CA', 141816.56, '8.1', 70908.28, '31 - UNIDAD MODELO', 'und', 49, 31, NULL, 65, 2),
-(132, 5.00, 'MATERIAL', 'PASTINA PRESTIGE GRIS PERLA X', 88108.45, '7.2', 17621.69, '14 - COLOCACIÓN DE PORCELANATO', 'und', 50, 14, NULL, 66, 2),
-(133, 2.88, 'MATERIAL', 'PORCELANATO GRANZA BLACK OUT 1 CAJA 1.44M2', 94246.19, '7.1', 32724.37, '14 - COLOCACIÓN DE PORCELANATO', 'm2', 50, 14, NULL, 67, 2),
-(134, 1.00, 'MATERIAL', 'WAYRA CAMPANA EMPOTRABLE COD 2', 214494.40, '6.1', 214494.40, '31 - UNIDAD MODELO', 'und', 51, 31, NULL, 68, 2),
-(135, 1.00, 'MATERIAL', 'BACHA KIRA PLUS 35X35X13.5 CAF', 146277.59, '5.2', 146277.59, '31 - UNIDAD MODELO', 'und', 52, 31, NULL, 69, 2),
-(136, 1.00, 'MATERIAL', 'BAÑERA SACHA 140 BCA.ROCA', 282490.98, '5.1', 282490.98, '31 - UNIDAD MODELO', 'und', 52, 31, NULL, 70, 2),
-(137, 2.00, 'MATERIAL', 'THE GAP INODORO LARGO', 679018.60, '4.9', 339509.30, '31 - UNIDAD MODELO', 'und', 53, 31, NULL, 71, 2),
-(138, 2.00, 'MATERIAL', 'THE GAP DEPOSITO APOYO BCO', 555562.94, '4.8', 277781.47, '31 - UNIDAD MODELO', 'und', 53, 31, NULL, 72, 2),
-(139, 2.00, 'MATERIAL', 'THE GAP BIDE 1 OR LLUVIA 11115', 503411.40, '4.7', 251705.70, '31 - UNIDAD MODELO', 'und', 53, 31, NULL, 73, 2),
-(140, 2.00, 'MATERIAL', 'VERA BIDET CROMO MONOC 70-180', 206875.52, '4.6', 103437.76, '31 - UNIDAD MODELO', 'und', 53, 31, NULL, 74, 2),
-(141, 2.00, 'MATERIAL', 'VERA DUCHA EMB C/TRANSF MONOC', 318270.04, '4.5', 159135.02, '31 - UNIDAD MODELO', 'und', 53, 31, NULL, 75, 2),
-(142, 1.00, 'MATERIAL', 'VERA LAVATORIO PARED MONOC CRO', 142136.06, '4.4', 142136.06, '31 - UNIDAD MODELO', 'und', 53, 31, NULL, 76, 2),
-(143, 1.00, 'MATERIAL', 'BACHA BCH14 RECTANG SEMIEMB BL', 87825.30, '4.3', 87825.30, '31 - UNIDAD MODELO', 'und', 53, 31, NULL, 77, 2),
-(144, 1.00, 'MATERIAL', 'ADRA COCINA MONO CROMO 20-162', 78188.75, '4.2', 78188.75, '31 - UNIDAD MODELO', 'und', 53, 31, NULL, 78, 2),
-(145, 1.00, 'MATERIAL', 'VERA LAVATORIO BAJOMONOC CROMO', 78218.90, '4.11', 78218.90, '31 - UNIDAD MODELO', 'und', 53, 31, NULL, 79, 2),
-(146, 2.00, 'MATERIAL', 'THE GAP TAPA INODORO C/AMORTIG', 166776.96, '4.10', 83388.48, '31 - UNIDAD MODELO', 'und', 53, 31, NULL, 80, 2),
-(147, 1.00, 'MATERIAL', 'LUXOR S171 A* COMPACT(BRILL) 7', 182664.03, '4.1', 182664.03, '31 - UNIDAD MODELO', 'und', 53, 31, NULL, 81, 2),
-(148, 11.34, 'MATERIAL', 'PORCELANATO BLANCO GLACIAR 30X', 497896.42, '3.4', 43906.21, '31 - UNIDAD MODELO', 'm2', 54, 31, NULL, 82, 2),
-(149, 9.60, 'MATERIAL', 'PORCELANATO GRANZA IVO OUT 79.', 206418.62, '3.3', 21501.94, '31 - UNIDAD MODELO', 'm2', 54, 31, NULL, 83, 2),
-(150, 17.82, 'MATERIAL', 'PORCELANATO BLANCO GLACIAR 30X', 782408.66, '3.2', 43906.21, '31 - UNIDAD MODELO', 'm2', 54, 31, NULL, 82, 2),
-(151, 94.08, 'MATERIAL', 'PORCELANATO LISCIO LGR N 79,7X 61.44XP', 2022902.52, '3.1', 21501.94, '31 - UNIDAD MODELO', 'm2', 54, 31, NULL, 84, 2),
-(152, 30.00, 'MATERIAL', 'VERA DUCHA EMB C/TRANSF MONOC', 4177283.40, '10.2', 139242.78, '31 - UNIDAD MODELO', 'und', 55, 31, NULL, 75, 2),
-(153, 20.00, 'MATERIAL', 'VERA LAVATORIO PARED MONOC CRO', 2487298.60, '10.1', 124364.93, '31 - UNIDAD MODELO', 'und', 55, 31, NULL, 76, 2),
-(154, 5.00, 'MATERIAL', 'DESAGUE AGUA 2 EN 1 ATRIM DA60', 787467.15, '2.2', 157493.43, '31 - UNIDAD MODELO', 'und', 56, 31, NULL, 64, 2),
-(155, 13.44, 'MATERIAL', 'PORCELANATO LISCIO LIGTH GREY', 350094.39, '2.1', 26048.69, '31 - UNIDAD MODELO', 'm2', 56, 31, NULL, 85, 2),
-(156, 4.00, 'MATERIAL', 'NYLON POLIETILENO. NEGRO 200 M', 215080.68, '18.3', 53770.17, '3 - MANTENIMIENTO', 'und', 57, 3, NULL, 86, 2),
-(157, 160.00, 'MATERIAL', 'Cemento x 25 kg BOLSA', 819830.40, '18.2', 5123.94, '2 - ALBAÑILERÍA GENERAL', 'und', 57, 2, NULL, 87, 2),
-(158, 154.00, 'MATERIAL', 'CAL HYDRAT X 25 KG', 716671.34, '18.1', 4653.71, '2 - ALBAÑILERÍA GENERAL', 'und', 57, 2, NULL, 88, 2),
-(159, 1.00, 'MATERIAL', 'CHAVETA PASANTE BRONCE REG.CON BOYA', 265.48, '478.7', 265.48, '3 - MANTENIMIENTO', 'und', 58, 3, NULL, 89, 2),
-(160, 1.00, 'MATERIAL', 'BOYATELGOPOR PRESION 3/4', 5327.59, '478.6', 5327.59, '3 - MANTENIMIENTO', 'und', 58, 3, NULL, 90, 2),
-(161, 1.00, 'MATERIAL', 'SALIDA DE TANQUE 3/4 POLIPROPI', 2057.59, '478.5', 2057.59, '3 - MANTENIMIENTO', 'und', 58, 3, NULL, 91, 2),
-(162, 2.00, 'MATERIAL', 'RACOR HEMBRA 3/4(ROSCA) X 3/4', 447.74, '478.4', 223.87, '3 - MANTENIMIENTO', 'und', 58, 3, NULL, 92, 2),
-(163, 4.00, 'MATERIAL', 'ESPIGA DOBLE 3/4 POLIPROPILEN', 676.44, '478.3', 169.11, '3 - MANTENIMIENTO', 'und', 58, 3, NULL, 93, 2),
-(164, 5.00, 'MATERIAL', 'CODO ESPIGA DOBLE 3/4 POLIPROP', 1301.05, '478.2', 260.21, '3 - MANTENIMIENTO', 'und', 58, 3, NULL, 94, 2),
-(165, 1.00, 'MATERIAL', 'FLOTANTE MECANICO TANQUE 3/4 BRONCE REG.CON BOYA', 28244.26, '478.1', 28244.26, '3 - MANTENIMIENTO', 'und', 58, 3, NULL, 95, 2),
-(166, 10.00, 'MATERIAL', 'BISAGRA MUNICION 100X 75MM', 206000.00, '476.2', 20600.00, '32 - CONSTRUCCIÓN DE CASETA', 'und', 59, 32, NULL, 96, 2),
-(167, 3.00, 'MATERIAL', 'CANDADO No 50', 29574.00, '476.1', 9858.00, '32 - CONSTRUCCIÓN DE CASETA', 'und', 59, 32, NULL, 97, 2),
-(168, 5.00, 'MATERIAL', 'UNION ROSCADA DE PVC 1/2\"', 798.05, '475.3', 159.61, '3 - MANTENIMIENTO', 'und', 60, 3, NULL, 98, 2),
-(169, 5.00, 'MATERIAL', 'TEE ROSCADA DE BRONCE DE 1/2\"', 20851.80, '475.2', 4170.36, '3 - MANTENIMIENTO', 'und', 60, 3, NULL, 99, 2),
-(170, 5.00, 'MATERIAL', 'CANILLA METALICA ESFERI 1/2\" M', 40055.80, '475.1', 8011.16, '3 - MANTENIMIENTO', 'und', 60, 3, NULL, 100, 2),
-(171, 1.00, 'MATERIAL', 'DISCO WIDIA SEGMENTADO 7 ́ ́', 13153.76, '474.4', 13153.76, '3 - MANTENIMIENTO', 'und', 61, 3, NULL, 101, 2),
-(172, 5.00, 'MATERIAL', 'HOJA SIERRA P/ACERO 24 DIENTES 30 CM DE LARGO', 8465.95, '474.3', 1693.19, '3 - MANTENIMIENTO', 'und', 61, 3, NULL, 102, 2),
-(173, 20.00, 'MATERIAL', 'HOJA DE CUTTER', 1708.00, '474.2', 85.40, '3 - MANTENIMIENTO', 'und', 61, 3, NULL, 103, 2),
-(174, 3.00, 'MATERIAL', 'Nylon negro polietileno 200mic negro', 221668.56, '474.1', 73889.52, '3 - MANTENIMIENTO', 'und', 61, 3, NULL, 104, 2),
-(175, 1.00, 'MATERIAL', 'DESTORNILLADOR PLANO 6MM LARGO', 3472.38, '402.3', 3472.38, '3 - MANTENIMIENTO', 'und', 62, 3, NULL, 105, 2),
-(176, 1.00, 'MATERIAL', 'DESTORNILLADOR PHILIPS No2 150', 3472.38, '402.2', 3472.38, '3 - MANTENIMIENTO', 'und', 62, 3, NULL, 106, 2),
-(177, 1.00, 'MATERIAL', 'CUTTER', 3295.60, '402.1', 3295.60, '3 - MANTENIMIENTO', 'und', 62, 3, NULL, 107, 2),
-(178, 5.00, 'MATERIAL', 'CINTA PAPEL AZUL 5CM ANCHO', 28487.60, '401.3', 5697.52, '13 - AISLACIONES E IMPERMEABILIZACIONES', 'und', 63, 13, NULL, 24, 2),
-(179, 3.00, 'MATERIAL', 'PINCELETA GALGO No 50', 15553.80, '401.2', 5184.60, '13 - AISLACIONES E IMPERMEABILIZACIONES', 'und', 63, 13, NULL, 108, 2),
-(180, 2.00, 'MATERIAL', 'galgo pincel silver n*20', 4921.00, '401.1', 2460.50, '13 - AISLACIONES E IMPERMEABILIZACIONES', 'und', 63, 13, NULL, 109, 2),
-(181, 9.00, 'MANO_OBRA', 'Mano de Obra por la ejecución del retiro de recubr imiento de nueve (09) puntos e n elementos estructu rales en edificio: 03 ptos. En subsuelo. 03 ptos. En piso 6 y 03 ptos en piso 12', 720000.00, '403.1', 80000.00, '26 - ESTRUCTURA', 'ptos', 64, 319, NULL, NULL, 1),
-(182, 1.00, 'MANO_OBRA', 'Construcción de Caseta de Vigi lancia y Control de acceso y salida de TQ4. Desmon tar la protección en la zona donde se contruira la rampa de acceso al subsuelo y llevar el caño del desague del subsuelo y amurarlo por debajo de la v ereda.', 850000.00, '403.2', 850000.00, '33 - INFRAESTRUCTURA DE OBRA', 'sg', 64, 33, NULL, NULL, 1),
-(183, 8.00, 'MANO_OBRA', 'Construcción de 02-Fajas en el lado derecho del ni cho central del pleno de palie res en el edificio.', 320000.00, '403.3', 40000.00, '11 - MAMPOSTERÍA', 'piso', 64, 319, NULL, NULL, 1),
-(184, 96.70, 'MANO_OBRA', 'Construcción de carpetas con p endiente de piso en balcones, en Pisos: 2, 6, 7, 8 , 9, 10, 11,12, 13 y 14', 1740600.00, '403.4', 18000.00, '24 - CONTRAPISOS Y CARPETAS', 'm2', 64, 24, NULL, NULL, 1),
-(185, 3.00, 'OTRO', 'INSPECCION Y CERTIFICACION MEN ASCENSOR', 570000.00, '399.1', 190000.00, '9 - Sin rubro', 'und', 65, 9, NULL, NULL, 3),
-(186, 100.00, 'OTRO', 'Servicio de Seg. e Higiene', 3150000.00, '397.1', 31500.00, '9 - Sin rubro', 'und', 66, 9, NULL, NULL, 3),
-(187, 4.00, 'MATERIAL', 'PROTEX 216 ADHESIVO EPOXI X 1K', 107993.12, '15.1', 26998.28, '13 - AISLACIONES E IMPERMEABILIZACIONES', 'und', 67, 13, NULL, 110, 2),
-(188, 41.00, 'MATERIAL', 'ANGULO DE HIERRO 1/2\"X 1/8\" X', 323183.73, '466.1', 7882.53, '34 - HERRERÍA', 'und', 68, 34, NULL, 111, 2),
-(189, 1.00, 'MATERIAL', 'DISCO SEGMENTADO DIAMANTADO DE', 5400.00, '465.5', 5400.00, '34 - HERRERÍA', 'und', 69, 34, NULL, 112, 2),
-(190, 300.00, 'MATERIAL', 'Tornillos hexas autoperf', 39000.00, '465.4', 130.00, '34 - HERRERÍA', 'und', 69, 34, NULL, 113, 2),
-(191, 5.00, 'MATERIAL', 'CEPILLO DE ALAMBRE DE 20 CM', 15000.00, '465.3', 3000.00, '34 - HERRERÍA', 'und', 69, 34, NULL, 114, 2),
-(192, 300.00, 'MATERIAL', 'TORNILLO FIX 5 X 45MM', 10500.00, '465.2', 35.00, '34 - HERRERÍA', 'und', 69, 34, NULL, 115, 2),
-(193, 300.00, 'MATERIAL', 'TARUGO DEL S8 FISCHER', 15000.00, '465.1', 50.00, '34 - HERRERÍA', 'und', 69, 34, NULL, 116, 2),
-(194, 15.00, 'MATERIAL', 'Electrodos 2.5 MM PUNTA AZUL', 151370.70, '391.1', 10091.38, '34 - HERRERÍA', 'und', 70, 34, NULL, 117, 2),
-(195, 111.60, 'MANO_OBRA', 'Construcción de paredes con la drillos No 8 en plen o de palieres.', 2790000.00, '393.1', 25000.00, '11 - MAMPOSTERÍA', 'm2', 71, 315, NULL, NULL, 1),
-(196, 314.03, 'MANO_OBRA', 'Revoque de paredes en el ducto de succión del módu lo de escaleras: Zona interior : aplicación de Cere cita bolseada. Zona exterior: revoque convencional bolseado y alisado.', 4396420.00, '393.2', 14000.00, '28 - REVOQUES', 'm2', 71, 323, NULL, NULL, 1),
-(197, 66.00, 'MANO_OBRA', 'Modificación de mochetas de va nos en puertas inter nas de los departamentos de lo s pisos: P2, P3 y P4 .', 1980000.00, '393.3', 30000.00, '11 - MAMPOSTERÍA', 'und', 71, 315, NULL, NULL, 1),
-(198, 1.00, 'MANO_OBRA', 'Apuntalamiento de la estructur a de hormigón; para asegurarla al momento de demol ición de muro del Su b-Suelo.', 700000.00, '393.4', 700000.00, '26 - ESTRUCTURA', 'und', 71, 26, NULL, NULL, 1),
-(199, 1.00, 'MANO_OBRA', 'Limpieza manual del escombro e xistente en la zona interna del muro a demoler, co rrespondiente al áre a de acceso al subsuelo.', 350000.00, '393.5', 350000.00, '29 - DEMOLICIONES', 'und', 71, 318, NULL, NULL, 1),
-(200, 120.40, 'MANO_OBRA', 'Revoque manual de la cara inte rna de los balcones de la fachada Este.', 1685600.00, '393.6', 14000.00, '28 - REVOQUES', 'ml', 71, 323, NULL, NULL, 1),
-(201, 193.40, 'MANO_OBRA', 'Construcción de contrapisos con pendientes en balcones: Piso 6, 7, 8, 9, 10, 11, 12, 13 y 14', 3868000.00, '393.7', 20000.00, '24 - CONTRAPISOS Y CARPETAS', 'm2', 71, 24, NULL, NULL, 1),
-(202, 1.00, 'OTRO', 'Alquiler de volquetes', 80000.00, '392.1', 80000.00, '9 - Sin rubro', 'und', 72, 9, NULL, NULL, 3),
-(203, 40.00, 'MANO_OBRA', 'Relleno de orificios producido s por la toma de mue stras en la Estructura de Horm igón: Vigas y Column as, tanto del Edificio como en Subsuelo, relladas', 1200000.00, '393.8', 30000.00, '26 - ESTRUCTURA', 'und', 71, 319, NULL, NULL, 1),
-(204, 10.00, 'MATERIAL', 'PUENTE ADHERENTE PAMAX X 28 KG', 1200000.00, '388.1', 120000.00, '1 - REVOQUE EXTERIOR', 'und', 73, 1, NULL, 2, 2),
-(205, 77.00, 'MATERIAL', 'Cal Cacique x 25 kg', 400409.24, '14.5', 5200.12, '11 - MAMPOSTERÍA', 'und', 74, 11, NULL, 118, 2),
-(206, 1080.00, 'MATERIAL', 'Ladrillos huecos 8x18x33', 498690.00, '14.4', 461.75, '1 - REVOQUE EXTERIOR', 'und', 74, 1, NULL, 18, 2),
-(207, 1120.00, 'MATERIAL', 'Intomap 3 en 1 ar bags x 25 kg', 7204915.20, '14.3', 6432.96, '1 - REVOQUE EXTERIOR', 'und', 74, 1, NULL, 12, 2),
-(208, 80.00, 'MATERIAL', 'Cemento x 25 kg bolsa', 400720.00, '14.2', 5009.00, '11 - MAMPOSTERÍA', 'und', 74, 11, NULL, 87, 2),
-(209, 8.00, 'MATERIAL', 'Arena fina', 263649.60, '14.1', 32956.20, '11 - MAMPOSTERÍA', 'und', 74, 11, NULL, 16, 2),
-(210, 2.00, 'OTRO', 'INSPECCION Y CERTIFICACION MEN ASCENSOR', 170000.00, '386.1', 85000.00, '22 - SERVICIO', 'und', 75, 22, NULL, NULL, 3),
-(211, 240.00, 'MATERIAL', 'Cemento x25 kg bolsa', 1182129.60, '4.4', 4925.54, '11 - MAMPOSTERÍA', 'und', 76, 11, NULL, 119, 2),
-(212, 648.00, 'MATERIAL', 'Ladrillos huecos 8x18x33', 299214.00, '4.3', 461.75, '11 - MAMPOSTERÍA', 'und', 76, 11, NULL, 18, 2),
-(213, 288.00, 'MATERIAL', 'Ladrillos huecos 12x18x33', 170795.52, '4.2', 593.04, '11 - MAMPOSTERÍA', 'und', 76, 11, NULL, 17, 2),
-(214, 12.00, 'MATERIAL', 'Arena fina', 376125.60, '4.1', 31343.80, '11 - MAMPOSTERÍA', 'und', 76, 11, NULL, 16, 2),
-(215, 5.00, 'MATERIAL', 'Balde de Albañil de Plastico', 9405.30, '376.4', 1881.06, '2 - ALBAÑILERÍA GENERAL', 'und', 77, 2, NULL, 120, 2),
-(216, 3.00, 'MATERIAL', 'Tanza Albañil 0.6mm x 100 mts', 10505.19, '376.3', 3501.73, '2 - ALBAÑILERÍA GENERAL', 'und', 77, 2, NULL, 121, 2),
-(217, 3.00, 'MATERIAL', 'Pala Ancha', 108780.48, '376.2', 36260.16, '2 - ALBAÑILERÍA GENERAL', 'und', 77, 2, NULL, 122, 2),
-(218, 2.00, 'MATERIAL', 'Carretilla de chapa', 164326.90, '376.1', 82163.45, '2 - ALBAÑILERÍA GENERAL', 'und', 77, 2, NULL, 123, 2),
-(219, 100.00, 'MANO_OBRA', 'Corte y demolición de pared de l lado del mueble de baño y agregar pared del lado opuesto de la puert a, para llegar a las medidas e xigidas por el proye cto de cada baño.', 4480000.00, '374.1', 44800.00, '11 - MAMPOSTERÍA', 'und', 78, 318, NULL, NULL, 1),
-(220, 100.00, 'MANO_OBRA', 'Sellado de pases del pluvial e n cada balcón, coloc andole vendas e impermeabiliza ndolos con Protex Se al 77.', 1120000.00, '374.2', 11200.00, '27 - IMPERMEABILIZACIONES', 'und', 78, 27, NULL, NULL, 1),
-(221, 100.00, 'MANO_OBRA', 'Impermeabilización (2 manos) d e Carpetas y canalet as', 1700000.00, '374.3', 17000.00, '27 - IMPERMEABILIZACIONES', 'und', 78, 27, NULL, NULL, 1),
-(222, 100.00, 'MANO_OBRA', 'Corregir medidas en mochetas d e Placares en los dp tos C y D', 1120000.00, '374.4', 11200.00, '11 - MAMPOSTERÍA', 'und', 78, 315, NULL, NULL, 1),
-(223, 100.00, 'MANO_OBRA', 'Tomar niveles en Sub-Suelo de TQ y colocar los Pun tos de referencia de Corte o R elleno, según sea el caso, en todo el Sub-Suelo. Levantamiento de Niveles en ca da Depto. solicitado s por el estudio de Arquitectu ra y para realizar e l estimado de material de RDC por piso.', 1600000.00, '373.1', 16000.00, '35 - REPLANTEO', 'und', 79, 321, NULL, NULL, 1),
-(224, 1.00, 'OTRO', 'Alquiler de volquetes', 80000.00, '372.1', 80000.00, '36 - Limpieza', 'und', 80, 36, NULL, NULL, 3),
-(225, 1.00, 'OTRO', 'Analisis Estructural - ejecución del análisis y Calcu lo estructural de la s mensulas fracturadas para so portar las solicitac iones de la planta baja. El cá lculo estructural re quiere la ejecución de cateos estructurales los cu ales NO SE INCLUYEN. Se realiz ará conforme a regla mentaciones CIRSOC vigentes, a segurando seguridad, optimización y compatibilidad con el diseño arqui tectónico. Se ejecutará el modelado total de la estructura de l edificio, con las dimensione s de la obra ejecuta da y todo el análisis de carga que se estima ejecu tar. Se hace notar que no se e ncuentra la document ación para extraer esta inform ación por tal motivo se contemplan 5 dias de relev amiento dimensional de la estructura para ejecutar un modelo y posteri ormente un periodo de ajuste q ue no será mayor a 2 dias donde se verificará con planos en la obra ac ompañado por la DO. 1. Análisis y diseño de la est ructura existente co n las cargas actuales y las nu evas condiciones de carga 2. Se plantearán la ejecución de refuerzos de la e structura existente, en caso d e ser necesarios. 3. Aplicación de normativa CIR SOC 2005 y complemen tarias, considerando cargas pe rmanentes, sobrecarg as de uso y cargas eventuales de proyecto. 4. Cálculo del edificio comple to y verificación de los sectores más relevantes d esignados en conjunt o con la DO. (10 sectores) en dichos sectores se v erificará la estructura y se c alculará la armadura la cual será contrastada con los cateos a ejecuta r (no contemplado). 5. Ejecución de planos de plan ta con denominacione s de vigas y columnas, sin cot as.PTO. NRO: 01-4054 R-B DE INGENIERIA MR FECHA 3 0/10/2025', 8600000.00, '458.1', 8600000.00, '9 - Sin rubro', 'und', 81, 9, NULL, NULL, 3),
-(226, 28.00, 'MATERIAL', 'Caños de cobre con cajas Inter - Provisión de material para la pre instalación de c añerias para unidades con 3 sp lit sistema multispl it provisión de 45 mteros de c añería de cobre con cajas interiores y caja exteri or. Todas las instal aciones se entregan presurizad as con nitrógeno. FORMA DE PAGO ANTICIPADO PAR A LA COMPRA DE MATER IAL , INSTALACIÓN Y POSTERIOR CERTICIACIÓN QUINCEN AL POR PISO FINALIZADO. VALOR MAS IVA. CABE ACLARAR QUE CADA PISO TIE NE 2 DPTOS. CON ESTA TIPOLOGIA', 17998638.28, '457.2', 642808.51, '37 - COLOCACIÓN DE DUCTOS', 'und', 82, 37, NULL, 124, 2),
-(227, 27.00, 'MATERIAL', 'Caños de cobre con cajas Inter - Provisión de material para la pre instalación de c añerias para unidades con 4 sp lit sistema multispl it provisión de 42 mteros de c añería de cobre con cajas interiores y caja exteri or. Todas las instal aciones se entregan presurizad as con nitrógeno. FORMA DE PAGO ANTICIPADO PAR A LA COMPRA DE MATER IAL , INSTALACIÓN Y POSTERIOR CERTICIACIÓN QUINCEN AL POR PISO FINALIZADO. VALOR MAS IVA. CADA PISO TIENE 2 DPTOS. CON E STA TIPOLOGIA', 16198774.20, '457.1', 599954.60, '37 - COLOCACIÓN DE DUCTOS', 'und', 82, 37, NULL, 125, 2),
-(228, 25.00, 'MATERIAL', 'Abrazadera 50mm', 8655.00, '455.5', 346.20, '38 - COLOCACIÓN PROVISIONAL', 'und', 83, 38, NULL, 126, 2),
-(229, 10.00, 'MATERIAL', 'Espiga Poliprop. Negro a 90° S', 4871.00, '455.4', 487.10, '38 - COLOCACIÓN PROVISIONAL', 'und', 83, 38, NULL, 127, 2),
-(230, 1.00, 'MATERIAL', 'Espiga Poliprop. Negro a 90° C', 548.59, '455.3', 548.59, '38 - COLOCACIÓN PROVISIONAL', 'und', 83, 38, NULL, 128, 2),
-(231, 1.00, 'MATERIAL', 'Codo Poliprop. a 90° con rosca', 2167.61, '455.2', 2167.61, '38 - COLOCACIÓN PROVISIONAL', 'und', 83, 38, NULL, 129, 2),
-(232, 25.00, 'MATERIAL', 'Caño Poliprop. Negro 1 1/2\'\' Para riego', 49778.50, '455.1', 1991.14, '38 - COLOCACIÓN PROVISIONAL', 'und', 83, 38, NULL, 130, 2),
-(233, 100.00, 'MANO_OBRA', 'Mano de obra pre instalación A - Cantidad 28 UF. Mano de obra p ara la pre instalaci ón de cañerias para unidades c on 3 split sistema m ultisplit provisión de 45 mter os de cañería de cob re con cajas interiores y caja exterior. Todas las instalaciones se entregan pre surizadas con nitróg eno. FORMA DE PAGO CERTIFICACIÓN Q UINCENAL POR PISO FI NALIZADO. VALOR AJUSTADO POR C AC MANO DE OBRA BASE OCTUBRE 2025', 17998638.00, '370.2', 179986.38, '39 - PREINSTALACION AA 3 SPLIT', 'und', 84, 39, NULL, NULL, 1),
-(234, 100.00, 'MANO_OBRA', 'Cantidad 28 UF. Mano de obra p ara la pre instalaci ón de cañerias para unidades c on 3 split sistema m ultisplit provisión de 45 mter os de cañería de cob re con cajas interiores y caja exterior. Todas las instalaciones se entregan pre surizadas con nitróg eno. FORMA DE PAGO CERTIFICACIÓN Q UINCENAL POR PISO FI NALIZADO. VALOR AJUSTADO POR C AC MANO DE OBRA BASE OCTUBRE 2025', 17998638.00, '370.2', 179986.38, '39 - PREINSTALACION AA 3 SPLIT', 'und', 84, 39, NULL, NULL, 1),
-(235, 100.00, 'MANO_OBRA', 'Cantidad 27 UF. -Mano de obra para la pre instalac ión de cañerias para unidades con 4 split sistema multisplit provisión de 42 mte ros de cañería de co bre con cajas interiores y caj a exterior. Todas la s instalaciones se entregan pr esurizadas con nitró geno. FORMA DE PAGO CERTIFICACIÓN Q UINCENAL POR PISO FI NALIZADO. VALOR AJUSTADO POR C AC MANO DE OBRA BASE OCTUBRE 2025', 16198774.00, '370.1', 161987.74, '40 - PREINSTALACION AA 4 SPLIT', 'und', 84, 40, NULL, NULL, 1),
-(236, 100.00, 'MANO_OBRA', 'Mano de obra pre instalación A - Cantidad 27 UF. -Mano de obra para la pre instalac ión de cañerias para unidades con 4 split sistema multisplit provisión de 42 mte ros de cañería de co bre con cajas interiores y caj a exterior. Todas la s instalaciones se entregan pr esurizadas con nitró geno. FORMA DE PAGO CERTIFICACIÓN Q UINCENAL POR PISO FI NALIZADO. VALOR AJUSTADO POR C AC MANO DE OBRA BASE OCTUBRE 2025', 1618774.00, '370.1', 16187.74, '40 - PREINSTALACION AA 4 SPLIT', 'und', 84, 40, NULL, NULL, 1),
-(237, 1.00, 'OTRO', 'Determinación de Contenido - Por la determinación del contenido, de agentes con taminantes como cloruros, sulf atos y ph. Definiend o el grado de ataque Sobre ca da testigo analizado Testigos adicionales a los 3 i ndicados , cada uno $ 40.200,00', 450000.00, '459.2', 450000.00, '41 - Extracción de Muestras y Laboratorio - Por la concurrencia a obra inc luyendo la extracció n de hasta cuarenta (40) testigos con máquina caladora apropiada y broca (Ø75mm .) con corona diaman tada refrigerada, cuya longitu d max. de 15 cm cada uno. Los mismos se extraerán en sectores, que pre viamente indicará el solicitan te. Sobre cada testi go se efectuarán las siguiente s tareas y determina ciones: ? Aserrado de sus base s con disco diamanta do refrigerado ? Carbonatación ? Densidad ? Absor ción de agua ? Encabezado y en sayo a la compresión ? Informe técnico', 'und', 85, 41, NULL, NULL, 3),
-(238, 1.00, 'OTRO', 'Extracción de Muestras y Laboratorio - Por la concurrencia a obra inc luyendo la extracció n de hasta cuarenta (40) testi gos con máquina cal adora apropiada y broca (Ø75mm .) con corona diaman tada refrigerada, cuya longitu d max. de 15 cm cada uno. Los mismos se extraerán en sectores, que pre viamente indicará el solicitan te. Sobre cada testi go se efectuarán las siguiente s tareas y determina ciones: ? Aserrado de sus base s con disco diamanta do refrigerado ? Carbonatación ? Densidad ? Absor ción de agua ? Encabezado y en sayo a la compresión ? Informe técnico', 1830000.00, '459.1', 1830000.00, '42 - Extracción de Muestras y Laboratorio', 'und', 85, 42, NULL, NULL, 3),
-(239, 432.00, 'MATERIAL', 'Ladrillos huecos del 12 12x18x33', 247056.48, '2.7', 571.89, '2 - ALBAÑILERÍA GENERAL', 'und', 86, 2, NULL, 131, 2),
-(240, 100.00, 'MATERIAL', 'Protex Fondo de Junta por Esp Polietileno', 221673.00, '2.6', 2216.73, '13 - AISLACIONES E IMPERMEABILIZACIONES', 'und', 86, 13, NULL, 132, 2),
-(241, 7.00, 'MATERIAL', 'Protex Proflex P1000 x 5kg', 1163418.97, '2.5', 166202.71, '13 - AISLACIONES E IMPERMEABILIZACIONES', 'und', 86, 13, NULL, 133, 2),
-(242, 2.00, 'MATERIAL', 'Protex imprimación S lata x 25', 31215.36, '2.4', 15607.68, '13 - AISLACIONES E IMPERMEABILIZACIONES', 'und', 86, 13, NULL, 134, 2),
-(243, 2.00, 'MATERIAL', 'Puente adherente tambor por 20', 1763139.06, '2.3', 881569.53, '2 - ALBAÑILERÍA GENERAL', 'und', 86, 2, NULL, 46, 2),
-(244, 1000.00, 'MATERIAL', 'Ladrillos comunes', 217560.00, '2.2', 217.56, '2 - ALBAÑILERÍA GENERAL', 'und', 86, 2, NULL, 47, 2),
-(245, 8.00, 'MATERIAL', 'Arena fina', 250750.40, '2.1', 31343.80, '2 - ALBAÑILERÍA GENERAL', 'und', 86, 2, NULL, 16, 2),
-(246, 1.00, 'MATERIAL', 'Bomba Sumergible Desagote Moto Agua 1.5 HP', 207399.62, '456.1', 207399.62, '43 - SUBSUELO', 'und', 87, 43, NULL, 135, 2),
-(247, 6.00, 'MATERIAL', 'Artefacto Liston 120 doble', 18543.18, '454.2', 3090.53, '44 - EDIFICIO', 'und', 88, 44, NULL, 136, 2),
-(248, 15.00, 'MATERIAL', 'Lampara Foco Led 15w', 26313.60, '451.1', 1754.24, '44 - EDIFICIO', 'und', 88, 44, NULL, 137, 2),
-(249, 15.00, 'MATERIAL', 'Puente Adherente Pamax x 25 kg', 1800000.00, '368.1', 120000.00, '1 - REVOQUE EXTERIOR', 'und', 89, 1, NULL, 138, 2),
-(250, 10.00, 'MATERIAL', 'Rollo Cartón Corrugado', 121305.90, '363.4', 12130.59, '31 - UNIDAD MODELO', 'und', 90, 31, NULL, 139, 2),
-(251, 1.00, 'OTRO', 'Alquiler de volquetes', 80000.00, '365.1', 80000.00, '45 - Limpieza General', 'und', 91, 45, NULL, NULL, 3),
-(252, 10.00, 'MATERIAL', 'Lapiz Carpintero', 3820.00, '363.3', 382.00, '3 - MANTENIMIENTO', 'und', 90, 3, NULL, 140, 2),
-(253, 10.00, 'MATERIAL', 'Punta Phillips PH2', 5671.00, '363.2', 567.10, '3 - MANTENIMIENTO', 'und', 90, 3, NULL, 141, 2),
-(254, 1.00, 'MATERIAL', 'Disco Wid. Segmentado 7\'\' Bremen', 14759.92, '363.1', 14759.92, '3 - MANTENIMIENTO', 'und', 90, 3, NULL, 142, 2),
-(255, 100.00, 'MANO_OBRA', 'Albañilería Mano de obra const Pluvial - Construcción de Colector Provi sional con Caño 110m m, embudos recolectores, const rucción de cámara re colectora de las aguas de lluv ia desde la Planta B aja y bombeadas en la calle: S G 1,00 $1.700.000,0 0 $1.700.000,00 Construcción de Colector PVC, 110mm, enframpado en la losa de techo. - Colocación de embudos 110mm. - Construcción de Cámara para de pósito de agua de ll uvia. Incluye: Revoque general e impermeabilizació n de la misma. -', 1700000.00, '366.1', 17000.00, '2 - ALBAÑILERÍA GENERAL', 'und', 92, 2, NULL, NULL, 1),
-(256, 1.00, 'OTRO', 'Alquiler de volquetes', 80000.00, '362.1', 80000.00, '45 - Limpieza General', 'und', 93, 45, NULL, NULL, 3),
-(257, 300.00, 'MANO_OBRA', 'ENCHAPADO DE PAREDES EXTERNAS DEL EDIFICIO', 4200000.00, '383.1', 14000.00, '10 - ENCHAPADO EXTERNO', 'm2', 94, 10, NULL, NULL, 1),
-(258, 11.00, 'MANO_OBRA', 'Ejecución de fajas en paredes de: Cocina y Baños de los pisos: 4,5,6,7,8,9,10,11,12,13 y 14', 2640000.00, '361.1', 240000.00, '46 - FAJAS Y NIVELACIÓN', 'piso', 95, 46, NULL, NULL, 1),
-(259, 7.00, 'MANO_OBRA', 'Ejecución de fajas en pisos para RDC en los niveles 8 al 14', 4900000.00, '361.2', 700000.00, '46 - FAJAS Y NIVELACIÓN', 'piso', 95, 46, NULL, NULL, 1),
-(260, 48.00, 'MANO_OBRA', 'Ejecución de contrapiso, fajas e impermeabilización con Protex Seal 77 en baños de los pisos 2 al 7.', 9600000.00, '361.3', 200000.00, '24 - CONTRAPISOS Y CARPETAS', 'baño', 95, 24, NULL, NULL, 1),
-(261, 1.00, 'MANO_OBRA', 'Nivelación general de losa de planta baja y patio.', 80000.00, '361.4', 80000.00, '35 - REPLANTEO', 'SG', 95, 321, NULL, NULL, 1),
-(262, 17.86, 'MANO_OBRA', 'Demolición de paredes en baño y cocina del Departamento 10-B, incluyendo bajada de escombros.', 535800.00, '361.5', 30000.00, '29 - DEMOLICIONES', 'm2', 95, 318, NULL, NULL, 1),
-(263, 17.86, 'MANO_OBRA', 'Construcción de paredes en baño y cocina del Departamento 10-B, incluyendo subida de materiales.', 267900.00, '361.6', 15000.00, '11 - MAMPOSTERÍA', 'm2', 95, 315, NULL, NULL, 1),
-(264, 48.00, 'MANO_OBRA', 'Impermeabilización y colocación de vendas en caños de baños y cocina', 2160000.00, '364.1', 45000.00, '27 - IMPERMEABILIZACIONES', 'Piso', 96, 27, NULL, NULL, 1),
-(265, 28.00, 'MANO_OBRA', 'Construcción de canaleta recolectora de agua en balcones', 840000.00, '364.2', 30000.00, '2 - ALBAÑILERÍA GENERAL', 'Piso', 96, 2, NULL, NULL, 1),
-(266, 56.00, 'MANO_OBRA', 'Corte, perfilamiento, recuardo e impermeabilización del muro debajo del premarco', 2520000.00, '364.3', 45000.00, '27 - IMPERMEABILIZACIONES', 'Dpto.', 96, 27, NULL, NULL, 1),
-(267, 1.00, 'MANO_OBRA', 'Recuadro de ventanas, con 3 en 1, en el Dpto Modelo.', 180000.00, '364.4', 180000.00, '2 - ALBAÑILERÍA GENERAL', 'Dpto.', 96, 2, NULL, NULL, 1),
-(268, 60.00, 'MANO_OBRA', 'Demolición de pases de losa en Baños (08) y Cocinas (04). Pisos: 3,4,5,6 y 7', 780000.00, '364.5', 13000.00, '29 - DEMOLICIONES', 'Piso', 96, 318, NULL, NULL, 1),
-(269, 56.00, 'MANO_OBRA', 'Demolición y amuramiento de de caño de succión decada baño del Dpto. Modelo. Dpto.', 1960000.00, '364.6', 35000.00, '29 - DEMOLICIONES', 'Dpto.', 96, 318, NULL, NULL, 1),
-(270, 620.00, 'MANO_OBRA', 'Revoque con 3 en 1, en Baños: P4, P5, P6, P7', 9300000.00, '364.7', 15000.00, '47 - REVOQUE INTERNO', 'm2', 96, 323, NULL, NULL, 1),
-(271, 731.09, 'MANO_OBRA', 'Revoque con 3 en 1, en Cocinas : P4, P5, P6, P7', 10966410.00, '364.8', 15000.00, '47 - REVOQUE INTERNO', 'm2', 96, 323, NULL, NULL, 1),
-(272, 2.00, 'OTRO', 'Inspección y certificación mensual de: Montacargas, Ascensor según normativa vigente de SRT', 170000.00, '359.1', 85000.00, '3 - MANTENIMIENTO', 'und', 97, 3, NULL, NULL, 3),
-(273, 100.00, 'MANO_OBRA', 'Preinstalación de cañerías para aire acondicionado en Unidad Modelo. Incluuye amurado de cajas plásticas, canaleteado de muros para cañerías, armado y colocación de cañerías', 817600.00, '353.1', 8176.00, '37 - COLOCACIÓN DE DUCTOS', 'und', 98, 37, NULL, NULL, 1),
-(274, 1.00, 'OTRO', 'Servicio de Seguridad de la Obra', 1500000.00, '352.1', 1500000.00, '48 - Servicio de Seguridad e Higiene', 'und', 99, 48, NULL, NULL, 3),
-(275, 1000.00, 'MATERIAL', 'Tornillo T1 Punta Aguja', 10800.00, '453.5', 10.80, '16 - COLOCACIÓN DE DURLOCK', 'und', 100, 16, NULL, 143, 2),
-(276, 2.00, 'MATERIAL', 'Cutter', 10755.40, '453.4', 5377.70, '16 - COLOCACIÓN DE DURLOCK', 'und', 100, 16, NULL, 107, 2),
-(277, 2000.00, 'MATERIAL', 'Tornillo T2 Punta Aguja Negro', 18800.00, '453.3', 9.40, '16 - COLOCACIÓN DE DURLOCK', 'und', 100, 16, NULL, 144, 2);
-INSERT INTO `item_orden_compra` (`id`, `cantidad`, `categoria`, `detalle`, `importe`, `item`, `precio_unitario`, `rubro`, `unidad`, `orden_compra_id`, `rubro_entidad_id`, `item_mano_obra_vinculado_id`, `material_catalogo_id`, `categoria_entidad_id`) VALUES
-(278, 12.00, 'MATERIAL', 'Placas Durlock Standard 12,5', 159802.32, '453.2', 13316.86, '16 - COLOCACIÓN DE DURLOCK', 'und', 100, 16, NULL, 145, 2),
-(279, 5.00, 'MATERIAL', 'Placas Durlock antih 12,5', 111657.00, '453.1', 22331.40, '16 - COLOCACIÓN DE DURLOCK', 'und', 100, 16, NULL, 146, 2),
-(280, 240.00, 'MANO_OBRA', 'Construcción den enchapado en paredes externas de TQ4', 3360000.00, '351.2', 14000.00, '10 - ENCHAPADO EXTERNO', 'm2', 101, 10, NULL, NULL, 1),
-(281, 3500.00, 'MANO_OBRA', 'Colocación de puente ahderente en paredes externas de TQ4', 5900020.00, '351.1', 1685.72, '49 - PUENTE ADHERENTE', 'm2', 101, 326, NULL, NULL, 1),
-(282, 3998.00, 'OTRO', 'Servicio de Seguridad de la Obra', 15984004.00, '350.1', 3998.00, '48 - Servicio de Seguridad e Higiene', 'GL', 102, 48, NULL, NULL, 3),
-(283, 17.86, 'MANO_OBRA', 'Demolición de paredes en Cocina y Baño en P4 Departamento A y en P10 Departamento B, incluye bajada de escombros y subida de material', 232180.00, '349.1', 13000.00, '29 - DEMOLICIONES', 'm²', 103, 318, NULL, NULL, 1),
-(284, 40.12, 'MANO_OBRA', 'Acondicionamiento y colocación de ceresita en paredes medianera del Departamento Modelo', 481440.00, '349.2', 12000.00, '2 - ALBAÑILERÍA GENERAL', 'm²', 103, 319, NULL, NULL, 1),
-(285, 17.86, 'MANO_OBRA', 'Construcción de paredes con ladrillos del #8 ajustados a medida del proyecto en los departamentos P4 A y P10 B', 267900.00, '349.3', 15000.00, '11 - MAMPOSTERÍA', 'm²', 103, 315, NULL, NULL, 1),
-(286, 13.00, 'MANO_OBRA', 'Revisión de mediciones de Cocinas, Baños y Vestidores de 13 pisos', 650000.00, '349.4', 50000.00, '50 - NIVELACIÓN Y REPLANTEO', 'piso', 103, 321, NULL, NULL, 1),
-(287, 4.00, 'MANO_OBRA', 'Ejecución de fajas en paredes de Cocina en pisos P3, P4, P5, P6 y P7', 240000.00, '349.5', 60000.00, '46 - FAJAS Y NIVELACIÓN', 'piso', 103, 46, NULL, NULL, 1),
-(288, 2.00, 'MANO_OBRA', 'Faja en piso en P6 y P7', 1200000.00, '349.6', 600000.00, '46 - FAJAS Y NIVELACIÓN', 'piso', 103, 46, NULL, NULL, 1),
-(289, 2.00, 'MATERIAL', 'Arco separador de 3mm P/porcel', 65120.00, '348.1', 32560.00, '14 - COLOCACIÓN DE PORCELANATO', 'und', 104, 14, NULL, 147, 2),
-(290, 50.00, 'MATERIAL', 'Pastina klaukol color talco bolsas de 1 kg', 100145.00, '449.6', 2002.90, '14 - COLOCACIÓN DE PORCELANATO', 'und', 105, 14, NULL, 148, 2),
-(291, 10.00, 'MATERIAL', 'Cantoneras yesera de 2.6m', 19230.40, '449.5', 1923.04, '51 - REVOQUE YESO', 'und', 105, 51, NULL, 149, 2),
-(292, 1.00, 'MATERIAL', 'Venda geotextil sintética 1mx', 16390.85, '449.4', 16390.85, '14 - COLOCACIÓN DE PORCELANATO', 'und', 105, 14, NULL, 150, 2),
-(293, 5.00, 'MATERIAL', 'Estopa de limpieza por bolsa', 5797.50, '449.3', 1159.50, '14 - COLOCACIÓN DE PORCELANATO', 'und', 105, 14, NULL, 56, 2),
-(294, 648.00, 'MATERIAL', 'Ladrillos huecos 8x18x33', 304171.20, '449.2', 469.40, '11 - MAMPOSTERÍA', 'und', 105, 11, NULL, 18, 2),
-(295, 18.00, 'MATERIAL', 'Arena', 602843.94, '449.1', 33491.33, '11 - MAMPOSTERÍA', 'm3', 105, 11, NULL, 151, 2),
-(296, 1.00, 'OTRO', 'Por la ejecución del estudio de suelos consistente en 2 perforaciones de hasta 4 metros de profundidad cada una y una perforación de hasta 10 metros de profundidad. En todos los sondeos se practicarán ensayos de penetración normal por cada metro de avance. Sobre las muestras extraídas se efectuarán las siguientes determinaciones de laboratorio. Según normal IRAM/ASTM: humedad natural, limites liquido y plastico, peso de la unidad de volumen, procentaje de finos por lavado sobre tamiz 200, granulometria sobre tamices 4, 10, 40, compresión triaxial sobre muestras no perturbadas y clasificación unificada de casagrande. Se confeccionará un informe final que contendrá perfiles geológicos resultantes y los parámetros para el diseño de fundaciones.', 2300000.00, '448.1', 2300000.00, '52 - PROYECTO/INGENIERIA', 'und', 106, 52, NULL, NULL, 3),
-(297, 1.00, 'OTRO', 'Relevamiento técnico de la estructura, para verificar el estado reglamentario de la misma. Informe técnico del cumplimiento actual respecto de la reglamentación vigente y las modiicaciones necesarias para su cummplimiento. Confección del informe técnico y cálculo de la estructura.', 350000.00, '346.2', 350000.00, '52 - PROYECTO/INGENIERIA', 'und', 107, 52, NULL, NULL, 3),
-(298, 1.00, 'OTRO', 'Calculo dimensionamiento estructural verificación técnica', 300000.00, '346.1', 300000.00, '52 - PROYECTO/INGENIERIA', 'und', 107, 52, NULL, NULL, 3),
-(299, 1.00, 'MATERIAL', 'Transformador reductor de 380v marca Yali', 49567.78, '442.1', 49567.78, '3 - MANTENIMIENTO', 'und', 108, 3, NULL, 152, 2),
-(300, 16.93, 'MANO_OBRA', 'Columna lateral derecha', 237020.00, '345.3', 14000.00, '10 - ENCHAPADO EXTERNO', 'm2', 109, 285, NULL, NULL, 1),
-(301, 18.00, 'MANO_OBRA', 'Parte superior de ventanas por pisos', 252000.00, '345.2', 14000.00, '10 - ENCHAPADO EXTERNO', 'm2', 109, 285, NULL, NULL, 1),
-(302, 66.78, 'MANO_OBRA', 'Zona central del balcón hasta el piso 14, entre los ventanales de Deptos B y C, de piso a techo', 934920.00, '345.1', 14000.00, '10 - ENCHAPADO EXTERNO', 'm2', 109, 285, NULL, NULL, 1),
-(303, 80.00, 'MATERIAL', 'Pegamento para porcelanato', 1300000.00, '446.1', 16250.00, '14 - COLOCACIÓN DE PORCELANATO', 'und', 110, 14, NULL, 153, 2),
-(304, 100.00, 'OTRO', '859 kg provisión y colocación de ductos de chapa galvanizada cal 25 y 27 colector + ducto', 3960419.00, '342.2', 39604.19, '53 - VENTILACIÓN', 'und', 111, 53, NULL, NULL, 3),
-(305, 100.00, 'OTRO', '1595 kg PROVISIÓ Y COLOCACIÓN DE DUCTOS DE CHAPA GALVANIZADA CAL 27 COLECLTOR + Ducto de extracción de BAÑOS según planos corrientes columna COVE a,b,c,d,e Y f', 7258845.00, '342.1', 72588.45, '53 - VENTILACIÓN', 'und', 111, 53, NULL, NULL, 3),
-(306, 10.00, 'MATERIAL', 'Corrotex Anticorrosivo Cementico 4 kg', 170661.20, '441.1', 17066.12, '15 - PATOLOGÍAS', 'und', 112, 15, NULL, 154, 2),
-(307, 120.76, 'MANO_OBRA', 'Revoque grueso de cal (espesor 2 cm): Piso 2 (43,76 m²) y Piso 3 (77,00 m²), total 120,76 m² x $15.000', 1811400.00, '339.1', 15000.00, '28 - REVOQUES', 'm²', 113, 323, NULL, NULL, 1),
-(308, 879.63, 'MANO_OBRA', 'Departamentos y palieres: ejecución de fajas, regleo y distribución de material para carpeta RDC en pisos 3, 4 y 5 (879,63 m² x $7.000)', 6157410.00, '339.2', 7000.00, '54 - Construcción', 'm²', 113, 54, NULL, NULL, 1),
-(309, 1.00, 'MANO_OBRA', 'Reparación de patologías por hierro expuesto en losa de techo, columnas y vigas. Incluye: descubrir armaduras, cepillado, aplicación de pintura anticorrosiva y posterior tratamiento con producto Protex', 300000.00, '339.3', 300000.00, '55 - Patología', 'und', 113, 319, NULL, NULL, 1),
-(310, 10.00, 'MANO_OBRA', 'Demolición y adecuación de plenos, con colocación de calandro para verificación de la verticalidad (10 x $280.000)', 2800000.00, '339.4', 280000.00, '26 - ESTRUCTURA', 'und', 113, 318, NULL, NULL, 1),
-(311, 40.00, 'MANO_OBRA', 'Ejecución de fajas en paredes de baños en pisos 2, 3, 4 y 5 (40 x $90.000)', 3600000.00, '339.5', 90000.00, '46 - FAJAS Y NIVELACIÓN', 'und', 113, 46, NULL, NULL, 1),
-(312, 91.00, 'MANO_OBRA', 'Construcción de contrapisos con pendientes en balcones de pisos 1, 3, 4 y 5 (91 x $11.000)', 1001000.00, '339.6', 11000.00, '4 - CARPETAS Y CONTRAPISOS', 'und', 113, 4, NULL, NULL, 1),
-(313, 98.00, 'MANO_OBRA', 'Construcción de contrapisos con pendientes en balcones de pisos 1, 3, 4 y 5 (98 x $15.000)', 1470000.00, '339.7', 15000.00, '4 - CARPETAS Y CONTRAPISOS', 'und', 113, 4, NULL, NULL, 1),
-(314, 1.00, 'MANO_OBRA', 'Hidrolavado', 100000.00, '340.7', 100000.00, '47 - REVOQUE INTERNO', 'und', 114, 47, NULL, NULL, 1),
-(315, 9.00, 'MANO_OBRA', 'Revoque proyectado hidrófugo', 130500.00, '340.6', 14500.00, '47 - REVOQUE INTERNO', 'm2', 114, 47, NULL, NULL, 1),
-(316, 36.20, 'MANO_OBRA', 'Aplicado en losa', 271500.00, '340.5', 7500.00, '47 - REVOQUE INTERNO', 'm2', 114, 47, NULL, NULL, 1),
-(317, 9.00, 'MANO_OBRA', 'Cantonera', 67500.00, '340.4', 7500.00, '47 - REVOQUE INTERNO', 'ml', 114, 47, NULL, NULL, 1),
-(318, 66.20, 'MANO_OBRA', 'Buña', 496500.00, '340.3', 7500.00, '47 - REVOQUE INTERNO', 'm2', 114, 47, NULL, NULL, 1),
-(319, 28.00, 'MANO_OBRA', 'Arista', 210000.00, '340.2', 7500.00, '47 - REVOQUE INTERNO', 'm2', 114, 47, NULL, NULL, 1),
-(320, 187.00, 'MANO_OBRA', 'Yeso proyectado en Pared', 1402500.00, '340.1', 7500.00, '47 - REVOQUE INTERNO', 'm2', 114, 47, NULL, NULL, 1),
-(321, 10.00, 'MATERIAL', 'Cantoneras yesera de 2.6m', 25657.80, '434.2', 2565.78, '51 - REVOQUE YESO', 'und', 115, 51, NULL, 149, 2),
-(322, 200.00, 'MATERIAL', 'Yeso Entre Rios x30 kg', 1749204.00, '434.1', 8746.02, '51 - REVOQUE YESO', 'und', 115, 51, NULL, 155, 2),
-(323, 1.00, 'OTRO', 'Por la visita a obra de hasta un (1) día de duración (en días hábiles e incluyendo tiempos de traslado) de dos (2) profesionales, uno especializado en Tecnología del Hormigón y otro en Evaluación Estructural, con el objetivo de realizar una primera inspección visual de relevamiento y tomar conocimiento de las posibles problemáticas existentes en la estructura de hormigón armado correspondiente al edificio de referencia. De dicha visita surgirá un Informe Preliminar sobre la situación observada, con registro fotográfico de los aspectos más relevantes encontrados, así como una propuesta de actividades a desarrollar para su estudio detallado. Esta propuesta incluirá la verificación estructural a cargo de nuestro Asesor Especialista, acompañada de su correspondiente plan de trabajos y presupuesto. En caso de aprobarse el presupuesto correspondiente al estudio detallado y verificación estructural derivada del mismo, el monto consignado en el presente presupuesto será bonificado en su totalidad en dicho nuevo presupuesto.', 1990000.00, '430.1', 1990000.00, '56 - VISITA', 'und', 116, 56, NULL, NULL, 3),
-(324, 6.00, 'OTRO', 'Alquier de camión diario. Alquiler diario de camión para extracción y disposición final de tierra y escombros', 1800000.00, '334.3', 300000.00, '57 - MOVIMIENTO DE SUELO', 'und', 117, 57, NULL, NULL, 3),
-(325, 2.00, 'OTRO', 'Alquiler de pala retro para ex, alquiler de pala retro 310 para excavación rampa ingreso cochera', 800000.00, '334.2', 400000.00, '57 - MOVIMIENTO DE SUELO', 'und', 117, 57, NULL, NULL, 3),
-(326, 2.00, 'OTRO', 'Alquiler por jornal 8 hs, percuto entrega y retiro eq alquiler diario diario de bobcat c/martillo neumático para picado de: Hormigón apertura lateral en rampa ingreso a cochera. Incliye motor man y Combustible jornada de 8 hs.', 1200000.00, '334.1', 600000.00, '57 - MOVIMIENTO DE SUELO', 'und', 117, 57, NULL, NULL, 3),
-(327, 1.00, 'MATERIAL', 'Vinilo de corte \"Red Sacchi\" color blanco detalle verde y rojo según muestra 60 cm x 40cm incluye instalación', 11000.00, '428.1', 11000.00, '2 - ALBAÑILERÍA GENERAL', 'und', 118, 2, NULL, 156, 2),
-(328, 16.00, 'MATERIAL', 'Hormigón RDC 300', 1547680.00, '427.3', 96730.00, '4 - CARPETAS Y CONTRAPISOS', 'und', 119, 4, NULL, 11, 2),
-(329, 1.00, 'MATERIAL', 'Bomba de arrastre Hormigón', 356087.00, '427.2', 356087.00, '4 - CARPETAS Y CONTRAPISOS', 'und', 119, 4, NULL, 10, 2),
-(330, 16.00, 'MATERIAL', 'Bombeado', 51792.00, '427.1', 3237.00, '4 - CARPETAS Y CONTRAPISOS', 'm3', 119, 4, NULL, 157, 2),
-(331, 1296.00, 'MATERIAL', 'Ladrillos huecos 8x18x33', 586232.64, '426.2', 452.34, '11 - MAMPOSTERÍA', 'und', 120, 11, NULL, 18, 2),
-(332, 8.00, 'MATERIAL', 'Arena', 236024.80, '426.1', 29503.10, '11 - MAMPOSTERÍA', 'm3', 120, 11, NULL, 151, 2),
-(333, 24.00, 'MANO_OBRA', 'Demolición de banquinas placares. Incluye bajar escombros a PB', 600000.00, '326.1', 25000.00, '29 - DEMOLICIONES', 'und', 121, 318, NULL, NULL, 1),
-(334, 2.00, 'MANO_OBRA', 'Colocación de bañera (incluye relleno y pared de asentamiento con revoque frontal)', 340000.00, '326.10', 170000.00, '58 - INSTALACIONES SANITARIAS', 'und', 121, 58, NULL, NULL, 1),
-(335, 154.00, 'MANO_OBRA', 'Construcción de mochetas y bajadas de dintel a medida de puerta (Del P2 al P8)', 4620000.00, '326.11', 30000.00, '11 - MAMPOSTERÍA', 'und', 121, 315, NULL, NULL, 1),
-(336, 112.00, 'MANO_OBRA', 'Colocación de ladrillo maciso en panderete  (bajo premarco)', 1008000.00, '326.12', 9000.00, '11 - MAMPOSTERÍA', 'ml', 121, 315, NULL, NULL, 1),
-(337, 155.82, 'MANO_OBRA', 'Ejecución de ladrillo hueco 8cm. En baños adosados al muro del tabique de hormigón, de los 14 pisos', 2025660.00, '326.13', 13000.00, '11 - MAMPOSTERÍA', 'm2', 121, 315, NULL, NULL, 1),
-(338, 107.12, 'MANO_OBRA', 'Colocació de Porcelanato', 1392560.00, '326.14', 13000.00, '25 - REVESTIMIENTOS', 'm2', 121, 25, NULL, NULL, 1),
-(339, 288.00, 'MANO_OBRA', 'Ejecución con carpeta fratachada tradicional (baños)', 4320000.00, '326.15', 15000.00, '24 - CONTRAPISOS Y CARPETAS', 'm2', 121, 24, NULL, NULL, 1),
-(340, 280.00, 'MANO_OBRA', 'Relleno detodos los premarcos para habilitar el revoque de sus mochetas', 1680000.00, '326.16', 6000.00, '54 - Construcción', 'und', 121, 54, NULL, NULL, 1),
-(341, 28.00, 'MANO_OBRA', 'Demolición de pared del 8 en departamento A y D, donde se ubicará la cabina de termotanque', 700000.00, '326.17', 25000.00, '29 - DEMOLICIONES', 'und', 121, 318, NULL, NULL, 1),
-(342, 644.00, 'MANO_OBRA', 'Reparación de los pases de losas en baños y cocinas con mortero', 4508000.00, '326.18', 7000.00, '59 - REVOQUES Y REPARACIONES', 'und', 121, 319, NULL, NULL, 1),
-(343, 112.00, 'MANO_OBRA', 'Construcción de mocheta en baños', 3920000.00, '326.19', 35000.00, '11 - MAMPOSTERÍA', 'und', 121, 315, NULL, NULL, 1),
-(344, 28.00, 'MANO_OBRA', 'Demolición de los plenos (adecuación de plenos). Incluye colocación de calandro para verificar la verticalidad', 560000.00, '326.2', 20000.00, '29 - DEMOLICIONES', 'und', 121, 318, NULL, NULL, 1),
-(345, 222.60, 'MANO_OBRA', 'Ejecución de mampostería con giro (mocheta) en menos de 1 m (tipo L-1 giro)', 3339000.00, '326.3', 15000.00, '11 - MAMPOSTERÍA', 'm²', 121, 315, NULL, NULL, 1),
-(346, 74.20, 'MANO_OBRA', 'Enchapado con ladrillo hueco (escalla) para engrosar las medidas de las bañeras', 816200.00, '326.4', 11000.00, '60 - ENCHAPADO INTERNO', 'm²', 121, 320, NULL, NULL, 1),
-(347, 9.62, 'MANO_OBRA', 'Ejecución de contrapiso + carpeta con pendiente máx. 7 cm de carga total, incluye subir material en balcones', 105820.00, '326.5', 11000.00, '61 - CONTRAPISOS Y CAERPETAS', 'm²', 121, 61, NULL, NULL, 1),
-(348, 332.00, 'MANO_OBRA', 'Departamentos + Palier: Ejecución de fajas, regleo y distribución de material para carpeta RDC', 1992000.00, '326.6', 6000.00, '4 - CARPETAS Y CONTRAPISOS', 'm²', 121, 4, NULL, NULL, 1),
-(349, 243.60, 'MANO_OBRA', 'Babeta hidrófuga en balcones (30 cm pared + 15 cm piso, desarrollo 45/50 cm). Incluye colocación de Protex Seal 77 (2 capas)', 2192400.00, '326.7', 9000.00, '27 - IMPERMEABILIZACIONES', 'ml', 121, 27, NULL, NULL, 1),
-(350, 15.68, 'MANO_OBRA', 'Retiro de carpetas en mal estado. Incluye bajar escombros a PB', 235200.00, '326.8', 15000.00, '29 - DEMOLICIONES', 'm²', 121, 318, NULL, NULL, 1),
-(351, 23.06, 'MANO_OBRA', 'Retiro de revoque en mal estado en P-1. Incluye bajada de escombros a PB', 345900.00, '326.9', 15000.00, '29 - DEMOLICIONES', 'm²', 121, 318, NULL, NULL, 1),
-(352, 1.00, 'MATERIAL', 'Bañera enlozada 1.6x0.7x antideslizante', 107183.00, '422.2', 107183.00, '62 - COLOCACIÓN DE BAÑERA', 'und', 122, 62, NULL, 158, 2),
-(353, 1.00, 'MATERIAL', 'Bañera enlozada 1.4x0.7x antideslizante', 95006.00, '422.1', 95006.00, '62 - COLOCACIÓN DE BAÑERA', 'und', 122, 62, NULL, 159, 2),
-(354, 50.00, 'MATERIAL', 'Discos de corte 4,5\'\' Disco 115mm x16,m', 108005.50, '327.3', 2160.11, '3 - MANTENIMIENTO', 'und', 123, 3, NULL, 160, 2),
-(355, 2.00, 'MATERIAL', 'Disco Diamantado 12\'\' Segmenta Patrol Black', 124262.24, '327.2', 62131.12, '3 - MANTENIMIENTO', 'und', 123, 3, NULL, 161, 2),
-(356, 100.00, 'MATERIAL', 'Discos de corte 4,5\'\' Disco 115mm x1,6m Tyrolit', 216011.00, '327.1', 2160.11, '3 - MANTENIMIENTO', 'und', 123, 3, NULL, 162, 2),
-(357, 300.00, 'MATERIAL', 'Tornillo autop. p. mecha 2 1/2 cabeza hexagonal', 24600.00, '421.1', 82.00, '3 - MANTENIMIENTO', 'und', 124, 3, NULL, 163, 2),
-(358, 10.00, 'MATERIAL', 'Corrotex Anticorrosivo Cementico 4 kg', 165289.30, '419.1', 16528.93, '15 - PATOLOGÍAS', 'und', 125, 15, NULL, 154, 2),
-(359, 1120.00, 'MATERIAL', 'Intomap 3 en 1 ar bags x 25 kg', 7887667.20, '418.1', 7042.56, '1 - REVOQUE EXTERIOR', 'und', 126, 1, NULL, 12, 2),
-(360, 1.00, 'MATERIAL', 'Vinilo impreso UV instalación', 200000.00, '415.1', 200000.00, '63 - CARTEL', 'und', 127, 63, NULL, 164, 2),
-(361, 100.00, 'MANO_OBRA', 'Hidrolavado de superficies exteriores donde se aplicará revoque 3 en 1', 3840000.00, '317.1', 38400.00, '64 - HIDROLAVADO', 'GL', 128, 327, NULL, NULL, 1),
-(362, 5.00, 'MATERIAL', 'Pallet vacío', 131575.00, '412.6', 26315.00, '3 - MANTENIMIENTO', 'und', 129, 3, NULL, 165, 2),
-(363, 231.00, 'MATERIAL', 'Cal Hydrat x 25 kg', 925908.06, '412.5', 4008.26, '11 - MAMPOSTERÍA', 'und', 129, 11, NULL, 88, 2),
-(364, 864.00, 'MATERIAL', 'Ladrillos huecos 8x18x33', 390821.76, '412.4', 452.34, '11 - MAMPOSTERÍA', 'und', 129, 11, NULL, 18, 2),
-(365, 1000.00, 'MATERIAL', 'Ladrillos comunes', 165200.00, '412.3', 165.20, '11 - MAMPOSTERÍA', 'und', 129, 11, NULL, 47, 2),
-(366, 160.00, 'MATERIAL', 'Cemento x25 kg bolsa', 688936.00, '412.2', 4305.85, '11 - MAMPOSTERÍA', 'und', 129, 11, NULL, 119, 2),
-(367, 12.00, 'MATERIAL', 'Arena', 339258.72, '412.1', 28271.56, '11 - MAMPOSTERÍA', 'm3', 129, 11, NULL, 151, 2),
-(368, 2.00, 'MATERIAL', 'Sellador poliuretano Proflex P', 324336.00, '411.2', 162168.00, '65 - AISLACIONES E IMPOERMEABILIZACIONES', 'und', 130, 65, NULL, 166, 2),
-(369, 1.00, 'MATERIAL', 'Protex Superligante x Tambor 2', 888330.00, '411.1', 888330.00, '2 - ALBAÑILERÍA GENERAL', 'und', 130, 2, NULL, 167, 2),
-(370, 1.00, 'MATERIAL', 'Provisión de honorarios por gestión y armado de la Solicitud de Factibilidad de Suministro Eléctrico para edificio de viviendas multifamiliar ubicado en la ciudad de Quilmes, ante la distribuidora EDESUR. Potencia total a solicitar: 778 kW. Incluye: Armado completo de la carpeta técnica conforme a los requisitos de EDESUR, con documentación de carácter técnico e informativo. Confección de la documentación técnica correspondiente (planilla de potencia, declaración jurada de cargas, memoria técnica, entre otras), firmadas por profesional matriculado. Presentación, entrega y envío de la carpeta técnica informativa a EDESUR. Gestión y entrega final de la Solicitud de Factibilidad aprobada.', 2887590.00, '316.1', 2887590.00, '9 - Sin rubro', 'und', 131, 9, NULL, 168, 2),
-(371, 1.00, 'OTRO', 'Alquiler de volquetes', 70000.00, '314.1', 70000.00, '9 - Sin rubro', 'und', 132, 9, NULL, NULL, 3),
-(372, 1.00, 'MATERIAL', 'Hidrófugo vitrosol tambor x 20', 146742.00, '313.1', 146742.00, '66 - ALBAÑILERÍA', 'und', 133, 66, NULL, 169, 2),
-(373, 4.00, 'MATERIAL', 'Pintura vial', 31373.56, '312.5', 7843.39, '3 - MANTENIMIENTO', 'und', 134, 3, NULL, 170, 2),
-(374, 18.00, 'MATERIAL', 'Aguarrás mineral', 39900.42, '312.4', 2216.69, '3 - MANTENIMIENTO', 'und', 134, 3, NULL, 171, 2),
-(375, 2.00, 'MATERIAL', 'Esmalte sintético color negro', 51189.02, '312.3', 25594.51, '3 - MANTENIMIENTO', 'und', 134, 3, NULL, 172, 2),
-(376, 2.00, 'MATERIAL', 'Pintura aerosol negra 430 ml', 34379.10, '312.2', 17189.55, '3 - MANTENIMIENTO', 'und', 134, 3, NULL, 173, 2),
-(377, 2.00, 'MATERIAL', 'Pintura aerosol amarilla', 34379.10, '312.1', 17189.55, '3 - MANTENIMIENTO', 'und', 134, 3, NULL, 174, 2),
-(378, 10.00, 'MATERIAL', 'Puente Adherente Pamax x 25 kg', 120000.00, '311.1', 12000.00, '1 - REVOQUE EXTERIOR', 'und', 135, 1, NULL, 138, 2),
-(379, 10.00, 'MATERIAL', 'Puente Adherente Pamax x 25 kg', 1200000.00, '300.1', 120000.00, '1 - REVOQUE EXTERIOR', 'und', 136, 1, NULL, 138, 2),
-(380, 5.00, 'MATERIAL', 'Pulsador rasante N/C completo para montacarga', 22019.40, '409.9', 4403.88, '3 - MANTENIMIENTO', 'und', 137, 3, NULL, 175, 2),
-(381, 20.00, 'MATERIAL', 'Toma 10 A 220 V blanco 1 módulo', 15305.80, '409.8', 765.29, '3 - MANTENIMIENTO', 'und', 137, 3, NULL, 176, 2),
-(382, 10.00, 'MATERIAL', 'Ficha 2x10 A macho', 27100.80, '409.7', 2710.08, '3 - MANTENIMIENTO', 'und', 137, 3, NULL, 177, 2),
-(383, 20.00, 'MATERIAL', 'Ficha 2x10 A macho', 19014.40, '409.6', 950.72, '3 - MANTENIMIENTO', 'und', 137, 3, NULL, 177, 2),
-(384, 20.00, 'MATERIAL', 'Ficha 2x10 A hembra', 22815.80, '409.5', 1140.79, '3 - MANTENIMIENTO', 'und', 137, 3, NULL, 178, 2),
-(385, 10.00, 'MATERIAL', 'Disyuntor bipolar 40 A', 256053.80, '409.4', 25605.38, '3 - MANTENIMIENTO', 'und', 137, 3, NULL, 179, 2),
-(386, 10.00, 'MATERIAL', 'Llave térmica bipolar 25 A', 56441.90, '409.3', 5644.19, '3 - MANTENIMIENTO', 'und', 137, 3, NULL, 180, 2),
-(387, 10.00, 'MATERIAL', 'Zócalo fotocélula', 39837.90, '409.21', 3983.79, '3 - MANTENIMIENTO', 'und', 137, 3, NULL, 181, 2),
-(388, 20.00, 'MATERIAL', 'Tapa 5x10 PVC blanca', 9999.20, '409.20', 499.96, '3 - MANTENIMIENTO', 'und', 137, 3, NULL, 182, 2),
-(389, 10.00, 'MATERIAL', 'Artefacto listón 120 doble', 23541.40, '409.2', 2354.14, '3 - MANTENIMIENTO', 'und', 137, 3, NULL, 183, 2),
-(390, 20.00, 'MATERIAL', 'Bastidor luz PVC', 7370.40, '409.19', 368.52, '3 - MANTENIMIENTO', 'und', 137, 3, NULL, 184, 2),
-(391, 10.00, 'MATERIAL', 'Ficha 3 + N + Tierra 16 A', 67538.60, '409.18', 6753.86, '3 - MANTENIMIENTO', 'und', 137, 3, NULL, 185, 2),
-(392, 10.00, 'MATERIAL', 'Fotocélula exterior 2500 Wts/CO', 116212.80, '409.17', 11621.28, '3 - MANTENIMIENTO', 'und', 137, 3, NULL, 186, 2),
-(393, 1.00, 'MATERIAL', 'Caja estanca PVC', 1745.85, '409.16', 1745.85, '3 - MANTENIMIENTO', 'und', 137, 3, NULL, 187, 2),
-(394, 10.00, 'MATERIAL', 'Toma 10 A 220 V doble blanco 3 módulos', 34593.60, '409.15', 3459.36, '3 - MANTENIMIENTO', 'und', 137, 3, NULL, 188, 2),
-(395, 10.00, 'MATERIAL', 'Portalámpara para foco 12 W', 10945.30, '409.14', 1094.53, '3 - MANTENIMIENTO', 'und', 137, 3, NULL, 189, 2),
-(396, 10.00, 'MATERIAL', 'Lámpara foco LED 15 W', 9993.30, '409.13', 999.33, '3 - MANTENIMIENTO', 'und', 137, 3, NULL, 190, 2),
-(397, 10.00, 'MATERIAL', 'Caja octogonal PVC Electric', 2492.10, '409.12', 249.21, '3 - MANTENIMIENTO', 'und', 137, 3, NULL, 191, 2),
-(398, 2.00, 'MATERIAL', 'Pulsador de emergencia', 18729.14, '409.11', 9364.57, '3 - MANTENIMIENTO', 'und', 137, 3, NULL, 192, 2),
-(399, 5.00, 'MATERIAL', 'Pulsador rasante N/O completo para montacarga', 22019.40, '409.10', 4403.88, '3 - MANTENIMIENTO', 'und', 137, 3, NULL, 193, 2),
-(400, 20.00, 'MATERIAL', 'Tubo LED 18W BLF 220V 1.2 m', 36651.40, '409.1', 1832.57, '3 - MANTENIMIENTO', 'und', 137, 3, NULL, 194, 2),
-(401, 2.00, 'MATERIAL', 'Vinilo impreso para cartel 4.8 1.22', 360900.70, '404.3', 180450.35, '67 - CARTEL PUBLICITARIO', 'und', 138, 67, NULL, 195, 2),
-(402, 2.00, 'MATERIAL', 'Vinilo impreso para cartel 4.8', 1804200.46, '404.2', 902100.23, '67 - CARTEL PUBLICITARIO', 'und', 138, 67, NULL, 196, 2),
-(403, 2.00, 'MATERIAL', 'Vinilo impreso para cartel 3x', 440898.84, '404.1', 220449.42, '67 - CARTEL PUBLICITARIO', 'und', 138, 67, NULL, 197, 2),
-(404, 16.00, 'MATERIAL', 'Malla fibra de vidrio 5x5 rol 90g revoque', 635430.24, '407.1', 39714.39, '1 - REVOQUE EXTERIOR', 'und', 139, 1, NULL, 198, 2),
-(405, 100.00, 'MANO_OBRA', 'Construcción de Dinteles en ventanas de habitaciones, baños, cocina y living comedor. Incluye colocación de barras, encofrado requerido y ladrillos hasta la altura de losa de techo.', 700000.00, '309.1', 7000.00, '26 - ESTRUCTURA', 'und', 140, 319, NULL, NULL, 1),
-(406, 100.00, 'MANO_OBRA', 'Colocación de Premarcos.', 420000.00, '309.2', 4200.00, '25 - REVESTIMIENTOS', 'm/m2', 140, 317, NULL, NULL, 1),
-(407, 100.00, 'MANO_OBRA', 'Enchapado de vigas en habitaciones, baño y sobre ventana de cocina. Incluye subir los ladrillos desde planta baja a cada piso.', 3609000.00, '309.3', 36090.00, '60 - ENCHAPADO INTERNO', 'm', 140, 320, NULL, NULL, 1),
-(408, 100.00, 'MANO_OBRA', 'Enchapado en columnas de baños de los departamentos C y D en pisos 14 al 4, dos por piso y una en piso 10.', 1645650.00, '309.4', 16456.50, '60 - ENCHAPADO INTERNO', 'm', 140, 320, NULL, NULL, 1),
-(409, 100.00, 'MANO_OBRA', 'Demolición de columnas en azotea.', 475000.00, '309.5', 4750.00, '26 - ESTRUCTURA', 'und', 140, 318, NULL, NULL, 1),
-(410, 100.00, 'MANO_OBRA', 'Construcción de mochetas y/o encuadre en premarcos.', 7280000.00, '309.6', 72800.00, '11 - MAMPOSTERÍA', 'und', 140, 315, NULL, NULL, 1),
-(411, 100.00, 'MANO_OBRA', 'Colocación de calandros y replanteo de ventanas en fachadas.', 1200000.00, '309.7', 12000.00, '35 - REPLANTEO', 'Piso', 140, 321, NULL, NULL, 1),
-(412, 100.00, 'MANO_OBRA', 'Niveles de losa de techo por piso.', 1120000.00, '309.8', 11200.00, '35 - REPLANTEO', 'Piso', 140, 321, NULL, NULL, 1),
-(413, 20.00, 'MANO_OBRA', 'Jornales de ayudante para cubrir trabajos varios de obra: movimiento y descarga de materiales.', 1400000.00, '309.9', 70000.00, '68 - JORNALES', 'Jornal', 140, 68, NULL, NULL, 1),
-(414, 10.00, 'MATERIAL', 'Reflector de LED Exterior 200W Artef. Proy. Leds 200W 220V 11', 302121.00, '405.1', 30212.10, '11 - MAMPOSTERÍA', 'und', 141, 11, NULL, 199, 2),
-(415, 2160.00, 'MATERIAL', 'Ladrillos huecos 8x18x33', 877802.40, '402.7', 406.39, '11 - MAMPOSTERÍA', 'und', 142, 11, NULL, 18, 2),
-(416, 770.00, 'MATERIAL', 'Cal Cacique', 4009082.00, '402.6', 5206.60, '11 - MAMPOSTERÍA', 'und', 142, 11, NULL, 200, 2),
-(417, 1120.00, 'MATERIAL', 'Intomap 3 en 1 ar bags x 25 kg', 6268024.00, '402.5', 5596.45, '1 - REVOQUE EXTERIOR', 'und', 142, 1, NULL, 12, 2),
-(418, 4000.00, 'MATERIAL', 'Ladrillos comunes', 627680.00, '402.4', 156.92, '11 - MAMPOSTERÍA', 'und', 142, 11, NULL, 47, 2),
-(419, 48.00, 'MATERIAL', 'Arena', 1289183.04, '402.3', 26857.98, '11 - MAMPOSTERÍA', 'm3', 142, 11, NULL, 151, 2),
-(420, 800.00, 'MATERIAL', 'Cemento x50 kg bolsa', 6002360.00, '402.2', 7502.95, '11 - MAMPOSTERÍA', 'und', 142, 11, NULL, 201, 2),
-(421, 1440.00, 'MATERIAL', 'Ladrillos huecos del 12 12x18x33', 762235.20, '402.1', 529.33, '2 - ALBAÑILERÍA GENERAL', 'und', 142, 2, NULL, 131, 2),
-(422, 1.00, 'MATERIAL', 'Lona frontar impresa con frontales', 195500.00, '400.1', 195500.00, '67 - CARTEL PUBLICITARIO', 'und', 143, 67, NULL, 202, 2),
-(423, 100.00, 'OTRO', 'Servicio de Seguridad de la Obra', 4800000.00, '307.1', 48000.00, '48 - Servicio de Seguridad e Higiene', 'GL', 144, 48, NULL, NULL, 3),
-(424, 1.00, 'MATERIAL', 'Sellador multiuso fastix color', 561900.00, '399.3', 561900.00, '13 - AISLACIONES E IMPERMEABILIZACIONES', 'und', 145, 13, NULL, 203, 2),
-(425, 200.00, 'MATERIAL', 'Tuerca 5/8 para andamio', 21486.00, '399.2', 107.43, '13 - AISLACIONES E IMPERMEABILIZACIONES', 'und', 145, 13, NULL, 204, 2),
-(426, 200.00, 'MATERIAL', 'Torn. Cab. Hex 3/8\'\' x38mm c/ara cabeza hexagonal', 82644.00, '399.1', 413.22, '13 - AISLACIONES E IMPERMEABILIZACIONES', 'und', 145, 13, NULL, 205, 2),
-(427, 2.00, 'MATERIAL', 'Pallet vacío', 49998.50, '398.6', 24999.25, '9 - Sin rubro', 'und', 146, 9, NULL, 165, 2),
-(428, 1.00, 'MATERIAL', 'Nylon negro polietileno 200mic negro', 46351.62, '398.5', 46351.62, '2 - ALBAÑILERÍA GENERAL', 'und', 146, 2, NULL, 104, 2),
-(429, 1000.00, 'MATERIAL', 'Ladrillos comunes', 156930.00, '398.4', 156.93, '2 - ALBAÑILERÍA GENERAL', 'und', 146, 2, NULL, 47, 2),
-(430, 12.00, 'MATERIAL', 'Arena', 322295.88, '398.3', 26857.99, '11 - MAMPOSTERÍA', 'und', 146, 11, NULL, 206, 2),
-(431, 80.00, 'MATERIAL', 'Cemento x50 kg bolsa', 608236.00, '398.2', 7602.95, '11 - MAMPOSTERÍA', 'und', 146, 11, NULL, 201, 2),
-(432, 720.00, 'MATERIAL', 'Ladrillos huecos del 12 12x18x33', 375883.20, '398.1', 522.06, '11 - MAMPOSTERÍA', 'und', 146, 11, NULL, 131, 2),
-(433, 1.00, 'MATERIAL', 'Envase de garrafa de gas x10 kg completo', 95041.32, '394.1', 95041.32, '69 - COMEDOR', 'und', 147, 69, NULL, 207, 2),
-(434, 2.00, 'MATERIAL', 'Pallet vacío', 49998.50, '389.4', 24999.25, '9 - Sin rubro', 'und', 148, 9, NULL, 165, 2),
-(435, 80.00, 'MATERIAL', 'Cemento x50 kg bolsa', 615464.00, '389.3', 7693.30, '11 - MAMPOSTERÍA', 'und', 148, 11, NULL, 201, 2),
-(436, 6.00, 'MATERIAL', 'Arena', 161147.88, '389.2', 26857.98, '11 - MAMPOSTERÍA', 'm3', 148, 11, NULL, 151, 2),
-(437, 720.00, 'MATERIAL', 'Ladrillos huecos del 12 12x18x33', 375883.20, '389.1', 522.06, '11 - MAMPOSTERÍA', 'und', 148, 11, NULL, 131, 2),
-(438, 246.00, 'MANO_OBRA', 'Recuadro balcones', 4182000.00, '301.6', 17000.00, '1 - REVOQUE EXTERIOR', 'ml', 149, 1, NULL, NULL, 1),
-(439, 84.24, 'MANO_OBRA', 'Recuadro Planta Baja', 1179360.00, '301.5', 14000.00, '1 - REVOQUE EXTERIOR', 'ml', 149, 1, NULL, NULL, 1),
-(440, 84.24, 'MANO_OBRA', 'Recuadro Planta Alta', 1179360.00, '301.4', 14000.00, '1 - REVOQUE EXTERIOR', 'ml', 149, 1, NULL, NULL, 1),
-(441, 422.00, 'MANO_OBRA', 'Aristas', 2954000.00, '301.3', 7000.00, '1 - REVOQUE EXTERIOR', 'ml', 149, 1, NULL, NULL, 1),
-(442, 1400.00, 'MANO_OBRA', 'Buñas', 9800000.00, '301.2', 7000.00, '1 - REVOQUE EXTERIOR', 'ml', 149, 1, NULL, NULL, 1),
-(443, 3560.00, 'MANO_OBRA', 'Revoque proyectado en Pared', 49840000.00, '301.1', 14000.00, '3.3.2 - REVOQUE EXTERIOR EN EL EDIFICIO', 'm2', 149, 324, NULL, NULL, 1),
-(444, 100.00, 'MATERIAL', 'Tornillo hexagonal para chapas de 2 1/2\'\'', 256100.00, '385.3', 2561.00, '2 - ALBAÑILERÍA GENERAL', 'und', 150, 2, NULL, 208, 2),
-(445, 270.00, 'MATERIAL', 'Tornillo autop. p. mecha 2 1/2 cabeza hexagonal', 37800.00, '385.2', 140.00, '2 - ALBAÑILERÍA GENERAL', 'und', 150, 2, NULL, 163, 2),
-(446, 100.00, 'MATERIAL', 'Discos de corte 4,5\'\'', 123900.00, '385.1', 1239.00, '3 - MANTENIMIENTO', 'und', 150, 3, NULL, 209, 2),
-(447, 1.00, 'MATERIAL', 'Plomada', 6257.87, '384.3', 6257.87, '2 - ALBAÑILERÍA GENERAL', 'und', 151, 2, NULL, 210, 2),
-(448, 20.00, 'MATERIAL', 'Antiparras p/polvos y liquidos transp.', 30125.00, '384.2', 1506.25, '70 - SEGURIDAD E HIGIENE', 'und', 151, 70, NULL, 211, 2),
-(449, 50.00, 'MATERIAL', 'Guantes hilo moteado', 37800.00, '384.1', 756.00, '70 - SEGURIDAD E HIGIENE', 'und', 151, 70, NULL, 212, 2),
-(450, 20.00, 'MATERIAL', 'Tubo LEDs 19w BLF 220V 1.2M', 23529.40, '381.1', 1176.47, '3 - MANTENIMIENTO', 'und', 152, 3, NULL, 213, 2),
-(451, 560.00, 'MATERIAL', 'Intomap 3 en 1 ar bags x 25 kg', 3134012.00, '387.1', 5596.45, '1 - REVOQUE EXTERIOR', 'und', 153, 1, NULL, 12, 2),
-(452, 5.00, 'MATERIAL', 'Tanza rollo de 100m', 12198.35, '382.4', 2439.67, '2 - ALBAÑILERÍA GENERAL', 'und', 154, 2, NULL, 214, 2),
-(453, 10.00, 'MATERIAL', 'Hoja sierra p/acero 244 dientes 30 cm de largo', 13551.00, '382.3', 1355.10, '2 - ALBAÑILERÍA GENERAL', 'und', 154, 2, NULL, 215, 2),
-(454, 10.00, 'MATERIAL', 'Fratacho plastico de fieltro', 5787.40, '382.2', 578.74, '2 - ALBAÑILERÍA GENERAL', 'und', 154, 2, NULL, 216, 2),
-(455, 10.00, 'MATERIAL', 'Fratacho de madera algarrobo 35 cm', 45593.00, '382.1', 4559.30, '2 - ALBAÑILERÍA GENERAL', 'und', 154, 2, NULL, 217, 2),
-(456, 2.00, 'MATERIAL', 'Pallet vacío', 49998.50, '380.4', 24999.25, '9 - Sin rubro', 'und', 155, 9, NULL, 165, 2),
-(457, 20.00, 'MATERIAL', 'Clavos punta paris 2\'', 65208.00, '380.3', 3260.40, '2 - ALBAÑILERÍA GENERAL', 'und', 155, 2, NULL, 218, 2),
-(458, 20.00, 'MATERIAL', 'Clavos punta paris 2 y 1/2\'', 63379.60, '380.2', 3168.98, '2 - ALBAÑILERÍA GENERAL', 'und', 155, 2, NULL, 219, 2),
-(459, 80.00, 'MATERIAL', 'Cemento x50kg bolsa AVELLANEDA', 608264.00, '380.1', 7603.30, '2 - ALBAÑILERÍA GENERAL', 'und', 155, 2, NULL, 220, 2),
-(460, 1.00, 'OTRO', 'Certificado de calibración', 47850.00, '379.2', 47850.00, '71 - CONTROL/CALIDAD', 'und', 156, 71, NULL, NULL, 3),
-(461, 1.00, 'MATERIAL', 'Calibración nivel laser spectro', 477000.00, '379.1', 477000.00, '9 - Sin rubro', 'und', 156, 9, NULL, 221, 2),
-(462, 3.00, 'MATERIAL', 'Malla fibra de vidrio 5x5 rol 90g revoque', 140152.14, '378.2', 46717.38, '1 - REVOQUE EXTERIOR', 'und', 157, 1, NULL, 198, 2),
-(463, 1280.00, 'MATERIAL', 'Intomap 3 en 1 ar bags x 25 kg', 7163456.00, '378.1', 5596.45, '1 - REVOQUE EXTERIOR', 'und', 157, 1, NULL, 12, 2),
-(464, 5.00, 'MATERIAL', 'Casco seg. blanco con arnes', 29988.00, '377.2', 5997.60, '70 - SEGURIDAD E HIGIENE', 'und', 158, 70, NULL, 222, 2),
-(465, 1.00, 'MATERIAL', 'Guantes dielectricos talle 11 l36cm dps1210336e', 41328.00, '377.1', 41328.00, '70 - SEGURIDAD E HIGIENE', 'und', 158, 70, NULL, 223, 2),
-(466, 2.00, 'MATERIAL', 'Pantalon cargo beige talle 42 y 54', 42000.00, '376.1', 21000.00, '70 - SEGURIDAD E HIGIENE', 'und', 159, 70, NULL, 224, 2),
-(467, 1.00, 'MATERIAL', 'Pallet vacío', 19008.26, '375.1', 19008.26, '9 - Sin rubro', 'und', 160, 9, NULL, 165, 2),
-(468, 49.00, 'MATERIAL', 'Chapa trapezoidal c25 x6mts ancho', 3710176.12, '374.2', 75717.88, '72 - BANDEJA PROTECTORA', 'und', 161, 72, NULL, 225, 2),
-(469, 28.00, 'MATERIAL', 'Chapa lista Galvanizada c30 2.00x 1.00 1.22 x 2.44', 613980.08, '374.1', 21927.86, '72 - BANDEJA PROTECTORA', 'und', 161, 72, NULL, 226, 2),
-(470, 5.00, 'MATERIAL', 'Anclaje quimico fischer v1 30', 126033.05, '373.1', 25206.61, '26 - ESTRUCTURA', 'und', 162, 26, NULL, 227, 2),
-(471, 100.00, 'MANO_OBRA', 'Colocación de lavatorio, construcción de measda, colocación de inodoro en el baño para damas del Local de Ventas', 180000.00, '296.1', 1800.00, '58 - INSTALACIONES SANITARIAS', 'und', 163, 58, NULL, NULL, 1),
-(472, 12.00, 'MATERIAL', 'Arena', 317355.36, '371.1', 26446.28, '11 - MAMPOSTERÍA', 'm3', 164, 11, NULL, 151, 2),
-(473, 5.00, 'MATERIAL', 'Disco widia segmentado 4.5\'\'', 23913.85, '370.3', 4782.77, '3 - MANTENIMIENTO', 'und', 165, 3, NULL, 228, 2),
-(474, 5.00, 'MATERIAL', 'Disco corte p/sensitiva 14\'\'', 40632.70, '370.2', 8126.54, '3 - MANTENIMIENTO', 'und', 165, 3, NULL, 229, 2),
-(475, 2.00, 'MATERIAL', 'Disco widia segmentado 7\'\'', 19771.08, '370.1', 9885.54, '3 - MANTENIMIENTO', 'und', 165, 3, NULL, 230, 2),
-(476, 12.00, 'MATERIAL', 'Arena', 317355.36, '360.1', 26446.28, '2 - ALBAÑILERÍA GENERAL', 'und', 166, 2, NULL, 206, 2),
-(477, 1.00, 'MATERIAL', 'Contrat. Seguro Respons. Civil. Respons. Civil. Suma asegurada $300.000.00 sin Franquicia asegurado Simende CO SRL asegurado baprisud S.A', 796271.08, '368.1', 796271.08, '22 - SERVICIO', 'und', 167, 22, NULL, 231, 2),
-(478, 130.00, 'MANO_OBRA', 'Colocación de Dos capas de Protex Seal 77', 910000.00, '292.1', 7000.00, '27 - IMPERMEABILIZACIONES', 'm2', 168, 27, NULL, NULL, 1),
-(479, 20.00, 'MANO_OBRA', 'Hidro Lavado en Sala de Maquinas-Ascensores', 26000.00, '292.2', 1300.00, '73 - LIMPIEZA TECNICA', 'm2', 168, 73, NULL, NULL, 1),
-(480, 15.00, 'MANO_OBRA', 'Nivelación en cada Piso del edificio y verificado nivel de cada dintel. Para conocer el punto más alto - Losa y el Punto mas bajo - Dintel.', 1200000.00, '292.3', 80000.00, '35 - REPLANTEO', 'und', 168, 321, NULL, NULL, 1),
-(481, 3.00, 'MATERIAL', 'Cabo grueso de madera con rosc', 9047.10, '367.9', 3015.70, '3 - MANTENIMIENTO', 'und', 169, 3, NULL, 232, 2),
-(482, 3.00, 'MATERIAL', 'Escobillón barrendero', 14816.91, '367.8', 4938.97, '3 - MANTENIMIENTO', 'und', 169, 3, NULL, 233, 2),
-(483, 1.00, 'MATERIAL', 'Cinta Métrica de 8 mts', 16490.74, '367.7', 16490.74, '3 - MANTENIMIENTO', 'und', 169, 3, NULL, 234, 2),
-(484, 20.00, 'MATERIAL', 'Guantes Hilo Moteado', 16666.60, '367.6', 833.33, '70 - SEGURIDAD E HIGIENE', 'und', 169, 70, NULL, 212, 2),
-(485, 6.00, 'MATERIAL', 'Lapiz Carpintero', 1539.12, '367.5', 256.52, '2 - ALBAÑILERÍA GENERAL', 'und', 169, 2, NULL, 140, 2),
-(486, 20.00, 'MATERIAL', 'Hoja de Cutter', 2134.80, '367.4', 106.74, '3 - MANTENIMIENTO', 'und', 169, 3, NULL, 103, 2),
-(487, 4.00, 'MATERIAL', 'Cutter', 8487.60, '367.3', 2121.90, '3 - MANTENIMIENTO', 'und', 169, 3, NULL, 107, 2),
-(488, 3.00, 'MATERIAL', 'Martillo carpintero 650 grs largo 35 cm', 68727.30, '367.2', 22909.10, '3 - MANTENIMIENTO', 'und', 169, 3, NULL, 235, 2),
-(489, 20.00, 'MATERIAL', 'Punta Phillips PH2', 13991.20, '367.1', 699.56, '3 - MANTENIMIENTO', 'und', 169, 3, NULL, 141, 2),
-(490, 1.00, 'MATERIAL', 'Horno Microondas', 90908.26, '366.1', 90908.26, '74 - OFICINA', 'und', 170, 74, NULL, 236, 2),
-(491, 1.00, 'MATERIAL', 'Heladera bajo mesada 78 a 125L 220V', 206610.74, '365.1', 206610.74, '74 - OFICINA', 'und', 171, 74, NULL, 237, 2),
-(492, 43.50, 'MANO_OBRA', 'Demolición de Muro Antepecho de la Azotea, de ladrillo hueco cerámico 12x18x33. Incluye manupulicación del material hasta PB incluye la colocación de mediasombra y la bajada de limpieza del sitio de trabajo hasta PB', 1087500.00, '293.1', 25000.00, '29 - DEMOLICIONES', 'm2', 172, 318, NULL, NULL, 1),
-(493, 252.00, 'MANO_OBRA', 'Demolición de Dinteles que no cumplan con los parametros de Seguridad y Calidad. Incluye la colocación de mediasombra y la bajada de limpieza del sitio de trabajo hasta PB', 4032000.00, '293.2', 16000.00, '29 - DEMOLICIONES', 'und', 172, 318, NULL, NULL, 1),
-(494, 8.00, 'MATERIAL', 'Codo HH 110 a 90° AWADUC Codo HH 110x90 Duratop', 19672.00, '362.1', 2459.00, '3 - MANTENIMIENTO', 'und', 173, 3, NULL, 238, 2),
-(495, 40.00, 'MATERIAL', 'Cemento x50 kg bolsa', 307107.60, '361.2', 7677.69, '2 - ALBAÑILERÍA GENERAL', 'und', 174, 2, NULL, 201, 2),
-(496, 864.00, 'MATERIAL', 'Ladrillos huecos del 12 12x18x33', 498692.16, '361.1', 577.19, '11 - MAMPOSTERÍA', 'und', 174, 11, NULL, 131, 2),
-(497, 1.00, 'OTRO', 'Elamobración de Proyecto Instalación Eléctrica', 9000000.00, '288.1', 9000000.00, '52 - PROYECTO/INGENIERIA', 'GL', 175, 52, NULL, NULL, 3),
-(498, 6.00, 'MATERIAL', 'Rodillo pelo corto de 7°', 15371.88, '359.5', 2561.98, '1 - REVOQUE EXTERIOR', 'und', 176, 1, NULL, 239, 2),
-(499, 6.00, 'MATERIAL', 'Rodillo antigota N°22', 49586.76, '359.4', 8264.46, '1 - REVOQUE EXTERIOR', 'und', 176, 1, NULL, 240, 2),
-(500, 2.00, 'MATERIAL', 'Pintura aerosol negro 430ML', 9669.42, '359.3', 4834.71, '3 - MANTENIMIENTO', 'und', 176, 3, NULL, 241, 2),
-(501, 5.00, 'MATERIAL', 'GFalgo pincel silver N°25', 35070.25, '359.2', 7014.05, '13 - AISLACIONES E IMPERMEABILIZACIONES', 'und', 176, 13, NULL, 242, 2),
-(502, 5.00, 'MATERIAL', 'Pinceleta N°50', 36363.65, '359.1', 7272.73, '13 - AISLACIONES E IMPERMEABILIZACIONES', 'und', 176, 13, NULL, 243, 2),
-(503, 43.50, 'MANO_OBRA', 'Construcción de Muro Antepecho de la Azotea, de ladrillo hueco cerámico 12x18x33. Incluye manipulación del material desde P.B hasta Azotea.', 1087500.00, '294.1', 25000.00, '11 - MAMPOSTERÍA', 'm2', 177, 315, NULL, NULL, 1),
-(504, 27.00, 'MANO_OBRA', 'Construccion de Columnas de soporte (Machones). Incluye el armado del hierro, colocación del encofrado y llenado con hormigión. Dim: 0.20x9.0', 621000.00, '294.2', 23000.00, '26 - ESTRUCTURA', 'ml', 177, 319, NULL, NULL, 1),
-(505, 80.00, 'MANO_OBRA', 'Construcción de Viga de Encadenado en Muro-Antepecho de Azotea. Incluye el armado del hierro, colocación del encofrado y llenado con hormigón. Dim: 0.12x0.20', 1840000.00, '294.3', 23000.00, '26 - ESTRUCTURA', 'ml', 177, 319, NULL, NULL, 1),
-(506, 252.00, 'MANO_OBRA', 'Construcción de Dinteles en: Ventanas de Habitaciones, Baños, Cocina y Living Comedor, todo en edificio. Incluye: Colocación de barras, encofrado requerido y ladrillos hasta la altura de losa de techo.', 6300000.00, '294.4', 25000.00, '26 - ESTRUCTURA', 'und', 177, 319, NULL, NULL, 1),
-(507, 252.00, 'MANO_OBRA', 'Colocación de Premarcos.', 3780000.00, '294.5', 15000.00, '11 - MAMPOSTERÍA', 'und', 177, 319, NULL, NULL, 1),
-(508, 179.00, 'MANO_OBRA', 'Revoque a mano de Módulo de Escaleras, Incluye salpicar la pared de ladrillo, con lechada de mortero arena-cemento, para garantizar la adherencia del revoque.', 2148000.00, '295.1', 12000.00, '11 - MAMPOSTERÍA', 'm2', 178, 319, NULL, NULL, 1),
-(509, 100.00, 'MANO_OBRA', 'Demolición de pared en la Sala de Usos Múltiples, la cual presentaba riesgo de desplome. Incluye el traslado manual del material proveniente de la demolición hasta el patio de planta baja. Desencofrado y limpieza de la madera existente en las vigas invertidas del Nivel 15 y en los 28 balcones del edificio. Comprende el retiro de madera incrustada en la losa y el traslado del material al patio de planta baja. Hidrolavado de toda la superficie superior del techo del Nivel 15 y de los 28 balcones. Aplicación de Protex Seal 77 en dos capas sobre el Nivel 15 (techo) y en las superficies de las vigas invertidas perimetrales de cada ambiente y de los 28 balcones. Eliminación de tacos de madera del encofrado. Incluye limpieza interna, relleno con hormigón y aplicación de gasa con puente adherente. Corrección de pendientes en balcones mediante mortero de arena y cemento, garantizando el correcto drenaje hacia el orificio del colector principal del edificio. Limpieza del patio de planta baja y de los locales comerciales N° 5, 6 y 7. Colocación de malla de seguridad naranja en el Nivel 15. Pintura en paredes de baños, colocación y pintura de puertas de vestuarios.', 5501700.00, '285.1', 55017.00, '29 - DEMOLICIONES', 'und', 179, 29, NULL, NULL, 1),
-(510, 20.00, 'MATERIAL', 'Malla naranja', 384160.00, '352.2', 19208.00, '70 - SEGURIDAD E HIGIENE', 'und', 180, 70, NULL, 244, 2),
-(511, 30.00, 'MATERIAL', 'Electrodos 2.5MM punta azul', 264113.10, '352.1', 8803.77, '34 - HERRERÍA', 'und', 180, 34, NULL, 245, 2),
-(512, 500.00, 'MATERIAL', 'Tornillo T1 Punta Aguja', 6250.00, '351.6', 12.50, '9 - Sin rubro', 'und', 181, 9, NULL, 143, 2),
-(513, 500.00, 'MATERIAL', 'Tornillo T2 Punta Aguja', 4500.00, '351.5', 9.00, '9 - Sin rubro', 'und', 181, 9, NULL, 246, 2),
-(514, 500.00, 'MATERIAL', 'Tornillos hexas autoperf', 32500.00, '351.4', 65.00, '9 - Sin rubro', 'und', 181, 9, NULL, 113, 2),
-(515, 500.00, 'MATERIAL', 'Fijación tarugo+tornillo 8 LAD', 33500.00, '351.3', 67.00, '9 - Sin rubro', 'und', 181, 9, NULL, 247, 2),
-(516, 500.00, 'MATERIAL', 'Fijación tarugo+tornillo 8', 25500.00, '351.2', 51.00, '9 - Sin rubro', 'und', 181, 9, NULL, 248, 2),
-(517, 20.00, 'MATERIAL', 'Disco de corte 4,5\'\'', 12528.80, '351.1', 626.44, '9 - Sin rubro', 'und', 181, 9, NULL, 249, 2),
-(518, 2.00, 'MATERIAL', 'Pinceleta galgo n°50', 9246.94, '280.6', 4623.47, '13 - AISLACIONES E IMPERMEABILIZACIONES', 'und', 182, 13, NULL, 250, 2),
-(519, 2.00, 'MATERIAL', 'Rodillo pelo corto 7\'\' para bar', 8140.16, '280.5', 4070.08, '1 - REVOQUE EXTERIOR', 'und', 182, 1, NULL, 251, 2),
-(520, 1.00, 'MATERIAL', 'Pincel N°15', 1635.17, '280.4', 1635.17, '13 - AISLACIONES E IMPERMEABILIZACIONES', 'und', 182, 13, NULL, 252, 2),
-(521, 1.00, 'MATERIAL', 'Galgo pincel silver n°20', 2006.48, '280.3', 2006.48, '13 - AISLACIONES E IMPERMEABILIZACIONES', 'und', 182, 13, NULL, 253, 2),
-(522, 16.00, 'MATERIAL', 'Esmalte sintético', 94123.68, '280.2', 5882.73, '13 - AISLACIONES E IMPERMEABILIZACIONES', 'und', 182, 13, NULL, 254, 2),
-(523, 18.00, 'MATERIAL', 'Aguarrás mineral', 33957.72, '280.1', 1886.54, '13 - AISLACIONES E IMPERMEABILIZACIONES', 'und', 182, 13, NULL, 171, 2),
-(524, 1.00, 'MATERIAL', 'Canillas 1/2\'\' plastica para la canilla lavat. 221 pico lev. c/cruz', 23179.36, '349.8', 23179.36, '9 - Sin rubro', 'und', 183, 9, NULL, 255, 2),
-(525, 1.00, 'MATERIAL', 'Adaptador tanque PPN 1/1', 1547.25, '349.7', 1547.25, '9 - Sin rubro', 'und', 183, 9, NULL, 256, 2),
-(526, 1.00, 'MATERIAL', 'Canillas para mesada un agua', 15254.90, '349.6', 15254.90, '9 - Sin rubro', 'und', 183, 9, NULL, 257, 2),
-(527, 3.00, 'MATERIAL', 'Lluvia M Plastica Completa', 19803.15, '349.5', 6601.05, '9 - Sin rubro', 'und', 183, 9, NULL, 258, 2),
-(528, 1.00, 'MATERIAL', 'Pileta de lavar PVC chica 49x43x28 DU', 17470.70, '349.4', 17470.70, '2 - ALBAÑILERÍA GENERAL', 'und', 183, 2, NULL, 259, 2),
-(529, 2.00, 'MATERIAL', 'Sopapa PVC 40 cromo', 5035.72, '349.3', 2517.86, '9 - Sin rubro', 'und', 183, 9, NULL, 260, 2),
-(530, 2.00, 'MATERIAL', 'Asiento inodoro Floren. TSX4 T RAFUL OFERTA', 57921.90, '349.2', 28960.95, '9 - Sin rubro', 'und', 183, 9, NULL, 261, 2),
-(531, 2.00, 'MATERIAL', 'Mochila PVC Codo Ideal', 50171.72, '349.1', 25085.86, '9 - Sin rubro', 'und', 183, 9, NULL, 262, 2),
-(532, 100.00, 'MANO_OBRA', 'Trabajo de apuntalamiento de cerco perimetral interno en terrazas de quilmes caido por tormenta dias 1 y 2 de marzo. Concurren tres operarios', 600000.00, '279.2', 6000.00, '57 - MOVIMIENTO DE SUELO', 'GL', 184, 269, NULL, NULL, 1),
-(533, 100.00, 'MANO_OBRA', 'Movimiento de suelo/personal asignado a servicio de nivelación final de PB con pala retro más operario y dos aytes. Incluye 6 viajes de camión volcador para retiro de residuos y descarga d', 1200000.00, '279.1', 12000.00, '57 - MOVIMIENTO DE SUELO', 'GL', 184, 269, NULL, NULL, 1),
-(534, 100.00, 'MANO_OBRA', 'Fabricación y Construcción de Cerco Perimetral - 1. Excavación de hueco para incar columnas de cerco. 2. Colocación, Nivelación y aplomado de coumnas en terreno. 3. Hormigonado de la fundación de cada columna. 4. Colocación de chapas, Incluye: excavación a lo largo del cerco dque lo necesite. 5. Retiro de cerco de madera y limpieza dgeneral de la zona de los vecions aledañas', 4027500.00, '277.1', 40275.00, '75 - PRELIMINARES', 'GL', 185, 75, NULL, NULL, 1),
-(535, 5.00, 'MATERIAL', 'Codo HH 40x90 mm Duratop.', 2469.40, '342.9', 493.88, '9 - Sin rubro', 'und', 186, 9, NULL, 263, 2),
-(536, 5.00, 'MATERIAL', 'Codo HH 50x90 mm Duratop.', 3422.85, '342.8', 684.57, '9 - Sin rubro', 'und', 186, 9, NULL, 264, 2),
-(537, 5.00, 'MATERIAL', 'Codo HH 63x45 mm Duratop.', 4403.20, '342.7', 880.64, '9 - Sin rubro', 'und', 186, 9, NULL, 265, 2),
-(538, 4.00, 'MATERIAL', 'Gomas de goyete para inodoro Ferrum.', 9483.56, '342.6', 2370.89, '9 - Sin rubro', 'und', 186, 9, NULL, 266, 2),
-(539, 24.00, 'MATERIAL', 'Tarugos N°8 marca Redex.', 703.68, '342.5', 29.32, '9 - Sin rubro', 'und', 186, 9, NULL, 267, 2),
-(540, 24.00, 'MATERIAL', 'Tornillos para inodoro cromados 22x70 mm.', 13727.28, '342.4', 571.97, '9 - Sin rubro', 'und', 186, 9, NULL, 268, 2),
-(541, 2.00, 'MATERIAL', 'Asiento para inodoro blanco Concordplast.', 26666.02, '342.3', 13333.01, '9 - Sin rubro', 'und', 186, 9, NULL, 269, 2),
-(542, 2.00, 'MATERIAL', 'Inodoro corto Andina blanco Ferrum.', 125985.52, '342.2', 62992.76, '9 - Sin rubro', 'und', 186, 9, NULL, 270, 2),
-(543, 6.00, 'MATERIAL', 'Tubo macho 25 mm Aquasystem.', 15440.58, '342.14', 2573.43, '9 - Sin rubro', 'und', 186, 9, NULL, 271, 2),
-(544, 4.00, 'MATERIAL', 'Unión doble 25 mm Aquasystem.', 7011.24, '342.13', 1752.81, '9 - Sin rubro', 'und', 186, 9, NULL, 272, 2),
-(545, 6.00, 'MATERIAL', 'Reducción 20x25 mm Aquasystem (buje red 25x20).', 2243.70, '342.12', 373.95, '9 - Sin rubro', 'und', 186, 9, NULL, 273, 2),
-(546, 3.00, 'MATERIAL', 'Codo MH 40x45 mm Duratop.', 1221.84, '342.11', 407.28, '9 - Sin rubro', 'und', 186, 9, NULL, 274, 2),
-(547, 5.00, 'MATERIAL', 'Codo HH 40x45 mm Duratop.', 2585.60, '342.10', 517.12, '9 - Sin rubro', 'und', 186, 9, NULL, 275, 2),
-(548, 2.00, 'MATERIAL', 'Mochila de PVC con codo Ideal.', 47663.12, '342.1', 23831.56, '9 - Sin rubro', 'und', 186, 9, NULL, 276, 2),
-(549, 350.00, 'MATERIAL', 'Tornillos hexas autoperf', 9515800.00, '341.1', 27188.00, '9 - Sin rubro', 'und', 187, 9, NULL, 113, 2),
-(550, 100.00, 'MANO_OBRA', 'ALBAÑILERIA MANO DE OBRA -- Aplicación de 2 capas de epoxy, hidrófugo (protex seal 77) en piso de azotea a brocha -- Colocación de malla electrosoldada, malla naranja y tapar madera en todos los ductos y servicios, tanto en ventanas, palieres y azotea de PB azotea inclue techo depto piso 15 -- Instalación de clumnas necesarias para los portones de entrada a la  bar -- Perforación de orificios para el agua que se retiene en la azotea -- Construcción de cordón de ladrillos y revoque-cerecita en los bordes de cada ventana de aireación-subsuelo. Colocación tapa -- Extracción de tacos de madera empotrados en la losa y colocar relleno de reposición', 3800000.00, '271.1', 38000.00, '76 - OBRAS PRELIMINARES', 'GL', 188, 76, NULL, NULL, 1),
-(551, 100.00, 'MANO_OBRA', 'TAREAS POR ADMINISTRACIÓN - Barrido, recolección y eliminación de encofrados adheridos a la estructura en azotea -- Baja de escombros y basura hasta el lugar selecccionado en terreno de PB -- Limpieza de todos los escombros -- Traslado de escombros fuera de la azotea, dptos. de cada piso, para luego comenzar su disposición en terreno de PB. -- Limpieza del módulo de escalera de todo el edificio, desde la azotea hasta subsuelo -- Hidrolavado de todo el área de la azotea -- Hidrolavado a todo el módulo de escaleras, sala de máquinas a subsuelo -- Colocación de malla electrosoldada y malla naranja de seguridad en zona de fachadas a los balcones en la azotea -- Colocación de malla electrosoldada, maderas o barras y malla naranja de seguridad en todas las ventanas, frontar ascensor y plenos de servicio del edificio, desde el P1 hasta el piso P14 -- Limpieza de todos los departamentos y palieres del edificio -- Instalación de columna para la colocación de los portones de entrada a la obra', 2280000.00, '270.1', 22800.00, '70 - SEGURIDAD E HIGIENE', 'GL', 189, 70, NULL, NULL, 1),
-(552, 10.00, 'MATERIAL', 'Cupla termofusión 25 mm.', 2726.00, '335.9', 272.60, '76 - OBRAS PRELIMINARES', 'und', 190, 76, NULL, 277, 2),
-(553, 5.00, 'MATERIAL', 'Caño Ø20 PN25 Aquasystem.', 19520.30, '335.8', 3904.06, '76 - OBRAS PRELIMINARES', 'und', 190, 76, NULL, 278, 2),
-(554, 6.00, 'MATERIAL', 'Caño Ø25 PN25 Aquasystem.', 34063.02, '335.7', 5677.17, '76 - OBRAS PRELIMINARES', 'und', 190, 76, NULL, 279, 2),
-(555, 2.00, 'MATERIAL', 'Llave de paso 25 mm polipropileno blanco Aquasystem.', 91452.00, '335.6', 7852.83, '76 - OBRAS PRELIMINARES', 'und', 190, 76, NULL, 280, 2),
-(556, 10.00, 'MATERIAL', 'Cupla termofusión 20 mm.', 1875.40, '335.5', 187.54, '76 - OBRAS PRELIMINARES', 'und', 190, 76, NULL, 281, 2),
-(557, 4.00, 'MATERIAL', 'Codo rosca hembra 25x3/4” a 90° Aquasystem.', 7549.28, '335.4', 1887.32, '76 - OBRAS PRELIMINARES', 'und', 190, 76, NULL, 282, 2),
-(558, 25.00, 'MATERIAL', 'Codo normal 25x90° Aquasystem.', 9007.00, '335.3', 360.28, '76 - OBRAS PRELIMINARES', 'und', 190, 76, NULL, 283, 2),
-(559, 1.00, 'MATERIAL', 'Boca de acceso Ø63 mm Duratop.', 3591.09, '335.29', 3591.09, '76 - OBRAS PRELIMINARES', 'und', 190, 76, NULL, 284, 2),
-(560, 8.00, 'MATERIAL', 'Llave de fusión externa 20 mm Aquasystem.', 50298.00, '335.28', 6287.25, '76 - OBRAS PRELIMINARES', 'und', 190, 76, NULL, 285, 2),
-(561, 8.00, 'MATERIAL', 'Tubo macho 20 mm Aquasystem.', 12903.12, '335.27', 1612.89, '76 - OBRAS PRELIMINARES', 'und', 190, 76, NULL, 286, 2),
-(562, 2.00, 'MATERIAL', 'Tubo hembra 25 mm Aquasystem.', 3774.64, '335.26', 1887.32, '76 - OBRAS PRELIMINARES', 'und', 190, 76, NULL, 287, 2);
-INSERT INTO `item_orden_compra` (`id`, `cantidad`, `categoria`, `detalle`, `importe`, `item`, `precio_unitario`, `rubro`, `unidad`, `orden_compra_id`, `rubro_entidad_id`, `item_mano_obra_vinculado_id`, `material_catalogo_id`, `categoria_entidad_id`) VALUES
-(563, 6.00, 'MATERIAL', 'Tubo hembra 20 mm Aquasystem.', 7474.56, '335.25', 1245.76, '76 - OBRAS PRELIMINARES', 'und', 190, 76, NULL, 288, 2),
-(564, 1.00, 'MATERIAL', 'Termotanque eléctrico.', 174840.16, '335.24', 174840.16, '76 - OBRAS PRELIMINARES', 'und', 190, 76, NULL, 289, 2),
-(565, 120.00, 'MATERIAL', 'Fijaciones Ø8 mm.', 7716.00, '335.23', 64.30, '76 - OBRAS PRELIMINARES', 'und', 190, 76, NULL, 290, 2),
-(566, 120.00, 'MATERIAL', 'Tarugo para hueco N°8 con tope.', 5487120.00, '335.22', 78.81, '76 - OBRAS PRELIMINARES', 'und', 190, 76, NULL, 291, 2),
-(567, 30.00, 'MATERIAL', 'Grampa tipo Omega 1/2”.', 9346.50, '335.21', 311.55, '76 - OBRAS PRELIMINARES', 'und', 190, 76, NULL, 292, 2),
-(568, 30.00, 'MATERIAL', 'Grampa tipo Omega 3/4”.', 10168.50, '335.20', 338.95, '76 - OBRAS PRELIMINARES', 'und', 190, 76, NULL, 293, 2),
-(569, 30.00, 'MATERIAL', 'Codo normal 20x90° Aquasystem.', 6969.90, '335.2', 232.33, '76 - OBRAS PRELIMINARES', 'und', 190, 76, NULL, 294, 2),
-(570, 4.00, 'MATERIAL', 'Silicona en aerosol (solución sellante).', 11937.28, '335.19', 2984.32, '76 - OBRAS PRELIMINARES', 'und', 190, 76, NULL, 295, 2),
-(571, 5.00, 'MATERIAL', 'Manguito de reparación Ø110 mm Duratop.', 8028.15, '335.18', 1605.63, '76 - OBRAS PRELIMINARES', 'und', 190, 76, NULL, 296, 2),
-(572, 6.00, 'MATERIAL', 'Codo MH 110x45° Duratop.', 7647.78, '335.17', 1274.63, '76 - OBRAS PRELIMINARES', 'und', 190, 76, NULL, 297, 2),
-(573, 4.00, 'MATERIAL', 'Ramal 110x63 mm a 45°.', 9596.00, '335.16', 2399.00, '76 - OBRAS PRELIMINARES', 'und', 190, 76, NULL, 298, 2),
-(574, 1.00, 'MATERIAL', 'Pileta de patio Ø110 mm chica Duratop.', 4030.19, '335.15', 4030.19, '76 - OBRAS PRELIMINARES', 'und', 190, 76, NULL, 299, 2),
-(575, 1.00, 'MATERIAL', 'Pileta de patio Ø63 mm Duratop.', 45726.00, '335.14', 4030.19, '76 - OBRAS PRELIMINARES', 'und', 190, 76, NULL, 300, 2),
-(576, 10.00, 'MATERIAL', 'Codo HH 110x45° Duratop.', 17926.20, '335.13', 1792.62, '76 - OBRAS PRELIMINARES', 'und', 190, 76, NULL, 301, 2),
-(577, 8.00, 'MATERIAL', 'Ramal 110x50 mm a 45°.', 27550.16, '335.12', 3443.77, '76 - OBRAS PRELIMINARES', 'und', 190, 76, NULL, 302, 2),
-(578, 20.00, 'MATERIAL', 'Codo 20 mm con rosca 1/2” Aquasystem.', 23526.40, '335.11', 1176.32, '76 - OBRAS PRELIMINARES', 'und', 190, 76, NULL, 303, 2),
-(579, 8.00, 'MATERIAL', 'Flexible mallado 1/2” x 30 cm.', 29052.56, '335.10', 3631.57, '1 - REVOQUE EXTERIOR', 'und', 190, 1, NULL, 304, 2),
-(580, 22.00, 'MATERIAL', 'Tee 25x20 mm Aquasystem.', 11601.92, '335.1', 527.36, '76 - OBRAS PRELIMINARES', 'und', 190, 76, NULL, 305, 2),
-(581, 10.00, 'MATERIAL', 'Disco de corte p/sensitiva 14\'\'', 86841.00, '332.1', 8684.10, '76 - OBRAS PRELIMINARES', 'und', 191, 76, NULL, 306, 2),
-(582, 200.00, 'MATERIAL', 'Puente Adherente Tambor por 200kg protex super ligante', 535904.00, '331.2', 2679.52, '13 - AISLACIONES E IMPERMEABILIZACIONES', 'und', 192, 13, NULL, 307, 2),
-(583, 112.00, 'MATERIAL', 'Protex Seal 77 Flex BI Componente', 2469600.00, '331.1', 22050.00, '13 - AISLACIONES E IMPERMEABILIZACIONES', 'und', 192, 13, NULL, 308, 2),
-(584, 3136.00, 'MATERIAL', 'Ladrillos huecos 8x18x33', 1503210.24, '330.2', 479.34, '76 - OBRAS PRELIMINARES', 'und', 193, 76, NULL, 18, 2),
-(585, 200.00, 'MATERIAL', 'Hierro dulce 6 mm', 661156.00, '330.1', 3305.78, '76 - OBRAS PRELIMINARES', 'und', 193, 76, NULL, 309, 2),
-(586, 20.00, 'MATERIAL', 'Precarga polvo ABC x kg', 132231.40, '329.3', 6611.57, '70 - SEGURIDAD E HIGIENE', 'und', 194, 70, NULL, 310, 2),
-(587, 16.00, 'MATERIAL', 'Mantenimiento anual ABC x 5 kg', 271074.40, '329.2', 16942.15, '70 - SEGURIDAD E HIGIENE', 'und', 194, 70, NULL, 311, 2),
-(588, 3.00, 'MATERIAL', 'Mantenimiento anual ABC x 10 kg', 57024.78, '329.1', 19008.26, '70 - SEGURIDAD E HIGIENE', 'und', 194, 70, NULL, 312, 2),
-(589, 4.00, 'MATERIAL', 'Convert de óxido negro x4lts', 116609.04, '268.3', 29152.26, '76 - OBRAS PRELIMINARES', 'und', 195, 76, NULL, 313, 2),
-(590, 18.00, 'MATERIAL', 'Aguarrás mineral', 33957.90, '268.2', 1886.55, '76 - OBRAS PRELIMINARES', 'und', 195, 76, NULL, 171, 2),
-(591, 5.00, 'MATERIAL', 'Pincel N°10', 6151.25, '268.1', 1230.25, '76 - OBRAS PRELIMINARES', 'und', 195, 76, NULL, 314, 2),
-(592, 100.00, 'MANO_OBRA', 'Instalación sanitaria fría y caliente para baños y duchas del personal', 1500000.00, '267.1', 15000.00, '58 - INSTALACIONES SANITARIAS', 'GL', 196, 58, NULL, NULL, 1),
-(593, 8.00, 'MATERIAL', 'Bisagra torneada 32x100mm', 123967.04, '328.1', 15495.88, '76 - OBRAS PRELIMINARES', 'und', 197, 76, NULL, 315, 2),
-(594, 60.00, 'MATERIAL', 'Abrazadera PVC tipo “U” M20 abierta.', 4764.00, '327.9', 79.40, '76 - OBRAS PRELIMINARES', 'und', 198, 76, NULL, 316, 2),
-(595, 30.00, 'MATERIAL', 'Caja octogonal PVC eléctrica.', 8821.50, '327.8', 294.05, '76 - OBRAS PRELIMINARES', 'und', 198, 76, NULL, 317, 2),
-(596, 50.00, 'MATERIAL', 'Codo PVC rígido 3/4” para instalación eléctrica.', 8025.00, '327.7', 160.50, '76 - OBRAS PRELIMINARES', 'und', 198, 76, NULL, 318, 2),
-(597, 140.00, 'MATERIAL', 'Caño PVC rígido 3/4” para instalación eléctrica.', 38703.00, '327.6', 276.45, '76 - OBRAS PRELIMINARES', 'und', 198, 76, NULL, 319, 2),
-(598, 70.00, 'MATERIAL', 'Cable unipolar 1,5 mm² color celeste.', 17819.90, '327.5', 254.57, '76 - OBRAS PRELIMINARES', 'und', 198, 76, NULL, 320, 2),
-(599, 70.00, 'MATERIAL', 'Cable unipolar 1,5 mm² color negro.', 17819.90, '327.4', 254.57, '76 - OBRAS PRELIMINARES', 'und', 198, 76, NULL, 321, 2),
-(600, 70.00, 'MATERIAL', 'Cable unipolar 2,5 mm² color verde/amarillo.', 28713.30, '327.3', 410.19, '76 - OBRAS PRELIMINARES', 'und', 198, 76, NULL, 322, 2),
-(601, 1.00, 'MATERIAL', 'Toma 20A blanco, 1 módulo.', 889.28, '327.21', 889.28, '76 - OBRAS PRELIMINARES', 'und', 198, 76, NULL, 323, 2),
-(602, 38.00, 'MATERIAL', 'Tapón ciego blanco, 1 módulo.', 2057.32, '327.20', 54.14, '76 - OBRAS PRELIMINARES', 'und', 198, 76, NULL, 324, 2),
-(603, 70.00, 'MATERIAL', 'Cable unipolar 2,5 mm² color celeste.', 28713.30, '327.2', 410.19, '76 - OBRAS PRELIMINARES', 'und', 198, 76, NULL, 325, 2),
-(604, 8.00, 'MATERIAL', 'Toma simple 10A 220V blanco, 1 módulo.', 3817.84, '327.19', 477.23, '76 - OBRAS PRELIMINARES', 'und', 198, 76, NULL, 326, 2),
-(605, 15.00, 'MATERIAL', 'Llave simple 10A blanca.', 6524.85, '327.18', 434.99, '76 - OBRAS PRELIMINARES', 'und', 198, 76, NULL, 327, 2),
-(606, 15.00, 'MATERIAL', 'Toma doble 10A 220V blanco, 3 módulos.', 18935.55, '327.17', 1262.37, '76 - OBRAS PRELIMINARES', 'und', 198, 76, NULL, 328, 2),
-(607, 34.00, 'MATERIAL', 'Tapa 5x10 cm blanca PVC.', 8188.22, '327.16', 240.83, '76 - OBRAS PRELIMINARES', 'und', 198, 76, NULL, 329, 2),
-(608, 34.00, 'MATERIAL', 'Bastidor de luz PVC.', 7934.58, '327.15', 233.37, '76 - OBRAS PRELIMINARES', 'und', 198, 76, NULL, 330, 2),
-(609, 34.00, 'MATERIAL', 'Caja rectangular PVC eléctrica.', 13358.26, '327.14', 392.89, '76 - OBRAS PRELIMINARES', 'und', 198, 76, NULL, 331, 2),
-(610, 20.00, 'MATERIAL', 'Tubo LED 18W.', 40445.80, '327.13', 2022.29, '76 - OBRAS PRELIMINARES', 'und', 198, 76, NULL, 332, 2),
-(611, 10.00, 'MATERIAL', 'Artefacto estanco LED 2x18W.', 158618.20, '327.12', 15861.82, '76 - OBRAS PRELIMINARES', 'und', 198, 76, NULL, 333, 2),
-(612, 60.00, 'MATERIAL', 'Conector de luz PVC 3/4”.', 8098.80, '327.11', 134.98, '76 - OBRAS PRELIMINARES', 'und', 198, 76, NULL, 334, 2),
-(613, 50.00, 'MATERIAL', 'Cupla de luz PVC 3/4”.', 5104.00, '327.10', 102.08, '76 - OBRAS PRELIMINARES', 'und', 198, 76, NULL, 335, 2),
-(614, 70.00, 'MATERIAL', 'Cable unipolar 2,5 mm² color marrón.', 28713.30, '327.1', 410.19, '76 - OBRAS PRELIMINARES', 'und', 198, 76, NULL, 336, 2),
-(615, 100.00, 'MANO_OBRA', 'Mano de obra Albañilería', 5300000.00, '264.1', 53000.00, '11 - MAMPOSTERÍA', 'und', 199, 11, NULL, NULL, 1),
-(616, 18.00, 'MANO_OBRA', 'Movimiento de suelo y retiro de escombro en camiones', 1080000.00, '265.1', 60000.00, '57 - MOVIMIENTO DE SUELO', 'und', 200, 269, NULL, NULL, 1),
-(617, 1.00, 'MATERIAL', 'Cerecita tambor x200 kg Hidrófugo x200 cimiento', 110250.00, '262.1', 110250.00, '76 - OBRAS PRELIMINARES', 'und', 201, 76, NULL, 337, 2),
-(618, 3.00, 'MATERIAL', 'Mecha de widia sds de 12', 6464.91, '261.9', 2154.97, '76 - OBRAS PRELIMINARES', 'und', 202, 76, NULL, 338, 2),
-(619, 3.00, 'MATERIAL', 'Mecha de widia sds del 10', 5845.38, '261.8', 1948.46, '76 - OBRAS PRELIMINARES', 'und', 202, 76, NULL, 339, 2),
-(620, 3.00, 'MATERIAL', 'Mecha de widia 8 encastre sds', 4808.01, '261.7', 1602.67, '76 - OBRAS PRELIMINARES', 'un', 202, 76, NULL, 340, 2),
-(621, 3.00, 'MATERIAL', 'Mecha de acero rapida del 13', 37612.71, '261.6', 12537.57, '76 - OBRAS PRELIMINARES', 'und', 202, 76, NULL, 341, 2),
-(622, 2.00, 'MATERIAL', 'Mecha de acero rapida del 12', 20011.88, '261.5', 10005.94, '76 - OBRAS PRELIMINARES', 'und', 202, 76, NULL, 342, 2),
-(623, 2.00, 'MATERIAL', 'Mecha de acero rapida del 10', 12013.96, '261.4', 6006.98, '76 - OBRAS PRELIMINARES', 'und', 202, 76, NULL, 343, 2),
-(624, 2.00, 'MATERIAL', 'Mecha cacero rapidade 8 mm', 7776.76, '261.3', 3888.38, '76 - OBRAS PRELIMINARES', 'und', 202, 76, NULL, 344, 2),
-(625, 50.00, 'MATERIAL', 'Disco de corte 4,5\'\' Disco 115mm x 1,6m Tyrolit', 94336.00, '261.2', 1886.72, '76 - OBRAS PRELIMINARES', 'und', 202, 76, NULL, 345, 2),
-(626, 1.00, 'MATERIAL', 'Disco p/circular madera 9 1/4 25 mm Disco de sierra circular Ecoli ne 184, orificio de 20mm, 1.4 mm de espesor, 60 dientes', 27215.25, '261.18', 27215.25, '76 - OBRAS PRELIMINARES', 'und', 202, 76, NULL, 346, 2),
-(627, 10.00, 'MATERIAL', 'Candado', 122224.10, '261.17', 12222.41, '76 - OBRAS PRELIMINARES', 'und', 202, 76, NULL, 347, 2),
-(628, 10.00, 'MATERIAL', 'Soporte Gancho Matafuego pared', 13910.00, '261.16', 1391.00, '76 - OBRAS PRELIMINARES', 'und', 202, 76, NULL, 348, 2),
-(629, 20.00, 'MATERIAL', 'Chapa baliza 22x80cm', 58721.60, '261.15', 2936.08, '76 - OBRAS PRELIMINARES', 'und', 202, 76, NULL, 349, 2),
-(630, 10.00, 'MATERIAL', 'Malla de seguridad naranja x rollo 50 ml', 197634.90, '261.14', 19763.49, '76 - OBRAS PRELIMINARES', 'und', 202, 76, NULL, 350, 2),
-(631, 60.00, 'OTRO', 'Guantes de hilo moteado', 38720.40, '261.13', 645.34, '70 - SEGURIDAD E HIGIENE', 'und', 202, 70, NULL, NULL, 4),
-(632, 24.00, 'OTRO', 'Lentes oscuros protección ocular', 39826.56, '261.12', 1659.44, '70 - SEGURIDAD E HIGIENE', 'und', 202, 70, NULL, NULL, 4),
-(633, 24.00, 'OTRO', 'Lentes transarentes protección ocular', 39826.56, '261.11', 1659.44, '70 - SEGURIDAD E HIGIENE', 'und', 202, 70, NULL, NULL, 4),
-(634, 3.00, 'MATERIAL', 'Mecha de widia sds de 13', 8518.32, '261.10', 2839.44, '76 - OBRAS PRELIMINARES', 'und', 202, 76, NULL, 351, 2),
-(635, 20.00, 'MATERIAL', 'Electrodos 2.5mm punta azul Conarco', 168932.60, '261.1', 8446.63, '76 - OBRAS PRELIMINARES', 'und', 202, 76, NULL, 352, 2),
-(636, 20.00, 'MATERIAL', 'Tee 3/4\'\' termofusión acq acq.system', 10620.00, '322.5', 531.00, '76 - OBRAS PRELIMINARES', 'und', 203, 76, NULL, 353, 2),
-(637, 20.00, 'MATERIAL', 'Codo a 45 3/4\'\' ACQ', 10366.80, '322.4', 518.34, '76 - OBRAS PRELIMINARES', 'und', 203, 76, NULL, 354, 2),
-(638, 10.00, 'MATERIAL', 'Caños termofusión 3/4\'\'', 58033.30, '322.3', 5803.33, '76 - OBRAS PRELIMINARES', 'und', 203, 76, NULL, 355, 2),
-(639, 68.00, 'MATERIAL', 'Chapa trapezoidal modelo t-101', 2524935.88, '324.1', 37131.41, '76 - OBRAS PRELIMINARES', 'und', 204, 76, NULL, 356, 2),
-(640, 20.00, 'MATERIAL', 'Tee 110 awaduct', 56110.00, '322.2', 2805.50, '76 - OBRAS PRELIMINARES', 'und', 203, 76, NULL, 357, 2),
-(641, 5.00, 'MANO_OBRA', 'Personal afectado a tareas de movimiento', 850000.00, '260.3', 170000.00, '57 - MOVIMIENTO DE SUELO', 'und', 205, 269, NULL, NULL, 1),
-(642, 40.00, 'MANO_OBRA', 'Movimiento de suelo y retiro de escombro en camiones', 2600000.00, '260.2', 65000.00, '57 - MOVIMIENTO DE SUELO', 'und', 205, 269, NULL, NULL, 1),
-(643, 5.00, 'MANO_OBRA', 'Movimiento de suelo retroexcavadora', 2250000.00, '260.1', 450000.00, '57 - MOVIMIENTO DE SUELO', 'und', 205, 269, NULL, NULL, 1),
-(644, 20.00, 'MATERIAL', 'Ficha 2x10 a Macho', 13665.40, '323.4', 683.27, '76 - OBRAS PRELIMINARES', 'und', 206, 76, NULL, 177, 2),
-(645, 20.00, 'MATERIAL', 'Ficha 2x10 a Hembra', 13665.40, '323.3', 683.27, '76 - OBRAS PRELIMINARES', 'und', 206, 76, NULL, 178, 2),
-(646, 10.00, 'MATERIAL', 'Cinta autovulcanizante', 75048.10, '323.2', 7504.81, '76 - OBRAS PRELIMINARES', 'und', 206, 76, NULL, 358, 2),
-(647, 20.00, 'MATERIAL', 'Cinta aislante', 35469.00, '323.1', 1773.45, '76 - OBRAS PRELIMINARES', 'und', 206, 76, NULL, 359, 2),
-(648, 20.00, 'MATERIAL', 'Caño 110 x 4 mts con o\'ring aw', 245138.80, '322.1', 12256.94, '76 - OBRAS PRELIMINARES', 'und', 203, 76, NULL, 360, 2),
-(649, 20.00, 'MATERIAL', 'Clavos punta paris 2 y 1/2\'\'', 82644.60, '321.7', 4132.23, '76 - OBRAS PRELIMINARES', 'und', 207, 76, NULL, 361, 2),
-(650, 20.00, 'MATERIAL', 'Clavos punta paris 2\'\'', 82644.60, '321.6', 4132.23, '76 - OBRAS PRELIMINARES', 'und', 207, 76, NULL, 362, 2),
-(651, 720.00, 'MATERIAL', 'Mampostería Ladrillo hueco 12', 386776.80, '321.5', 537.19, '76 - OBRAS PRELIMINARES', 'und', 207, 76, NULL, 363, 2),
-(652, 8.00, 'MATERIAL', 'Arena', 211570.24, '321.4', 26446.28, '76 - OBRAS PRELIMINARES', 'und', 207, 76, NULL, 206, 2),
-(653, 55.00, 'MATERIAL', 'Cal Cacique', 318181.60, '321.3', 5785.12, '76 - OBRAS PRELIMINARES', 'und', 207, 76, NULL, 200, 2),
-(654, 120.00, 'MATERIAL', 'Cemento x50 kg bolsa', 1041321.60, '321.2', 8677.68, '76 - OBRAS PRELIMINARES', 'und', 207, 76, NULL, 201, 2),
-(655, 8.00, 'MATERIAL', 'Piedra partida', 396694.16, '321.1', 49586.77, '76 - OBRAS PRELIMINARES', 'und', 207, 76, NULL, 364, 2),
-(656, 30.00, 'MATERIAL', 'Lampara Foco Led 12w', 24984.60, '319.2', 832.82, '76 - OBRAS PRELIMINARES', 'und', 208, 76, NULL, 365, 2),
-(657, 30.00, 'MATERIAL', 'Porta lampara f/foco 12w', 6899.70, '319.1', 229.99, '76 - OBRAS PRELIMINARES', 'und', 208, 76, NULL, 366, 2),
-(658, 13.00, 'MATERIAL', 'Canillas 1/2\'\' plastica', 25400.70, '318.1', 1953.90, '76 - OBRAS PRELIMINARES', 'und', 209, 76, NULL, 367, 2);
-
--- --------------------------------------------------------
+LOCK TABLES `item_orden_compra` WRITE;
+/*!40000 ALTER TABLE `item_orden_compra` DISABLE KEYS */;
+INSERT INTO `item_orden_compra` VALUES (1,6.00,'MATERIAL','PUENTE ADHERENTE PAMAX X 28 KG',784200.00,'449.1',130700.00,NULL,'un',1,NULL,NULL,1,2,NULL),(2,38.68,'MANO_OBRA','Construcción de Contrapiso en balcon de P1 y Techo de balcones Fachadas Este y Oeste.',773600.00,'450.1',20000.00,NULL,'m2',2,657,NULL,NULL,1,NULL),(3,38.68,'MANO_OBRA','Construcción de Carpeta en bal con de P1 y Techo de balcones Fachadas: Este y Oeste.',696240.00,'450.2',18000.00,NULL,'m2',2,657,NULL,NULL,1,NULL),(4,1.00,'MANO_OBRA','Colocación de CORROTEX en: Techos de balcones y Techo del nivel N-15. Incluye co rte de barras sobran tes en techo de sala de maquin as.',200000.00,'450.3',200000.00,NULL,'sg',2,648,NULL,NULL,1,NULL),(5,14.00,'MANO_OBRA','Amure de Embudos en Azotea (N- 15). Incluye laimpe rmeabilización con Protex Seal 77 y venda.',700000.00,'450.4',50000.00,NULL,'und',2,NULL,NULL,NULL,1,NULL),(6,16.00,'MANO_OBRA','Amure de Caños 110 en Losa de piso de la Cocina en los pisos P13 y P14',640000.00,'450.5',40000.00,NULL,'und',2,NULL,NULL,NULL,1,NULL),(7,52.56,'MANO_OBRA','Construcción de paredes en la baulera externa al D pto. del encargado.',1314000.00,'450.6',25000.00,NULL,'m2',2,612,NULL,NULL,1,NULL),(8,182.64,'MANO_OBRA','Revoque con Mapei 3en1, en paredes de: Cocinas de los pisos: P13 y P14.',3287520.00,'450.7',18000.00,NULL,'m2',2,651,NULL,NULL,1,NULL),(9,632.64,'MANO_OBRA','Revoque con Mapei 3en1, en paredes de: Baños de lo s pisos: P3 , P4, P13 y P14.',11387520.00,'450.8',18000.00,NULL,'m2',2,651,NULL,NULL,1,NULL),(10,17.00,'MANO_OBRA','Colocación de tejuelas en Bal con de piso 2 - Fachada Este. Incluye colocación d e la pastina y el se llador.',935000.00,'450.9',55000.00,NULL,'m2',2,659,NULL,NULL,1,NULL),(12,1.00,'MATERIAL','Contactor 3x 32A 2+2 24Vca 5 0/60Hz EC MON TERO',42412.32,'544.2',42412.32,NULL,'und',3,NULL,NULL,3,2,NULL),(13,30.00,'MATERIAL','HORMIGON RDC 300',3590700.00,'448.1',119690.00,NULL,'und',4,NULL,NULL,4,2,NULL),(14,30.00,'MATERIAL','BOMBEO DE HORMIGON RDC 300',123030.00,'448.2',4101.00,NULL,'und',4,NULL,NULL,5,2,NULL),(15,1.00,'MATERIAL','BOMBA DE ARRASTRE HORMIGON',451079.00,'448.3',451079.00,NULL,'und',4,NULL,NULL,6,2,NULL),(16,141.52,'MATERIAL','ZOCALOS PLAIN BLANCO MATE COD',951979.57,'014.1',6726.82,NULL,'und',5,NULL,NULL,7,2,NULL),(17,25.00,'MATERIAL','CONTRAMARCO SQUARE BCO.MATE 5',186900.25,'014.2',7476.01,NULL,'und',5,NULL,NULL,8,2,NULL),(18,247.77,'MANO_OBRA','Revoque de espesor 6mm, aplicado a toda la superficie del Tramo 1 de la Fachada Oeste. Incluye la colocación de Adherente en toda el área',4162536.00,'443.1',16800.00,NULL,'M2',6,656,NULL,NULL,1,NULL),(19,82.52,'MANO_OBRA','Picar y hacer Buña, tanto en la Fachada Oeste como en la Este',990240.00,'443.2',12000.00,NULL,'ML',6,656,NULL,NULL,1,NULL),(20,4.00,'MATERIAL','TUBO LEDs 18W BLF 220V 1.2M',11504.12,'536.1',2876.03,NULL,'und',7,NULL,NULL,9,2,NULL),(21,1.00,'OTRO','ESTUDIO TOMOGRAFICO DE VIGAS CO',17320000.00,'539.1',17320000.00,NULL,'und',8,NULL,NULL,NULL,3,NULL),(22,1.00,'MATERIAL','Bomba de arrastre hormigón',451079.00,'444.1',451079.00,NULL,'und',9,NULL,NULL,10,2,NULL),(23,20.00,'MATERIAL','Hormigón RDC 300',2393800.00,'444.2',119690.00,NULL,'und',9,NULL,NULL,11,2,NULL),(24,20.00,'MATERIAL','Bombeo de hormigon RDC 300',82020.00,'444.3',4101.00,NULL,'und',9,NULL,NULL,5,2,NULL),(25,2240.00,'MATERIAL','INTOMAP 3 EN 1 AR BAGS X 25 KG',17565788.80,'030.1',7841.87,NULL,'und',10,NULL,NULL,12,2,NULL),(26,7.00,'MATERIAL','Pastina junta acha x 5 kg',88030.88,'522.1',12575.84,NULL,'und',11,NULL,NULL,13,2,NULL),(27,1.00,'MATERIAL','Fletes',8000.00,'522.2',8000.00,NULL,'und',11,NULL,NULL,14,2,NULL),(28,4.00,'OTRO','Alquiler de volquetes',400000.00,'438.1',100000.00,NULL,'und',12,NULL,NULL,NULL,3,NULL),(29,250.00,'MANO_OBRA','Enchapado de paredes exteriores en fachadas',3500000.00,'439.1',14000.00,NULL,'m2',13,643,NULL,NULL,1,80),(30,1.00,'OTRO','Servicio de Seg. e Higiene',3000000.00,'440.1',3000000.00,NULL,'und',14,NULL,NULL,NULL,3,NULL),(31,35.00,'MATERIAL','Hormigon RDC 300',3791095.00,'518.1',108317.00,NULL,'und',15,NULL,NULL,4,2,NULL),(32,35.00,'MATERIAL','Bombeo de Hormigón RDC 300',129885.00,'518.2',3711.00,NULL,'und',15,NULL,NULL,15,2,NULL),(33,1.00,'MATERIAL','Bomba de arrastre hormigón',408216.00,'518.3',408216.00,NULL,'und',15,NULL,NULL,10,2,NULL),(34,8.00,'MATERIAL','Arena fina',287087.44,'029.1',35885.93,NULL,'und',16,NULL,NULL,16,2,NULL),(35,432.00,'MATERIAL','Ladrillos huecos 12x18x33',271680.05,'029.2',628.89,NULL,'und',16,NULL,NULL,17,2,NULL),(36,648.00,'MATERIAL','Ladrillos huecos 8x18x33',345759.84,'029.3',533.58,NULL,'und',16,NULL,NULL,18,2,NULL),(37,4.00,'MATERIAL','Mallas fibra de vidrio 5x5 rol 90grs revoque',152083.44,'029.4',38020.86,NULL,'und',16,NULL,NULL,19,2,NULL),(38,4.00,'MATERIAL','Látex interior blanco x 20 l',254292.08,'436.1',63573.02,NULL,'und',17,NULL,NULL,20,2,NULL),(39,1.00,'MATERIAL','Sellador fijador al agua x 20l',35501.36,'436.2',35501.36,NULL,'und',17,NULL,NULL,21,2,NULL),(40,50.00,'MATERIAL','LIJA AL AGUA 150 DOBLE A',23117.50,'436.3',462.35,NULL,'und',17,NULL,NULL,22,2,NULL),(41,5.00,'MATERIAL','ROLLO CARTON CORRUGADO',56067.75,'436.4',11213.55,NULL,'und',17,NULL,NULL,23,2,NULL),(42,5.00,'MATERIAL','CINTA PAPEL AZUL 5CM ANCHO',11722.30,'436.5',2344.46,NULL,'und',17,NULL,NULL,24,2,NULL),(43,1.00,'MATERIAL','TERSUAVE ENDUIDO INT. X 10 LTS .',24768.60,'436.6',24768.60,NULL,'und',17,NULL,NULL,25,2,NULL),(44,10.00,'MATERIAL','CEPILLO ALAMBRE',29805.00,'436.7',2980.50,NULL,'und',17,NULL,NULL,26,2,NULL),(45,10.00,'MATERIAL','PINCELETAS No 42',64145.50,'436.8',6414.55,NULL,'und',17,NULL,NULL,27,2,NULL),(46,1120.00,'MATERIAL','INTOMAP 3 EN 1 AR BAGS X 25 KG',8782905.60,'028.1',7841.88,NULL,'und',18,NULL,NULL,12,2,NULL),(47,3.84,'MATERIAL','Porcelanato Vite Granza ivori',103126.81,'013.1',26855.94,NULL,'und',19,NULL,NULL,28,2,NULL),(48,10.00,'MATERIAL','Protex corrotex bicomponente X',176349.50,'027.1',17634.95,NULL,'und',20,NULL,NULL,29,2,NULL),(49,5.00,'MATERIAL','MECHA COPA DIAMANTADA SIN CERA',22996.60,'434.1',4599.32,NULL,'und',21,NULL,NULL,30,2,NULL),(50,100.00,'MANO_OBRA','Latex en paredes, techos y cielorasos en el Departamento Modelo',1340000.00,'432.1',13400.00,NULL,'und',22,616,NULL,NULL,1,NULL),(51,5.00,'MATERIAL','Placas durlock standard 9,5 mm',53408.35,'513.1',10681.67,NULL,'und',23,NULL,NULL,31,2,NULL),(52,1000.00,'MATERIAL','Tornillo T1 punta mecha',23830.00,'513.2',23.83,NULL,'und',23,NULL,NULL,32,2,NULL),(53,1.00,'MATERIAL','Fletes',20661.15,'513.3',20661.15,NULL,'und',23,NULL,NULL,14,2,NULL),(54,6.40,'MANO_OBRA','Quitar y reponer Porcelanato en el baño Principal. Incluye recuperación de porcelanato y limpieza la pared.',500000.00,'435.1',78125.00,NULL,'m2',24,660,NULL,NULL,1,NULL),(55,1.00,'MANO_OBRA','Bajar mugre del edificio y limpieza de zona del balancín 1',900000.00,'435.10',900000.00,NULL,'SG',24,NULL,NULL,NULL,1,NULL),(56,1.00,'MANO_OBRA','Receptaculo de ducha, carpeta, colocación de porcelanato y zocalo de marmol.',600000.00,'435.11',600000.00,NULL,'SG',24,NULL,NULL,NULL,1,NULL),(57,1.00,'MANO_OBRA','Colocación de Niveles en Terrazas para colocación de pendientes en tarraza. incluye fajas.',1500000.00,'435.12',1500000.00,NULL,'SG',24,650,NULL,NULL,1,NULL),(58,1.00,'MANO_OBRA','Tapar caños de electricidad y Aires Acondicionado en Dpto Modelo',300000.00,'435.2',300000.00,NULL,'SG',24,648,NULL,NULL,1,NULL),(59,1.00,'MANO_OBRA','Sacar dos (02) cerámicas en baño secundario rotas por personal de Enercon en caja de luz y revocar mocheta de dormitorio 3',300000.00,'435.3',300000.00,NULL,'SG',24,648,NULL,NULL,1,NULL),(60,1.00,'MANO_OBRA','Sacar agua de los pisos 11-12-13-14 debido a fuerte lluvia que inundó el edificio',300000.00,'435.4',300000.00,NULL,'SG',24,NULL,NULL,NULL,1,NULL),(61,15.00,'MANO_OBRA','Tapado de cañerias electricas sobre losa en 3 Dptos. mas Palier del Pis: 2 y en los  Pisos 3, 4 y 5 en los 4 dptos y Palier.',1500000.00,'435.5',100000.00,NULL,'Und.',24,NULL,NULL,NULL,1,NULL),(62,3.00,'OTRO','INSPECCION Y CERTIFICACION MEN ASCENSOR',570000.00,'433.1',190000.00,NULL,'und',25,NULL,NULL,NULL,3,NULL),(63,154.00,'MANO_OBRA','Colocación de mochetas y Bajada de dinteles a medida de puertas, Pisos: 1,9, 10, 11, 12 , 13 y 14',6930000.00,'435.6',45000.00,NULL,'Und.',24,612,NULL,NULL,1,NULL),(64,22.00,'MANO_OBRA','Colocación de Porcelanato en balcón Fachada Oeste y Palier del piso 2.',770000.00,'435.7',35000.00,NULL,'M2',24,660,NULL,NULL,1,NULL),(65,14.00,'MANO_OBRA','Carpeta Niveladora y de Terminación Rodillada en escalera principal, desde subsuelo a piso15',8400000.00,'435.8',600000.00,NULL,'PISO',24,650,NULL,NULL,1,NULL),(66,1.00,'MANO_OBRA','Construcción de mochetas de puertas de entrada a los Dptos  y ascensor en palier del piso 2. Incluye revoque y encuadre.',1500000.00,'435.9',1500000.00,NULL,'SG',24,612,NULL,NULL,1,NULL),(67,1.00,'MATERIAL','PROTEX SUPERLIGANTE X TAMBOR 200',917463.21,'025.1',917463.21,NULL,'und',26,NULL,NULL,33,2,NULL),(68,2.00,'MATERIAL','PROTEX IMPRIMACION S LATA X 25',32467.40,'025.2',16233.70,NULL,'und',26,NULL,NULL,34,2,NULL),(69,1.62,'MATERIAL','CERAMICA RECTIFICADA BLANCA SA',59720.91,'012.1',36864.76,NULL,'und',27,NULL,NULL,35,2,NULL),(70,15.00,'MATERIAL','LAMPARA FOCO LED 15 W',47268.60,'500.4',3151.24,NULL,'und',28,NULL,NULL,36,2,NULL),(71,4.00,'MATERIAL','WD-40 LUBRICANTE 432CC',14231.40,'500.3',3557.85,NULL,'und',28,NULL,NULL,37,2,NULL),(72,5.00,'MATERIAL','SILICONA NEUTRA TRANSPARENTE',31321.10,'500.2',6264.22,NULL,'und',28,NULL,NULL,38,2,NULL),(73,5.00,'MATERIAL','SILICONA ACETICA TRANSPARENTE',26051.25,'500.1',5210.25,NULL,'und',28,NULL,NULL,39,2,NULL),(74,1.00,'MATERIAL','ZOCALO DE CUARZO GRIS',80000.00,'428.1',80000.00,NULL,'und',29,NULL,NULL,40,2,NULL),(75,648.00,'MATERIAL','Ladrillos huecos 8 x 18 x 33',299201.04,'24.2',461.73,NULL,'und',30,NULL,NULL,41,2,NULL),(76,432.00,'MATERIAL','Ladrillos huecos 12 x 18 x 33',255532.32,'24.1',591.51,NULL,'und',30,NULL,NULL,42,2,NULL),(77,960.00,'MATERIAL','INTOMAP 3 EN 1 AR BAGS X 25 KG',7632000.00,'23.1',7950.00,NULL,'und',31,NULL,NULL,12,2,NULL),(78,53.00,'MANO_OBRA','Retiro de Membrana existente en el techo del local de exhibición, demoler carpeta, bajar escombros. retirar toda la madera. (Local 1)',795000.00,'424.1',15000.00,NULL,'m2',32,NULL,NULL,NULL,1,NULL),(79,1279.64,'MANO_OBRA','Limpieza e Hidrolavado general del techo de los Locales Comerciales. Incluye bajar suciedad, toda la madera y residuos de la superficie del techo.',1919466.60,'424.2',1500.00,NULL,'m2',32,NULL,NULL,NULL,1,NULL),(80,494.86,'MANO_OBRA','Impermeabilización en losa de techo con dos (02) manos de protex seal 77',2969160.00,'424.3',6000.00,NULL,'m2',32,623,NULL,NULL,1,NULL),(81,494.86,'MANO_OBRA','Construcción de contrapiso con pendiente, Utilizando material tipo RDC, que resista intemperie en techo, según proyecto:',7422900.00,'424.4',15000.00,NULL,'m2',32,657,NULL,NULL,1,NULL),(82,72.92,'MANO_OBRA','Relleno con cascote en el desnivel  dentro de los locales. Esp.est= 12 cm. Tapar caño de desague cloacal',875024.64,'424.5',12000.00,NULL,'m3',32,NULL,NULL,NULL,1,NULL),(83,494.86,'MANO_OBRA','Colocación de contrapiso Carpeta RDC dentro de locales . Fratazado total.  Espesor a definir',5938320.00,'424.6',12000.00,NULL,'m2',32,NULL,NULL,NULL,1,NULL),(84,8.00,'MANO_OBRA','Construcción de muro para la ventilación de los baños de cada local. Incluye: Babeta con protex Seal 77 y vendas en la union losa-ladrllo y losa de techo.',2400000.00,'424.7',300000.00,NULL,'und',32,NULL,NULL,NULL,1,NULL),(85,8.00,'MANO_OBRA','Nivelar escalera de hormigon con carpeta rodillada niveladora, sin nariz',3200000.00,'424.8',400000.00,NULL,'und',32,NULL,NULL,NULL,1,NULL),(86,4.00,'OTRO','Alquiler de volquetes',400000.00,'423.1',100000.00,NULL,'und',33,NULL,NULL,NULL,3,NULL),(87,2.00,'MATERIAL','SELLADOR X 5 LITROS',480801.36,'491.3',240400.68,NULL,'und',34,NULL,NULL,43,2,NULL),(88,5.00,'MATERIAL','PASTINA JUNTA ANCHA X 5KG NEGR',75941.05,'491.2',15188.21,NULL,'und',34,NULL,NULL,44,2,NULL),(89,17.66,'MATERIAL','TEJUELA NEGRA LISA',610210.57,'491.1',34553.26,NULL,'und',34,NULL,NULL,45,2,NULL),(90,4.00,'OTRO','Alquiler de volquetes',320000.00,'422.1',80000.00,NULL,'und',35,NULL,NULL,NULL,3,NULL),(91,2.00,'MATERIAL','PUENTE ADHERENTE TAMBOR POR 20',1917498.26,'22.4',958749.13,NULL,'und',36,NULL,NULL,46,2,NULL),(92,1000.00,'MATERIAL','Ladrillos comunes',222610.00,'22.3',222.61,NULL,'und',36,NULL,NULL,47,2,NULL),(93,432.00,'MATERIAL','Ladrillos huecos 12 x 18 x 33',293734.08,'22.2',679.94,NULL,'und',36,NULL,NULL,42,2,NULL),(94,8.00,'MATERIAL','Arena fina',288226.96,'22.1',36028.37,NULL,'m3',36,NULL,NULL,48,2,NULL),(95,35.00,'MATERIAL','HORMIGON RDC 300',3610565.00,'480.3',103159.00,NULL,'und',37,NULL,NULL,4,2,NULL),(96,35.00,'MATERIAL','BOMBEO DE HORMIGON RDC 300',123690.00,'480.2',3534.00,NULL,'und',37,NULL,NULL,5,2,NULL),(97,1.00,'MATERIAL','BOMBA DE ARRASTRE HORMIGON',388776.00,'480.1',388776.00,NULL,'und',37,NULL,NULL,6,2,NULL),(98,350.00,'MANO_OBRA','ENCHAPADO DE PAREDES EXTERNAS DEL EDIFICIO',4900000.00,'419.1',14000.00,NULL,'und',38,643,NULL,NULL,1,70),(99,1.00,'MATERIAL','Fletes',29600.00,'11.4',29600.00,NULL,'und',39,NULL,NULL,14,2,NULL),(100,21.60,'MATERIAL','PORCELANATO LISCIO IVORY 1.20X',705111.91,'11.3',32644.07,NULL,'m2',39,NULL,NULL,49,2,NULL),(101,21.60,'MATERIAL','PORCELANATO LISCIO IVORY 1.20X',705111.91,'11.2',32644.07,NULL,'m2',39,NULL,NULL,49,2,NULL),(102,5.76,'MATERIAL','PORCELANATO VITE GRANZA IVORI',188029.84,'11.1',32644.07,NULL,'m2',39,NULL,NULL,50,2,NULL),(103,77.36,'MANO_OBRA','Construcción de Carpeta en Balcones de Fachada Oeste: P2, P12, P13 Y P14 - Fachada Este: P1, P3, P4 Y P5',1392480.00,'410.1',18000.00,NULL,'m2',40,657,NULL,NULL,1,NULL),(104,3.00,'MANO_OBRA','Colocación de Carpeta niveladora en escalones del Módulo de Escaleras, desde PB a P2. NO Incluye: Soldar bordes a grampas,',1290000.00,'410.10',430000.00,NULL,'piso',40,657,NULL,NULL,1,NULL),(105,1.00,'MANO_OBRA','Amurar Puerta Principal de Dpto. Modelo',130000.00,'410.11',130000.00,NULL,'und',40,612,NULL,NULL,1,NULL),(106,1.00,'MANO_OBRA','Reposición de Porcelanatos y Cerámicas en Dpto: Piso de Sala Comedor-Dpto Modelo y en pared de Baño exterior, por ajuste en el pto. de agua fría/caliente de la Bañera. Incluye: Corte de dos (02) cerámicas con amoladora para evitar daños en las piezs aledañas.',400000.00,'410.2',400000.00,NULL,'gl',40,662,NULL,NULL,1,NULL),(107,9.00,'MANO_OBRA','Cateo de Vigas, Columnas y Losas de techo. Implica la demolición de 09 cateos más hasta llegar a las barras principales y los estribos para su estudio del soporte de los elementos estructurales (Etapa II).',720000.00,'410.3',80000.00,NULL,'und',40,650,NULL,NULL,1,NULL),(108,18.00,'MANO_OBRA','Reparación de cada una de las roturas realizadas en la estructura principal del edificio, tanto en la etapa I y la etapa II. Incluye la colocación de Protex Corrotex y la reposición del hormigpon demolido con mortero PROTEX REP',900000.00,'410.4',50000.00,NULL,'und',40,644,NULL,NULL,1,NULL),(109,28.00,'MANO_OBRA','Hilada de ladrllos comúnes en mocheta de las cocina de los Dptos A y B, en todo el edificio.',980000.00,'410.5',35000.00,NULL,'und',40,612,NULL,NULL,1,NULL),(110,67.62,'MANO_OBRA','Impermeabilización de la unión de las paredes de la ducha con la losa del piso de las duchas de los Dptos A y B de todo el edificio. Incluye la colocación de malla entre la pared y losa de la bañera y 02 manos de protex seal 77 a una altura de 25 cm.',1352400.00,'410.6',20000.00,NULL,'m2',40,643,NULL,NULL,1,60),(111,365.28,'MANO_OBRA','Revoque de paredes en Cocina, para Cuatro (04) pisos: P4-P5-P6-P7. Incluye amurar las cañerias de la plomería y la electricidad.',6575040.00,'410.7',18000.00,NULL,'m2',40,651,NULL,NULL,1,NULL),(112,632.64,'MANO_OBRA','Revoque de paredes en Baños. Para Cuatro (04) pisos:P4-P5-P6-P7 . Incluye amurar las cañerias de la plomería y la electricidad.',11387520.00,'410.8',18000.00,NULL,'m2',40,651,NULL,NULL,1,NULL),(113,318.77,'MANO_OBRA','Demolición de contrapiso del piso 1. Incluye bajar escombros a P.B.',2868930.00,'410.9',9000.00,NULL,'m2',40,647,NULL,NULL,1,NULL),(114,20.00,'MATERIAL','DISCO CORTE HIERRO 7 ́ ́ 1.6 MM',48000.00,'484.7',2400.00,NULL,'und',41,NULL,NULL,51,2,NULL),(115,30.00,'MATERIAL','DISCO CORTE ACERO 230X 1.9X22.',119400.00,'484.6',3980.00,NULL,'und',41,NULL,NULL,52,2,NULL),(116,5.00,'MATERIAL','CEPILLO ALAMBRE P/AMOL D BANCO MOLA SKIL 350 W',72500.00,'484.5',14500.00,NULL,'und',41,NULL,NULL,53,2,NULL),(117,4.00,'MATERIAL','CAMARA DE INSPECCION PLASTICA',4354.56,'483.2',1088.64,NULL,'und',42,NULL,NULL,54,2,NULL),(118,4.00,'MATERIAL','JABALINA AC-COBRE 1.5 MTS 1/2\"',38892.08,'483.1',9723.02,NULL,'und',42,NULL,NULL,55,2,NULL),(119,100.00,'OTRO','Servicio de Seg. e Higiene',3300000.00,'414.1',33000.00,NULL,'und',43,NULL,NULL,NULL,3,NULL),(120,5.00,'MATERIAL','ESTOPA DE LIMPIEZA POR BOLSA',7897.05,'19.6',1579.41,NULL,'und',44,NULL,NULL,56,2,NULL),(121,1600.00,'MATERIAL','INTOMAP 3 EN 1 AR BAGS X 25 KG',10521600.00,'19.5',6576.00,NULL,'und',44,NULL,NULL,12,2,NULL),(122,1.00,'MATERIAL','KLAUKOL ALTA PERFORMANCE X 1KG COLOR GRIS ARTICO',4796.57,'19.4',4796.57,NULL,'und',44,NULL,NULL,57,2,NULL),(123,1.00,'MATERIAL','KLAUKOL ALTA PERFORMANCE X1KG COLOR GRIS PLOMO',4796.57,'19.3',4796.57,NULL,'und',44,NULL,NULL,58,2,NULL),(124,10.00,'MATERIAL','Clavos punta parís 2 y 1/2\"',37231.90,'19.2',3723.19,NULL,'und',44,NULL,NULL,59,2,NULL),(125,15.00,'MATERIAL','Alambre de fardo x kg',44347.50,'19.1',2956.50,NULL,'und',44,NULL,NULL,60,2,NULL),(126,40.00,'MATERIAL','PROTEX 216 X KG',5944680.00,'481.2',148617.00,NULL,'und',45,NULL,NULL,61,2,NULL),(127,15.00,'MATERIAL','PROTEX FIJATEX PLUS CARTUCHO',779280.00,'481.1',51952.00,NULL,'und',45,NULL,NULL,62,2,NULL),(128,57.00,'MATERIAL','PROTEX SEAL 77 FLEX BI COMPONE',2588826.00,'480.1',45418.00,NULL,'und',46,NULL,NULL,63,2,NULL),(129,1.00,'OTRO','Alquiler de volquetes',80000.00,'406.1',80000.00,NULL,'und',47,NULL,NULL,NULL,3,NULL),(130,1.00,'MATERIAL','DESAGUE AGUA 2 EN 1 ATRIM DA60',162808.26,'9.1',162808.26,NULL,'und',48,NULL,NULL,64,2,NULL),(131,2.00,'MATERIAL','B 10 PLUS EXTRACTOR DE AIRE CA',141816.56,'8.1',70908.28,NULL,'und',49,NULL,NULL,65,2,NULL),(132,5.00,'MATERIAL','PASTINA PRESTIGE GRIS PERLA X',88108.45,'7.2',17621.69,NULL,'und',50,NULL,NULL,66,2,NULL),(133,2.88,'MATERIAL','PORCELANATO GRANZA BLACK OUT 1 CAJA 1.44M2',94246.19,'7.1',32724.37,NULL,'m2',50,NULL,NULL,67,2,NULL),(134,1.00,'MATERIAL','WAYRA CAMPANA EMPOTRABLE COD 2',214494.40,'6.1',214494.40,NULL,'und',51,NULL,NULL,68,2,NULL),(135,1.00,'MATERIAL','BACHA KIRA PLUS 35X35X13.5 CAF',146277.59,'5.2',146277.59,NULL,'und',52,NULL,NULL,69,2,NULL),(136,1.00,'MATERIAL','BAÑERA SACHA 140 BCA.ROCA',282490.98,'5.1',282490.98,NULL,'und',52,NULL,NULL,70,2,NULL),(137,2.00,'MATERIAL','THE GAP INODORO LARGO',679018.60,'4.9',339509.30,NULL,'und',53,NULL,NULL,71,2,NULL),(138,2.00,'MATERIAL','THE GAP DEPOSITO APOYO BCO',555562.94,'4.8',277781.47,NULL,'und',53,NULL,NULL,72,2,NULL),(139,2.00,'MATERIAL','THE GAP BIDE 1 OR LLUVIA 11115',503411.40,'4.7',251705.70,NULL,'und',53,NULL,NULL,73,2,NULL),(140,2.00,'MATERIAL','VERA BIDET CROMO MONOC 70-180',206875.52,'4.6',103437.76,NULL,'und',53,NULL,NULL,74,2,NULL),(141,2.00,'MATERIAL','VERA DUCHA EMB C/TRANSF MONOC',318270.04,'4.5',159135.02,NULL,'und',53,NULL,NULL,75,2,NULL),(142,1.00,'MATERIAL','VERA LAVATORIO PARED MONOC CRO',142136.06,'4.4',142136.06,NULL,'und',53,NULL,NULL,76,2,NULL),(143,1.00,'MATERIAL','BACHA BCH14 RECTANG SEMIEMB BL',87825.30,'4.3',87825.30,NULL,'und',53,NULL,NULL,77,2,NULL),(144,1.00,'MATERIAL','ADRA COCINA MONO CROMO 20-162',78188.75,'4.2',78188.75,NULL,'und',53,NULL,NULL,78,2,NULL),(145,1.00,'MATERIAL','VERA LAVATORIO BAJOMONOC CROMO',78218.90,'4.11',78218.90,NULL,'und',53,NULL,NULL,79,2,NULL),(146,2.00,'MATERIAL','THE GAP TAPA INODORO C/AMORTIG',166776.96,'4.10',83388.48,NULL,'und',53,NULL,NULL,80,2,NULL),(147,1.00,'MATERIAL','LUXOR S171 A* COMPACT(BRILL) 7',182664.03,'4.1',182664.03,NULL,'und',53,NULL,NULL,81,2,NULL),(148,11.34,'MATERIAL','PORCELANATO BLANCO GLACIAR 30X',497896.42,'3.4',43906.21,NULL,'m2',54,NULL,NULL,82,2,NULL),(149,9.60,'MATERIAL','PORCELANATO GRANZA IVO OUT 79.',206418.62,'3.3',21501.94,NULL,'m2',54,NULL,NULL,83,2,NULL),(150,17.82,'MATERIAL','PORCELANATO BLANCO GLACIAR 30X',782408.66,'3.2',43906.21,NULL,'m2',54,NULL,NULL,82,2,NULL),(151,94.08,'MATERIAL','PORCELANATO LISCIO LGR N 79,7X 61.44XP',2022902.52,'3.1',21501.94,NULL,'m2',54,NULL,NULL,84,2,NULL),(152,30.00,'MATERIAL','VERA DUCHA EMB C/TRANSF MONOC',4177283.40,'10.2',139242.78,NULL,'und',55,NULL,NULL,75,2,NULL),(153,20.00,'MATERIAL','VERA LAVATORIO PARED MONOC CRO',2487298.60,'10.1',124364.93,NULL,'und',55,NULL,NULL,76,2,NULL),(154,5.00,'MATERIAL','DESAGUE AGUA 2 EN 1 ATRIM DA60',787467.15,'2.2',157493.43,NULL,'und',56,NULL,NULL,64,2,NULL),(155,13.44,'MATERIAL','PORCELANATO LISCIO LIGTH GREY',350094.39,'2.1',26048.69,NULL,'m2',56,NULL,NULL,85,2,NULL),(156,4.00,'MATERIAL','NYLON POLIETILENO. NEGRO 200 M',215080.68,'18.3',53770.17,NULL,'und',57,NULL,NULL,86,2,NULL),(157,160.00,'MATERIAL','Cemento x 25 kg BOLSA',819830.40,'18.2',5123.94,NULL,'und',57,NULL,NULL,87,2,NULL),(158,154.00,'MATERIAL','CAL HYDRAT X 25 KG',716671.34,'18.1',4653.71,NULL,'und',57,NULL,NULL,88,2,NULL),(159,1.00,'MATERIAL','CHAVETA PASANTE BRONCE REG.CON BOYA',265.48,'478.7',265.48,NULL,'und',58,NULL,NULL,89,2,NULL),(160,1.00,'MATERIAL','BOYATELGOPOR PRESION 3/4',5327.59,'478.6',5327.59,NULL,'und',58,NULL,NULL,90,2,NULL),(161,1.00,'MATERIAL','SALIDA DE TANQUE 3/4 POLIPROPI',2057.59,'478.5',2057.59,NULL,'und',58,NULL,NULL,91,2,NULL),(162,2.00,'MATERIAL','RACOR HEMBRA 3/4(ROSCA) X 3/4',447.74,'478.4',223.87,NULL,'und',58,NULL,NULL,92,2,NULL),(163,4.00,'MATERIAL','ESPIGA DOBLE 3/4 POLIPROPILEN',676.44,'478.3',169.11,NULL,'und',58,NULL,NULL,93,2,NULL),(164,5.00,'MATERIAL','CODO ESPIGA DOBLE 3/4 POLIPROP',1301.05,'478.2',260.21,NULL,'und',58,NULL,NULL,94,2,NULL),(165,1.00,'MATERIAL','FLOTANTE MECANICO TANQUE 3/4 BRONCE REG.CON BOYA',28244.26,'478.1',28244.26,NULL,'und',58,NULL,NULL,95,2,NULL),(166,10.00,'MATERIAL','BISAGRA MUNICION 100X 75MM',206000.00,'476.2',20600.00,NULL,'und',59,NULL,NULL,96,2,NULL),(167,3.00,'MATERIAL','CANDADO No 50',29574.00,'476.1',9858.00,NULL,'und',59,NULL,NULL,97,2,NULL),(168,5.00,'MATERIAL','UNION ROSCADA DE PVC 1/2\"',798.05,'475.3',159.61,NULL,'und',60,NULL,NULL,98,2,NULL),(169,5.00,'MATERIAL','TEE ROSCADA DE BRONCE DE 1/2\"',20851.80,'475.2',4170.36,NULL,'und',60,NULL,NULL,99,2,NULL),(170,5.00,'MATERIAL','CANILLA METALICA ESFERI 1/2\" M',40055.80,'475.1',8011.16,NULL,'und',60,NULL,NULL,100,2,NULL),(171,1.00,'MATERIAL','DISCO WIDIA SEGMENTADO 7 ́ ́',13153.76,'474.4',13153.76,NULL,'und',61,NULL,NULL,101,2,NULL),(172,5.00,'MATERIAL','HOJA SIERRA P/ACERO 24 DIENTES 30 CM DE LARGO',8465.95,'474.3',1693.19,NULL,'und',61,NULL,NULL,102,2,NULL),(173,20.00,'MATERIAL','HOJA DE CUTTER',1708.00,'474.2',85.40,NULL,'und',61,NULL,NULL,103,2,NULL),(174,3.00,'MATERIAL','Nylon negro polietileno 200mic negro',221668.56,'474.1',73889.52,NULL,'und',61,NULL,NULL,104,2,NULL),(175,1.00,'MATERIAL','DESTORNILLADOR PLANO 6MM LARGO',3472.38,'402.3',3472.38,NULL,'und',62,NULL,NULL,105,2,NULL),(176,1.00,'MATERIAL','DESTORNILLADOR PHILIPS No2 150',3472.38,'402.2',3472.38,NULL,'und',62,NULL,NULL,106,2,NULL),(177,1.00,'MATERIAL','CUTTER',3295.60,'402.1',3295.60,NULL,'und',62,NULL,NULL,107,2,NULL),(178,5.00,'MATERIAL','CINTA PAPEL AZUL 5CM ANCHO',28487.60,'401.3',5697.52,NULL,'und',63,NULL,NULL,24,2,NULL),(179,3.00,'MATERIAL','PINCELETA GALGO No 50',15553.80,'401.2',5184.60,NULL,'und',63,NULL,NULL,108,2,NULL),(180,2.00,'MATERIAL','galgo pincel silver n*20',4921.00,'401.1',2460.50,NULL,'und',63,NULL,NULL,109,2,NULL),(181,9.00,'MANO_OBRA','Mano de Obra por la ejecución del retiro de recubr imiento de nueve (09) puntos e n elementos estructu rales en edificio: 03 ptos. En subsuelo. 03 ptos. En piso 6 y 03 ptos en piso 12',720000.00,'403.1',80000.00,NULL,'ptos',64,648,NULL,NULL,1,NULL),(182,1.00,'MANO_OBRA','Construcción de Caseta de Vigi lancia y Control de acceso y salida de TQ4. Desmon tar la protección en la zona donde se contruira la rampa de acceso al subsuelo y llevar el caño del desague del subsuelo y amurarlo por debajo de la v ereda.',850000.00,'403.2',850000.00,NULL,'sg',64,641,NULL,NULL,1,70),(183,8.00,'MANO_OBRA','Construcción de 02-Fajas en el lado derecho del ni cho central del pleno de palie res en el edificio.',320000.00,'403.3',40000.00,NULL,'piso',64,644,NULL,NULL,1,NULL),(184,96.70,'MANO_OBRA','Construcción de carpetas con p endiente de piso en balcones, en Pisos: 2, 6, 7, 8 , 9, 10, 11,12, 13 y 14',1740600.00,'403.4',18000.00,NULL,'m2',64,657,NULL,NULL,1,NULL),(185,3.00,'OTRO','INSPECCION Y CERTIFICACION MEN ASCENSOR',570000.00,'399.1',190000.00,NULL,'und',65,NULL,NULL,NULL,3,NULL),(186,100.00,'OTRO','Servicio de Seg. e Higiene',3150000.00,'397.1',31500.00,NULL,'und',66,NULL,NULL,NULL,3,NULL),(187,4.00,'MATERIAL','PROTEX 216 ADHESIVO EPOXI X 1K',107993.12,'15.1',26998.28,NULL,'und',67,NULL,NULL,110,2,NULL),(188,41.00,'MATERIAL','ANGULO DE HIERRO 1/2\"X 1/8\" X',323183.73,'466.1',7882.53,NULL,'und',68,NULL,NULL,111,2,NULL),(189,1.00,'MATERIAL','DISCO SEGMENTADO DIAMANTADO DE',5400.00,'465.5',5400.00,NULL,'und',69,NULL,NULL,112,2,NULL),(190,300.00,'MATERIAL','Tornillos hexas autoperf',39000.00,'465.4',130.00,NULL,'und',69,NULL,NULL,113,2,NULL),(191,5.00,'MATERIAL','CEPILLO DE ALAMBRE DE 20 CM',15000.00,'465.3',3000.00,NULL,'und',69,NULL,NULL,114,2,NULL),(192,300.00,'MATERIAL','TORNILLO FIX 5 X 45MM',10500.00,'465.2',35.00,NULL,'und',69,NULL,NULL,115,2,NULL),(193,300.00,'MATERIAL','TARUGO DEL S8 FISCHER',15000.00,'465.1',50.00,NULL,'und',69,NULL,NULL,116,2,NULL),(194,15.00,'MATERIAL','Electrodos 2.5 MM PUNTA AZUL',151370.70,'391.1',10091.38,NULL,'und',70,NULL,NULL,117,2,NULL),(195,111.60,'MANO_OBRA','Construcción de paredes con la drillos No 8 en plen o de palieres.',2790000.00,'393.1',25000.00,NULL,'m2',71,612,NULL,NULL,1,NULL),(196,314.03,'MANO_OBRA','Revoque de paredes en el ducto de succión del módu lo de escaleras: Zona interior : aplicación de Cere cita bolseada. Zona exterior: revoque convencional bolseado y alisado.',4396420.00,'393.2',14000.00,NULL,'m2',71,651,NULL,NULL,1,NULL),(197,66.00,'MANO_OBRA','Modificación de mochetas de va nos en puertas inter nas de los departamentos de lo s pisos: P2, P3 y P4 .',1980000.00,'393.3',30000.00,NULL,'und',71,612,NULL,NULL,1,NULL),(198,1.00,'MANO_OBRA','Apuntalamiento de la estructur a de hormigón; para asegurarla al momento de demol ición de muro del Su b-Suelo.',700000.00,'393.4',700000.00,NULL,'und',71,668,NULL,NULL,1,NULL),(199,1.00,'MANO_OBRA','Limpieza manual del escombro e xistente en la zona interna del muro a demoler, co rrespondiente al áre a de acceso al subsuelo.',350000.00,'393.5',350000.00,NULL,'und',71,647,NULL,NULL,1,NULL),(200,120.40,'MANO_OBRA','Revoque manual de la cara inte rna de los balcones de la fachada Este.',1685600.00,'393.6',14000.00,NULL,'ml',71,651,NULL,NULL,1,NULL),(201,193.40,'MANO_OBRA','Construcción de contrapisos con pendientes en balcones: Piso 6, 7, 8, 9, 10, 11, 12, 13 y 14',3868000.00,'393.7',20000.00,NULL,'m2',71,657,NULL,NULL,1,NULL),(202,1.00,'OTRO','Alquiler de volquetes',80000.00,'392.1',80000.00,NULL,'und',72,NULL,NULL,NULL,3,NULL),(203,40.00,'MANO_OBRA','Relleno de orificios producido s por la toma de mue stras en la Estructura de Horm igón: Vigas y Column as, tanto del Edificio como en Subsuelo, relladas',1200000.00,'393.8',30000.00,NULL,'und',71,644,NULL,NULL,1,NULL),(204,10.00,'MATERIAL','PUENTE ADHERENTE PAMAX X 28 KG',1200000.00,'388.1',120000.00,NULL,'und',73,NULL,NULL,2,2,NULL),(205,77.00,'MATERIAL','Cal Cacique x 25 kg',400409.24,'14.5',5200.12,NULL,'und',74,NULL,NULL,118,2,NULL),(206,1080.00,'MATERIAL','Ladrillos huecos 8x18x33',498690.00,'14.4',461.75,NULL,'und',74,NULL,NULL,18,2,NULL),(207,1120.00,'MATERIAL','Intomap 3 en 1 ar bags x 25 kg',7204915.20,'14.3',6432.96,NULL,'und',74,NULL,NULL,12,2,NULL),(208,80.00,'MATERIAL','Cemento x 25 kg bolsa',400720.00,'14.2',5009.00,NULL,'und',74,NULL,NULL,87,2,NULL),(209,8.00,'MATERIAL','Arena fina',263649.60,'14.1',32956.20,NULL,'und',74,NULL,NULL,16,2,NULL),(210,2.00,'OTRO','INSPECCION Y CERTIFICACION MEN ASCENSOR',170000.00,'386.1',85000.00,NULL,'und',75,NULL,NULL,NULL,3,NULL),(211,240.00,'MATERIAL','Cemento x25 kg bolsa',1182129.60,'4.4',4925.54,NULL,'und',76,NULL,NULL,119,2,NULL),(212,648.00,'MATERIAL','Ladrillos huecos 8x18x33',299214.00,'4.3',461.75,NULL,'und',76,NULL,NULL,18,2,NULL),(213,288.00,'MATERIAL','Ladrillos huecos 12x18x33',170795.52,'4.2',593.04,NULL,'und',76,NULL,NULL,17,2,NULL),(214,12.00,'MATERIAL','Arena fina',376125.60,'4.1',31343.80,NULL,'und',76,NULL,NULL,16,2,NULL),(215,5.00,'MATERIAL','Balde de Albañil de Plastico',9405.30,'376.4',1881.06,NULL,'und',77,NULL,NULL,120,2,NULL),(216,3.00,'MATERIAL','Tanza Albañil 0.6mm x 100 mts',10505.19,'376.3',3501.73,NULL,'und',77,NULL,NULL,121,2,NULL),(217,3.00,'MATERIAL','Pala Ancha',108780.48,'376.2',36260.16,NULL,'und',77,NULL,NULL,122,2,NULL),(218,2.00,'MATERIAL','Carretilla de chapa',164326.90,'376.1',82163.45,NULL,'und',77,NULL,NULL,123,2,NULL),(219,112.00,'MANO_OBRA','Corte y demolición de pared de l lado del mueble de baño y agregar pared del lado opuesto de la puert a, para llegar a las medidas e xigidas por el proye cto de cada baño.',4480000.00,'374.1',40000.00,NULL,'und',78,647,NULL,NULL,1,NULL),(220,28.00,'MANO_OBRA','Sellado de pases del pluvial e n cada balcón, coloc andole vendas e impermeabiliza ndolos con Protex Se al 77.',1120000.00,'374.2',40000.00,NULL,'und',78,623,NULL,NULL,1,NULL),(221,280.00,'MANO_OBRA','Impermeabilización (2 manos) d e Carpetas y canalet as',4760000.00,'374.3',17000.00,NULL,'und',78,623,NULL,NULL,1,NULL),(222,28.00,'MANO_OBRA','Corregir medidas en mochetas d e Placares en los dp tos C y D',1120000.00,'374.4',40000.00,NULL,'und',78,612,NULL,NULL,1,NULL),(223,100.00,'MANO_OBRA','Tomar niveles en Sub-Suelo de TQ y colocar los Pun tos de referencia de Corte o R elleno, según sea el caso, en todo el Sub-Suelo. Levantamiento de Niveles en ca da Depto. solicitado s por el estudio de Arquitectu ra y para realizar e l estimado de material de RDC por piso.',1600000.00,'373.1',16000.00,NULL,'und',79,650,NULL,NULL,1,NULL),(224,1.00,'OTRO','Alquiler de volquetes',80000.00,'372.1',80000.00,NULL,'und',80,NULL,NULL,NULL,3,NULL),(225,1.00,'OTRO','Analisis Estructural - ejecución del análisis y Calcu lo estructural de la s mensulas fracturadas para so portar las solicitac iones de la planta baja. El cá lculo estructural re quiere la ejecución de cateos estructurales los cu ales NO SE INCLUYEN. Se realiz ará conforme a regla mentaciones CIRSOC vigentes, a segurando seguridad, optimización y compatibilidad con el diseño arqui tectónico. Se ejecutará el modelado total de la estructura de l edificio, con las dimensione s de la obra ejecuta da y todo el análisis de carga que se estima ejecu tar. Se hace notar que no se e ncuentra la document ación para extraer esta inform ación por tal motivo se contemplan 5 dias de relev amiento dimensional de la estructura para ejecutar un modelo y posteri ormente un periodo de ajuste q ue no será mayor a 2 dias donde se verificará con planos en la obra ac ompañado por la DO. 1. Análisis y diseño de la est ructura existente co n las cargas actuales y las nu evas condiciones de carga 2. Se plantearán la ejecución de refuerzos de la e structura existente, en caso d e ser necesarios. 3. Aplicación de normativa CIR SOC 2005 y complemen tarias, considerando cargas pe rmanentes, sobrecarg as de uso y cargas eventuales de proyecto. 4. Cálculo del edificio comple to y verificación de los sectores más relevantes d esignados en conjunt o con la DO. (10 sectores) en dichos sectores se v erificará la estructura y se c alculará la armadura la cual será contrastada con los cateos a ejecuta r (no contemplado). 5. Ejecución de planos de plan ta con denominacione s de vigas y columnas, sin cot as.PTO. NRO: 01-4054 R-B DE INGENIERIA MR FECHA 3 0/10/2025',8600000.00,'458.1',8600000.00,NULL,'und',81,NULL,NULL,NULL,3,NULL),(226,28.00,'MANO_OBRA','Caños de cobre con cajas Inter - Provisión de material para la pre instalación de c añerias para unidades con 3 sp lit sistema multispl it provisión de 45 mteros de c añería de cobre con cajas interiores y caja exteri or. Todas las instal aciones se entregan presurizad as con nitrógeno. FORMA DE PAGO ANTICIPADO PAR A LA COMPRA DE MATER IAL , INSTALACIÓN Y POSTERIOR CERTICIACIÓN QUINCEN AL POR PISO FINALIZADO. VALOR MAS IVA. CABE ACLARAR QUE CADA PISO TIE NE 2 DPTOS. CON ESTA TIPOLOGIA',17998638.28,'457.2',642808.51,NULL,'und',82,NULL,NULL,NULL,1,NULL),(227,27.00,'MANO_OBRA','Caños de cobre con cajas Inter - Provisión de material para la pre instalación de c añerias para unidades con 4 sp lit sistema multispl it provisión de 42 mteros de c añería de cobre con cajas interiores y caja exteri or. Todas las instal aciones se entregan presurizad as con nitrógeno. FORMA DE PAGO ANTICIPADO PAR A LA COMPRA DE MATER IAL , INSTALACIÓN Y POSTERIOR CERTICIACIÓN QUINCEN AL POR PISO FINALIZADO. VALOR MAS IVA. CADA PISO TIENE 2 DPTOS. CON E STA TIPOLOGIA',16198774.20,'457.1',599954.60,NULL,'und',82,NULL,NULL,NULL,1,NULL),(228,25.00,'MATERIAL','Abrazadera 50mm',8655.00,'455.5',346.20,NULL,'und',83,NULL,NULL,126,2,NULL),(229,10.00,'MATERIAL','Espiga Poliprop. Negro a 90° S',4871.00,'455.4',487.10,NULL,'und',83,NULL,NULL,127,2,NULL),(230,1.00,'MATERIAL','Espiga Poliprop. Negro a 90° C',548.59,'455.3',548.59,NULL,'und',83,NULL,NULL,128,2,NULL),(231,1.00,'MATERIAL','Codo Poliprop. a 90° con rosca',2167.61,'455.2',2167.61,NULL,'und',83,NULL,NULL,129,2,NULL),(232,25.00,'MATERIAL','Caño Poliprop. Negro 1 1/2\'\' Para riego',49778.50,'455.1',1991.14,NULL,'und',83,NULL,NULL,130,2,NULL),(233,100.00,'MANO_OBRA','Mano de obra pre instalación A - Cantidad 28 UF. Mano de obra p ara la pre instalaci ón de cañerias para unidades c on 3 split sistema m ultisplit provisión de 45 mter os de cañería de cob re con cajas interiores y caja exterior. Todas las instalaciones se entregan pre surizadas con nitróg eno. FORMA DE PAGO CERTIFICACIÓN Q UINCENAL POR PISO FI NALIZADO. VALOR AJUSTADO POR C AC MANO DE OBRA BASE OCTUBRE 2025',17998638.00,'370.2',179986.38,NULL,'und',84,NULL,NULL,NULL,1,NULL),(236,100.00,'MANO_OBRA','Mano de obra pre instalación A - Cantidad 27 UF. -Mano de obra para la pre instalac ión de cañerias para unidades con 4 split sistema multisplit provisión de 42 mte ros de cañería de co bre con cajas interiores y caj a exterior. Todas la s instalaciones se entregan pr esurizadas con nitró geno. FORMA DE PAGO CERTIFICACIÓN Q UINCENAL POR PISO FI NALIZADO. VALOR AJUSTADO POR C AC MANO DE OBRA BASE OCTUBRE 2025',16198774.00,'370.1',161987.74,NULL,'und',84,NULL,NULL,NULL,1,NULL),(237,1.00,'OTRO','Determinación de Contenido - Por la determinación del contenido, de agentes con taminantes como cloruros, sulf atos y ph. Definiend o el grado de ataque Sobre ca da testigo analizado Testigos adicionales a los 3 i ndicados , cada uno $ 40.200,00',450000.00,'459.2',450000.00,NULL,'und',85,NULL,NULL,NULL,3,NULL),(238,1.00,'OTRO','Extracción de Muestras y Laboratorio - Por la concurrencia a obra inc luyendo la extracció n de hasta cuarenta (40) testi gos con máquina cal adora apropiada y broca (Ø75mm .) con corona diaman tada refrigerada, cuya longitu d max. de 15 cm cada uno. Los mismos se extraerán en sectores, que pre viamente indicará el solicitan te. Sobre cada testi go se efectuarán las siguiente s tareas y determina ciones: ? Aserrado de sus base s con disco diamanta do refrigerado ? Carbonatación ? Densidad ? Absor ción de agua ? Encabezado y en sayo a la compresión ? Informe técnico',1830000.00,'459.1',1830000.00,NULL,'und',85,NULL,NULL,NULL,3,NULL),(239,432.00,'MATERIAL','Ladrillos huecos del 12 12x18x33',247056.48,'2.7',571.89,NULL,'und',86,NULL,NULL,131,2,NULL),(240,100.00,'MATERIAL','Protex Fondo de Junta por Esp Polietileno',221673.00,'2.6',2216.73,NULL,'und',86,NULL,NULL,132,2,NULL),(241,7.00,'MATERIAL','Protex Proflex P1000 x 5kg',1163418.97,'2.5',166202.71,NULL,'und',86,NULL,NULL,133,2,NULL),(242,2.00,'MATERIAL','Protex imprimación S lata x 25',31215.36,'2.4',15607.68,NULL,'und',86,NULL,NULL,134,2,NULL),(243,2.00,'MATERIAL','PUENTE ADHERENTE TAMBOR POR 20',1763139.06,'2.3',881569.53,NULL,'und',86,NULL,NULL,46,2,NULL),(244,1000.00,'MATERIAL','Ladrillos comunes',217560.00,'2.2',217.56,NULL,'und',86,NULL,NULL,47,2,NULL),(245,8.00,'MATERIAL','Arena fina',250750.40,'2.1',31343.80,NULL,'und',86,NULL,NULL,16,2,NULL),(246,1.00,'MATERIAL','Bomba Sumergible Desagote Moto Agua 1.5 HP',207399.62,'456.1',207399.62,NULL,'und',87,NULL,NULL,135,2,NULL),(247,6.00,'MATERIAL','Artefacto Liston 120 doble',18543.18,'454.2',3090.53,NULL,'und',88,NULL,NULL,136,2,NULL),(248,15.00,'MATERIAL','Lampara Foco Led 15w',26313.60,'451.1',1754.24,NULL,'und',88,NULL,NULL,137,2,NULL),(249,15.00,'MATERIAL','Puente Adherente Pamax x 25 kg',1800000.00,'368.1',120000.00,NULL,'und',89,NULL,NULL,138,2,NULL),(250,10.00,'MATERIAL','Rollo Cartón Corrugado',121305.90,'363.4',12130.59,NULL,'und',90,NULL,NULL,139,2,NULL),(251,1.00,'OTRO','Alquiler de volquetes',80000.00,'365.1',80000.00,NULL,'und',91,NULL,NULL,NULL,3,NULL),(252,10.00,'MATERIAL','Lapiz Carpintero',3820.00,'363.3',382.00,NULL,'und',90,NULL,NULL,140,2,NULL),(253,10.00,'MATERIAL','Punta Phillips PH2',5671.00,'363.2',567.10,NULL,'und',90,NULL,NULL,141,2,NULL),(254,1.00,'MATERIAL','Disco Wid. Segmentado 7\'\' Bremen',14759.92,'363.1',14759.92,NULL,'und',90,NULL,NULL,142,2,NULL),(255,100.00,'MANO_OBRA','Albañilería Mano de obra const Pluvial - Construcción de Colector Provi sional con Caño 110m m, embudos recolectores, const rucción de cámara re colectora de las aguas de lluv ia desde la Planta B aja y bombeadas en la calle: S G 1,00 $1.700.000,0 0 $1.700.000,00 Construcción de Colector PVC, 110mm, enframpado en la losa de techo. - Colocación de embudos 110mm. - Construcción de Cámara para de pósito de agua de ll uvia. Incluye: Revoque general e impermeabilizació n de la misma. -',1700000.00,'366.1',17000.00,NULL,'und',92,648,NULL,NULL,1,NULL),(256,1.00,'OTRO','Alquiler de volquetes',80000.00,'362.1',80000.00,NULL,'und',93,NULL,NULL,NULL,3,NULL),(257,300.00,'MANO_OBRA','ENCHAPADO DE PAREDES EXTERNAS DEL EDIFICIO',4200000.00,'383.1',14000.00,NULL,'m2',94,643,NULL,NULL,1,50),(258,11.00,'MANO_OBRA','Ejecución de fajas en paredes de: Cocina y Baños de los pisos: 4,5,6,7,8,9,10,11,12,13 y 14',2640000.00,'361.1',240000.00,NULL,'piso',95,650,NULL,NULL,1,NULL),(259,7.00,'MANO_OBRA','Ejecución de fajas en pisos para RDC en los niveles 8 al 14',4900000.00,'361.2',700000.00,NULL,'piso',95,650,NULL,NULL,1,NULL),(260,48.00,'MANO_OBRA','Ejecución de contrapiso, fajas e impermeabilización con Protex Seal 77 en baños de los pisos 2 al 7.',9600000.00,'361.3',200000.00,NULL,'baño',95,657,NULL,NULL,1,NULL),(261,1.00,'MANO_OBRA','Nivelación general de losa de planta baja y patio.',80000.00,'361.4',80000.00,NULL,'SG',95,650,NULL,NULL,1,NULL),(262,17.86,'MANO_OBRA','Demolición de paredes en baño y cocina del Departamento 10-B, incluyendo bajada de escombros.',232180.00,'361.5',13000.00,NULL,'m2',95,647,NULL,NULL,1,NULL),(263,17.86,'MANO_OBRA','Construcción de paredes en baño y cocina del Departamento 10-B, incluyendo subida de materiales.',267900.00,'361.6',15000.00,NULL,'m2',95,612,NULL,NULL,1,NULL),(264,48.00,'MANO_OBRA','Impermeabilización y colocación de vendas en caños de baños y cocina',2160000.00,'364.1',45000.00,NULL,'Piso',96,623,NULL,NULL,1,NULL),(265,28.00,'MANO_OBRA','Construcción de canaleta recolectora de agua en balcones',840000.00,'364.2',30000.00,NULL,'Piso',96,648,NULL,NULL,1,NULL),(266,56.00,'MANO_OBRA','Corte, perfilamiento, recuardo e impermeabilización del muro debajo del premarco',2520000.00,'364.3',45000.00,NULL,'Dpto.',96,623,NULL,NULL,1,NULL),(267,1.00,'MANO_OBRA','Recuadro de ventanas, con 3 en 1, en el Dpto Modelo.',180000.00,'364.4',180000.00,NULL,'Dpto.',96,650,NULL,NULL,1,NULL),(268,60.00,'MANO_OBRA','Demolición de pases de losa en Baños (08) y Cocinas (04). Pisos: 3,4,5,6 y 7',780000.00,'364.5',13000.00,NULL,'Piso',96,647,NULL,NULL,1,NULL),(269,56.00,'MANO_OBRA','Demolición y amuramiento de de caño de succión decada baño del Dpto. Modelo. Dpto.',1960000.00,'364.6',35000.00,NULL,'Dpto.',96,647,NULL,NULL,1,NULL),(270,620.00,'MANO_OBRA','Revoque con 3 en 1, en Baños: P4, P5, P6, P7',9300000.00,'364.7',15000.00,NULL,'m2',96,651,NULL,NULL,1,NULL),(271,731.09,'MANO_OBRA','Revoque con 3 en 1, en Cocinas : P4, P5, P6, P7',10966350.00,'364.8',15000.00,NULL,'m2',96,651,NULL,NULL,1,NULL),(272,2.00,'OTRO','Inspección y certificación mensual de: Montacargas, Ascensor según normativa vigente de SRT',170000.00,'359.1',85000.00,NULL,'und',97,NULL,NULL,NULL,3,NULL),(273,100.00,'MANO_OBRA','Preinstalación de cañerías para aire acondicionado en Unidad Modelo. Incluuye amurado de cajas plásticas, canaleteado de muros para cañerías, armado y colocación de cañerías',817600.00,'353.1',8176.00,NULL,'und',98,NULL,NULL,NULL,1,NULL),(274,1.00,'OTRO','Servicio de Seguridad de la Obra',1500000.00,'352.1',1500000.00,NULL,'und',99,NULL,NULL,NULL,3,NULL),(275,1000.00,'MATERIAL','Tornillo T1 Punta Aguja',10800.00,'453.5',10.80,NULL,'und',100,NULL,NULL,143,2,NULL),(276,2.00,'MATERIAL','Cutter',10755.40,'453.4',5377.70,NULL,'und',100,NULL,NULL,107,2,NULL),(277,2000.00,'MATERIAL','Tornillo T2 Punta Aguja Negro',18800.00,'453.3',9.40,NULL,'und',100,NULL,NULL,144,2,NULL),(278,12.00,'MATERIAL','Placas Durlock Standard 12,5',159802.32,'453.2',13316.86,NULL,'und',100,NULL,NULL,145,2,NULL),(279,5.00,'MATERIAL','Placas Durlock antih 12,5',111657.00,'453.1',22331.40,NULL,'und',100,NULL,NULL,146,2,NULL),(280,240.00,'MANO_OBRA','Construcción den enchapado en paredes externas de TQ4',3360000.00,'351.2',14000.00,NULL,'m2',101,643,NULL,NULL,1,40),(281,3500.00,'MANO_OBRA','Colocación de puente ahderente en paredes externas de TQ4',5900020.00,'351.1',1685.72,NULL,'m2',101,655,NULL,NULL,1,NULL),(282,100.00,'MANO_OBRA','Servicio de Seguridad de la Obra',399800.00,'350.1',3998.00,NULL,'GL',102,NULL,NULL,NULL,1,NULL),(283,17.86,'MANO_OBRA','Demolición de paredes en Cocina y Baño en P4 Departamento A y en P10 Departamento B, incluye bajada de escombros y subida de material',232180.00,'349.1',13000.00,NULL,'m²',103,647,NULL,NULL,1,NULL),(284,40.12,'MANO_OBRA','Acondicionamiento y colocación de ceresita en paredes medianera del Departamento Modelo',481440.00,'349.2',12000.00,NULL,'m²',103,648,NULL,NULL,1,NULL),(285,17.86,'MANO_OBRA','Construcción de paredes con ladrillos del #8 ajustados a medida del proyecto en los departamentos P4 A y P10 B',267900.00,'349.3',15000.00,NULL,'m²',103,612,NULL,NULL,1,NULL),(286,13.00,'MANO_OBRA','Revisión de mediciones de Cocinas, Baños y Vestidores de 13 pisos',650000.00,'349.4',50000.00,NULL,'piso',103,650,NULL,NULL,1,NULL),(287,4.00,'MANO_OBRA','Ejecución de fajas en paredes de Cocina en pisos P3, P4, P5, P6 y P7',240000.00,'349.5',60000.00,NULL,'piso',103,650,NULL,NULL,1,NULL),(288,2.00,'MANO_OBRA','Faja en piso en P6 y P7',1200000.00,'349.6',600000.00,NULL,'piso',103,650,NULL,NULL,1,NULL),(289,2.00,'MATERIAL','Arco separador de 3mm P/porcel',65120.00,'348.1',32560.00,NULL,'und',104,NULL,NULL,147,2,NULL),(290,50.00,'MATERIAL','Pastina klaukol color talco bolsas de 1 kg',100145.00,'449.6',2002.90,NULL,'und',105,NULL,NULL,148,2,NULL),(291,10.00,'MATERIAL','Cantoneras yesera de 2.6m',19230.40,'449.5',1923.04,NULL,'und',105,NULL,NULL,149,2,NULL),(292,1.00,'MATERIAL','Venda geotextil sintética 1mx',16390.85,'449.4',16390.85,NULL,'und',105,NULL,NULL,150,2,NULL),(293,5.00,'MATERIAL','Estopa de limpieza por bolsa',5797.50,'449.3',1159.50,NULL,'und',105,NULL,NULL,56,2,NULL),(294,648.00,'MATERIAL','Ladrillos huecos 8x18x33',304171.20,'449.2',469.40,NULL,'und',105,NULL,NULL,18,2,NULL),(295,18.00,'MATERIAL','Arena',602843.94,'449.1',33491.33,NULL,'m3',105,NULL,NULL,151,2,NULL),(296,1.00,'OTRO','Por la ejecución del estudio de suelos consistente en 2 perforaciones de hasta 4 metros de profundidad cada una y una perforación de hasta 10 metros de profundidad. En todos los sondeos se practicarán ensayos de penetración normal por cada metro de avance. Sobre las muestras extraídas se efectuarán las siguientes determinaciones de laboratorio. Según normal IRAM/ASTM: humedad natural, limites liquido y plastico, peso de la unidad de volumen, procentaje de finos por lavado sobre tamiz 200, granulometria sobre tamices 4, 10, 40, compresión triaxial sobre muestras no perturbadas y clasificación unificada de casagrande. Se confeccionará un informe final que contendrá perfiles geológicos resultantes y los parámetros para el diseño de fundaciones.',2300000.00,'448.1',2300000.00,NULL,'und',106,NULL,NULL,NULL,3,NULL),(297,1.00,'OTRO','Relevamiento técnico de la estructura, para verificar el estado reglamentario de la misma. Informe técnico del cumplimiento actual respecto de la reglamentación vigente y las modiicaciones necesarias para su cummplimiento. Confección del informe técnico y cálculo de la estructura.',350000.00,'346.2',350000.00,NULL,'und',107,NULL,NULL,NULL,3,NULL),(298,1.00,'OTRO','Calculo dimensionamiento estructural verificación técnica',300000.00,'346.1',300000.00,NULL,'und',107,NULL,NULL,NULL,3,NULL),(299,1.00,'MATERIAL','Transformador reductor de 380v marca Yali',49567.78,'442.1',49567.78,NULL,'und',108,NULL,NULL,152,2,NULL),(300,16.93,'MANO_OBRA','Columna lateral derecha',237020.00,'345.3',14000.00,NULL,'m2',109,643,NULL,NULL,1,30),(301,18.00,'MANO_OBRA','Parte superior de ventanas por pisos',252000.00,'345.2',14000.00,NULL,'m2',109,643,NULL,NULL,1,10),(302,66.78,'MANO_OBRA','Zona central del balcón hasta el piso 14, entre los ventanales de Deptos B y C, de piso a techo',934920.00,'345.1',14000.00,NULL,'m2',109,643,NULL,NULL,1,20),(303,80.00,'MATERIAL','Pegamento para porcelanato',1300000.00,'446.1',16250.00,NULL,'und',110,NULL,NULL,153,2,NULL),(304,100.00,'MANO_OBRA','859 kg provisión y colocación de ductos de chapa galvanizada cal 25 y 27 colector + ducto',3960419.00,'342.2',39604.19,NULL,'und',111,NULL,NULL,NULL,1,NULL),(305,100.00,'MANO_OBRA','1595 kg PROVISIÓ Y COLOCACIÓN DE DUCTOS DE CHAPA GALVANIZADA CAL 27 COLECLTOR + Ducto de extracción de BAÑOS según planos corrientes columna COVE a,b,c,d,e Y f',7258845.00,'342.1',72588.45,NULL,'und',111,NULL,NULL,NULL,1,NULL),(306,10.00,'MATERIAL','Corrotex Anticorrosivo Cementico 4 kg',170661.20,'441.1',17066.12,NULL,'und',112,NULL,NULL,154,2,NULL),(307,120.76,'MANO_OBRA','Revoque grueso de cal (espesor 2 cm): Piso 2 (43,76 m²) y Piso 3 (77,00 m²), total 120,76 m² x $15.000',1811400.00,'339.1',15000.00,NULL,'m²',113,651,NULL,NULL,1,NULL),(308,879.63,'MANO_OBRA','Departamentos y palieres: ejecución de fajas, regleo y distribución de material para carpeta RDC en pisos 3, 4 y 5 (879,63 m² x $7.000)',6157410.00,'339.2',7000.00,NULL,'m²',113,658,NULL,NULL,1,NULL),(309,1.00,'MANO_OBRA','Reparación de patologías por hierro expuesto en losa de techo, columnas y vigas. Incluye: descubrir armaduras, cepillado, aplicación de pintura anticorrosiva y posterior tratamiento con producto Protex',300000.00,'339.3',300000.00,NULL,'und',113,644,NULL,NULL,1,NULL),(310,10.00,'MANO_OBRA','Demolición y adecuación de plenos, con colocación de calandro para verificación de la verticalidad (10 x $280.000)',2800000.00,'339.4',280000.00,NULL,'und',113,647,NULL,NULL,1,NULL),(311,40.00,'MANO_OBRA','Ejecución de fajas en paredes de baños en pisos 2, 3, 4 y 5 (40 x $90.000)',3600000.00,'339.5',90000.00,NULL,'und',113,650,NULL,NULL,1,NULL),(312,91.00,'MANO_OBRA','Construcción de contrapisos con pendientes en balcones de pisos 1, 3, 4 y 5 (91 x $11.000)',1001000.00,'339.6',11000.00,NULL,'und',113,657,NULL,NULL,1,NULL),(313,98.00,'MANO_OBRA','Construcción de contrapisos con pendientes en balcones de pisos 1, 3, 4 y 5 (98 x $15.000)',1470000.00,'339.7',15000.00,NULL,'und',113,657,NULL,NULL,1,NULL),(314,1.00,'MANO_OBRA','Hidrolavado',100000.00,'340.7',100000.00,NULL,'und',114,653,NULL,NULL,1,NULL),(315,89.00,'MANO_OBRA','Revoque proyectado hidrófugo',1290500.00,'340.6',14500.00,NULL,'m2',114,653,NULL,NULL,1,NULL),(316,36.20,'MANO_OBRA','Aplicado en losa',271500.00,'340.5',7500.00,NULL,'m2',114,653,NULL,NULL,1,NULL),(317,9.00,'MANO_OBRA','Cantonera',67500.00,'340.4',7500.00,NULL,'ml',114,653,NULL,NULL,1,NULL),(318,66.20,'MANO_OBRA','Buña',496500.00,'340.3',7500.00,NULL,'m2',114,653,NULL,NULL,1,NULL),(319,28.00,'MANO_OBRA','Arista',210000.00,'340.2',7500.00,NULL,'m2',114,653,NULL,NULL,1,NULL),(320,187.00,'MANO_OBRA','Yeso proyectado en Pared',1402500.00,'340.1',7500.00,NULL,'m2',114,653,NULL,NULL,1,NULL),(321,10.00,'MATERIAL','Cantoneras yesera de 2.6m',25657.80,'434.2',2565.78,NULL,'und',115,NULL,NULL,149,2,NULL),(322,200.00,'MATERIAL','Yeso Entre Rios x30 kg',1749204.00,'434.1',8746.02,NULL,'und',115,NULL,NULL,155,2,NULL),(323,1.00,'OTRO','Por la visita a obra de hasta un (1) día de duración (en días hábiles e incluyendo tiempos de traslado) de dos (2) profesionales, uno especializado en Tecnología del Hormigón y otro en Evaluación Estructural, con el objetivo de realizar una primera inspección visual de relevamiento y tomar conocimiento de las posibles problemáticas existentes en la estructura de hormigón armado correspondiente al edificio de referencia. De dicha visita surgirá un Informe Preliminar sobre la situación observada, con registro fotográfico de los aspectos más relevantes encontrados, así como una propuesta de actividades a desarrollar para su estudio detallado. Esta propuesta incluirá la verificación estructural a cargo de nuestro Asesor Especialista, acompañada de su correspondiente plan de trabajos y presupuesto. En caso de aprobarse el presupuesto correspondiente al estudio detallado y verificación estructural derivada del mismo, el monto consignado en el presente presupuesto será bonificado en su totalidad en dicho nuevo presupuesto.',1990000.00,'430.1',1990000.00,NULL,'und',116,NULL,NULL,NULL,3,NULL),(324,6.00,'MANO_OBRA','Alquier de camión diario. Alquiler diario de camión para extracción y disposición final de tierra y escombros',1800000.00,'334.3',300000.00,NULL,'und',117,640,NULL,NULL,1,20),(325,2.00,'MANO_OBRA','Alquiler de pala retro para ex, alquiler de pala retro 310 para excavación rampa ingreso cochera',800000.00,'334.2',400000.00,NULL,'und',117,640,NULL,NULL,1,70),(326,2.00,'MANO_OBRA','Alquiler por jornal 8 hs, percuto entrega y retiro eq alquiler diario diario de bobcat c/martillo neumático para picado de: Hormigón apertura lateral en rampa ingreso a cochera. Incliye motor man y Combustible jornada de 8 hs.',1200000.00,'334.1',600000.00,NULL,'und',117,640,NULL,NULL,1,90),(327,1.00,'MATERIAL','Vinilo de corte \"Red Sacchi\" color blanco detalle verde y rojo según muestra 60 cm x 40cm incluye instalación',11000.00,'428.1',11000.00,NULL,'und',118,NULL,NULL,156,2,NULL),(328,16.00,'MATERIAL','Hormigón RDC 300',1547680.00,'427.3',96730.00,NULL,'und',119,NULL,NULL,11,2,NULL),(329,1.00,'MATERIAL','Bomba de arrastre Hormigón',356087.00,'427.2',356087.00,NULL,'und',119,NULL,NULL,10,2,NULL),(330,16.00,'MATERIAL','Bombeado',51792.00,'427.1',3237.00,NULL,'m3',119,NULL,NULL,157,2,NULL),(331,1296.00,'MATERIAL','Ladrillos huecos 8x18x33',586232.64,'426.2',452.34,NULL,'und',120,NULL,NULL,18,2,NULL),(332,8.00,'MATERIAL','Arena',236024.80,'426.1',29503.10,NULL,'m3',120,NULL,NULL,151,2,NULL),(333,24.00,'MANO_OBRA','Demolición de banquinas placares. Incluye bajar escombros a PB',600000.00,'326.1',25000.00,NULL,'und',121,647,NULL,NULL,1,NULL),(334,2.00,'MANO_OBRA','Colocación de bañera (incluye relleno y pared de asentamiento con revoque frontal)',340000.00,'326.10',170000.00,NULL,'und',121,665,NULL,NULL,1,NULL),(335,154.00,'MANO_OBRA','Construcción de mochetas y bajadas de dintel a medida de puerta (Del P2 al P8)',4620000.00,'326.11',30000.00,NULL,'und',121,612,NULL,NULL,1,NULL),(336,112.00,'MANO_OBRA','Colocación de ladrillo maciso en panderete  (bajo premarco)',1008000.00,'326.12',9000.00,NULL,'ml',121,612,NULL,NULL,1,NULL),(337,155.82,'MANO_OBRA','Ejecución de ladrillo hueco 8cm. En baños adosados al muro del tabique de hormigón, de los 14 pisos',2025660.00,'326.13',13000.00,NULL,'m2',121,612,NULL,NULL,1,NULL),(338,107.12,'MANO_OBRA','Colocació de Porcelanato',1392560.00,'326.14',13000.00,NULL,'m2',121,662,NULL,NULL,1,NULL),(339,288.00,'MANO_OBRA','Ejecución con carpeta fratachada tradicional (baños)',4320000.00,'326.15',15000.00,NULL,'m2',121,657,NULL,NULL,1,NULL),(340,280.00,'MANO_OBRA','Relleno detodos los premarcos para habilitar el revoque de sus mochetas',1680000.00,'326.16',6000.00,NULL,'und',121,651,NULL,NULL,1,NULL),(341,28.00,'MANO_OBRA','Demolición de pared del 8 en departamento A y D, donde se ubicará la cabina de termotanque',700000.00,'326.17',25000.00,NULL,'und',121,647,NULL,NULL,1,NULL),(342,644.00,'MANO_OBRA','Reparación de los pases de losas en baños y cocinas con mortero',4508000.00,'326.18',7000.00,NULL,'und',121,648,NULL,NULL,1,NULL),(343,112.00,'MANO_OBRA','Construcción de mocheta en baños',3920000.00,'326.19',35000.00,NULL,'und',121,612,NULL,NULL,1,NULL),(344,28.00,'MANO_OBRA','Demolición de los plenos (adecuación de plenos). Incluye colocación de calandro para verificar la verticalidad',560000.00,'326.2',20000.00,NULL,'und',121,647,NULL,NULL,1,NULL),(345,222.60,'MANO_OBRA','Ejecución de mampostería con giro (mocheta) en menos de 1 m (tipo L-1 giro)',3339000.00,'326.3',15000.00,NULL,'m²',121,612,NULL,NULL,1,NULL),(346,74.20,'MANO_OBRA','Enchapado con ladrillo hueco (escalla) para engrosar las medidas de las bañeras',816200.00,'326.4',11000.00,NULL,'m²',121,649,NULL,NULL,1,NULL),(347,9.62,'MANO_OBRA','Ejecución de contrapiso + carpeta con pendiente máx. 7 cm de carga total, incluye subir material en balcones',105820.00,'326.5',11000.00,NULL,'m²',121,657,NULL,NULL,1,NULL),(348,332.00,'MANO_OBRA','Departamentos + Palier: Ejecución de fajas, regleo y distribución de material para carpeta RDC',1992000.00,'326.6',6000.00,NULL,'m²',121,658,NULL,NULL,1,NULL),(349,243.60,'MANO_OBRA','Babeta hidrófuga en balcones (30 cm pared + 15 cm piso, desarrollo 45/50 cm). Incluye colocación de Protex Seal 77 (2 capas)',2192400.00,'326.7',9000.00,NULL,'ml',121,623,NULL,NULL,1,NULL),(350,15.68,'MANO_OBRA','Retiro de carpetas en mal estado. Incluye bajar escombros a PB',235200.00,'326.8',15000.00,NULL,'m²',121,647,NULL,NULL,1,NULL),(351,23.06,'MANO_OBRA','Retiro de revoque en mal estado en P-1. Incluye bajada de escombros a PB',345900.00,'326.9',15000.00,NULL,'m²',121,647,NULL,NULL,1,NULL),(352,1.00,'MATERIAL','Bañera enlozada 1.6x0.7x antideslizante',107183.00,'422.2',107183.00,NULL,'und',122,NULL,NULL,158,2,NULL),(353,1.00,'MATERIAL','Bañera enlozada 1.4x0.7x antideslizante',95006.00,'422.1',95006.00,NULL,'und',122,NULL,NULL,159,2,NULL),(354,50.00,'MATERIAL','Discos de corte 4,5\'\' Disco 115mm x16,m',108005.50,'327.3',2160.11,NULL,'und',123,NULL,NULL,160,2,NULL),(355,2.00,'MATERIAL','Disco Diamantado 12\'\' Segmenta Patrol Black',124262.24,'327.2',62131.12,NULL,'und',123,NULL,NULL,161,2,NULL),(356,100.00,'MATERIAL','Discos de corte 4,5\'\' Disco 115mm x1,6m Tyrolit',216011.00,'327.1',2160.11,NULL,'und',123,NULL,NULL,162,2,NULL),(357,300.00,'MATERIAL','Tornillo autop. p. mecha 2 1/2 cabeza hexagonal',24600.00,'421.1',82.00,NULL,'und',124,NULL,NULL,163,2,NULL),(358,10.00,'MATERIAL','Corrotex Anticorrosivo Cementico 4 kg',165289.30,'419.1',16528.93,NULL,'und',125,NULL,NULL,154,2,NULL),(359,1120.00,'MATERIAL','Intomap 3 en 1 ar bags x 25 kg',7887667.20,'418.1',7042.56,NULL,'und',126,NULL,NULL,12,2,NULL),(360,1.00,'MATERIAL','Vinilo impreso UV instalación',200000.00,'415.1',200000.00,NULL,'und',127,NULL,NULL,164,2,NULL),(361,100.00,'MANO_OBRA','Hidrolavado de superficies exteriores donde se aplicará revoque 3 en 1',3840000.00,'317.1',38400.00,NULL,'GL',128,654,NULL,NULL,1,NULL),(362,5.00,'MATERIAL','Pallet vacío',131575.00,'412.6',26315.00,NULL,'und',129,NULL,NULL,165,2,NULL),(363,231.00,'MATERIAL','Cal Hydrat x 25 kg',925908.06,'412.5',4008.26,NULL,'und',129,NULL,NULL,88,2,NULL),(364,864.00,'MATERIAL','Ladrillos huecos 8x18x33',390821.76,'412.4',452.34,NULL,'und',129,NULL,NULL,18,2,NULL),(365,1000.00,'MATERIAL','Ladrillos comunes',165200.00,'412.3',165.20,NULL,'und',129,NULL,NULL,47,2,NULL),(366,160.00,'MATERIAL','Cemento x25 kg bolsa',688936.00,'412.2',4305.85,NULL,'und',129,NULL,NULL,119,2,NULL),(367,12.00,'MATERIAL','Arena',339258.72,'412.1',28271.56,NULL,'m3',129,NULL,NULL,151,2,NULL),(368,2.00,'MATERIAL','Sellador poliuretano Proflex P',324336.00,'411.2',162168.00,NULL,'und',130,NULL,NULL,166,2,NULL),(369,1.00,'MATERIAL','Protex Superligante x Tambor 2',888330.00,'411.1',888330.00,NULL,'und',130,NULL,NULL,167,2,NULL),(370,1.00,'MATERIAL','Provisión de honorarios por gestión y armado de la Solicitud de Factibilidad de Suministro Eléctrico para edificio de viviendas multifamiliar ubicado en la ciudad de Quilmes, ante la distribuidora EDESUR. Potencia total a solicitar: 778 kW. Incluye: Armado completo de la carpeta técnica conforme a los requisitos de EDESUR, con documentación de carácter técnico e informativo. Confección de la documentación técnica correspondiente (planilla de potencia, declaración jurada de cargas, memoria técnica, entre otras), firmadas por profesional matriculado. Presentación, entrega y envío de la carpeta técnica informativa a EDESUR. Gestión y entrega final de la Solicitud de Factibilidad aprobada.',2887590.00,'316.1',2887590.00,NULL,'und',131,NULL,NULL,168,2,NULL),(371,1.00,'OTRO','Alquiler de volquetes',70000.00,'314.1',70000.00,NULL,'und',132,NULL,NULL,NULL,3,NULL),(372,1.00,'MATERIAL','Hidrófugo vitrosol tambor x 20',146742.00,'313.1',146742.00,NULL,'und',133,NULL,NULL,169,2,NULL),(373,4.00,'MATERIAL','Pintura vial',31373.56,'312.5',7843.39,NULL,'und',134,NULL,NULL,170,2,NULL),(374,18.00,'MATERIAL','Aguarrás mineral',39900.42,'312.4',2216.69,NULL,'und',134,NULL,NULL,171,2,NULL),(375,2.00,'MATERIAL','Esmalte sintético color negro',51189.02,'312.3',25594.51,NULL,'und',134,NULL,NULL,172,2,NULL),(376,2.00,'MATERIAL','Pintura aerosol negra 430 ml',34379.10,'312.2',17189.55,NULL,'und',134,NULL,NULL,173,2,NULL),(377,2.00,'MATERIAL','Pintura aerosol amarilla',34379.10,'312.1',17189.55,NULL,'und',134,NULL,NULL,174,2,NULL),(378,10.00,'MATERIAL','Puente Adherente Pamax x 25 kg',120000.00,'311.1',12000.00,NULL,'und',135,NULL,NULL,138,2,NULL),(379,10.00,'MATERIAL','Puente Adherente Pamax x 25 kg',1200000.00,'300.1',120000.00,NULL,'und',136,NULL,NULL,138,2,NULL),(380,5.00,'MATERIAL','Pulsador rasante N/C completo para montacarga',22019.40,'409.9',4403.88,NULL,'und',137,NULL,NULL,175,2,NULL),(381,20.00,'MATERIAL','Toma 10 A 220 V blanco 1 módulo',15305.80,'409.8',765.29,NULL,'und',137,NULL,NULL,176,2,NULL),(382,10.00,'MATERIAL','Ficha 2x10 A macho',27100.80,'409.7',2710.08,NULL,'und',137,NULL,NULL,177,2,NULL),(383,20.00,'MATERIAL','Ficha 2x10 A macho',19014.40,'409.6',950.72,NULL,'und',137,NULL,NULL,177,2,NULL),(384,20.00,'MATERIAL','Ficha 2x10 A hembra',22815.80,'409.5',1140.79,NULL,'und',137,NULL,NULL,178,2,NULL),(385,10.00,'MATERIAL','Disyuntor bipolar 40 A',256053.80,'409.4',25605.38,NULL,'und',137,NULL,NULL,179,2,NULL),(386,10.00,'MATERIAL','Llave térmica bipolar 25 A',56441.90,'409.3',5644.19,NULL,'und',137,NULL,NULL,180,2,NULL),(387,10.00,'MATERIAL','Zócalo fotocélula',39837.90,'409.21',3983.79,NULL,'und',137,NULL,NULL,181,2,NULL),(388,20.00,'MATERIAL','Tapa 5x10 PVC blanca',9999.20,'409.20',499.96,NULL,'und',137,NULL,NULL,182,2,NULL),(389,10.00,'MATERIAL','Artefacto listón 120 doble',23541.40,'409.2',2354.14,NULL,'und',137,NULL,NULL,183,2,NULL),(390,20.00,'MATERIAL','Bastidor luz PVC',7370.40,'409.19',368.52,NULL,'und',137,NULL,NULL,184,2,NULL),(391,10.00,'MATERIAL','Ficha 3 + N + Tierra 16 A',67538.60,'409.18',6753.86,NULL,'und',137,NULL,NULL,185,2,NULL),(392,10.00,'MATERIAL','Fotocélula exterior 2500 Wts/CO',116212.80,'409.17',11621.28,NULL,'und',137,NULL,NULL,186,2,NULL),(393,1.00,'MATERIAL','Caja estanca PVC',1745.85,'409.16',1745.85,NULL,'und',137,NULL,NULL,187,2,NULL),(394,10.00,'MATERIAL','Toma 10 A 220 V doble blanco 3 módulos',34593.60,'409.15',3459.36,NULL,'und',137,NULL,NULL,188,2,NULL),(395,10.00,'MATERIAL','Portalámpara para foco 12 W',10945.30,'409.14',1094.53,NULL,'und',137,NULL,NULL,189,2,NULL),(396,10.00,'MATERIAL','Lámpara foco LED 15 W',9993.30,'409.13',999.33,NULL,'und',137,NULL,NULL,190,2,NULL),(397,10.00,'MATERIAL','Caja octogonal PVC Electric',2492.10,'409.12',249.21,NULL,'und',137,NULL,NULL,191,2,NULL),(398,2.00,'MATERIAL','Pulsador de emergencia',18729.14,'409.11',9364.57,NULL,'und',137,NULL,NULL,192,2,NULL),(399,5.00,'MATERIAL','Pulsador rasante N/O completo para montacarga',22019.40,'409.10',4403.88,NULL,'und',137,NULL,NULL,193,2,NULL),(400,20.00,'MATERIAL','Tubo LED 18W BLF 220V 1.2 m',36651.40,'409.1',1832.57,NULL,'und',137,NULL,NULL,194,2,NULL),(401,2.00,'MATERIAL','Vinilo impreso para cartel 4.8 1.22',360900.70,'404.3',180450.35,NULL,'und',138,NULL,NULL,195,2,NULL),(402,2.00,'MATERIAL','Vinilo impreso para cartel 4.8',1804200.46,'404.2',902100.23,NULL,'und',138,NULL,NULL,196,2,NULL),(403,2.00,'MATERIAL','Vinilo impreso para cartel 3x',440898.84,'404.1',220449.42,NULL,'und',138,NULL,NULL,197,2,NULL),(404,16.00,'MATERIAL','Malla fibra de vidrio 5x5 rol 90g revoque',635430.24,'407.1',39714.39,NULL,'und',139,NULL,NULL,198,2,NULL),(405,100.00,'MANO_OBRA','Construcción de Dinteles en ventanas de habitaciones, baños, cocina y living comedor. Incluye colocación de barras, encofrado requerido y ladrillos hasta la altura de losa de techo.',700000.00,'309.1',7000.00,NULL,'und',140,644,NULL,NULL,1,NULL),(406,100.00,'MANO_OBRA','Colocación de Premarcos.',420000.00,'309.2',4200.00,NULL,'m/m2',140,646,NULL,NULL,1,NULL),(407,100.00,'MANO_OBRA','Enchapado de vigas en habitaciones, baño y sobre ventana de cocina. Incluye subir los ladrillos desde planta baja a cada piso.',3609000.00,'309.3',36090.00,NULL,'m',140,649,NULL,NULL,1,NULL),(408,100.00,'MANO_OBRA','Enchapado en columnas de baños de los departamentos C y D en pisos 14 al 4, dos por piso y una en piso 10.',1645650.00,'309.4',16456.50,NULL,'m',140,649,NULL,NULL,1,NULL),(409,100.00,'MANO_OBRA','Demolición de columnas en azotea.',475000.00,'309.5',4750.00,NULL,'und',140,647,NULL,NULL,1,NULL),(410,100.00,'MANO_OBRA','Construcción de mochetas y/o encuadre en premarcos.',7280000.00,'309.6',72800.00,NULL,'und',140,612,NULL,NULL,1,NULL),(411,100.00,'MANO_OBRA','Colocación de calandros y replanteo de ventanas en fachadas.',1200000.00,'309.7',12000.00,NULL,'Piso',140,650,NULL,NULL,1,NULL),(412,100.00,'MANO_OBRA','Niveles de losa de techo por piso.',1120000.00,'309.8',11200.00,NULL,'Piso',140,650,NULL,NULL,1,NULL),(413,20.00,'MANO_OBRA','Jornales de ayudante para cubrir trabajos varios de obra: movimiento y descarga de materiales.',1400000.00,'309.9',70000.00,NULL,'Jornal',140,NULL,NULL,NULL,1,NULL),(414,10.00,'MATERIAL','Reflector de LED Exterior 200W Artef. Proy. Leds 200W 220V 11',302121.00,'405.1',30212.10,NULL,'und',141,NULL,NULL,199,2,NULL),(415,2160.00,'MATERIAL','Ladrillos huecos 8x18x33',877802.40,'402.7',406.39,NULL,'und',142,NULL,NULL,18,2,NULL),(416,770.00,'MATERIAL','Cal Cacique',4009082.00,'402.6',5206.60,NULL,'und',142,NULL,NULL,200,2,NULL),(417,1120.00,'MATERIAL','Intomap 3 en 1 ar bags x 25 kg',6268024.00,'402.5',5596.45,NULL,'und',142,NULL,NULL,12,2,NULL),(418,4000.00,'MATERIAL','Ladrillos comunes',627680.00,'402.4',156.92,NULL,'und',142,NULL,NULL,47,2,NULL),(419,48.00,'MATERIAL','Arena',1289183.04,'402.3',26857.98,NULL,'m3',142,NULL,NULL,151,2,NULL),(420,800.00,'MATERIAL','Cemento x50 kg bolsa',6002360.00,'402.2',7502.95,NULL,'und',142,NULL,NULL,201,2,NULL),(421,1440.00,'MATERIAL','Ladrillos huecos del 12 12x18x33',762235.20,'402.1',529.33,NULL,'und',142,NULL,NULL,131,2,NULL),(422,1.00,'MATERIAL','Lona frontar impresa con frontales',195500.00,'400.1',195500.00,NULL,'und',143,NULL,NULL,202,2,NULL),(423,100.00,'MANO_OBRA','Servicio de Seguridad de la Obra',4800000.00,'307.1',48000.00,NULL,'GL',144,NULL,NULL,NULL,1,NULL),(424,1.00,'MATERIAL','Sellador multiuso fastix color',561900.00,'399.3',561900.00,NULL,'und',145,NULL,NULL,203,2,NULL),(425,200.00,'MATERIAL','Tuerca 5/8 para andamio',21486.00,'399.2',107.43,NULL,'und',145,NULL,NULL,204,2,NULL),(426,200.00,'MATERIAL','Torn. Cab. Hex 3/8\'\' x38mm c/ara cabeza hexagonal',82644.00,'399.1',413.22,NULL,'und',145,NULL,NULL,205,2,NULL),(427,2.00,'MATERIAL','Pallet vacío',49998.50,'398.6',24999.25,NULL,'und',146,NULL,NULL,165,2,NULL),(428,1.00,'MATERIAL','Nylon negro polietileno 200mic negro',46351.62,'398.5',46351.62,NULL,'und',146,NULL,NULL,104,2,NULL),(429,1000.00,'MATERIAL','Ladrillos comunes',156930.00,'398.4',156.93,NULL,'und',146,NULL,NULL,47,2,NULL),(430,12.00,'MATERIAL','Arena',322295.88,'398.3',26857.99,NULL,'und',146,NULL,NULL,206,2,NULL),(431,80.00,'MATERIAL','Cemento x50 kg bolsa',608236.00,'398.2',7602.95,NULL,'und',146,NULL,NULL,201,2,NULL),(432,720.00,'MATERIAL','Ladrillos huecos del 12 12x18x33',375883.20,'398.1',522.06,NULL,'und',146,NULL,NULL,131,2,NULL),(433,1.00,'MATERIAL','Envase de garrafa de gas x10 kg completo',95041.32,'394.1',95041.32,NULL,'und',147,NULL,NULL,207,2,NULL),(434,2.00,'MATERIAL','Pallet vacío',49998.50,'389.4',24999.25,NULL,'und',148,NULL,NULL,165,2,NULL),(435,80.00,'MATERIAL','Cemento x50 kg bolsa',615464.00,'389.3',7693.30,NULL,'und',148,NULL,NULL,201,2,NULL),(436,6.00,'MATERIAL','Arena',161147.88,'389.2',26857.98,NULL,'m3',148,NULL,NULL,151,2,NULL),(437,720.00,'MATERIAL','Ladrillos huecos del 12 12x18x33',375883.20,'389.1',522.06,NULL,'und',148,NULL,NULL,131,2,NULL),(443,100.00,'MANO_OBRA','Revoque proyectado en Pared, Recuadro balcones, Recuadro Planta Baja, Recuadro Planta Alta, Aristas, Buñas',69134720.00,'301.1',691347.20,NULL,'gl',149,682,NULL,NULL,1,NULL),(444,100.00,'MATERIAL','Tornillo hexagonal para chapas de 2 1/2\'\'',256100.00,'385.3',2561.00,NULL,'und',150,NULL,NULL,208,2,NULL),(445,270.00,'MATERIAL','Tornillo autop. p. mecha 2 1/2 cabeza hexagonal',37800.00,'385.2',140.00,NULL,'und',150,NULL,NULL,163,2,NULL),(446,100.00,'MATERIAL','Discos de corte 4,5\'\'',123900.00,'385.1',1239.00,NULL,'und',150,NULL,NULL,209,2,NULL),(447,1.00,'MATERIAL','Plomada',6257.87,'384.3',6257.87,NULL,'und',151,NULL,NULL,210,2,NULL),(448,20.00,'MATERIAL','Antiparras p/polvos y liquidos transp.',30125.00,'384.2',1506.25,NULL,'und',151,NULL,NULL,211,2,NULL),(449,50.00,'MATERIAL','Guantes hilo moteado',37800.00,'384.1',756.00,NULL,'und',151,NULL,NULL,212,2,NULL),(450,20.00,'MATERIAL','Tubo LEDs 19w BLF 220V 1.2M',23529.40,'381.1',1176.47,NULL,'und',152,NULL,NULL,213,2,NULL),(451,560.00,'MATERIAL','Intomap 3 en 1 ar bags x 25 kg',3134012.00,'387.1',5596.45,NULL,'und',153,NULL,NULL,12,2,NULL),(452,5.00,'MATERIAL','Tanza rollo de 100m',12198.35,'382.4',2439.67,NULL,'und',154,NULL,NULL,214,2,NULL),(453,10.00,'MATERIAL','Hoja sierra p/acero 244 dientes 30 cm de largo',13551.00,'382.3',1355.10,NULL,'und',154,NULL,NULL,215,2,NULL),(454,10.00,'MATERIAL','Fratacho plastico de fieltro',5787.40,'382.2',578.74,NULL,'und',154,NULL,NULL,216,2,NULL),(455,10.00,'MATERIAL','Fratacho de madera algarrobo 35 cm',45593.00,'382.1',4559.30,NULL,'und',154,NULL,NULL,217,2,NULL),(456,2.00,'MATERIAL','Pallet vacío',49998.50,'380.4',24999.25,NULL,'und',155,NULL,NULL,165,2,NULL),(457,20.00,'MATERIAL','Clavos punta paris 2\'',65208.00,'380.3',3260.40,NULL,'und',155,NULL,NULL,218,2,NULL),(458,20.00,'MATERIAL','Clavos punta paris 2 y 1/2\'',63379.60,'380.2',3168.98,NULL,'und',155,NULL,NULL,219,2,NULL),(459,80.00,'MATERIAL','Cemento x50kg bolsa AVELLANEDA',608264.00,'380.1',7603.30,NULL,'und',155,NULL,NULL,220,2,NULL),(460,1.00,'OTRO','Certificado de calibración',47850.00,'379.2',47850.00,NULL,'und',156,NULL,NULL,NULL,3,NULL),(461,1.00,'MATERIAL','Calibración nivel laser spectro',477000.00,'379.1',477000.00,NULL,'und',156,NULL,NULL,221,2,NULL),(462,3.00,'MATERIAL','Malla fibra de vidrio 5x5 rol 90g revoque',140152.14,'378.2',46717.38,NULL,'und',157,NULL,NULL,198,2,NULL),(463,1280.00,'MATERIAL','Intomap 3 en 1 ar bags x 25 kg',7163456.00,'378.1',5596.45,NULL,'und',157,NULL,NULL,12,2,NULL),(464,5.00,'MATERIAL','Casco seg. blanco con arnes',29988.00,'377.2',5997.60,NULL,'und',158,NULL,NULL,222,2,NULL),(465,1.00,'MATERIAL','Guantes dielectricos talle 11 l36cm dps1210336e',41328.00,'377.1',41328.00,NULL,'und',158,NULL,NULL,223,2,NULL),(466,2.00,'MATERIAL','Pantalon cargo beige talle 42 y 54',42000.00,'376.1',21000.00,NULL,'und',159,NULL,NULL,224,2,NULL),(467,1.00,'MATERIAL','Pallet vacío',19008.26,'375.1',19008.26,NULL,'und',160,NULL,NULL,165,2,NULL),(468,49.00,'MATERIAL','Chapa trapezoidal c25 x6mts ancho',3710176.12,'374.2',75717.88,NULL,'und',161,NULL,NULL,225,2,NULL),(469,28.00,'MATERIAL','Chapa lista Galvanizada c30 2.00x 1.00 1.22 x 2.44',613980.08,'374.1',21927.86,NULL,'und',161,NULL,NULL,226,2,NULL),(470,5.00,'MATERIAL','Anclaje quimico fischer v1 30',126033.05,'373.1',25206.61,NULL,'und',162,NULL,NULL,227,2,NULL),(471,100.00,'MANO_OBRA','Colocación de lavatorio, construcción de measda, colocación de inodoro en el baño para damas del Local de Ventas',180000.00,'296.1',1800.00,NULL,'und',163,641,NULL,NULL,1,60),(472,12.00,'MATERIAL','Arena',317355.36,'371.1',26446.28,NULL,'m3',164,NULL,NULL,151,2,NULL),(473,5.00,'MATERIAL','Disco widia segmentado 4.5\'\'',23913.85,'370.3',4782.77,NULL,'und',165,NULL,NULL,228,2,NULL),(474,5.00,'MATERIAL','Disco corte p/sensitiva 14\'\'',40632.70,'370.2',8126.54,NULL,'und',165,NULL,NULL,229,2,NULL),(475,2.00,'MATERIAL','Disco widia segmentado 7\'\'',19771.08,'370.1',9885.54,NULL,'und',165,NULL,NULL,230,2,NULL),(476,12.00,'MATERIAL','Arena',317355.36,'360.1',26446.28,NULL,'und',166,NULL,NULL,206,2,NULL),(477,1.00,'MATERIAL','Contrat. Seguro Respons. Civil. Respons. Civil. Suma asegurada $300.000.00 sin Franquicia asegurado Simende CO SRL asegurado baprisud S.A',796271.08,'368.1',796271.08,NULL,'und',167,NULL,NULL,231,2,NULL),(478,130.00,'MANO_OBRA','Colocación de Dos capas de Protex Seal 77',910000.00,'292.3',7000.00,NULL,'m2',168,644,NULL,NULL,1,NULL),(479,20.00,'MANO_OBRA','Hidro Lavado en Sala de Maquinas-Ascensores',26000.00,'292.2',1300.00,NULL,'m2',168,641,NULL,NULL,1,50),(480,15.00,'MANO_OBRA','Nivelación en cada Piso del edificio y verificado nivel de cada dintel. Para conocer el punto más alto - Losa y el Punto mas bajo - Dintel.',1200000.00,'292.1',80000.00,NULL,'und',168,650,NULL,NULL,1,NULL),(481,3.00,'MATERIAL','Cabo grueso de madera con rosc',9047.10,'367.9',3015.70,NULL,'und',169,NULL,NULL,232,2,NULL),(482,3.00,'MATERIAL','Escobillón barrendero',14816.91,'367.8',4938.97,NULL,'und',169,NULL,NULL,233,2,NULL),(483,1.00,'MATERIAL','Cinta Métrica de 8 mts',16490.74,'367.7',16490.74,NULL,'und',169,NULL,NULL,234,2,NULL),(484,20.00,'MATERIAL','Guantes Hilo Moteado',16666.60,'367.6',833.33,NULL,'und',169,NULL,NULL,212,2,NULL),(485,6.00,'MATERIAL','Lapiz Carpintero',1539.12,'367.5',256.52,NULL,'und',169,NULL,NULL,140,2,NULL),(486,20.00,'MATERIAL','Hoja de Cutter',2134.80,'367.4',106.74,NULL,'und',169,NULL,NULL,103,2,NULL),(487,4.00,'MATERIAL','Cutter',8487.60,'367.3',2121.90,NULL,'und',169,NULL,NULL,107,2,NULL),(488,3.00,'MATERIAL','Martillo carpintero 650 grs largo 35 cm',68727.30,'367.2',22909.10,NULL,'und',169,NULL,NULL,235,2,NULL),(489,20.00,'MATERIAL','Punta Phillips PH2',13991.20,'367.1',699.56,NULL,'und',169,NULL,NULL,141,2,NULL),(490,1.00,'MATERIAL','Horno Microondas',90908.26,'366.1',90908.26,NULL,'und',170,NULL,NULL,236,2,NULL),(491,1.00,'MATERIAL','Heladera bajo mesada 78 a 125L 220V',206610.74,'365.1',206610.74,NULL,'und',171,NULL,NULL,237,2,NULL),(492,43.50,'MANO_OBRA','Demolición de Muro Antepecho de la Azotea, de ladrillo hueco cerámico 12x18x33. Incluye manupulicación del material hasta PB incluye la colocación de mediasombra y la bajada de limpieza del sitio de trabajo hasta PB',1087500.00,'293.1',25000.00,NULL,'m2',172,647,NULL,NULL,1,NULL),(493,252.00,'MANO_OBRA','Demolición de Dinteles que no cumplan con los parametros de Seguridad y Calidad. Incluye la colocación de mediasombra y la bajada de limpieza del sitio de trabajo hasta PB',4032000.00,'293.2',16000.00,NULL,'und',172,647,NULL,NULL,1,NULL),(494,8.00,'MATERIAL','Codo HH 110 a 90° AWADUC Codo HH 110x90 Duratop',19672.00,'362.1',2459.00,NULL,'und',173,NULL,NULL,238,2,NULL),(495,40.00,'MATERIAL','Cemento x50 kg bolsa',307107.60,'361.2',7677.69,NULL,'und',174,NULL,NULL,201,2,NULL),(496,864.00,'MATERIAL','Ladrillos huecos del 12 12x18x33',498692.16,'361.1',577.19,NULL,'und',174,NULL,NULL,131,2,NULL),(497,1.00,'MANO_OBRA','Elamobración de Proyecto Instalación Eléctrica',9000000.00,'288.1',9000000.00,NULL,'GL',175,645,NULL,NULL,1,10),(498,6.00,'MATERIAL','Rodillo pelo corto de 7°',15371.88,'359.5',2561.98,NULL,'und',176,NULL,NULL,239,2,NULL),(499,6.00,'MATERIAL','Rodillo antigota N°22',49586.76,'359.4',8264.46,NULL,'und',176,NULL,NULL,240,2,NULL),(500,2.00,'MATERIAL','Pintura aerosol negro 430ML',9669.42,'359.3',4834.71,NULL,'und',176,NULL,NULL,241,2,NULL),(501,5.00,'MATERIAL','GFalgo pincel silver N°25',35070.25,'359.2',7014.05,NULL,'und',176,NULL,NULL,242,2,NULL),(502,5.00,'MATERIAL','Pinceleta N°50',36363.65,'359.1',7272.73,NULL,'und',176,NULL,NULL,243,2,NULL),(503,43.50,'MANO_OBRA','Construcción de Muro Antepecho de la Azotea, de ladrillo hueco cerámico 12x18x33. Incluye manipulación del material desde P.B hasta Azotea.',1087500.00,'294.1',25000.00,NULL,'m2',177,612,NULL,NULL,1,NULL),(504,27.00,'MANO_OBRA','Construccion de Columnas de soporte (Machones). Incluye el armado del hierro, colocación del encofrado y llenado con hormigión. Dim: 0.20x9.0',621000.00,'294.2',23000.00,NULL,'ml',177,648,NULL,NULL,1,NULL),(505,80.00,'MANO_OBRA','Construcción de Viga de Encadenado en Muro-Antepecho de Azotea. Incluye el armado del hierro, colocación del encofrado y llenado con hormigón. Dim: 0.12x0.20',1840000.00,'294.3',23000.00,NULL,'ml',177,648,NULL,NULL,1,NULL),(506,252.00,'MANO_OBRA','Construcción de Dinteles en: Ventanas de Habitaciones, Baños, Cocina y Living Comedor, todo en edificio. Incluye: Colocación de barras, encofrado requerido y ladrillos hasta la altura de losa de techo.',6300000.00,'294.4',25000.00,NULL,'und',177,648,NULL,NULL,1,NULL),(507,252.00,'MANO_OBRA','Colocación de Premarcos.',3780000.00,'294.5',15000.00,NULL,'und',177,646,NULL,NULL,1,NULL),(508,179.00,'MANO_OBRA','Revoque a mano de Módulo de Escaleras, Incluye salpicar la pared de ladrillo, con lechada de mortero arena-cemento, para garantizar la adherencia del revoque.',2148000.00,'295.1',12000.00,NULL,'m2',178,648,NULL,NULL,1,NULL),(509,100.00,'MANO_OBRA','Demolición de pared en la Sala de Usos Múltiples, la cual presentaba riesgo de desplome. Incluye el traslado manual del material proveniente de la demolición hasta el patio de planta baja. Desencofrado y limpieza de la madera existente en las vigas invertidas del Nivel 15 y en los 28 balcones del edificio. Comprende el retiro de madera incrustada en la losa y el traslado del material al patio de planta baja. Hidrolavado de toda la superficie superior del techo del Nivel 15 y de los 28 balcones. Aplicación de Protex Seal 77 en dos capas sobre el Nivel 15 (techo) y en las superficies de las vigas invertidas perimetrales de cada ambiente y de los 28 balcones. Eliminación de tacos de madera del encofrado. Incluye limpieza interna, relleno con hormigón y aplicación de gasa con puente adherente. Corrección de pendientes en balcones mediante mortero de arena y cemento, garantizando el correcto drenaje hacia el orificio del colector principal del edificio. Limpieza del patio de planta baja y de los locales comerciales N° 5, 6 y 7. Colocación de malla de seguridad naranja en el Nivel 15. Pintura en paredes de baños, colocación y pintura de puertas de vestuarios.',5501700.00,'285.1',55017.00,NULL,'und',179,647,NULL,NULL,1,NULL),(510,20.00,'MATERIAL','Malla naranja',384160.00,'352.2',19208.00,NULL,'und',180,NULL,NULL,244,2,NULL),(511,30.00,'MATERIAL','Electrodos 2.5MM punta azul',264113.10,'352.1',8803.77,NULL,'und',180,NULL,NULL,245,2,NULL),(512,500.00,'MATERIAL','Tornillo T1 Punta Aguja',6250.00,'351.6',12.50,NULL,'und',181,NULL,NULL,143,2,NULL),(513,500.00,'MATERIAL','Tornillo T2 Punta Aguja',4500.00,'351.5',9.00,NULL,'und',181,NULL,NULL,246,2,NULL),(514,500.00,'MATERIAL','Tornillos hexas autoperf',32500.00,'351.4',65.00,NULL,'und',181,NULL,NULL,113,2,NULL),(515,500.00,'MATERIAL','Fijación tarugo+tornillo 8 LAD',33500.00,'351.3',67.00,NULL,'und',181,NULL,NULL,247,2,NULL),(516,500.00,'MATERIAL','Fijación tarugo+tornillo 8',25500.00,'351.2',51.00,NULL,'und',181,NULL,NULL,248,2,NULL),(517,20.00,'MATERIAL','Disco de corte 4,5\'\'',12528.80,'351.1',626.44,NULL,'und',181,NULL,NULL,249,2,NULL),(518,2.00,'MATERIAL','Pinceleta galgo n°50',9246.94,'280.6',4623.47,NULL,'und',182,NULL,NULL,250,2,NULL),(519,2.00,'MATERIAL','Rodillo pelo corto 7\'\' para bar',8140.16,'280.5',4070.08,NULL,'und',182,NULL,NULL,251,2,NULL),(520,1.00,'MATERIAL','Pincel N°15',1635.17,'280.4',1635.17,NULL,'und',182,NULL,NULL,252,2,NULL),(521,1.00,'MATERIAL','Galgo pincel silver n°20',2006.48,'280.3',2006.48,NULL,'und',182,NULL,NULL,253,2,NULL),(522,16.00,'MATERIAL','Esmalte sintético',94123.68,'280.2',5882.73,NULL,'und',182,NULL,NULL,254,2,NULL),(523,18.00,'MATERIAL','Aguarrás mineral',33957.72,'280.1',1886.54,NULL,'und',182,NULL,NULL,171,2,NULL),(524,1.00,'MATERIAL','Canillas 1/2\'\' plastica para la canilla lavat. 221 pico lev. c/cruz',23179.36,'349.8',23179.36,NULL,'und',183,NULL,NULL,255,2,NULL),(525,1.00,'MATERIAL','Adaptador tanque PPN 1/1',1547.25,'349.7',1547.25,NULL,'und',183,NULL,NULL,256,2,NULL),(526,1.00,'MATERIAL','Canillas para mesada un agua',15254.90,'349.6',15254.90,NULL,'und',183,NULL,NULL,257,2,NULL),(527,3.00,'MATERIAL','Lluvia M Plastica Completa',19803.15,'349.5',6601.05,NULL,'und',183,NULL,NULL,258,2,NULL),(528,1.00,'MATERIAL','Pileta de lavar PVC chica 49x43x28 DU',17470.70,'349.4',17470.70,NULL,'und',183,NULL,NULL,259,2,NULL),(529,2.00,'MATERIAL','Sopapa PVC 40 cromo',5035.72,'349.3',2517.86,NULL,'und',183,NULL,NULL,260,2,NULL),(530,2.00,'MATERIAL','Asiento inodoro Floren. TSX4 T RAFUL OFERTA',57921.90,'349.2',28960.95,NULL,'und',183,NULL,NULL,261,2,NULL),(531,2.00,'MATERIAL','Mochila PVC Codo Ideal',50171.72,'349.1',25085.86,NULL,'und',183,NULL,NULL,262,2,NULL),(532,100.00,'MANO_OBRA','Trabajo de apuntalamiento de cerco perimetral interno en terrazas de quilmes caido por tormenta dias 1 y 2 de marzo. Concurren tres operarios',600000.00,'279.2',6000.00,NULL,'GL',184,640,NULL,NULL,1,30),(533,100.00,'MANO_OBRA','Movimiento de suelo/personal asignado a servicio de nivelación final de PB con pala retro más operario y dos aytes. Incluye 6 viajes de camión volcador para retiro de residuos y descarga d',1200000.00,'279.1',12000.00,NULL,'GL',184,640,NULL,NULL,1,50),(534,100.00,'MANO_OBRA','Fabricación y Construcción de Cerco Perimetral - 1. Excavación de hueco para incar columnas de cerco. 2. Colocación, Nivelación y aplomado de coumnas en terreno. 3. Hormigonado de la fundación de cada columna. 4. Colocación de chapas, Incluye: excavación a lo largo del cerco dque lo necesite. 5. Retiro de cerco de madera y limpieza dgeneral de la zona de los vecions aledañas',4027500.00,'277.1',40275.00,NULL,'GL',185,641,NULL,NULL,1,40),(535,5.00,'MATERIAL','Codo HH 40x90 mm Duratop.',2469.40,'342.9',493.88,NULL,'und',186,NULL,NULL,263,2,NULL),(536,5.00,'MATERIAL','Codo HH 50x90 mm Duratop.',3422.85,'342.8',684.57,NULL,'und',186,NULL,NULL,264,2,NULL),(537,5.00,'MATERIAL','Codo HH 63x45 mm Duratop.',4403.20,'342.7',880.64,NULL,'und',186,NULL,NULL,265,2,NULL),(538,4.00,'MATERIAL','Gomas de goyete para inodoro Ferrum.',9483.56,'342.6',2370.89,NULL,'und',186,NULL,NULL,266,2,NULL),(539,24.00,'MATERIAL','Tarugos N°8 marca Redex.',703.68,'342.5',29.32,NULL,'und',186,NULL,NULL,267,2,NULL),(540,24.00,'MATERIAL','Tornillos para inodoro cromados 22x70 mm.',13727.28,'342.4',571.97,NULL,'und',186,NULL,NULL,268,2,NULL),(541,2.00,'MATERIAL','Asiento para inodoro blanco Concordplast.',26666.02,'342.3',13333.01,NULL,'und',186,NULL,NULL,269,2,NULL),(542,2.00,'MATERIAL','Inodoro corto Andina blanco Ferrum.',125985.52,'342.2',62992.76,NULL,'und',186,NULL,NULL,270,2,NULL),(543,6.00,'MATERIAL','Tubo macho 25 mm Aquasystem.',15440.58,'342.14',2573.43,NULL,'und',186,NULL,NULL,271,2,NULL),(544,4.00,'MATERIAL','Unión doble 25 mm Aquasystem.',7011.24,'342.13',1752.81,NULL,'und',186,NULL,NULL,272,2,NULL),(545,6.00,'MATERIAL','Reducción 20x25 mm Aquasystem (buje red 25x20).',2243.70,'342.12',373.95,NULL,'und',186,NULL,NULL,273,2,NULL),(546,3.00,'MATERIAL','Codo MH 40x45 mm Duratop.',1221.84,'342.11',407.28,NULL,'und',186,NULL,NULL,274,2,NULL),(547,5.00,'MATERIAL','Codo HH 40x45 mm Duratop.',2585.60,'342.10',517.12,NULL,'und',186,NULL,NULL,275,2,NULL),(548,2.00,'MATERIAL','Mochila de PVC con codo Ideal.',47663.12,'342.1',23831.56,NULL,'und',186,NULL,NULL,276,2,NULL),(549,350.00,'MATERIAL','Tornillos hexas autoperf',9515800.00,'341.1',27188.00,NULL,'und',187,NULL,NULL,113,2,NULL),(550,100.00,'MANO_OBRA','ALBAÑILERIA MANO DE OBRA -- Aplicación de 2 capas de epoxy, hidrófugo (protex seal 77) en piso de azotea a brocha -- Colocación de malla electrosoldada, malla naranja y tapar madera en todos los ductos y servicios, tanto en ventanas, palieres y azotea de PB azotea inclue techo depto piso 15 -- Instalación de clumnas necesarias para los portones de entrada a la  bar -- Perforación de orificios para el agua que se retiene en la azotea -- Construcción de cordón de ladrillos y revoque-cerecita en los bordes de cada ventana de aireación-subsuelo. Colocación tapa -- Extracción de tacos de madera empotrados en la losa y colocar relleno de reposición',3800000.00,'271.1',38000.00,NULL,'GL',188,672,NULL,NULL,1,NULL),(551,100.00,'MANO_OBRA','TAREAS POR ADMINISTRACIÓN - Barrido, recolección y eliminación de encofrados adheridos a la estructura en azotea -- Baja de escombros y basura hasta el lugar selecccionado en terreno de PB -- Limpieza de todos los escombros -- Traslado de escombros fuera de la azotea, dptos. de cada piso, para luego comenzar su disposición en terreno de PB. -- Limpieza del módulo de escalera de todo el edificio, desde la azotea hasta subsuelo -- Hidrolavado de todo el área de la azotea -- Hidrolavado a todo el módulo de escaleras, sala de máquinas a subsuelo -- Colocación de malla electrosoldada y malla naranja de seguridad en zona de fachadas a los balcones en la azotea -- Colocación de malla electrosoldada, maderas o barras y malla naranja de seguridad en todas las ventanas, frontar ascensor y plenos de servicio del edificio, desde el P1 hasta el piso P14 -- Limpieza de todos los departamentos y palieres del edificio -- Instalación de columna para la colocación de los portones de entrada a la obra',2280000.00,'270.1',22800.00,NULL,'GL',189,672,NULL,NULL,1,NULL),(552,10.00,'MATERIAL','Cupla termofusión 25 mm.',2726.00,'335.9',272.60,NULL,'und',190,NULL,NULL,277,2,NULL),(553,5.00,'MATERIAL','Caño Ø20 PN25 Aquasystem.',19520.30,'335.8',3904.06,NULL,'und',190,NULL,NULL,278,2,NULL),(554,6.00,'MATERIAL','Caño Ø25 PN25 Aquasystem.',34063.02,'335.7',5677.17,NULL,'und',190,NULL,NULL,279,2,NULL),(555,2.00,'MATERIAL','Llave de paso 25 mm polipropileno blanco Aquasystem.',91452.00,'335.6',7852.83,NULL,'und',190,NULL,NULL,280,2,NULL),(556,10.00,'MATERIAL','Cupla termofusión 20 mm.',1875.40,'335.5',187.54,NULL,'und',190,NULL,NULL,281,2,NULL),(557,4.00,'MATERIAL','Codo rosca hembra 25x3/4” a 90° Aquasystem.',7549.28,'335.4',1887.32,NULL,'und',190,NULL,NULL,282,2,NULL),(558,25.00,'MATERIAL','Codo normal 25x90° Aquasystem.',9007.00,'335.3',360.28,NULL,'und',190,NULL,NULL,283,2,NULL),(559,1.00,'MATERIAL','Boca de acceso Ø63 mm Duratop.',3591.09,'335.29',3591.09,NULL,'und',190,NULL,NULL,284,2,NULL),(560,8.00,'MATERIAL','Llave de fusión externa 20 mm Aquasystem.',50298.00,'335.28',6287.25,NULL,'und',190,NULL,NULL,285,2,NULL),(561,8.00,'MATERIAL','Tubo macho 20 mm Aquasystem.',12903.12,'335.27',1612.89,NULL,'und',190,NULL,NULL,286,2,NULL),(562,2.00,'MATERIAL','Tubo hembra 25 mm Aquasystem.',3774.64,'335.26',1887.32,NULL,'und',190,NULL,NULL,287,2,NULL),(563,6.00,'MATERIAL','Tubo hembra 20 mm Aquasystem.',7474.56,'335.25',1245.76,NULL,'und',190,NULL,NULL,288,2,NULL),(564,1.00,'MATERIAL','Termotanque eléctrico.',174840.16,'335.24',174840.16,NULL,'und',190,NULL,NULL,289,2,NULL),(565,120.00,'MATERIAL','Fijaciones Ø8 mm.',7716.00,'335.23',64.30,NULL,'und',190,NULL,NULL,290,2,NULL),(566,120.00,'MATERIAL','Tarugo para hueco N°8 con tope.',5487120.00,'335.22',78.81,NULL,'und',190,NULL,NULL,291,2,NULL),(567,30.00,'MATERIAL','Grampa tipo Omega 1/2”.',9346.50,'335.21',311.55,NULL,'und',190,NULL,NULL,292,2,NULL),(568,30.00,'MATERIAL','Grampa tipo Omega 3/4”.',10168.50,'335.20',338.95,NULL,'und',190,NULL,NULL,293,2,NULL),(569,30.00,'MATERIAL','Codo normal 20x90° Aquasystem.',6969.90,'335.2',232.33,NULL,'und',190,NULL,NULL,294,2,NULL),(570,4.00,'MATERIAL','Silicona en aerosol (solución sellante).',11937.28,'335.19',2984.32,NULL,'und',190,NULL,NULL,295,2,NULL),(571,5.00,'MATERIAL','Manguito de reparación Ø110 mm Duratop.',8028.15,'335.18',1605.63,NULL,'und',190,NULL,NULL,296,2,NULL),(572,6.00,'MATERIAL','Codo MH 110x45° Duratop.',7647.78,'335.17',1274.63,NULL,'und',190,NULL,NULL,297,2,NULL),(573,4.00,'MATERIAL','Ramal 110x63 mm a 45°.',9596.00,'335.16',2399.00,NULL,'und',190,NULL,NULL,298,2,NULL),(574,1.00,'MATERIAL','Pileta de patio Ø110 mm chica Duratop.',4030.19,'335.15',4030.19,NULL,'und',190,NULL,NULL,299,2,NULL),(575,1.00,'MATERIAL','Pileta de patio Ø63 mm Duratop.',45726.00,'335.14',4030.19,NULL,'und',190,NULL,NULL,300,2,NULL),(576,10.00,'MATERIAL','Codo HH 110x45° Duratop.',17926.20,'335.13',1792.62,NULL,'und',190,NULL,NULL,301,2,NULL),(577,8.00,'MATERIAL','Ramal 110x50 mm a 45°.',27550.16,'335.12',3443.77,NULL,'und',190,NULL,NULL,302,2,NULL),(578,20.00,'MATERIAL','Codo 20 mm con rosca 1/2” Aquasystem.',23526.40,'335.11',1176.32,NULL,'und',190,NULL,NULL,303,2,NULL),(579,8.00,'MATERIAL','Flexible mallado 1/2” x 30 cm.',29052.56,'335.10',3631.57,NULL,'und',190,NULL,NULL,304,2,NULL),(580,22.00,'MATERIAL','Tee 25x20 mm Aquasystem.',11601.92,'335.1',527.36,NULL,'und',190,NULL,NULL,305,2,NULL),(581,10.00,'MATERIAL','Disco de corte p/sensitiva 14\'\'',86841.00,'332.1',8684.10,NULL,'und',191,NULL,NULL,306,2,NULL),(582,200.00,'MATERIAL','Puente Adherente Tambor por 200kg protex super ligante',535904.00,'331.2',2679.52,NULL,'und',192,NULL,NULL,307,2,NULL),(583,112.00,'MATERIAL','Protex Seal 77 Flex BI Componente',2469600.00,'331.1',22050.00,NULL,'und',192,NULL,NULL,308,2,NULL),(584,3136.00,'MATERIAL','Ladrillos huecos 8x18x33',1503210.24,'330.2',479.34,NULL,'und',193,NULL,NULL,18,2,NULL),(585,200.00,'MATERIAL','Hierro dulce 6 mm',661156.00,'330.1',3305.78,NULL,'und',193,NULL,NULL,309,2,NULL),(586,20.00,'MATERIAL','Precarga polvo ABC x kg',132231.40,'329.3',6611.57,NULL,'und',194,NULL,NULL,310,2,NULL),(587,16.00,'MATERIAL','Mantenimiento anual ABC x 5 kg',271074.40,'329.2',16942.15,NULL,'und',194,NULL,NULL,311,2,NULL),(588,3.00,'MATERIAL','Mantenimiento anual ABC x 10 kg',57024.78,'329.1',19008.26,NULL,'und',194,NULL,NULL,312,2,NULL),(589,4.00,'MATERIAL','Convert de óxido negro x4lts',116609.04,'268.3',29152.26,NULL,'und',195,NULL,NULL,313,2,NULL),(590,18.00,'MATERIAL','Aguarrás mineral',33957.90,'268.2',1886.55,NULL,'und',195,NULL,NULL,171,2,NULL),(591,5.00,'MATERIAL','Pincel N°10',6151.25,'268.1',1230.25,NULL,'und',195,NULL,NULL,314,2,NULL),(592,100.00,'MANO_OBRA','Instalación sanitaria fría y caliente para baños y duchas del personal',1500000.00,'267.1',15000.00,NULL,'GL',196,641,NULL,NULL,1,80),(593,8.00,'MATERIAL','Bisagra torneada 32x100mm',123967.04,'328.1',15495.88,NULL,'und',197,NULL,NULL,315,2,NULL),(594,60.00,'MATERIAL','Abrazadera PVC tipo “U” M20 abierta.',4764.00,'327.9',79.40,NULL,'und',198,NULL,NULL,316,2,NULL),(595,30.00,'MATERIAL','Caja octogonal PVC eléctrica.',8821.50,'327.8',294.05,NULL,'und',198,NULL,NULL,317,2,NULL),(596,50.00,'MATERIAL','Codo PVC rígido 3/4” para instalación eléctrica.',8025.00,'327.7',160.50,NULL,'und',198,NULL,NULL,318,2,NULL),(597,140.00,'MATERIAL','Caño PVC rígido 3/4” para instalación eléctrica.',38703.00,'327.6',276.45,NULL,'und',198,NULL,NULL,319,2,NULL),(598,70.00,'MATERIAL','Cable unipolar 1,5 mm² color celeste.',17819.90,'327.5',254.57,NULL,'und',198,NULL,NULL,320,2,NULL),(599,70.00,'MATERIAL','Cable unipolar 1,5 mm² color negro.',17819.90,'327.4',254.57,NULL,'und',198,NULL,NULL,321,2,NULL),(600,70.00,'MATERIAL','Cable unipolar 2,5 mm² color verde/amarillo.',28713.30,'327.3',410.19,NULL,'und',198,NULL,NULL,322,2,NULL),(601,1.00,'MATERIAL','Toma 20A blanco, 1 módulo.',889.28,'327.21',889.28,NULL,'und',198,NULL,NULL,323,2,NULL),(602,38.00,'MATERIAL','Tapón ciego blanco, 1 módulo.',2057.32,'327.20',54.14,NULL,'und',198,NULL,NULL,324,2,NULL),(603,70.00,'MATERIAL','Cable unipolar 2,5 mm² color celeste.',28713.30,'327.2',410.19,NULL,'und',198,NULL,NULL,325,2,NULL),(604,8.00,'MATERIAL','Toma simple 10A 220V blanco, 1 módulo.',3817.84,'327.19',477.23,NULL,'und',198,NULL,NULL,326,2,NULL),(605,15.00,'MATERIAL','Llave simple 10A blanca.',6524.85,'327.18',434.99,NULL,'und',198,NULL,NULL,327,2,NULL),(606,15.00,'MATERIAL','Toma doble 10A 220V blanco, 3 módulos.',18935.55,'327.17',1262.37,NULL,'und',198,NULL,NULL,328,2,NULL),(607,34.00,'MATERIAL','Tapa 5x10 cm blanca PVC.',8188.22,'327.16',240.83,NULL,'und',198,NULL,NULL,329,2,NULL),(608,34.00,'MATERIAL','Bastidor de luz PVC.',7934.58,'327.15',233.37,NULL,'und',198,NULL,NULL,330,2,NULL),(609,34.00,'MATERIAL','Caja rectangular PVC eléctrica.',13358.26,'327.14',392.89,NULL,'und',198,NULL,NULL,331,2,NULL),(610,20.00,'MATERIAL','Tubo LED 18W.',40445.80,'327.13',2022.29,NULL,'und',198,NULL,NULL,332,2,NULL),(611,10.00,'MATERIAL','Artefacto estanco LED 2x18W.',158618.20,'327.12',15861.82,NULL,'und',198,NULL,NULL,333,2,NULL),(612,60.00,'MATERIAL','Conector de luz PVC 3/4”.',8098.80,'327.11',134.98,NULL,'und',198,NULL,NULL,334,2,NULL),(613,50.00,'MATERIAL','Cupla de luz PVC 3/4”.',5104.00,'327.10',102.08,NULL,'und',198,NULL,NULL,335,2,NULL),(614,70.00,'MATERIAL','Cable unipolar 2,5 mm² color marrón.',28713.30,'327.1',410.19,NULL,'und',198,NULL,NULL,336,2,NULL),(615,100.00,'MANO_OBRA','Mano de obra Albañilería',5300000.00,'264.1',53000.00,NULL,'und',199,641,NULL,NULL,1,30),(616,18.00,'MANO_OBRA','Movimiento de suelo y retiro de escombro en camiones',1080000.00,'265.1',60000.00,NULL,'und',200,640,NULL,NULL,1,10),(617,1.00,'MATERIAL','Cerecita tambor x200 kg Hidrófugo x200 cimiento',110250.00,'262.1',110250.00,NULL,'und',201,NULL,NULL,337,2,NULL),(618,3.00,'MATERIAL','Mecha de widia sds de 12',6464.91,'261.9',2154.97,NULL,'und',202,NULL,NULL,338,2,NULL),(619,3.00,'MATERIAL','Mecha de widia sds del 10',5845.38,'261.8',1948.46,NULL,'und',202,NULL,NULL,339,2,NULL),(620,3.00,'MATERIAL','Mecha de widia 8 encastre sds',4808.01,'261.7',1602.67,NULL,'un',202,NULL,NULL,340,2,NULL),(621,3.00,'MATERIAL','Mecha de acero rapida del 13',37612.71,'261.6',12537.57,NULL,'und',202,NULL,NULL,341,2,NULL),(622,2.00,'MATERIAL','Mecha de acero rapida del 12',20011.88,'261.5',10005.94,NULL,'und',202,NULL,NULL,342,2,NULL),(623,2.00,'MATERIAL','Mecha de acero rapida del 10',12013.96,'261.4',6006.98,NULL,'und',202,NULL,NULL,343,2,NULL),(624,2.00,'MATERIAL','Mecha cacero rapidade 8 mm',7776.76,'261.3',3888.38,NULL,'und',202,NULL,NULL,344,2,NULL),(625,50.00,'MATERIAL','Disco de corte 4,5\'\' Disco 115mm x 1,6m Tyrolit',94336.00,'261.2',1886.72,NULL,'und',202,NULL,NULL,345,2,NULL),(626,1.00,'MATERIAL','Disco p/circular madera 9 1/4 25 mm Disco de sierra circular Ecoli ne 184, orificio de 20mm, 1.4 mm de espesor, 60 dientes',27215.25,'261.18',27215.25,NULL,'und',202,NULL,NULL,346,2,NULL),(627,10.00,'MATERIAL','Candado',122224.10,'261.17',12222.41,NULL,'und',202,NULL,NULL,347,2,NULL),(628,10.00,'MATERIAL','Soporte Gancho Matafuego pared',13910.00,'261.16',1391.00,NULL,'und',202,NULL,NULL,348,2,NULL),(629,20.00,'MATERIAL','Chapa baliza 22x80cm',58721.60,'261.15',2936.08,NULL,'und',202,NULL,NULL,349,2,NULL),(630,10.00,'MATERIAL','Malla de seguridad naranja x rollo 50 ml',197634.90,'261.14',19763.49,NULL,'und',202,NULL,NULL,350,2,NULL),(631,60.00,'OTRO','Guantes de hilo moteado',38720.40,'261.13',645.34,NULL,'und',202,NULL,NULL,NULL,4,NULL),(632,24.00,'OTRO','Lentes oscuros protección ocular',39826.56,'261.12',1659.44,NULL,'und',202,NULL,NULL,NULL,4,NULL),(633,24.00,'OTRO','Lentes transarentes protección ocular',39826.56,'261.11',1659.44,NULL,'und',202,NULL,NULL,NULL,4,NULL),(634,3.00,'MATERIAL','Mecha de widia sds de 13',8518.32,'261.10',2839.44,NULL,'und',202,NULL,NULL,351,2,NULL),(635,20.00,'MATERIAL','Electrodos 2.5mm punta azul Conarco',168932.60,'261.1',8446.63,NULL,'und',202,NULL,NULL,352,2,NULL),(636,20.00,'MATERIAL','Tee 3/4\'\' termofusión acq acq.system',10620.00,'322.5',531.00,NULL,'und',203,NULL,NULL,353,2,NULL),(637,20.00,'MATERIAL','Codo a 45 3/4\'\' ACQ',10366.80,'322.4',518.34,NULL,'und',203,NULL,NULL,354,2,NULL),(638,10.00,'MATERIAL','Caños termofusión 3/4\'\'',58033.30,'322.3',5803.33,NULL,'und',203,NULL,NULL,355,2,NULL),(639,68.00,'MATERIAL','Chapa trapezoidal modelo t-101',2524935.88,'324.1',37131.41,NULL,'und',204,NULL,NULL,356,2,NULL),(640,20.00,'MATERIAL','Tee 110 awaduct',56110.00,'322.2',2805.50,NULL,'und',203,NULL,NULL,357,2,NULL),(641,5.00,'MANO_OBRA','Personal afectado a tareas de movimiento',850000.00,'260.3',170000.00,NULL,'und',205,640,NULL,NULL,1,40),(642,40.00,'MANO_OBRA','Movimiento de suelo y retiro de escombro en camiones',2600000.00,'260.2',65000.00,NULL,'und',205,640,NULL,NULL,1,80),(643,5.00,'MANO_OBRA','Movimiento de suelo retroexcavadora',2250000.00,'260.1',450000.00,NULL,'und',205,640,NULL,NULL,1,60),(644,20.00,'MATERIAL','Ficha 2x10 a Macho',13665.40,'323.4',683.27,NULL,'und',206,NULL,NULL,177,2,NULL),(645,20.00,'MATERIAL','Ficha 2x10 a Hembra',13665.40,'323.3',683.27,NULL,'und',206,NULL,NULL,178,2,NULL),(646,10.00,'MATERIAL','Cinta autovulcanizante',75048.10,'323.2',7504.81,NULL,'und',206,NULL,NULL,358,2,NULL),(647,20.00,'MATERIAL','Cinta aislante',35469.00,'323.1',1773.45,NULL,'und',206,NULL,NULL,359,2,NULL),(648,20.00,'MATERIAL','Caño 110 x 4 mts con o\'ring aw',245138.80,'322.1',12256.94,NULL,'und',203,NULL,NULL,360,2,NULL),(649,20.00,'MATERIAL','Clavos punta paris 2 y 1/2\'\'',82644.60,'321.7',4132.23,NULL,'und',207,NULL,NULL,361,2,NULL),(650,20.00,'MATERIAL','Clavos punta paris 2\'\'',82644.60,'321.6',4132.23,NULL,'und',207,NULL,NULL,362,2,NULL),(651,720.00,'MATERIAL','Mampostería Ladrillo hueco 12',386776.80,'321.5',537.19,NULL,'und',207,NULL,NULL,363,2,NULL),(652,8.00,'MATERIAL','Arena',211570.24,'321.4',26446.28,NULL,'und',207,NULL,NULL,206,2,NULL),(653,55.00,'MATERIAL','Cal Cacique',318181.60,'321.3',5785.12,NULL,'und',207,NULL,NULL,200,2,NULL),(654,120.00,'MATERIAL','Cemento x50 kg bolsa',1041321.60,'321.2',8677.68,NULL,'und',207,NULL,NULL,201,2,NULL),(655,8.00,'MATERIAL','Piedra partida',396694.16,'321.1',49586.77,NULL,'und',207,NULL,NULL,364,2,NULL),(656,30.00,'MATERIAL','Lampara Foco Led 12w',24984.60,'319.2',832.82,NULL,'und',208,NULL,NULL,365,2,NULL),(657,30.00,'MATERIAL','Porta lampara f/foco 12w',6899.70,'319.1',229.99,NULL,'und',208,NULL,NULL,366,2,NULL),(658,13.00,'MATERIAL','Canillas 1/2\'\' plastica',25400.70,'318.1',1953.90,NULL,'und',209,NULL,NULL,367,2,NULL),(660,1.00,'OTRO','SERVICIO DE SEGURIDAD',3000000.00,'367.1',3000000.00,NULL,'GL',210,NULL,NULL,NULL,3,NULL),(661,1.00,'OTRO','SERVICIO DE SEGURIDAD E HIGIENE',1800000.00,'455.1',1800000.00,NULL,'GL',211,NULL,NULL,NULL,3,NULL),(662,3.00,'OTRO','SERVICIO TÉCNICO INSPECCIÓN Y CERTIFICACIÓN DE ASCENSOR Y MONTACARGAS DE OBRA TERRAZAS DE QUILMES',600000.00,'456.1',200000.00,NULL,'',212,NULL,NULL,NULL,3,NULL),(665,100.00,'MANO_OBRA','PROVISION COLOCACION DUCTOS EN +DUCTOS DE EXT.BAÑOS 1595 kg provision y colocacio n de ductos de chap a galvanizada cal 27 colector + ducto de extraccio n de baños según planos corres ponde a columna cove A,B,C,D,E y F',7258845.00,'439.1',72588.45,NULL,'',111,NULL,NULL,NULL,1,NULL),(666,100.00,'MANO_OBRA','PROVISION COLOC. DUCTOS EN CHA +DUCTOS DE EXT.+VENT 859 kg provision y colocacion de ductos de chapa g alvanizada cal 25 y 27 colecto r + ducto de extracc ion + DUCTO de inyeccion siste ma de ventilacion de palieres ( cove )',3960419.00,'439.2',39604.19,NULL,'',111,NULL,NULL,NULL,1,NULL),(667,1.00,'OTRO','Alquiler de volquetes',80000.00,'411.1',80000.00,NULL,'und',214,NULL,NULL,NULL,3,NULL),(668,8.00,'MATERIAL','Arena fina',295520.40,'33.1',36940.05,NULL,'UN',215,NULL,NULL,16,2,NULL),(669,720.00,'MATERIAL','Ladrillos huecos 12 x 18 x 33',488865.60,'33.2',678.98,NULL,'UN',215,NULL,NULL,42,2,NULL),(670,240.00,'MATERIAL','Cemento x 25 kg BOLSA',1438545.60,'33.3',5993.94,NULL,'UN',215,NULL,NULL,87,2,NULL),(671,3.00,'MATERIAL','PALLET VACIO',92736.36,'33.4',30912.12,NULL,'UN',215,NULL,NULL,165,2,NULL);
+/*!40000 ALTER TABLE `item_orden_compra` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
--- Estructura de tabla para la tabla `item_recepcion_material`
+-- Table structure for table `item_recepcion_material`
 --
 
+DROP TABLE IF EXISTS `item_recepcion_material`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `item_recepcion_material` (
-  `id` bigint(20) NOT NULL,
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `cantidad_recibida` decimal(38,2) DEFAULT NULL,
   `item_orden_compra_id` bigint(20) DEFAULT NULL,
-  `recepcion_material_id` bigint(20) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
+  `recepcion_material_id` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK4f1mqivglsvdnuyslrk91bd9m` (`item_orden_compra_id`),
+  KEY `FKk2ypgwoht5qi8a6cjpmhtpb2s` (`recepcion_material_id`),
+  CONSTRAINT `FK4f1mqivglsvdnuyslrk91bd9m` FOREIGN KEY (`item_orden_compra_id`) REFERENCES `item_orden_compra` (`id`),
+  CONSTRAINT `FKk2ypgwoht5qi8a6cjpmhtpb2s` FOREIGN KEY (`recepcion_material_id`) REFERENCES `recepcion_material` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Estructura de tabla para la tabla `material_catalogo`
+-- Dumping data for table `item_recepcion_material`
 --
 
+LOCK TABLES `item_recepcion_material` WRITE;
+/*!40000 ALTER TABLE `item_recepcion_material` DISABLE KEYS */;
+INSERT INTO `item_recepcion_material` VALUES (1,1.00,256,1),(2,1.00,371,2),(3,1.00,251,3),(4,1.00,224,4),(5,1.00,202,5),(7,15.00,249,7),(8,10.00,250,8),(9,10.00,252,8),(10,10.00,253,8),(11,1.00,254,8),(17,5.00,215,9),(18,3.00,216,9),(19,2.00,217,9),(20,2.00,218,9),(21,1.00,217,10),(22,15.00,194,11),(23,1.00,129,6),(24,1.00,667,12),(25,8.00,668,13),(26,240.00,670,13),(27,3.00,671,13),(28,720.00,669,14),(29,7.00,26,15),(30,1.00,27,15);
+/*!40000 ALTER TABLE `item_recepcion_material` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `material_catalogo`
+--
+
+DROP TABLE IF EXISTS `material_catalogo`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `material_catalogo` (
-  `id` bigint(20) NOT NULL,
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `activo` bit(1) NOT NULL,
   `nombre` varchar(2000) DEFAULT NULL,
   `observacion` varchar(255) DEFAULT NULL,
-  `unidad` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `unidad` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=368 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Volcado de datos para la tabla `material_catalogo`
+-- Dumping data for table `material_catalogo`
 --
 
-INSERT INTO `material_catalogo` (`id`, `activo`, `nombre`, `observacion`, `unidad`) VALUES
-(1, b'1', 'PUENTE ADHERENTE PAMAX X 28 KG', NULL, 'un'),
-(2, b'1', 'PUENTE ADHERENTE PAMAX X 28 KG', NULL, 'und'),
-(3, b'1', 'Contactor 3x 32A 2+2 24Vca 5 0/60Hz EC MON TERO', NULL, 'und'),
-(4, b'1', 'HORMIGON RDC 300', NULL, 'und'),
-(5, b'1', 'BOMBEO DE HORMIGON RDC 300', NULL, 'und'),
-(6, b'1', 'BOMBA DE ARRASTRE HORMIGON', NULL, 'und'),
-(7, b'1', 'ZOCALOS PLAIN BLANCO MATE COD', NULL, 'und'),
-(8, b'1', 'CONTRAMARCO SQUARE BCO.MATE 5', NULL, 'und'),
-(9, b'1', 'TUBO LEDs 18W BLF 220V 1.2M', NULL, 'und'),
-(10, b'1', 'Bomba de arrastre hormigón', NULL, 'und'),
-(11, b'1', 'Hormigón RDC 300', NULL, 'und'),
-(12, b'1', 'INTOMAP 3 EN 1 AR BAGS X 25 KG', NULL, 'und'),
-(13, b'1', 'Pastina junta acha x 5 kg', NULL, 'und'),
-(14, b'1', 'Fletes', NULL, 'und'),
-(15, b'1', 'Bombeo de Hormigón RDC 300', NULL, 'und'),
-(16, b'1', 'Arena fina', NULL, 'und'),
-(17, b'1', 'Ladrillos huecos 12x18x33', NULL, 'und'),
-(18, b'1', 'Ladrillos huecos 8x18x33', NULL, 'und'),
-(19, b'1', 'Mallas fibra de vidrio 5x5 rol 90grs revoque', NULL, 'und'),
-(20, b'1', 'Látex interior blanco x 20 l', NULL, 'und'),
-(21, b'1', 'Sellador fijador al agua x 20l', NULL, 'und'),
-(22, b'1', 'LIJA AL AGUA 150 DOBLE A', NULL, 'und'),
-(23, b'1', 'ROLLO CARTON CORRUGADO', NULL, 'und'),
-(24, b'1', 'CINTA PAPEL AZUL 5CM ANCHO', NULL, 'und'),
-(25, b'1', 'TERSUAVE ENDUIDO INT. X 10 LTS .', NULL, 'und'),
-(26, b'1', 'CEPILLO ALAMBRE', NULL, 'und'),
-(27, b'1', 'PINCELETAS No 42', NULL, 'und'),
-(28, b'1', 'Porcelanato Vite Granza ivori', NULL, 'und'),
-(29, b'1', 'Protex corrotex bicomponente X', NULL, 'und'),
-(30, b'1', 'MECHA COPA DIAMANTADA SIN CERA', NULL, 'und'),
-(31, b'1', 'Placas durlock standard 9,5 mm', NULL, 'und'),
-(32, b'1', 'Tornillo T1 punta mecha', NULL, 'und'),
-(33, b'1', 'PROTEX SUPERLIGANTE X TAMBOR 200', NULL, 'und'),
-(34, b'1', 'PROTEX IMPRIMACION S LATA X 25', NULL, 'und'),
-(35, b'1', 'CERAMICA RECTIFICADA BLANCA SA', NULL, 'und'),
-(36, b'1', 'LAMPARA FOCO LED 15 W', NULL, 'und'),
-(37, b'1', 'WD-40 LUBRICANTE 432CC', NULL, 'und'),
-(38, b'1', 'SILICONA NEUTRA TRANSPARENTE', NULL, 'und'),
-(39, b'1', 'SILICONA ACETICA TRANSPARENTE', NULL, 'und'),
-(40, b'1', 'ZOCALO DE CUARZO GRIS', NULL, 'und'),
-(41, b'1', 'Ladrillos huecos 8 x 18 x 33', NULL, 'und'),
-(42, b'1', 'Ladrillos huecos 12 x 18 x 33', NULL, 'und'),
-(43, b'1', 'SELLADOR X 5 LITROS', NULL, 'und'),
-(44, b'1', 'PASTINA JUNTA ANCHA X 5KG NEGR', NULL, 'und'),
-(45, b'1', 'TEJUELA NEGRA LISA', NULL, 'und'),
-(46, b'1', 'PUENTE ADHERENTE TAMBOR POR 20', NULL, 'und'),
-(47, b'1', 'Ladrillos comunes', NULL, 'und'),
-(48, b'1', 'Arena fina', NULL, 'm3'),
-(49, b'1', 'PORCELANATO LISCIO IVORY 1.20X', NULL, 'm2'),
-(50, b'1', 'PORCELANATO VITE GRANZA IVORI', NULL, 'm2'),
-(51, b'1', 'DISCO CORTE HIERRO 7 ́ ́ 1.6 MM', NULL, 'und'),
-(52, b'1', 'DISCO CORTE ACERO 230X 1.9X22.', NULL, 'und'),
-(53, b'1', 'CEPILLO ALAMBRE P/AMOL D BANCO MOLA SKIL 350 W', NULL, 'und'),
-(54, b'1', 'CAMARA DE INSPECCION PLASTICA', NULL, 'und'),
-(55, b'1', 'JABALINA AC-COBRE 1.5 MTS 1/2\"', NULL, 'und'),
-(56, b'1', 'ESTOPA DE LIMPIEZA POR BOLSA', NULL, 'und'),
-(57, b'1', 'KLAUKOL ALTA PERFORMANCE X 1KG COLOR GRIS ARTICO', NULL, 'und'),
-(58, b'1', 'KLAUKOL ALTA PERFORMANCE X1KG COLOR GRIS PLOMO', NULL, 'und'),
-(59, b'1', 'Clavos punta parís 2 y 1/2\"', NULL, 'und'),
-(60, b'1', 'Alambre de fardo x kg', NULL, 'und'),
-(61, b'1', 'PROTEX 216 X KG', NULL, 'und'),
-(62, b'1', 'PROTEX FIJATEX PLUS CARTUCHO', NULL, 'und'),
-(63, b'1', 'PROTEX SEAL 77 FLEX BI COMPONE', NULL, 'und'),
-(64, b'1', 'DESAGUE AGUA 2 EN 1 ATRIM DA60', NULL, 'und'),
-(65, b'1', 'B 10 PLUS EXTRACTOR DE AIRE CA', NULL, 'und'),
-(66, b'1', 'PASTINA PRESTIGE GRIS PERLA X', NULL, 'und'),
-(67, b'1', 'PORCELANATO GRANZA BLACK OUT 1 CAJA 1.44M2', NULL, 'm2'),
-(68, b'1', 'WAYRA CAMPANA EMPOTRABLE COD 2', NULL, 'und'),
-(69, b'1', 'BACHA KIRA PLUS 35X35X13.5 CAF', NULL, 'und'),
-(70, b'1', 'BAÑERA SACHA 140 BCA.ROCA', NULL, 'und'),
-(71, b'1', 'THE GAP INODORO LARGO', NULL, 'und'),
-(72, b'1', 'THE GAP DEPOSITO APOYO BCO', NULL, 'und'),
-(73, b'1', 'THE GAP BIDE 1 OR LLUVIA 11115', NULL, 'und'),
-(74, b'1', 'VERA BIDET CROMO MONOC 70-180', NULL, 'und'),
-(75, b'1', 'VERA DUCHA EMB C/TRANSF MONOC', NULL, 'und'),
-(76, b'1', 'VERA LAVATORIO PARED MONOC CRO', NULL, 'und'),
-(77, b'1', 'BACHA BCH14 RECTANG SEMIEMB BL', NULL, 'und'),
-(78, b'1', 'ADRA COCINA MONO CROMO 20-162', NULL, 'und'),
-(79, b'1', 'VERA LAVATORIO BAJOMONOC CROMO', NULL, 'und'),
-(80, b'1', 'THE GAP TAPA INODORO C/AMORTIG', NULL, 'und'),
-(81, b'1', 'LUXOR S171 A* COMPACT(BRILL) 7', NULL, 'und'),
-(82, b'1', 'PORCELANATO BLANCO GLACIAR 30X', NULL, 'm2'),
-(83, b'1', 'PORCELANATO GRANZA IVO OUT 79.', NULL, 'm2'),
-(84, b'1', 'PORCELANATO LISCIO LGR N 79,7X 61.44XP', NULL, 'm2'),
-(85, b'1', 'PORCELANATO LISCIO LIGTH GREY', NULL, 'm2'),
-(86, b'1', 'NYLON POLIETILENO. NEGRO 200 M', NULL, 'und'),
-(87, b'1', 'Cemento x 25 kg BOLSA', NULL, 'und'),
-(88, b'1', 'CAL HYDRAT X 25 KG', NULL, 'und'),
-(89, b'1', 'CHAVETA PASANTE BRONCE REG.CON BOYA', NULL, 'und'),
-(90, b'1', 'BOYATELGOPOR PRESION 3/4', NULL, 'und'),
-(91, b'1', 'SALIDA DE TANQUE 3/4 POLIPROPI', NULL, 'und'),
-(92, b'1', 'RACOR HEMBRA 3/4(ROSCA) X 3/4', NULL, 'und'),
-(93, b'1', 'ESPIGA DOBLE 3/4 POLIPROPILEN', NULL, 'und'),
-(94, b'1', 'CODO ESPIGA DOBLE 3/4 POLIPROP', NULL, 'und'),
-(95, b'1', 'FLOTANTE MECANICO TANQUE 3/4 BRONCE REG.CON BOYA', NULL, 'und'),
-(96, b'1', 'BISAGRA MUNICION 100X 75MM', NULL, 'und'),
-(97, b'1', 'CANDADO No 50', NULL, 'und'),
-(98, b'1', 'UNION ROSCADA DE PVC 1/2\"', NULL, 'und'),
-(99, b'1', 'TEE ROSCADA DE BRONCE DE 1/2\"', NULL, 'und'),
-(100, b'1', 'CANILLA METALICA ESFERI 1/2\" M', NULL, 'und'),
-(101, b'1', 'DISCO WIDIA SEGMENTADO 7 ́ ́', NULL, 'und'),
-(102, b'1', 'HOJA SIERRA P/ACERO 24 DIENTES 30 CM DE LARGO', NULL, 'und'),
-(103, b'1', 'HOJA DE CUTTER', NULL, 'und'),
-(104, b'1', 'Nylon negro polietileno 200mic negro', NULL, 'und'),
-(105, b'1', 'DESTORNILLADOR PLANO 6MM LARGO', NULL, 'und'),
-(106, b'1', 'DESTORNILLADOR PHILIPS No2 150', NULL, 'und'),
-(107, b'1', 'CUTTER', NULL, 'und'),
-(108, b'1', 'PINCELETA GALGO No 50', NULL, 'und'),
-(109, b'1', 'galgo pincel silver n*20', NULL, 'und'),
-(110, b'1', 'PROTEX 216 ADHESIVO EPOXI X 1K', NULL, 'und'),
-(111, b'1', 'ANGULO DE HIERRO 1/2\"X 1/8\" X', NULL, 'und'),
-(112, b'1', 'DISCO SEGMENTADO DIAMANTADO DE', NULL, 'und'),
-(113, b'1', 'Tornillos hexas autoperf', NULL, 'und'),
-(114, b'1', 'CEPILLO DE ALAMBRE DE 20 CM', NULL, 'und'),
-(115, b'1', 'TORNILLO FIX 5 X 45MM', NULL, 'und'),
-(116, b'1', 'TARUGO DEL S8 FISCHER', NULL, 'und'),
-(117, b'1', 'Electrodos 2.5 MM PUNTA AZUL', NULL, 'und'),
-(118, b'1', 'Cal Cacique x 25 kg', NULL, 'und'),
-(119, b'1', 'Cemento x25 kg bolsa', NULL, 'und'),
-(120, b'1', 'Balde de Albañil de Plastico', NULL, 'und'),
-(121, b'1', 'Tanza Albañil 0.6mm x 100 mts', NULL, 'und'),
-(122, b'1', 'Pala Ancha', NULL, 'und'),
-(123, b'1', 'Carretilla de chapa', NULL, 'und'),
-(124, b'1', 'Caños de cobre con cajas Inter - Provisión de material para la pre instalación de c añerias para unidades con 3 sp lit sistema multispl it provisión de 45 mteros de c añería de cobre con cajas interiores y caja exteri or. Todas las instal aciones se entregan presurizad as con nitrógeno. FORMA DE PAGO ANTICIPADO PAR A LA COMPRA DE MATER IAL , INSTALACIÓN Y POSTERIOR CERTICIACIÓN QUINCEN AL POR PISO FINALIZADO. VALOR MAS IVA. CABE ACLARAR QUE CADA PISO TIE NE 2 DPTOS. CON ESTA TIPOLOGIA', NULL, 'und'),
-(125, b'1', 'Caños de cobre con cajas Inter - Provisión de material para la pre instalación de c añerias para unidades con 4 sp lit sistema multispl it provisión de 42 mteros de c añería de cobre con cajas interiores y caja exteri or. Todas las instal aciones se entregan presurizad as con nitrógeno. FORMA DE PAGO ANTICIPADO PAR A LA COMPRA DE MATER IAL , INSTALACIÓN Y POSTERIOR CERTICIACIÓN QUINCEN AL POR PISO FINALIZADO. VALOR MAS IVA. CADA PISO TIENE 2 DPTOS. CON E STA TIPOLOGIA', NULL, 'und'),
-(126, b'1', 'Abrazadera 50mm', NULL, 'und'),
-(127, b'1', 'Espiga Poliprop. Negro a 90° S', NULL, 'und'),
-(128, b'1', 'Espiga Poliprop. Negro a 90° C', NULL, 'und'),
-(129, b'1', 'Codo Poliprop. a 90° con rosca', NULL, 'und'),
-(130, b'1', 'Caño Poliprop. Negro 1 1/2\'\' Para riego', NULL, 'und'),
-(131, b'1', 'Ladrillos huecos del 12 12x18x33', NULL, 'und'),
-(132, b'1', 'Protex Fondo de Junta por Esp Polietileno', NULL, 'und'),
-(133, b'1', 'Protex Proflex P1000 x 5kg', NULL, 'und'),
-(134, b'1', 'Protex imprimación S lata x 25', NULL, 'und'),
-(135, b'1', 'Bomba Sumergible Desagote Moto Agua 1.5 HP', NULL, 'und'),
-(136, b'1', 'Artefacto Liston 120 doble', NULL, 'und'),
-(137, b'1', 'Lampara Foco Led 15w', NULL, 'und'),
-(138, b'1', 'Puente Adherente Pamax x 25 kg', NULL, 'und'),
-(139, b'1', 'Rollo Cartón Corrugado', NULL, 'und'),
-(140, b'1', 'Lapiz Carpintero', NULL, 'und'),
-(141, b'1', 'Punta Phillips PH2', NULL, 'und'),
-(142, b'1', 'Disco Wid. Segmentado 7\'\' Bremen', NULL, 'und'),
-(143, b'1', 'Tornillo T1 Punta Aguja', NULL, 'und'),
-(144, b'1', 'Tornillo T2 Punta Aguja Negro', NULL, 'und'),
-(145, b'1', 'Placas Durlock Standard 12,5', NULL, 'und'),
-(146, b'1', 'Placas Durlock antih 12,5', NULL, 'und'),
-(147, b'1', 'Arco separador de 3mm P/porcel', NULL, 'und'),
-(148, b'1', 'Pastina klaukol color talco bolsas de 1 kg', NULL, 'und'),
-(149, b'1', 'Cantoneras yesera de 2.6m', NULL, 'und'),
-(150, b'1', 'Venda geotextil sintética 1mx', NULL, 'und'),
-(151, b'1', 'Arena', NULL, 'm3'),
-(152, b'1', 'Transformador reductor de 380v marca Yali', NULL, 'und'),
-(153, b'1', 'Pegamento para porcelanato', NULL, 'und'),
-(154, b'1', 'Corrotex Anticorrosivo Cementico 4 kg', NULL, 'und'),
-(155, b'1', 'Yeso Entre Rios x30 kg', NULL, 'und'),
-(156, b'1', 'Vinilo de corte \"Red Sacchi\" color blanco detalle verde y rojo según muestra 60 cm x 40cm incluye instalación', NULL, 'und'),
-(157, b'1', 'Bombeado', NULL, 'm3'),
-(158, b'1', 'Bañera enlozada 1.6x0.7x antideslizante', NULL, 'und'),
-(159, b'1', 'Bañera enlozada 1.4x0.7x antideslizante', NULL, 'und'),
-(160, b'1', 'Discos de corte 4,5\'\' Disco 115mm x16,m', NULL, 'und'),
-(161, b'1', 'Disco Diamantado 12\'\' Segmenta Patrol Black', NULL, 'und'),
-(162, b'1', 'Discos de corte 4,5\'\' Disco 115mm x1,6m Tyrolit', NULL, 'und'),
-(163, b'1', 'Tornillo autop. p. mecha 2 1/2 cabeza hexagonal', NULL, 'und'),
-(164, b'1', 'Vinilo impreso UV instalación', NULL, 'und'),
-(165, b'1', 'Pallet vacío', NULL, 'und'),
-(166, b'1', 'Sellador poliuretano Proflex P', NULL, 'und'),
-(167, b'1', 'Protex Superligante x Tambor 2', NULL, 'und'),
-(168, b'1', 'Provisión de honorarios por gestión y armado de la Solicitud de Factibilidad de Suministro Eléctrico para edificio de viviendas multifamiliar ubicado en la ciudad de Quilmes, ante la distribuidora EDESUR. Potencia total a solicitar: 778 kW. Incluye: Armado completo de la carpeta técnica conforme a los requisitos de EDESUR, con documentación de carácter técnico e informativo. Confección de la documentación técnica correspondiente (planilla de potencia, declaración jurada de cargas, memoria técnica, entre otras), firmadas por profesional matriculado. Presentación, entrega y envío de la carpeta técnica informativa a EDESUR. Gestión y entrega final de la Solicitud de Factibilidad aprobada.', NULL, 'und'),
-(169, b'1', 'Hidrófugo vitrosol tambor x 20', NULL, 'und'),
-(170, b'1', 'Pintura vial', NULL, 'und'),
-(171, b'1', 'Aguarrás mineral', NULL, 'und'),
-(172, b'1', 'Esmalte sintético color negro', NULL, 'und'),
-(173, b'1', 'Pintura aerosol negra 430 ml', NULL, 'und'),
-(174, b'1', 'Pintura aerosol amarilla', NULL, 'und'),
-(175, b'1', 'Pulsador rasante N/C completo para montacarga', NULL, 'und'),
-(176, b'1', 'Toma 10 A 220 V blanco 1 módulo', NULL, 'und'),
-(177, b'1', 'Ficha 2x10 A macho', NULL, 'und'),
-(178, b'1', 'Ficha 2x10 A hembra', NULL, 'und'),
-(179, b'1', 'Disyuntor bipolar 40 A', NULL, 'und'),
-(180, b'1', 'Llave térmica bipolar 25 A', NULL, 'und'),
-(181, b'1', 'Zócalo fotocélula', NULL, 'und'),
-(182, b'1', 'Tapa 5x10 PVC blanca', NULL, 'und'),
-(183, b'1', 'Artefacto listón 120 doble', NULL, 'und'),
-(184, b'1', 'Bastidor luz PVC', NULL, 'und'),
-(185, b'1', 'Ficha 3 + N + Tierra 16 A', NULL, 'und'),
-(186, b'1', 'Fotocélula exterior 2500 Wts/CO', NULL, 'und'),
-(187, b'1', 'Caja estanca PVC', NULL, 'und'),
-(188, b'1', 'Toma 10 A 220 V doble blanco 3 módulos', NULL, 'und'),
-(189, b'1', 'Portalámpara para foco 12 W', NULL, 'und'),
-(190, b'1', 'Lámpara foco LED 15 W', NULL, 'und'),
-(191, b'1', 'Caja octogonal PVC Electric', NULL, 'und'),
-(192, b'1', 'Pulsador de emergencia', NULL, 'und'),
-(193, b'1', 'Pulsador rasante N/O completo para montacarga', NULL, 'und'),
-(194, b'1', 'Tubo LED 18W BLF 220V 1.2 m', NULL, 'und'),
-(195, b'1', 'Vinilo impreso para cartel 4.8 1.22', NULL, 'und'),
-(196, b'1', 'Vinilo impreso para cartel 4.8', NULL, 'und'),
-(197, b'1', 'Vinilo impreso para cartel 3x', NULL, 'und'),
-(198, b'1', 'Malla fibra de vidrio 5x5 rol 90g revoque', NULL, 'und'),
-(199, b'1', 'Reflector de LED Exterior 200W Artef. Proy. Leds 200W 220V 11', NULL, 'und'),
-(200, b'1', 'Cal Cacique', NULL, 'und'),
-(201, b'1', 'Cemento x50 kg bolsa', NULL, 'und'),
-(202, b'1', 'Lona frontar impresa con frontales', NULL, 'und'),
-(203, b'1', 'Sellador multiuso fastix color', NULL, 'und'),
-(204, b'1', 'Tuerca 5/8 para andamio', NULL, 'und'),
-(205, b'1', 'Torn. Cab. Hex 3/8\'\' x38mm c/ara cabeza hexagonal', NULL, 'und'),
-(206, b'1', 'Arena', NULL, 'und'),
-(207, b'1', 'Envase de garrafa de gas x10 kg completo', NULL, 'und'),
-(208, b'1', 'Tornillo hexagonal para chapas de 2 1/2\'\'', NULL, 'und'),
-(209, b'1', 'Discos de corte 4,5\'\'', NULL, 'und'),
-(210, b'1', 'Plomada', NULL, 'und'),
-(211, b'1', 'Antiparras p/polvos y liquidos transp.', NULL, 'und'),
-(212, b'1', 'Guantes hilo moteado', NULL, 'und'),
-(213, b'1', 'Tubo LEDs 19w BLF 220V 1.2M', NULL, 'und'),
-(214, b'1', 'Tanza rollo de 100m', NULL, 'und'),
-(215, b'1', 'Hoja sierra p/acero 244 dientes 30 cm de largo', NULL, 'und'),
-(216, b'1', 'Fratacho plastico de fieltro', NULL, 'und'),
-(217, b'1', 'Fratacho de madera algarrobo 35 cm', NULL, 'und'),
-(218, b'1', 'Clavos punta paris 2\'', NULL, 'und'),
-(219, b'1', 'Clavos punta paris 2 y 1/2\'', NULL, 'und'),
-(220, b'1', 'Cemento x50kg bolsa AVELLANEDA', NULL, 'und'),
-(221, b'1', 'Calibración nivel laser spectro', NULL, 'und'),
-(222, b'1', 'Casco seg. blanco con arnes', NULL, 'und'),
-(223, b'1', 'Guantes dielectricos talle 11 l36cm dps1210336e', NULL, 'und'),
-(224, b'1', 'Pantalon cargo beige talle 42 y 54', NULL, 'und'),
-(225, b'1', 'Chapa trapezoidal c25 x6mts ancho', NULL, 'und'),
-(226, b'1', 'Chapa lista Galvanizada c30 2.00x 1.00 1.22 x 2.44', NULL, 'und'),
-(227, b'1', 'Anclaje quimico fischer v1 30', NULL, 'und'),
-(228, b'1', 'Disco widia segmentado 4.5\'\'', NULL, 'und'),
-(229, b'1', 'Disco corte p/sensitiva 14\'\'', NULL, 'und'),
-(230, b'1', 'Disco widia segmentado 7\'\'', NULL, 'und'),
-(231, b'1', 'Contrat. Seguro Respons. Civil. Respons. Civil. Suma asegurada $300.000.00 sin Franquicia asegurado Simende CO SRL asegurado baprisud S.A', NULL, 'und'),
-(232, b'1', 'Cabo grueso de madera con rosc', NULL, 'und'),
-(233, b'1', 'Escobillón barrendero', NULL, 'und'),
-(234, b'1', 'Cinta Métrica de 8 mts', NULL, 'und'),
-(235, b'1', 'Martillo carpintero 650 grs largo 35 cm', NULL, 'und'),
-(236, b'1', 'Horno Microondas', NULL, 'und'),
-(237, b'1', 'Heladera bajo mesada 78 a 125L 220V', NULL, 'und'),
-(238, b'1', 'Codo HH 110 a 90° AWADUC Codo HH 110x90 Duratop', NULL, 'und'),
-(239, b'1', 'Rodillo pelo corto de 7°', NULL, 'und'),
-(240, b'1', 'Rodillo antigota N°22', NULL, 'und'),
-(241, b'1', 'Pintura aerosol negro 430ML', NULL, 'und'),
-(242, b'1', 'GFalgo pincel silver N°25', NULL, 'und'),
-(243, b'1', 'Pinceleta N°50', NULL, 'und'),
-(244, b'1', 'Malla naranja', NULL, 'und'),
-(245, b'1', 'Electrodos 2.5MM punta azul', NULL, 'und'),
-(246, b'1', 'Tornillo T2 Punta Aguja', NULL, 'und'),
-(247, b'1', 'Fijación tarugo+tornillo 8 LAD', NULL, 'und'),
-(248, b'1', 'Fijación tarugo+tornillo 8', NULL, 'und'),
-(249, b'1', 'Disco de corte 4,5\'\'', NULL, 'und'),
-(250, b'1', 'Pinceleta galgo n°50', NULL, 'und'),
-(251, b'1', 'Rodillo pelo corto 7\'\' para bar', NULL, 'und'),
-(252, b'1', 'Pincel N°15', NULL, 'und'),
-(253, b'1', 'Galgo pincel silver n°20', NULL, 'und'),
-(254, b'1', 'Esmalte sintético', NULL, 'und'),
-(255, b'1', 'Canillas 1/2\'\' plastica para la canilla lavat. 221 pico lev. c/cruz', NULL, 'und'),
-(256, b'1', 'Adaptador tanque PPN 1/1', NULL, 'und'),
-(257, b'1', 'Canillas para mesada un agua', NULL, 'und'),
-(258, b'1', 'Lluvia M Plastica Completa', NULL, 'und'),
-(259, b'1', 'Pileta de lavar PVC chica 49x43x28 DU', NULL, 'und'),
-(260, b'1', 'Sopapa PVC 40 cromo', NULL, 'und'),
-(261, b'1', 'Asiento inodoro Floren. TSX4 T RAFUL OFERTA', NULL, 'und'),
-(262, b'1', 'Mochila PVC Codo Ideal', NULL, 'und'),
-(263, b'1', 'Codo HH 40x90 mm Duratop.', NULL, 'und'),
-(264, b'1', 'Codo HH 50x90 mm Duratop.', NULL, 'und'),
-(265, b'1', 'Codo HH 63x45 mm Duratop.', NULL, 'und'),
-(266, b'1', 'Gomas de goyete para inodoro Ferrum.', NULL, 'und'),
-(267, b'1', 'Tarugos N°8 marca Redex.', NULL, 'und'),
-(268, b'1', 'Tornillos para inodoro cromados 22x70 mm.', NULL, 'und'),
-(269, b'1', 'Asiento para inodoro blanco Concordplast.', NULL, 'und'),
-(270, b'1', 'Inodoro corto Andina blanco Ferrum.', NULL, 'und'),
-(271, b'1', 'Tubo macho 25 mm Aquasystem.', NULL, 'und'),
-(272, b'1', 'Unión doble 25 mm Aquasystem.', NULL, 'und'),
-(273, b'1', 'Reducción 20x25 mm Aquasystem (buje red 25x20).', NULL, 'und'),
-(274, b'1', 'Codo MH 40x45 mm Duratop.', NULL, 'und'),
-(275, b'1', 'Codo HH 40x45 mm Duratop.', NULL, 'und'),
-(276, b'1', 'Mochila de PVC con codo Ideal.', NULL, 'und'),
-(277, b'1', 'Cupla termofusión 25 mm.', NULL, 'und'),
-(278, b'1', 'Caño Ø20 PN25 Aquasystem.', NULL, 'und'),
-(279, b'1', 'Caño Ø25 PN25 Aquasystem.', NULL, 'und'),
-(280, b'1', 'Llave de paso 25 mm polipropileno blanco Aquasystem.', NULL, 'und'),
-(281, b'1', 'Cupla termofusión 20 mm.', NULL, 'und'),
-(282, b'1', 'Codo rosca hembra 25x3/4” a 90° Aquasystem.', NULL, 'und'),
-(283, b'1', 'Codo normal 25x90° Aquasystem.', NULL, 'und'),
-(284, b'1', 'Boca de acceso Ø63 mm Duratop.', NULL, 'und'),
-(285, b'1', 'Llave de fusión externa 20 mm Aquasystem.', NULL, 'und'),
-(286, b'1', 'Tubo macho 20 mm Aquasystem.', NULL, 'und'),
-(287, b'1', 'Tubo hembra 25 mm Aquasystem.', NULL, 'und'),
-(288, b'1', 'Tubo hembra 20 mm Aquasystem.', NULL, 'und'),
-(289, b'1', 'Termotanque eléctrico.', NULL, 'und'),
-(290, b'1', 'Fijaciones Ø8 mm.', NULL, 'und'),
-(291, b'1', 'Tarugo para hueco N°8 con tope.', NULL, 'und'),
-(292, b'1', 'Grampa tipo Omega 1/2”.', NULL, 'und'),
-(293, b'1', 'Grampa tipo Omega 3/4”.', NULL, 'und'),
-(294, b'1', 'Codo normal 20x90° Aquasystem.', NULL, 'und'),
-(295, b'1', 'Silicona en aerosol (solución sellante).', NULL, 'und'),
-(296, b'1', 'Manguito de reparación Ø110 mm Duratop.', NULL, 'und'),
-(297, b'1', 'Codo MH 110x45° Duratop.', NULL, 'und'),
-(298, b'1', 'Ramal 110x63 mm a 45°.', NULL, 'und'),
-(299, b'1', 'Pileta de patio Ø110 mm chica Duratop.', NULL, 'und'),
-(300, b'1', 'Pileta de patio Ø63 mm Duratop.', NULL, 'und'),
-(301, b'1', 'Codo HH 110x45° Duratop.', NULL, 'und'),
-(302, b'1', 'Ramal 110x50 mm a 45°.', NULL, 'und'),
-(303, b'1', 'Codo 20 mm con rosca 1/2” Aquasystem.', NULL, 'und'),
-(304, b'1', 'Flexible mallado 1/2” x 30 cm.', NULL, 'und'),
-(305, b'1', 'Tee 25x20 mm Aquasystem.', NULL, 'und'),
-(306, b'1', 'Disco de corte p/sensitiva 14\'\'', NULL, 'und'),
-(307, b'1', 'Puente Adherente Tambor por 200kg protex super ligante', NULL, 'und'),
-(308, b'1', 'Protex Seal 77 Flex BI Componente', NULL, 'und'),
-(309, b'1', 'Hierro dulce 6 mm', NULL, 'und'),
-(310, b'1', 'Precarga polvo ABC x kg', NULL, 'und'),
-(311, b'1', 'Mantenimiento anual ABC x 5 kg', NULL, 'und'),
-(312, b'1', 'Mantenimiento anual ABC x 10 kg', NULL, 'und'),
-(313, b'1', 'Convert de óxido negro x4lts', NULL, 'und'),
-(314, b'1', 'Pincel N°10', NULL, 'und'),
-(315, b'1', 'Bisagra torneada 32x100mm', NULL, 'und'),
-(316, b'1', 'Abrazadera PVC tipo “U” M20 abierta.', NULL, 'und'),
-(317, b'1', 'Caja octogonal PVC eléctrica.', NULL, 'und'),
-(318, b'1', 'Codo PVC rígido 3/4” para instalación eléctrica.', NULL, 'und'),
-(319, b'1', 'Caño PVC rígido 3/4” para instalación eléctrica.', NULL, 'und'),
-(320, b'1', 'Cable unipolar 1,5 mm² color celeste.', NULL, 'und'),
-(321, b'1', 'Cable unipolar 1,5 mm² color negro.', NULL, 'und'),
-(322, b'1', 'Cable unipolar 2,5 mm² color verde/amarillo.', NULL, 'und'),
-(323, b'1', 'Toma 20A blanco, 1 módulo.', NULL, 'und'),
-(324, b'1', 'Tapón ciego blanco, 1 módulo.', NULL, 'und'),
-(325, b'1', 'Cable unipolar 2,5 mm² color celeste.', NULL, 'und'),
-(326, b'1', 'Toma simple 10A 220V blanco, 1 módulo.', NULL, 'und'),
-(327, b'1', 'Llave simple 10A blanca.', NULL, 'und'),
-(328, b'1', 'Toma doble 10A 220V blanco, 3 módulos.', NULL, 'und'),
-(329, b'1', 'Tapa 5x10 cm blanca PVC.', NULL, 'und'),
-(330, b'1', 'Bastidor de luz PVC.', NULL, 'und'),
-(331, b'1', 'Caja rectangular PVC eléctrica.', NULL, 'und'),
-(332, b'1', 'Tubo LED 18W.', NULL, 'und'),
-(333, b'1', 'Artefacto estanco LED 2x18W.', NULL, 'und'),
-(334, b'1', 'Conector de luz PVC 3/4”.', NULL, 'und'),
-(335, b'1', 'Cupla de luz PVC 3/4”.', NULL, 'und'),
-(336, b'1', 'Cable unipolar 2,5 mm² color marrón.', NULL, 'und'),
-(337, b'1', 'Cerecita tambor x200 kg Hidrófugo x200 cimiento', NULL, 'und'),
-(338, b'1', 'Mecha de widia sds de 12', NULL, 'und'),
-(339, b'1', 'Mecha de widia sds del 10', NULL, 'und'),
-(340, b'1', 'Mecha de widia 8 encastre sds', NULL, 'un'),
-(341, b'1', 'Mecha de acero rapida del 13', NULL, 'und'),
-(342, b'1', 'Mecha de acero rapida del 12', NULL, 'und'),
-(343, b'1', 'Mecha de acero rapida del 10', NULL, 'und'),
-(344, b'1', 'Mecha cacero rapidade 8 mm', NULL, 'und'),
-(345, b'1', 'Disco de corte 4,5\'\' Disco 115mm x 1,6m Tyrolit', NULL, 'und'),
-(346, b'1', 'Disco p/circular madera 9 1/4 25 mm Disco de sierra circular Ecoli ne 184, orificio de 20mm, 1.4 mm de espesor, 60 dientes', NULL, 'und'),
-(347, b'1', 'Candado', NULL, 'und'),
-(348, b'1', 'Soporte Gancho Matafuego pared', NULL, 'und'),
-(349, b'1', 'Chapa baliza 22x80cm', NULL, 'und'),
-(350, b'1', 'Malla de seguridad naranja x rollo 50 ml', NULL, 'und'),
-(351, b'1', 'Mecha de widia sds de 13', NULL, 'und'),
-(352, b'1', 'Electrodos 2.5mm punta azul Conarco', NULL, 'und'),
-(353, b'1', 'Tee 3/4\'\' termofusión acq acq.system', NULL, 'und'),
-(354, b'1', 'Codo a 45 3/4\'\' ACQ', NULL, 'und'),
-(355, b'1', 'Caños termofusión 3/4\'\'', NULL, 'und'),
-(356, b'1', 'Chapa trapezoidal modelo t-101', NULL, 'und'),
-(357, b'1', 'Tee 110 awaduct', NULL, 'und'),
-(358, b'1', 'Cinta autovulcanizante', NULL, 'und'),
-(359, b'1', 'Cinta aislante', NULL, 'und'),
-(360, b'1', 'Caño 110 x 4 mts con o\'ring aw', NULL, 'und'),
-(361, b'1', 'Clavos punta paris 2 y 1/2\'\'', NULL, 'und'),
-(362, b'1', 'Clavos punta paris 2\'\'', NULL, 'und'),
-(363, b'1', 'Mampostería Ladrillo hueco 12', NULL, 'und'),
-(364, b'1', 'Piedra partida', NULL, 'und'),
-(365, b'1', 'Lampara Foco Led 12w', NULL, 'und'),
-(366, b'1', 'Porta lampara f/foco 12w', NULL, 'und'),
-(367, b'1', 'Canillas 1/2\'\' plastica', NULL, 'und');
-
--- --------------------------------------------------------
+LOCK TABLES `material_catalogo` WRITE;
+/*!40000 ALTER TABLE `material_catalogo` DISABLE KEYS */;
+INSERT INTO `material_catalogo` VALUES (1,'','PUENTE ADHERENTE PAMAX X 28 KG',NULL,'un'),(2,'','PUENTE ADHERENTE PAMAX X 28 KG',NULL,'und'),(3,'','Contactor 3x 32A 2+2 24Vca 5 0/60Hz EC MON TERO',NULL,'und'),(4,'','HORMIGON RDC 300',NULL,'und'),(5,'','BOMBEO DE HORMIGON RDC 300',NULL,'und'),(6,'','BOMBA DE ARRASTRE HORMIGON',NULL,'und'),(7,'','ZOCALOS PLAIN BLANCO MATE COD',NULL,'und'),(8,'','CONTRAMARCO SQUARE BCO.MATE 5',NULL,'und'),(9,'','TUBO LEDs 18W BLF 220V 1.2M',NULL,'und'),(10,'','Bomba de arrastre hormigón',NULL,'und'),(11,'','Hormigón RDC 300',NULL,'und'),(12,'','INTOMAP 3 EN 1 AR BAGS X 25 KG',NULL,'und'),(13,'','Pastina junta acha x 5 kg',NULL,'und'),(14,'','Fletes',NULL,'und'),(15,'','Bombeo de Hormigón RDC 300',NULL,'und'),(16,'','Arena fina',NULL,'und'),(17,'','Ladrillos huecos 12x18x33',NULL,'und'),(18,'','Ladrillos huecos 8x18x33',NULL,'und'),(19,'','Mallas fibra de vidrio 5x5 rol 90grs revoque',NULL,'und'),(20,'','Látex interior blanco x 20 l',NULL,'und'),(21,'','Sellador fijador al agua x 20l',NULL,'und'),(22,'','LIJA AL AGUA 150 DOBLE A',NULL,'und'),(23,'','ROLLO CARTON CORRUGADO',NULL,'und'),(24,'','CINTA PAPEL AZUL 5CM ANCHO',NULL,'und'),(25,'','TERSUAVE ENDUIDO INT. X 10 LTS .',NULL,'und'),(26,'','CEPILLO ALAMBRE',NULL,'und'),(27,'','PINCELETAS No 42',NULL,'und'),(28,'','Porcelanato Vite Granza ivori',NULL,'und'),(29,'','Protex corrotex bicomponente X',NULL,'und'),(30,'','MECHA COPA DIAMANTADA SIN CERA',NULL,'und'),(31,'','Placas durlock standard 9,5 mm',NULL,'und'),(32,'','Tornillo T1 punta mecha',NULL,'und'),(33,'','PROTEX SUPERLIGANTE X TAMBOR 200',NULL,'und'),(34,'','PROTEX IMPRIMACION S LATA X 25',NULL,'und'),(35,'','CERAMICA RECTIFICADA BLANCA SA',NULL,'und'),(36,'','LAMPARA FOCO LED 15 W',NULL,'und'),(37,'','WD-40 LUBRICANTE 432CC',NULL,'und'),(38,'','SILICONA NEUTRA TRANSPARENTE',NULL,'und'),(39,'','SILICONA ACETICA TRANSPARENTE',NULL,'und'),(40,'','ZOCALO DE CUARZO GRIS',NULL,'und'),(41,'','Ladrillos huecos 8 x 18 x 33',NULL,'und'),(42,'','Ladrillos huecos 12 x 18 x 33',NULL,'und'),(43,'','SELLADOR X 5 LITROS',NULL,'und'),(44,'','PASTINA JUNTA ANCHA X 5KG NEGR',NULL,'und'),(45,'','TEJUELA NEGRA LISA',NULL,'und'),(46,'','PUENTE ADHERENTE TAMBOR POR 20',NULL,'und'),(47,'','Ladrillos comunes',NULL,'und'),(48,'','Arena fina',NULL,'m3'),(49,'','PORCELANATO LISCIO IVORY 1.20X',NULL,'m2'),(50,'','PORCELANATO VITE GRANZA IVORI',NULL,'m2'),(51,'','DISCO CORTE HIERRO 7 ́ ́ 1.6 MM',NULL,'und'),(52,'','DISCO CORTE ACERO 230X 1.9X22.',NULL,'und'),(53,'','CEPILLO ALAMBRE P/AMOL D BANCO MOLA SKIL 350 W',NULL,'und'),(54,'','CAMARA DE INSPECCION PLASTICA',NULL,'und'),(55,'','JABALINA AC-COBRE 1.5 MTS 1/2\"',NULL,'und'),(56,'','ESTOPA DE LIMPIEZA POR BOLSA',NULL,'und'),(57,'','KLAUKOL ALTA PERFORMANCE X 1KG COLOR GRIS ARTICO',NULL,'und'),(58,'','KLAUKOL ALTA PERFORMANCE X1KG COLOR GRIS PLOMO',NULL,'und'),(59,'','Clavos punta parís 2 y 1/2\"',NULL,'und'),(60,'','Alambre de fardo x kg',NULL,'und'),(61,'','PROTEX 216 X KG',NULL,'und'),(62,'','PROTEX FIJATEX PLUS CARTUCHO',NULL,'und'),(63,'','PROTEX SEAL 77 FLEX BI COMPONE',NULL,'und'),(64,'','DESAGUE AGUA 2 EN 1 ATRIM DA60',NULL,'und'),(65,'','B 10 PLUS EXTRACTOR DE AIRE CA',NULL,'und'),(66,'','PASTINA PRESTIGE GRIS PERLA X',NULL,'und'),(67,'','PORCELANATO GRANZA BLACK OUT 1 CAJA 1.44M2',NULL,'m2'),(68,'','WAYRA CAMPANA EMPOTRABLE COD 2',NULL,'und'),(69,'','BACHA KIRA PLUS 35X35X13.5 CAF',NULL,'und'),(70,'','BAÑERA SACHA 140 BCA.ROCA',NULL,'und'),(71,'','THE GAP INODORO LARGO',NULL,'und'),(72,'','THE GAP DEPOSITO APOYO BCO',NULL,'und'),(73,'','THE GAP BIDE 1 OR LLUVIA 11115',NULL,'und'),(74,'','VERA BIDET CROMO MONOC 70-180',NULL,'und'),(75,'','VERA DUCHA EMB C/TRANSF MONOC',NULL,'und'),(76,'','VERA LAVATORIO PARED MONOC CRO',NULL,'und'),(77,'','BACHA BCH14 RECTANG SEMIEMB BL',NULL,'und'),(78,'','ADRA COCINA MONO CROMO 20-162',NULL,'und'),(79,'','VERA LAVATORIO BAJOMONOC CROMO',NULL,'und'),(80,'','THE GAP TAPA INODORO C/AMORTIG',NULL,'und'),(81,'','LUXOR S171 A* COMPACT(BRILL) 7',NULL,'und'),(82,'','PORCELANATO BLANCO GLACIAR 30X',NULL,'m2'),(83,'','PORCELANATO GRANZA IVO OUT 79.',NULL,'m2'),(84,'','PORCELANATO LISCIO LGR N 79,7X 61.44XP',NULL,'m2'),(85,'','PORCELANATO LISCIO LIGTH GREY',NULL,'m2'),(86,'','NYLON POLIETILENO. NEGRO 200 M',NULL,'und'),(87,'','Cemento x 25 kg BOLSA',NULL,'und'),(88,'','CAL HYDRAT X 25 KG',NULL,'und'),(89,'','CHAVETA PASANTE BRONCE REG.CON BOYA',NULL,'und'),(90,'','BOYATELGOPOR PRESION 3/4',NULL,'und'),(91,'','SALIDA DE TANQUE 3/4 POLIPROPI',NULL,'und'),(92,'','RACOR HEMBRA 3/4(ROSCA) X 3/4',NULL,'und'),(93,'','ESPIGA DOBLE 3/4 POLIPROPILEN',NULL,'und'),(94,'','CODO ESPIGA DOBLE 3/4 POLIPROP',NULL,'und'),(95,'','FLOTANTE MECANICO TANQUE 3/4 BRONCE REG.CON BOYA',NULL,'und'),(96,'','BISAGRA MUNICION 100X 75MM',NULL,'und'),(97,'','CANDADO No 50',NULL,'und'),(98,'','UNION ROSCADA DE PVC 1/2\"',NULL,'und'),(99,'','TEE ROSCADA DE BRONCE DE 1/2\"',NULL,'und'),(100,'','CANILLA METALICA ESFERI 1/2\" M',NULL,'und'),(101,'','DISCO WIDIA SEGMENTADO 7 ́ ́',NULL,'und'),(102,'','HOJA SIERRA P/ACERO 24 DIENTES 30 CM DE LARGO',NULL,'und'),(103,'','HOJA DE CUTTER',NULL,'und'),(104,'','Nylon negro polietileno 200mic negro',NULL,'und'),(105,'','DESTORNILLADOR PLANO 6MM LARGO',NULL,'und'),(106,'','DESTORNILLADOR PHILIPS No2 150',NULL,'und'),(107,'','CUTTER',NULL,'und'),(108,'','PINCELETA GALGO No 50',NULL,'und'),(109,'','galgo pincel silver n*20',NULL,'und'),(110,'','PROTEX 216 ADHESIVO EPOXI X 1K',NULL,'und'),(111,'','ANGULO DE HIERRO 1/2\"X 1/8\" X',NULL,'und'),(112,'','DISCO SEGMENTADO DIAMANTADO DE',NULL,'und'),(113,'','Tornillos hexas autoperf',NULL,'und'),(114,'','CEPILLO DE ALAMBRE DE 20 CM',NULL,'und'),(115,'','TORNILLO FIX 5 X 45MM',NULL,'und'),(116,'','TARUGO DEL S8 FISCHER',NULL,'und'),(117,'','Electrodos 2.5 MM PUNTA AZUL',NULL,'und'),(118,'','Cal Cacique x 25 kg',NULL,'und'),(119,'','Cemento x25 kg bolsa',NULL,'und'),(120,'','Balde de Albañil de Plastico',NULL,'und'),(121,'','Tanza Albañil 0.6mm x 100 mts',NULL,'und'),(122,'','Pala Ancha',NULL,'und'),(123,'','Carretilla de chapa',NULL,'und'),(124,'','Caños de cobre con cajas Inter - Provisión de material para la pre instalación de c añerias para unidades con 3 sp lit sistema multispl it provisión de 45 mteros de c añería de cobre con cajas interiores y caja exteri or. Todas las instal aciones se entregan presurizad as con nitrógeno. FORMA DE PAGO ANTICIPADO PAR A LA COMPRA DE MATER IAL , INSTALACIÓN Y POSTERIOR CERTICIACIÓN QUINCEN AL POR PISO FINALIZADO. VALOR MAS IVA. CABE ACLARAR QUE CADA PISO TIE NE 2 DPTOS. CON ESTA TIPOLOGIA',NULL,'und'),(125,'','Caños de cobre con cajas Inter - Provisión de material para la pre instalación de c añerias para unidades con 4 sp lit sistema multispl it provisión de 42 mteros de c añería de cobre con cajas interiores y caja exteri or. Todas las instal aciones se entregan presurizad as con nitrógeno. FORMA DE PAGO ANTICIPADO PAR A LA COMPRA DE MATER IAL , INSTALACIÓN Y POSTERIOR CERTICIACIÓN QUINCEN AL POR PISO FINALIZADO. VALOR MAS IVA. CADA PISO TIENE 2 DPTOS. CON E STA TIPOLOGIA',NULL,'und'),(126,'','Abrazadera 50mm',NULL,'und'),(127,'','Espiga Poliprop. Negro a 90° S',NULL,'und'),(128,'','Espiga Poliprop. Negro a 90° C',NULL,'und'),(129,'','Codo Poliprop. a 90° con rosca',NULL,'und'),(130,'','Caño Poliprop. Negro 1 1/2\'\' Para riego',NULL,'und'),(131,'','Ladrillos huecos del 12 12x18x33',NULL,'und'),(132,'','Protex Fondo de Junta por Esp Polietileno',NULL,'und'),(133,'','Protex Proflex P1000 x 5kg',NULL,'und'),(134,'','Protex imprimación S lata x 25',NULL,'und'),(135,'','Bomba Sumergible Desagote Moto Agua 1.5 HP',NULL,'und'),(136,'','Artefacto Liston 120 doble',NULL,'und'),(137,'','Lampara Foco Led 15w',NULL,'und'),(138,'','Puente Adherente Pamax x 25 kg',NULL,'und'),(139,'','Rollo Cartón Corrugado',NULL,'und'),(140,'','Lapiz Carpintero',NULL,'und'),(141,'','Punta Phillips PH2',NULL,'und'),(142,'','Disco Wid. Segmentado 7\'\' Bremen',NULL,'und'),(143,'','Tornillo T1 Punta Aguja',NULL,'und'),(144,'','Tornillo T2 Punta Aguja Negro',NULL,'und'),(145,'','Placas Durlock Standard 12,5',NULL,'und'),(146,'','Placas Durlock antih 12,5',NULL,'und'),(147,'','Arco separador de 3mm P/porcel',NULL,'und'),(148,'','Pastina klaukol color talco bolsas de 1 kg',NULL,'und'),(149,'','Cantoneras yesera de 2.6m',NULL,'und'),(150,'','Venda geotextil sintética 1mx',NULL,'und'),(151,'','Arena',NULL,'m3'),(152,'','Transformador reductor de 380v marca Yali',NULL,'und'),(153,'','Pegamento para porcelanato',NULL,'und'),(154,'','Corrotex Anticorrosivo Cementico 4 kg',NULL,'und'),(155,'','Yeso Entre Rios x30 kg',NULL,'und'),(156,'','Vinilo de corte \"Red Sacchi\" color blanco detalle verde y rojo según muestra 60 cm x 40cm incluye instalación',NULL,'und'),(157,'','Bombeado',NULL,'m3'),(158,'','Bañera enlozada 1.6x0.7x antideslizante',NULL,'und'),(159,'','Bañera enlozada 1.4x0.7x antideslizante',NULL,'und'),(160,'','Discos de corte 4,5\'\' Disco 115mm x16,m',NULL,'und'),(161,'','Disco Diamantado 12\'\' Segmenta Patrol Black',NULL,'und'),(162,'','Discos de corte 4,5\'\' Disco 115mm x1,6m Tyrolit',NULL,'und'),(163,'','Tornillo autop. p. mecha 2 1/2 cabeza hexagonal',NULL,'und'),(164,'','Vinilo impreso UV instalación',NULL,'und'),(165,'','Pallet vacío',NULL,'und'),(166,'','Sellador poliuretano Proflex P',NULL,'und'),(167,'','Protex Superligante x Tambor 2',NULL,'und'),(168,'','Provisión de honorarios por gestión y armado de la Solicitud de Factibilidad de Suministro Eléctrico para edificio de viviendas multifamiliar ubicado en la ciudad de Quilmes, ante la distribuidora EDESUR. Potencia total a solicitar: 778 kW. Incluye: Armado completo de la carpeta técnica conforme a los requisitos de EDESUR, con documentación de carácter técnico e informativo. Confección de la documentación técnica correspondiente (planilla de potencia, declaración jurada de cargas, memoria técnica, entre otras), firmadas por profesional matriculado. Presentación, entrega y envío de la carpeta técnica informativa a EDESUR. Gestión y entrega final de la Solicitud de Factibilidad aprobada.',NULL,'und'),(169,'','Hidrófugo vitrosol tambor x 20',NULL,'und'),(170,'','Pintura vial',NULL,'und'),(171,'','Aguarrás mineral',NULL,'und'),(172,'','Esmalte sintético color negro',NULL,'und'),(173,'','Pintura aerosol negra 430 ml',NULL,'und'),(174,'','Pintura aerosol amarilla',NULL,'und'),(175,'','Pulsador rasante N/C completo para montacarga',NULL,'und'),(176,'','Toma 10 A 220 V blanco 1 módulo',NULL,'und'),(177,'','Ficha 2x10 A macho',NULL,'und'),(178,'','Ficha 2x10 A hembra',NULL,'und'),(179,'','Disyuntor bipolar 40 A',NULL,'und'),(180,'','Llave térmica bipolar 25 A',NULL,'und'),(181,'','Zócalo fotocélula',NULL,'und'),(182,'','Tapa 5x10 PVC blanca',NULL,'und'),(183,'','Artefacto listón 120 doble',NULL,'und'),(184,'','Bastidor luz PVC',NULL,'und'),(185,'','Ficha 3 + N + Tierra 16 A',NULL,'und'),(186,'','Fotocélula exterior 2500 Wts/CO',NULL,'und'),(187,'','Caja estanca PVC',NULL,'und'),(188,'','Toma 10 A 220 V doble blanco 3 módulos',NULL,'und'),(189,'','Portalámpara para foco 12 W',NULL,'und'),(190,'','Lámpara foco LED 15 W',NULL,'und'),(191,'','Caja octogonal PVC Electric',NULL,'und'),(192,'','Pulsador de emergencia',NULL,'und'),(193,'','Pulsador rasante N/O completo para montacarga',NULL,'und'),(194,'','Tubo LED 18W BLF 220V 1.2 m',NULL,'und'),(195,'','Vinilo impreso para cartel 4.8 1.22',NULL,'und'),(196,'','Vinilo impreso para cartel 4.8',NULL,'und'),(197,'','Vinilo impreso para cartel 3x',NULL,'und'),(198,'','Malla fibra de vidrio 5x5 rol 90g revoque',NULL,'und'),(199,'','Reflector de LED Exterior 200W Artef. Proy. Leds 200W 220V 11',NULL,'und'),(200,'','Cal Cacique',NULL,'und'),(201,'','Cemento x50 kg bolsa',NULL,'und'),(202,'','Lona frontar impresa con frontales',NULL,'und'),(203,'','Sellador multiuso fastix color',NULL,'und'),(204,'','Tuerca 5/8 para andamio',NULL,'und'),(205,'','Torn. Cab. Hex 3/8\'\' x38mm c/ara cabeza hexagonal',NULL,'und'),(206,'','Arena',NULL,'und'),(207,'','Envase de garrafa de gas x10 kg completo',NULL,'und'),(208,'','Tornillo hexagonal para chapas de 2 1/2\'\'',NULL,'und'),(209,'','Discos de corte 4,5\'\'',NULL,'und'),(210,'','Plomada',NULL,'und'),(211,'','Antiparras p/polvos y liquidos transp.',NULL,'und'),(212,'','Guantes hilo moteado',NULL,'und'),(213,'','Tubo LEDs 19w BLF 220V 1.2M',NULL,'und'),(214,'','Tanza rollo de 100m',NULL,'und'),(215,'','Hoja sierra p/acero 244 dientes 30 cm de largo',NULL,'und'),(216,'','Fratacho plastico de fieltro',NULL,'und'),(217,'','Fratacho de madera algarrobo 35 cm',NULL,'und'),(218,'','Clavos punta paris 2\'',NULL,'und'),(219,'','Clavos punta paris 2 y 1/2\'',NULL,'und'),(220,'','Cemento x50kg bolsa AVELLANEDA',NULL,'und'),(221,'','Calibración nivel laser spectro',NULL,'und'),(222,'','Casco seg. blanco con arnes',NULL,'und'),(223,'','Guantes dielectricos talle 11 l36cm dps1210336e',NULL,'und'),(224,'','Pantalon cargo beige talle 42 y 54',NULL,'und'),(225,'','Chapa trapezoidal c25 x6mts ancho',NULL,'und'),(226,'','Chapa lista Galvanizada c30 2.00x 1.00 1.22 x 2.44',NULL,'und'),(227,'','Anclaje quimico fischer v1 30',NULL,'und'),(228,'','Disco widia segmentado 4.5\'\'',NULL,'und'),(229,'','Disco corte p/sensitiva 14\'\'',NULL,'und'),(230,'','Disco widia segmentado 7\'\'',NULL,'und'),(231,'','Contrat. Seguro Respons. Civil. Respons. Civil. Suma asegurada $300.000.00 sin Franquicia asegurado Simende CO SRL asegurado baprisud S.A',NULL,'und'),(232,'','Cabo grueso de madera con rosc',NULL,'und'),(233,'','Escobillón barrendero',NULL,'und'),(234,'','Cinta Métrica de 8 mts',NULL,'und'),(235,'','Martillo carpintero 650 grs largo 35 cm',NULL,'und'),(236,'','Horno Microondas',NULL,'und'),(237,'','Heladera bajo mesada 78 a 125L 220V',NULL,'und'),(238,'','Codo HH 110 a 90° AWADUC Codo HH 110x90 Duratop',NULL,'und'),(239,'','Rodillo pelo corto de 7°',NULL,'und'),(240,'','Rodillo antigota N°22',NULL,'und'),(241,'','Pintura aerosol negro 430ML',NULL,'und'),(242,'','GFalgo pincel silver N°25',NULL,'und'),(243,'','Pinceleta N°50',NULL,'und'),(244,'','Malla naranja',NULL,'und'),(245,'','Electrodos 2.5MM punta azul',NULL,'und'),(246,'','Tornillo T2 Punta Aguja',NULL,'und'),(247,'','Fijación tarugo+tornillo 8 LAD',NULL,'und'),(248,'','Fijación tarugo+tornillo 8',NULL,'und'),(249,'','Disco de corte 4,5\'\'',NULL,'und'),(250,'','Pinceleta galgo n°50',NULL,'und'),(251,'','Rodillo pelo corto 7\'\' para bar',NULL,'und'),(252,'','Pincel N°15',NULL,'und'),(253,'','Galgo pincel silver n°20',NULL,'und'),(254,'','Esmalte sintético',NULL,'und'),(255,'','Canillas 1/2\'\' plastica para la canilla lavat. 221 pico lev. c/cruz',NULL,'und'),(256,'','Adaptador tanque PPN 1/1',NULL,'und'),(257,'','Canillas para mesada un agua',NULL,'und'),(258,'','Lluvia M Plastica Completa',NULL,'und'),(259,'','Pileta de lavar PVC chica 49x43x28 DU',NULL,'und'),(260,'','Sopapa PVC 40 cromo',NULL,'und'),(261,'','Asiento inodoro Floren. TSX4 T RAFUL OFERTA',NULL,'und'),(262,'','Mochila PVC Codo Ideal',NULL,'und'),(263,'','Codo HH 40x90 mm Duratop.',NULL,'und'),(264,'','Codo HH 50x90 mm Duratop.',NULL,'und'),(265,'','Codo HH 63x45 mm Duratop.',NULL,'und'),(266,'','Gomas de goyete para inodoro Ferrum.',NULL,'und'),(267,'','Tarugos N°8 marca Redex.',NULL,'und'),(268,'','Tornillos para inodoro cromados 22x70 mm.',NULL,'und'),(269,'','Asiento para inodoro blanco Concordplast.',NULL,'und'),(270,'','Inodoro corto Andina blanco Ferrum.',NULL,'und'),(271,'','Tubo macho 25 mm Aquasystem.',NULL,'und'),(272,'','Unión doble 25 mm Aquasystem.',NULL,'und'),(273,'','Reducción 20x25 mm Aquasystem (buje red 25x20).',NULL,'und'),(274,'','Codo MH 40x45 mm Duratop.',NULL,'und'),(275,'','Codo HH 40x45 mm Duratop.',NULL,'und'),(276,'','Mochila de PVC con codo Ideal.',NULL,'und'),(277,'','Cupla termofusión 25 mm.',NULL,'und'),(278,'','Caño Ø20 PN25 Aquasystem.',NULL,'und'),(279,'','Caño Ø25 PN25 Aquasystem.',NULL,'und'),(280,'','Llave de paso 25 mm polipropileno blanco Aquasystem.',NULL,'und'),(281,'','Cupla termofusión 20 mm.',NULL,'und'),(282,'','Codo rosca hembra 25x3/4” a 90° Aquasystem.',NULL,'und'),(283,'','Codo normal 25x90° Aquasystem.',NULL,'und'),(284,'','Boca de acceso Ø63 mm Duratop.',NULL,'und'),(285,'','Llave de fusión externa 20 mm Aquasystem.',NULL,'und'),(286,'','Tubo macho 20 mm Aquasystem.',NULL,'und'),(287,'','Tubo hembra 25 mm Aquasystem.',NULL,'und'),(288,'','Tubo hembra 20 mm Aquasystem.',NULL,'und'),(289,'','Termotanque eléctrico.',NULL,'und'),(290,'','Fijaciones Ø8 mm.',NULL,'und'),(291,'','Tarugo para hueco N°8 con tope.',NULL,'und'),(292,'','Grampa tipo Omega 1/2”.',NULL,'und'),(293,'','Grampa tipo Omega 3/4”.',NULL,'und'),(294,'','Codo normal 20x90° Aquasystem.',NULL,'und'),(295,'','Silicona en aerosol (solución sellante).',NULL,'und'),(296,'','Manguito de reparación Ø110 mm Duratop.',NULL,'und'),(297,'','Codo MH 110x45° Duratop.',NULL,'und'),(298,'','Ramal 110x63 mm a 45°.',NULL,'und'),(299,'','Pileta de patio Ø110 mm chica Duratop.',NULL,'und'),(300,'','Pileta de patio Ø63 mm Duratop.',NULL,'und'),(301,'','Codo HH 110x45° Duratop.',NULL,'und'),(302,'','Ramal 110x50 mm a 45°.',NULL,'und'),(303,'','Codo 20 mm con rosca 1/2” Aquasystem.',NULL,'und'),(304,'','Flexible mallado 1/2” x 30 cm.',NULL,'und'),(305,'','Tee 25x20 mm Aquasystem.',NULL,'und'),(306,'','Disco de corte p/sensitiva 14\'\'',NULL,'und'),(307,'','Puente Adherente Tambor por 200kg protex super ligante',NULL,'und'),(308,'','Protex Seal 77 Flex BI Componente',NULL,'und'),(309,'','Hierro dulce 6 mm',NULL,'und'),(310,'','Precarga polvo ABC x kg',NULL,'und'),(311,'','Mantenimiento anual ABC x 5 kg',NULL,'und'),(312,'','Mantenimiento anual ABC x 10 kg',NULL,'und'),(313,'','Convert de óxido negro x4lts',NULL,'und'),(314,'','Pincel N°10',NULL,'und'),(315,'','Bisagra torneada 32x100mm',NULL,'und'),(316,'','Abrazadera PVC tipo “U” M20 abierta.',NULL,'und'),(317,'','Caja octogonal PVC eléctrica.',NULL,'und'),(318,'','Codo PVC rígido 3/4” para instalación eléctrica.',NULL,'und'),(319,'','Caño PVC rígido 3/4” para instalación eléctrica.',NULL,'und'),(320,'','Cable unipolar 1,5 mm² color celeste.',NULL,'und'),(321,'','Cable unipolar 1,5 mm² color negro.',NULL,'und'),(322,'','Cable unipolar 2,5 mm² color verde/amarillo.',NULL,'und'),(323,'','Toma 20A blanco, 1 módulo.',NULL,'und'),(324,'','Tapón ciego blanco, 1 módulo.',NULL,'und'),(325,'','Cable unipolar 2,5 mm² color celeste.',NULL,'und'),(326,'','Toma simple 10A 220V blanco, 1 módulo.',NULL,'und'),(327,'','Llave simple 10A blanca.',NULL,'und'),(328,'','Toma doble 10A 220V blanco, 3 módulos.',NULL,'und'),(329,'','Tapa 5x10 cm blanca PVC.',NULL,'und'),(330,'','Bastidor de luz PVC.',NULL,'und'),(331,'','Caja rectangular PVC eléctrica.',NULL,'und'),(332,'','Tubo LED 18W.',NULL,'und'),(333,'','Artefacto estanco LED 2x18W.',NULL,'und'),(334,'','Conector de luz PVC 3/4”.',NULL,'und'),(335,'','Cupla de luz PVC 3/4”.',NULL,'und'),(336,'','Cable unipolar 2,5 mm² color marrón.',NULL,'und'),(337,'','Cerecita tambor x200 kg Hidrófugo x200 cimiento',NULL,'und'),(338,'','Mecha de widia sds de 12',NULL,'und'),(339,'','Mecha de widia sds del 10',NULL,'und'),(340,'','Mecha de widia 8 encastre sds',NULL,'un'),(341,'','Mecha de acero rapida del 13',NULL,'und'),(342,'','Mecha de acero rapida del 12',NULL,'und'),(343,'','Mecha de acero rapida del 10',NULL,'und'),(344,'','Mecha cacero rapidade 8 mm',NULL,'und'),(345,'','Disco de corte 4,5\'\' Disco 115mm x 1,6m Tyrolit',NULL,'und'),(346,'','Disco p/circular madera 9 1/4 25 mm Disco de sierra circular Ecoli ne 184, orificio de 20mm, 1.4 mm de espesor, 60 dientes',NULL,'und'),(347,'','Candado',NULL,'und'),(348,'','Soporte Gancho Matafuego pared',NULL,'und'),(349,'','Chapa baliza 22x80cm',NULL,'und'),(350,'','Malla de seguridad naranja x rollo 50 ml',NULL,'und'),(351,'','Mecha de widia sds de 13',NULL,'und'),(352,'','Electrodos 2.5mm punta azul Conarco',NULL,'und'),(353,'','Tee 3/4\'\' termofusión acq acq.system',NULL,'und'),(354,'','Codo a 45 3/4\'\' ACQ',NULL,'und'),(355,'','Caños termofusión 3/4\'\'',NULL,'und'),(356,'','Chapa trapezoidal modelo t-101',NULL,'und'),(357,'','Tee 110 awaduct',NULL,'und'),(358,'','Cinta autovulcanizante',NULL,'und'),(359,'','Cinta aislante',NULL,'und'),(360,'','Caño 110 x 4 mts con o\'ring aw',NULL,'und'),(361,'','Clavos punta paris 2 y 1/2\'\'',NULL,'und'),(362,'','Clavos punta paris 2\'\'',NULL,'und'),(363,'','Mampostería Ladrillo hueco 12',NULL,'und'),(364,'','Piedra partida',NULL,'und'),(365,'','Lampara Foco Led 12w',NULL,'und'),(366,'','Porta lampara f/foco 12w',NULL,'und'),(367,'','Canillas 1/2\'\' plastica',NULL,'und');
+/*!40000 ALTER TABLE `material_catalogo` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
--- Estructura de tabla para la tabla `orden_compra`
+-- Table structure for table `movimiento_deposito`
 --
 
+DROP TABLE IF EXISTS `movimiento_deposito`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `movimiento_deposito` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `cantidad` decimal(38,2) DEFAULT NULL,
+  `destino` varchar(255) DEFAULT NULL,
+  `fecha` date DEFAULT NULL,
+  `observacion` varchar(1200) DEFAULT NULL,
+  `responsable` varchar(255) DEFAULT NULL,
+  `stock_anterior` decimal(38,2) DEFAULT NULL,
+  `stock_resultante` decimal(38,2) DEFAULT NULL,
+  `tipo` enum('AJUSTE','DEVOLUCION','ENTRADA','SALIDA') DEFAULT NULL,
+  `item_id` bigint(20) DEFAULT NULL,
+  `item_recepcion_material_id` bigint(20) DEFAULT NULL,
+  `orden_compra_id` bigint(20) DEFAULT NULL,
+  `orden_compra_numero` varchar(255) DEFAULT NULL,
+  `recepcion_material_id` bigint(20) DEFAULT NULL,
+  `devuelto` bit(1) NOT NULL,
+  `movimiento_origen_id` bigint(20) DEFAULT NULL,
+  `requiere_devolucion` bit(1) NOT NULL,
+  `trabajador_id` bigint(20) DEFAULT NULL,
+  `trabajador_nombre` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FKrc5p7jdkmx85qu8fxry3tkyi2` (`item_id`),
+  CONSTRAINT `FKrc5p7jdkmx85qu8fxry3tkyi2` FOREIGN KEY (`item_id`) REFERENCES `deposito_item` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `movimiento_deposito`
+--
+
+LOCK TABLES `movimiento_deposito` WRITE;
+/*!40000 ALTER TABLE `movimiento_deposito` DISABLE KEYS */;
+INSERT INTO `movimiento_deposito` VALUES (1,7.00,'OC 522','2026-07-01','','',0.00,7.00,'ENTRADA',1,29,11,'522',15,'\0',NULL,'\0',NULL,NULL),(2,2.00,'','2026-07-12','','',7.00,5.00,'SALIDA',1,NULL,NULL,NULL,NULL,'\0',NULL,'\0',1,'Juan Carlos');
+/*!40000 ALTER TABLE `movimiento_deposito` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `obra`
+--
+
+DROP TABLE IF EXISTS `obra`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `obra` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `activa` bit(1) NOT NULL,
+  `cliente` varchar(255) DEFAULT NULL,
+  `nombre` varchar(500) NOT NULL,
+  `ubicacion` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `obra`
+--
+
+LOCK TABLES `obra` WRITE;
+/*!40000 ALTER TABLE `obra` DISABLE KEYS */;
+INSERT INTO `obra` VALUES (1,'',NULL,'Terrazas de Quilmes','Quilmes'),(2,'','','Godines','');
+/*!40000 ALTER TABLE `obra` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `orden_compra`
+--
+
+DROP TABLE IF EXISTS `orden_compra`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `orden_compra` (
-  `id` bigint(20) NOT NULL,
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `fecha` date DEFAULT NULL,
   `numero` varchar(255) DEFAULT NULL,
   `observacion` varchar(255) DEFAULT NULL,
   `proveedor` varchar(255) DEFAULT NULL,
   `proveedor_entidad_id` bigint(20) DEFAULT NULL,
-  `fecha_vigencia` date DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `fecha_vigencia` date DEFAULT NULL,
+  `modo_seguimiento` enum('CERTIFICACION','ENTREGA','REGISTRO') DEFAULT NULL,
+  `obra_id` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK4dhyef6kiav1dkwjxe8mybfvc` (`proveedor_entidad_id`),
+  KEY `FK1f0syscsa5oeg2wmpyxt8ycua` (`obra_id`),
+  CONSTRAINT `FK1f0syscsa5oeg2wmpyxt8ycua` FOREIGN KEY (`obra_id`) REFERENCES `obra` (`id`),
+  CONSTRAINT `FK4dhyef6kiav1dkwjxe8mybfvc` FOREIGN KEY (`proveedor_entidad_id`) REFERENCES `proveedor` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=216 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Volcado de datos para la tabla `orden_compra`
+-- Dumping data for table `orden_compra`
 --
 
-INSERT INTO `orden_compra` (`id`, `fecha`, `numero`, `observacion`, `proveedor`, `proveedor_entidad_id`, `fecha_vigencia`) VALUES
-(1, '2026-06-11', '449', 'Importada desde planilla separando OC por proveedor', NULL, 1, '2026-07-11'),
-(2, '2026-06-11', '450', 'Importada desde planilla separando OC por proveedor', NULL, 2, '2026-07-11'),
-(3, '2026-06-10', '544', 'Importada desde planilla separando OC por proveedor', NULL, 3, '2026-07-10'),
-(4, '2026-06-09', '448', 'Importada desde planilla separando OC por proveedor', NULL, 4, '2026-07-09'),
-(5, '2026-06-09', '14', 'Importada desde planilla separando OC por proveedor', NULL, 5, '2026-07-09'),
-(6, '2026-06-01', '443', 'Importada desde planilla separando OC por proveedor', NULL, 6, '2026-07-01'),
-(7, '2026-05-29', '536', 'Importada desde planilla separando OC por proveedor', NULL, 7, '2026-06-28'),
-(8, '2026-06-09', '539', 'Importada desde planilla separando OC por proveedor', NULL, 8, '2026-07-09'),
-(9, '2026-05-26', '444', 'Importada desde planilla separando OC por proveedor', NULL, 4, '2026-06-25'),
-(10, '2026-05-06', '30', 'Importada desde planilla separando OC por proveedor', NULL, 9, '2026-06-05'),
-(11, '2026-05-05', '522', 'Importada desde planilla separando OC por proveedor', NULL, 10, '2026-06-04'),
-(12, '2026-04-29', '438', 'Importada desde planilla separando OC por proveedor', NULL, 11, '2026-05-29'),
-(13, '2026-04-29', '439', 'Importada desde planilla separando OC por proveedor', NULL, 6, '2026-05-29'),
-(14, '2026-04-29', '440', 'Importada desde planilla separando OC por proveedor', NULL, 12, '2026-05-29'),
-(15, '2026-04-29', '518', 'Importada desde planilla separando OC por proveedor', NULL, 4, '2026-05-29'),
-(16, '2026-04-22', '29', 'Importada desde planilla separando OC por proveedor', NULL, 9, '2026-05-22'),
-(17, '2026-04-16', '436', 'Importada desde planilla separando OC por proveedor', NULL, 13, '2026-05-16'),
-(18, '2026-04-15', '28', 'Importada desde planilla separando OC por proveedor', NULL, 14, '2026-05-15'),
-(19, '2026-04-14', '13', 'Importada desde planilla separando OC por proveedor', NULL, 5, '2026-05-14'),
-(20, '2026-04-14', '27', 'Importada desde planilla separando OC por proveedor', NULL, 14, '2026-05-14'),
-(21, '2026-04-14', '434', 'Importada desde planilla separando OC por proveedor', NULL, 15, '2026-05-14'),
-(22, '2026-04-14', '432', 'Importada desde planilla separando OC por proveedor', NULL, 16, '2026-05-14'),
-(23, '2026-04-13', '513', 'Importada desde planilla separando OC por proveedor', NULL, 17, '2026-05-13'),
-(24, '2026-04-10', '435', 'Importada desde planilla separando OC por proveedor', NULL, 2, '2026-05-10'),
-(25, '2026-04-14', '433', 'Importada desde planilla separando OC por proveedor', NULL, 18, '2026-05-14'),
-(26, '2026-04-08', '25', 'Importada desde planilla separando OC por proveedor', NULL, 14, '2026-05-08'),
-(27, '2026-04-08', '12', 'Importada desde planilla separando OC por proveedor', NULL, 5, '2026-05-08'),
-(28, '2026-03-27', '500', 'Importada desde planilla separando OC por proveedor', NULL, 7, '2026-04-26'),
-(29, '2026-03-27', '428', 'Importada desde planilla separando OC por proveedor', NULL, 19, '2026-04-26'),
-(30, '2026-03-27', '24', 'Importada desde planilla separando OC por proveedor', NULL, 14, '2026-04-26'),
-(31, '2026-03-27', '23', 'Importada desde planilla separando OC por proveedor', NULL, 14, '2026-04-26'),
-(32, '2026-03-27', '424', 'Importada desde planilla separando OC por proveedor', NULL, 2, '2026-04-26'),
-(33, '2026-03-20', '423', 'Importada desde planilla separando OC por proveedor', NULL, 20, '2026-04-19'),
-(34, '2026-03-11', '491', 'Importada desde planilla separando OC por proveedor', NULL, 10, '2026-04-10'),
-(35, '2026-03-05', '422', 'Importada desde planilla separando OC por proveedor', NULL, 20, '2026-04-04'),
-(36, '2026-03-05', '22', 'Importada desde planilla separando OC por proveedor', NULL, 14, '2026-04-04'),
-(37, '2026-02-27', '488', 'Importada desde planilla separando OC por proveedor', NULL, 4, '2026-03-29'),
-(38, '2026-02-27', '419', 'Importada desde planilla separando OC por proveedor', NULL, 6, '2026-03-29'),
-(39, '2026-02-27', '11', 'Importada desde planilla separando OC por proveedor', NULL, 5, '2026-03-29'),
-(40, '2026-02-27', '410', 'Importada desde planilla separando OC por proveedor', NULL, 2, '2026-03-29'),
-(41, '2026-02-19', '484', 'Importada desde planilla separando OC por proveedor', NULL, 21, '2026-03-21'),
-(42, '2026-02-19', '483', 'Importada desde planilla separando OC por proveedor', NULL, 22, '2026-03-21'),
-(43, '2026-02-19', '414', 'Importada desde planilla separando OC por proveedor', NULL, 23, '2026-03-21'),
-(44, '2026-02-13', '19', 'Importada desde planilla separando OC por proveedor', NULL, 14, '2026-03-15'),
-(45, '2026-02-11', '481', 'Importada desde planilla separando OC por proveedor', NULL, 24, '2026-03-13'),
-(46, '2026-02-11', '480', 'Importada desde planilla separando OC por proveedor', NULL, 24, '2026-03-13'),
-(47, '2026-02-11', '406', 'Importada desde planilla separando OC por proveedor', NULL, 20, '2026-03-13'),
-(48, '2026-02-06', '9', 'Importada desde planilla separando OC por proveedor', NULL, 5, '2026-03-08'),
-(49, '2026-02-06', '8', 'Importada desde planilla separando OC por proveedor', NULL, 5, '2026-03-08'),
-(50, '2026-02-06', '7', 'Importada desde planilla separando OC por proveedor', NULL, 5, '2026-03-08'),
-(51, '2026-02-06', '6', 'Importada desde planilla separando OC por proveedor', NULL, 5, '2026-03-08'),
-(52, '2026-02-06', '5', 'Importada desde planilla separando OC por proveedor', NULL, 5, '2026-03-08'),
-(53, '2026-02-06', '4', 'Importada desde planilla separando OC por proveedor', NULL, 5, '2026-03-08'),
-(54, '2026-02-06', '3', 'Importada desde planilla separando OC por proveedor', NULL, 5, '2026-03-08'),
-(55, '2026-02-06', '10', 'Importada desde planilla separando OC por proveedor', NULL, 5, '2026-03-08'),
-(56, '2026-02-04', '2', 'Importada desde planilla separando OC por proveedor', NULL, 5, '2026-03-06'),
-(57, '2026-02-03', '18', 'Importada desde planilla separando OC por proveedor', NULL, 14, '2026-03-05'),
-(58, '2026-01-23', '478', 'Importada desde planilla separando OC por proveedor', NULL, 25, '2026-02-22'),
-(59, '2026-01-21', '476', 'Importada desde planilla separando OC por proveedor', NULL, 21, '2026-02-20'),
-(60, '2026-01-21', '475', 'Importada desde planilla separando OC por proveedor', NULL, 25, '2026-02-20'),
-(61, '2026-01-21', '474', 'Importada desde planilla separando OC por proveedor', NULL, 7, '2026-02-20'),
-(62, '2026-01-21', '402', 'Importada desde planilla separando OC por proveedor', NULL, 15, '2026-02-20'),
-(63, '2026-01-21', '401', 'Importada desde planilla separando OC por proveedor', NULL, 13, '2026-02-20'),
-(64, '2026-01-21', '403', 'Importada desde planilla separando OC por proveedor', NULL, 2, '2026-02-20'),
-(65, '2026-01-07', '399', 'Importada desde planilla separando OC por proveedor', NULL, 18, '2026-02-06'),
-(66, '2026-01-07', '397', 'Importada desde planilla separando OC por proveedor', NULL, 23, '2026-02-06'),
-(67, '2026-01-02', '15', 'Importada desde planilla separando OC por proveedor', NULL, 14, '2026-02-01'),
-(68, '2025-12-26', '466', 'Importada desde planilla separando OC por proveedor', NULL, 26, '2026-01-25'),
-(69, '2025-12-26', '465', 'Importada desde planilla separando OC por proveedor', NULL, 21, '2026-01-25'),
-(70, '2025-12-26', '391', 'Importada desde planilla separando OC por proveedor', NULL, 27, '2026-01-25'),
-(71, '2025-12-26', '393', 'Importada desde planilla separando OC por proveedor', NULL, 2, '2026-01-25'),
-(72, '2025-12-26', '392', 'Importada desde planilla separando OC por proveedor', NULL, 20, '2026-01-25'),
-(73, '2025-12-17', '388', 'Importada desde planilla separando OC por proveedor', NULL, 47, '2026-01-16'),
-(74, '2025-12-17', '14', 'Importada desde planilla separando OC por proveedor', NULL, 14, '2026-01-16'),
-(75, '2025-12-10', '386', 'Importada desde planilla separando OC por proveedor', NULL, 18, '2026-01-09'),
-(76, '2025-11-25', '4', 'Importada desde planilla separando OC por proveedor', NULL, 14, '2025-12-25'),
-(77, '2025-11-25', '376', 'Importada desde planilla separando OC por proveedor', NULL, 27, '2025-12-25'),
-(78, '2025-11-20', '374', 'Importada desde planilla separando OC por proveedor', NULL, 2, '2025-12-20'),
-(79, '2025-11-19', '373', 'Importada desde planilla separando OC por proveedor', NULL, 2, '2025-12-19'),
-(80, '2025-11-19', '372', 'Importada desde planilla separando OC por proveedor', NULL, 20, '2025-12-19'),
-(81, '2025-11-13', '458', 'Importada desde planilla separando OC por proveedor', NULL, 29, '2025-12-13'),
-(82, '2025-11-12', '457', 'Importada desde planilla separando OC por proveedor', NULL, 30, '2025-12-12'),
-(83, '2025-11-12', '455', 'Importada desde planilla separando OC por proveedor', NULL, 25, '2025-12-12'),
-(84, '2025-11-12', '370', 'Importada desde planilla separando OC por proveedor', NULL, 30, '2025-12-12'),
-(85, '2025-11-11', '459', 'Importada desde planilla separando OC por proveedor', NULL, 31, '2025-12-11'),
-(86, '2025-11-10', '2', 'Importada desde planilla separando OC por proveedor', NULL, 14, '2025-12-10'),
-(87, '2025-11-07', '456', 'Importada desde planilla separando OC por proveedor', NULL, 32, '2025-12-07'),
-(88, '2025-11-04', '454', 'Importada desde planilla separando OC por proveedor', NULL, 22, '2025-12-04'),
-(89, '2025-11-04', '368', 'Importada desde planilla separando OC por proveedor', NULL, 47, '2025-12-04'),
-(90, '2025-11-04', '363', 'Importada desde planilla separando OC por proveedor', NULL, 33, '2025-12-04'),
-(91, '2025-11-04', '365', 'Importada desde planilla separando OC por proveedor', NULL, 20, '2025-12-04'),
-(92, '2025-11-04', '366', 'Importada desde planilla separando OC por proveedor', NULL, 2, '2025-12-04'),
-(93, '2025-11-04', '362', 'Importada desde planilla separando OC por proveedor', NULL, 20, '2025-12-04'),
-(94, '2025-11-02', '383', 'Importada desde planilla separando OC por proveedor', NULL, 6, '2025-12-02'),
-(95, '2025-10-28', '361', 'Importada desde planilla separando OC por proveedor', NULL, 2, '2025-11-27'),
-(96, '2025-10-28', '364', 'Importada desde planilla separando OC por proveedor', NULL, 2, '2025-11-27'),
-(97, '2025-10-22', '359', 'Importada desde planilla separando OC por proveedor', NULL, 18, '2025-11-21'),
-(98, '2025-10-16', '353', 'Importada desde planilla separando OC por proveedor', NULL, 34, '2025-11-15'),
-(99, '2025-10-16', '352', 'Importada desde planilla separando OC por proveedor', NULL, 23, '2025-11-15'),
-(100, '2025-10-15', '453', 'Importada desde planilla separando OC por proveedor', NULL, 14, '2025-11-14'),
-(101, '2025-10-15', '351', 'Importada desde planilla separando OC por proveedor', NULL, 6, '2025-11-14'),
-(102, '2025-10-08', '350', 'Importada desde planilla separando OC por proveedor', NULL, 35, '2025-11-07'),
-(103, '2025-10-08', '349', 'Importada desde planilla separando OC por proveedor', NULL, 2, '2025-11-07'),
-(104, '2025-10-08', '348', 'Importada desde planilla separando OC por proveedor', NULL, 36, '2025-11-07'),
-(105, '2025-10-06', '449', 'Importada desde planilla separando OC por proveedor', NULL, 14, '2025-11-05'),
-(106, '2025-09-30', '448', 'Importada desde planilla separando OC por proveedor', NULL, 37, '2025-10-30'),
-(107, '2025-09-30', '346', 'Importada desde planilla separando OC por proveedor', NULL, 18, '2025-10-30'),
-(108, '2025-09-26', '442', 'Importada desde planilla separando OC por proveedor', NULL, 22, '2025-10-26'),
-(109, '2025-09-26', '345', 'Importada desde planilla separando OC por proveedor', NULL, 6, '2025-10-26'),
-(110, '2025-09-25', '446', 'Importada desde planilla separando OC por proveedor', NULL, 14, '2025-10-25'),
-(111, '2025-09-23', '342', 'Importada desde planilla separando OC por proveedor', NULL, 30, '2025-10-23'),
-(112, '2025-09-22', '441', 'Importada desde planilla separando OC por proveedor', NULL, 14, '2025-10-22'),
-(113, '2025-09-12', '339', 'Importada desde planilla separando OC por proveedor', NULL, 2, '2025-10-12'),
-(114, '2025-09-12', '340', 'Importada desde planilla separando OC por proveedor', NULL, 6, '2025-10-12'),
-(115, '2025-09-11', '434', 'Importada desde planilla separando OC por proveedor', NULL, 14, '2025-10-11'),
-(116, '2025-09-03', '430', 'Importada desde planilla separando OC por proveedor', NULL, 38, '2025-10-03'),
-(117, '2025-08-29', '334', 'Importada desde planilla separando OC por proveedor', NULL, 39, '2025-09-28'),
-(118, '2025-08-28', '428', 'Importada desde planilla separando OC por proveedor', NULL, 40, '2025-09-27'),
-(119, '2025-08-28', '427', 'Importada desde planilla separando OC por proveedor', NULL, 4, '2025-09-27'),
-(120, '2025-08-26', '426', 'Importada desde planilla separando OC por proveedor', NULL, 14, '2025-09-25'),
-(121, '2025-08-21', '326', 'Importada desde planilla separando OC por proveedor', NULL, 2, '2025-09-20'),
-(122, '2025-08-21', '422', 'Importada desde planilla separando OC por proveedor', NULL, 41, '2025-09-20'),
-(123, '2025-08-21', '327', 'Importada desde planilla separando OC por proveedor', NULL, 15, '2025-09-20'),
-(124, '2025-08-19', '421', 'Importada desde planilla separando OC por proveedor', NULL, 21, '2025-09-18'),
-(125, '2025-08-18', '419', 'Importada desde planilla separando OC por proveedor', NULL, 42, '2025-09-17'),
-(126, '2025-08-18', '418', 'Importada desde planilla separando OC por proveedor', NULL, 14, '2025-09-17'),
-(127, '2025-08-12', '415', 'Importada desde planilla separando OC por proveedor', NULL, 40, '2025-09-11'),
-(128, '2025-08-01', '317', 'Importada desde planilla separando OC por proveedor', NULL, 6, '2025-08-31'),
-(129, '2025-07-31', '412', 'Importada desde planilla separando OC por proveedor', NULL, 14, '2025-08-30'),
-(130, '2025-07-31', '411', 'Importada desde planilla separando OC por proveedor', NULL, 24, '2025-08-30'),
-(131, '2025-07-30', '316', 'Importada desde planilla separando OC por proveedor', NULL, 43, '2025-08-29'),
-(132, '2025-07-30', '314', 'Importada desde planilla separando OC por proveedor', NULL, 44, '2025-08-29'),
-(133, '2025-07-30', '313', 'Importada desde planilla separando OC por proveedor', NULL, 45, '2025-08-29'),
-(134, '2025-07-30', '312', 'Importada desde planilla separando OC por proveedor', NULL, 13, '2025-08-29'),
-(135, '2025-07-30', '311', 'Importada desde planilla separando OC por proveedor', NULL, 46, '2025-08-29'),
-(136, '2025-07-30', '300', 'Importada desde planilla separando OC por proveedor', NULL, 47, '2025-08-29'),
-(137, '2025-07-28', '409', 'Importada desde planilla separando OC por proveedor', NULL, 48, '2025-08-27'),
-(138, '2025-07-25', '404', 'Importada desde planilla separando OC por proveedor', NULL, 40, '2025-08-24'),
-(139, '2025-07-23', '407', 'Importada desde planilla separando OC por proveedor', NULL, 14, '2025-08-22'),
-(140, '2025-07-22', '309', 'Importada desde planilla separando OC por proveedor', NULL, 2, '2025-08-21'),
-(141, '2025-07-21', '405', 'Importada desde planilla separando OC por proveedor', NULL, 49, '2025-08-20'),
-(142, '2025-07-10', '402', 'Importada desde planilla separando OC por proveedor', NULL, 14, '2025-08-09'),
-(143, '2025-07-03', '400', 'Importada desde planilla separando OC por proveedor', NULL, 40, '2025-08-02'),
-(144, '2025-07-03', '307', 'Importada desde planilla separando OC por proveedor', NULL, 35, '2025-08-02'),
-(145, '2025-07-02', '399', 'Importada desde planilla separando OC por proveedor', NULL, 50, '2025-08-01'),
-(146, '2025-07-02', '398', 'Importada desde planilla separando OC por proveedor', NULL, 14, '2025-08-01'),
-(147, '2025-06-24', '394', 'Importada desde planilla separando OC por proveedor', NULL, 51, '2025-07-24'),
-(148, '2025-06-18', '389', 'Importada desde planilla separando OC por proveedor', NULL, 14, '2025-07-18'),
-(149, '2025-06-17', '301', 'Importada desde planilla separando OC por proveedor', NULL, 6, '2025-07-17'),
-(150, '2025-06-13', '385', 'Importada desde planilla separando OC por proveedor', NULL, 50, '2025-07-13'),
-(151, '2025-06-13', '384', 'Importada desde planilla separando OC por proveedor', NULL, 33, '2025-07-13'),
-(152, '2025-06-13', '381', 'Importada desde planilla separando OC por proveedor', NULL, 52, '2025-07-13'),
-(153, '2025-06-12', '387', 'Importada desde planilla separando OC por proveedor', NULL, 14, '2025-07-12'),
-(154, '2025-06-09', '382', 'Importada desde planilla separando OC por proveedor', NULL, 53, '2025-07-09'),
-(155, '2025-06-06', '380', 'Importada desde planilla separando OC por proveedor', NULL, 14, '2025-07-06'),
-(156, '2025-06-04', '379', 'Importada desde planilla separando OC por proveedor', NULL, 54, '2025-07-04'),
-(157, '2025-06-03', '378', 'Importada desde planilla separando OC por proveedor', NULL, 14, '2025-07-03'),
-(158, '2025-06-03', '377', 'Importada desde planilla separando OC por proveedor', NULL, 33, '2025-07-03'),
-(159, '2025-06-03', '376', 'Importada desde planilla separando OC por proveedor', NULL, 55, '2025-07-03'),
-(160, '2025-06-03', '375', 'Importada desde planilla separando OC por proveedor', NULL, 56, '2025-07-03'),
-(161, '2025-06-03', '374', 'Importada desde planilla separando OC por proveedor', NULL, 57, '2025-07-03'),
-(162, '2025-06-02', '373', 'Importada desde planilla separando OC por proveedor', NULL, 58, '2025-07-02'),
-(163, '2025-05-22', '296', 'Importada desde planilla separando OC por proveedor', NULL, 59, '2025-06-21'),
-(164, '2025-05-21', '371', 'Importada desde planilla separando OC por proveedor', NULL, 42, '2025-06-20'),
-(165, '2025-05-21', '370', 'Importada desde planilla separando OC por proveedor', NULL, 53, '2025-06-20'),
-(166, '2025-05-21', '369', 'Importada desde planilla separando OC por proveedor', NULL, 42, '2025-06-20'),
-(167, '2025-05-19', '368', 'Importada desde planilla separando OC por proveedor', NULL, 60, '2025-06-18'),
-(168, '2025-05-18', '292', 'Importada desde planilla separando OC por proveedor', NULL, 2, '2025-06-17'),
-(169, '2025-05-16', '367', 'Importada desde planilla separando OC por proveedor', NULL, 53, '2025-06-15'),
-(170, '2025-05-16', '366', 'Importada desde planilla separando OC por proveedor', NULL, 61, '2025-06-15'),
-(171, '2025-05-16', '365', 'Importada desde planilla separando OC por proveedor', NULL, 61, '2025-06-15'),
-(172, '2025-05-15', '293', 'Importada desde planilla separando OC por proveedor', NULL, 2, '2025-06-14'),
-(173, '2025-05-15', '362', 'Importada desde planilla separando OC por proveedor', NULL, 62, '2025-06-14'),
-(174, '2025-05-15', '361', 'Importada desde planilla separando OC por proveedor', NULL, 56, '2025-06-14'),
-(175, '2025-05-15', '288', 'Importada desde planilla separando OC por proveedor', NULL, 63, '2025-06-14'),
-(176, '2025-05-13', '359', 'Importada desde planilla separando OC por proveedor', NULL, 64, '2025-06-12'),
-(177, '2025-05-12', '294', 'Importada desde planilla separando OC por proveedor', NULL, 2, '2025-06-11'),
-(178, '2025-05-12', '295', 'Importada desde planilla separando OC por proveedor', NULL, 2, '2025-06-11'),
-(179, '2025-04-30', '285', 'Importada desde planilla separando OC por proveedor', NULL, 2, '2025-05-30'),
-(180, '2025-04-22', '352', 'Importada desde planilla separando OC por proveedor', NULL, 33, '2025-05-22'),
-(181, '2025-04-22', '351', 'Importada desde planilla separando OC por proveedor', NULL, 21, '2025-05-22'),
-(182, '2025-04-21', '280', 'Importada desde planilla separando OC por proveedor', NULL, 13, '2025-05-21'),
-(183, '2025-04-17', '349', 'Importada desde planilla separando OC por proveedor', NULL, 25, '2025-05-17'),
-(184, '2025-04-16', '279', 'Importada desde planilla separando OC por proveedor', NULL, 39, '2025-05-16'),
-(185, '2025-04-04', '277', 'Importada desde planilla separando OC por proveedor', NULL, 2, '2025-05-04'),
-(186, '2025-04-04', '342', 'Importada desde planilla separando OC por proveedor', NULL, 25, '2025-05-04'),
-(187, '2025-04-04', '341', 'Importada desde planilla separando OC por proveedor', NULL, 21, '2025-05-04'),
-(188, '2025-03-14', '271', 'Importada desde planilla separando OC por proveedor', NULL, 2, '2025-04-13'),
-(189, '2025-03-12', '270', 'Importada desde planilla separando OC por proveedor', NULL, 2, '2025-04-11'),
-(190, '2025-03-10', '335', 'Importada desde planilla separando OC por proveedor', NULL, 25, '2025-04-09'),
-(191, '2025-03-06', '332', 'Importada desde planilla separando OC por proveedor', NULL, 33, '2025-04-05'),
-(192, '2025-03-06', '331', 'Importada desde planilla separando OC por proveedor', NULL, 24, '2025-04-05'),
-(193, '2025-03-06', '330', 'Importada desde planilla separando OC por proveedor', NULL, 42, '2025-04-05'),
-(194, '2025-03-06', '329', 'Importada desde planilla separando OC por proveedor', NULL, 65, '2025-04-05'),
-(195, '2025-03-05', '268', 'Importada desde planilla separando OC por proveedor', NULL, 13, '2025-04-04'),
-(196, '2025-03-05', '267', 'Importada desde planilla separando OC por proveedor', NULL, 66, '2025-04-04'),
-(197, '2025-02-27', '328', 'Importada desde planilla separando OC por proveedor', NULL, 67, '2025-03-29'),
-(198, '2025-02-27', '327', 'Importada desde planilla separando OC por proveedor', NULL, 68, '2025-03-29'),
-(199, '2025-02-21', '264', 'Importada desde planilla separando OC por proveedor', NULL, 2, '2025-03-23'),
-(200, '2025-02-21', '265', 'Importada desde planilla separando OC por proveedor', NULL, 39, '2025-03-23'),
-(201, '2025-02-17', '262', 'Importada desde planilla separando OC por proveedor', NULL, 45, '2025-03-19'),
-(202, '2025-02-17', '261', 'Importada desde planilla separando OC por proveedor', NULL, 15, '2025-03-19'),
-(203, '2025-02-16', '322', 'Importada desde planilla separando OC por proveedor', NULL, 25, '2025-03-18'),
-(204, '2025-02-14', '324', 'Importada desde planilla separando OC por proveedor', NULL, 57, '2025-03-16'),
-(205, '2025-02-14', '260', 'Importada desde planilla separando OC por proveedor', NULL, 39, '2025-03-16'),
-(206, '2025-02-13', '323', 'Importada desde planilla separando OC por proveedor', NULL, 68, '2025-03-15'),
-(207, '2025-02-13', '321', 'Importada desde planilla separando OC por proveedor', NULL, 42, '2025-03-15'),
-(208, '2025-02-11', '319', 'Importada desde planilla separando OC por proveedor', NULL, 68, '2025-03-13'),
-(209, '2025-02-10', '318', 'Importada desde planilla separando OC por proveedor', NULL, 69, '2025-03-12');
-
--- --------------------------------------------------------
+LOCK TABLES `orden_compra` WRITE;
+/*!40000 ALTER TABLE `orden_compra` DISABLE KEYS */;
+INSERT INTO `orden_compra` VALUES (1,'2026-06-11','449','Importada desde planilla separando OC por proveedor',NULL,1,'2026-07-11',NULL,1),(2,'2026-06-11','450','Importada desde planilla separando OC por proveedor',NULL,2,'2026-07-11',NULL,1),(3,'2026-06-10','544','Importada desde planilla separando OC por proveedor',NULL,3,'2026-07-10',NULL,1),(4,'2026-06-09','448','Importada desde planilla separando OC por proveedor',NULL,4,'2026-07-09',NULL,1),(5,'2026-06-09','14','Importada desde planilla separando OC por proveedor',NULL,5,'2026-07-09',NULL,1),(6,'2026-06-01','443','Importada desde planilla separando OC por proveedor',NULL,6,'2026-07-01',NULL,1),(7,'2026-05-29','536','Importada desde planilla separando OC por proveedor',NULL,7,'2026-06-28',NULL,1),(8,'2026-06-09','539','Importada desde planilla separando OC por proveedor',NULL,8,'2026-07-09','REGISTRO',1),(9,'2026-05-26','444','Importada desde planilla separando OC por proveedor',NULL,4,'2026-06-25',NULL,1),(10,'2026-05-06','30','Importada desde planilla separando OC por proveedor',NULL,9,'2026-06-05',NULL,1),(11,'2026-05-05','522','Importada desde planilla separando OC por proveedor',NULL,10,'2026-06-04',NULL,1),(12,'2026-04-29','438','Importada desde planilla separando OC por proveedor',NULL,11,'2026-05-29','CERTIFICACION',1),(13,'2026-04-29','439','Importada desde planilla separando OC por proveedor',NULL,6,'2026-05-29',NULL,1),(14,'2026-04-29','440','Importada desde planilla separando OC por proveedor',NULL,23,'2026-05-29','CERTIFICACION',1),(15,'2026-04-29','518','Importada desde planilla separando OC por proveedor',NULL,4,'2026-05-29',NULL,1),(16,'2026-04-22','29','Importada desde planilla separando OC por proveedor',NULL,9,'2026-05-22',NULL,1),(17,'2026-04-16','436','Importada desde planilla separando OC por proveedor',NULL,13,'2026-05-16',NULL,1),(18,'2026-04-15','28','Importada desde planilla separando OC por proveedor',NULL,14,'2026-05-15',NULL,1),(19,'2026-04-14','13','Importada desde planilla separando OC por proveedor',NULL,5,'2026-05-14',NULL,1),(20,'2026-04-14','27','Importada desde planilla separando OC por proveedor',NULL,14,'2026-05-14',NULL,1),(21,'2026-04-14','434','Importada desde planilla separando OC por proveedor',NULL,15,'2026-05-14',NULL,1),(22,'2026-04-14','432','Importada desde planilla separando OC por proveedor',NULL,16,'2026-05-14',NULL,1),(23,'2026-04-13','513','Importada desde planilla separando OC por proveedor',NULL,17,'2026-05-13',NULL,1),(24,'2026-04-10','435','Importada desde planilla separando OC por proveedor',NULL,2,'2026-05-10',NULL,1),(25,'2026-04-14','433','Importada desde planilla separando OC por proveedor',NULL,18,'2026-05-14','CERTIFICACION',1),(26,'2026-04-08','25','Importada desde planilla separando OC por proveedor',NULL,14,'2026-05-08',NULL,1),(27,'2026-04-08','12','Importada desde planilla separando OC por proveedor',NULL,5,'2026-05-08',NULL,1),(28,'2026-03-27','500','Importada desde planilla separando OC por proveedor',NULL,7,'2026-04-26',NULL,1),(29,'2026-03-27','428','Importada desde planilla separando OC por proveedor',NULL,19,'2026-04-26',NULL,1),(30,'2026-03-27','24','Importada desde planilla separando OC por proveedor',NULL,14,'2026-04-26',NULL,1),(31,'2026-03-27','23','Importada desde planilla separando OC por proveedor',NULL,14,'2026-04-26',NULL,1),(32,'2026-03-27','424','Importada desde planilla separando OC por proveedor',NULL,2,'2026-04-26',NULL,1),(33,'2026-03-20','423','Importada desde planilla separando OC por proveedor',NULL,20,'2026-04-19','CERTIFICACION',1),(34,'2026-03-11','491','Importada desde planilla separando OC por proveedor',NULL,10,'2026-04-10',NULL,1),(35,'2026-03-05','422','Importada desde planilla separando OC por proveedor',NULL,20,'2026-04-04','CERTIFICACION',1),(36,'2026-03-05','22','Importada desde planilla separando OC por proveedor',NULL,14,'2026-04-04',NULL,1),(37,'2026-02-27','488','Importada desde planilla separando OC por proveedor',NULL,4,'2026-03-29',NULL,1),(38,'2026-02-27','419','Importada desde planilla separando OC por proveedor',NULL,6,'2026-03-29',NULL,1),(39,'2026-02-27','11','Importada desde planilla separando OC por proveedor',NULL,5,'2026-03-29',NULL,1),(40,'2026-02-27','410','Importada desde planilla separando OC por proveedor',NULL,2,'2026-03-29',NULL,1),(41,'2026-02-19','484','Importada desde planilla separando OC por proveedor',NULL,21,'2026-03-21',NULL,1),(42,'2026-02-19','483','Importada desde planilla separando OC por proveedor',NULL,22,'2026-03-21',NULL,1),(43,'2026-02-19','414','Importada desde planilla separando OC por proveedor',NULL,23,'2026-03-21','CERTIFICACION',1),(44,'2026-02-13','19','Importada desde planilla separando OC por proveedor',NULL,14,'2026-03-15',NULL,1),(45,'2026-02-11','481','Importada desde planilla separando OC por proveedor',NULL,24,'2026-03-13',NULL,1),(46,'2026-02-11','480','Importada desde planilla separando OC por proveedor',NULL,24,'2026-03-13',NULL,1),(47,'2026-02-11','406','Importada desde planilla separando OC por proveedor',NULL,20,'2026-03-13','ENTREGA',1),(48,'2026-02-06','9','Importada desde planilla separando OC por proveedor',NULL,5,'2026-03-08',NULL,1),(49,'2026-02-06','8','Importada desde planilla separando OC por proveedor',NULL,5,'2026-03-08',NULL,1),(50,'2026-02-06','7','Importada desde planilla separando OC por proveedor',NULL,5,'2026-03-08',NULL,1),(51,'2026-02-06','6','Importada desde planilla separando OC por proveedor',NULL,5,'2026-03-08',NULL,1),(52,'2026-02-06','5','Importada desde planilla separando OC por proveedor',NULL,5,'2026-03-08',NULL,1),(53,'2026-02-06','4','Importada desde planilla separando OC por proveedor',NULL,5,'2026-03-08',NULL,1),(54,'2026-02-06','3','Importada desde planilla separando OC por proveedor',NULL,5,'2026-03-08',NULL,1),(55,'2026-02-06','10','Importada desde planilla separando OC por proveedor',NULL,5,'2026-03-08',NULL,1),(56,'2026-02-04','2','Importada desde planilla separando OC por proveedor',NULL,5,'2026-03-06',NULL,1),(57,'2026-02-03','18','Importada desde planilla separando OC por proveedor',NULL,14,'2026-03-05',NULL,1),(58,'2026-01-23','478','Importada desde planilla separando OC por proveedor',NULL,25,'2026-02-22',NULL,1),(59,'2026-01-21','476','Importada desde planilla separando OC por proveedor',NULL,21,'2026-02-20',NULL,1),(60,'2026-01-21','475','Importada desde planilla separando OC por proveedor',NULL,25,'2026-02-20',NULL,1),(61,'2026-01-21','474','Importada desde planilla separando OC por proveedor',NULL,7,'2026-02-20',NULL,1),(62,'2026-01-21','402','Importada desde planilla separando OC por proveedor',NULL,15,'2026-02-20',NULL,1),(63,'2026-01-21','401','Importada desde planilla separando OC por proveedor',NULL,13,'2026-02-20',NULL,1),(64,'2026-01-21','403','Importada desde planilla separando OC por proveedor',NULL,2,'2026-02-20',NULL,1),(65,'2026-01-07','399','Importada desde planilla separando OC por proveedor',NULL,18,'2026-02-06','CERTIFICACION',1),(66,'2026-01-07','397','Importada desde planilla separando OC por proveedor',NULL,23,'2026-02-06','CERTIFICACION',1),(67,'2026-01-02','15','Importada desde planilla separando OC por proveedor',NULL,14,'2026-02-01',NULL,1),(68,'2025-12-26','466','Importada desde planilla separando OC por proveedor',NULL,26,'2026-01-25',NULL,1),(69,'2025-12-26','465','Importada desde planilla separando OC por proveedor',NULL,21,'2026-01-25',NULL,1),(70,'2025-12-26','391','Importada desde planilla separando OC por proveedor',NULL,27,'2026-01-25',NULL,1),(71,'2025-12-26','393','Importada desde planilla separando OC por proveedor',NULL,2,'2026-01-25',NULL,1),(72,'2025-12-26','392','Importada desde planilla separando OC por proveedor',NULL,20,'2026-01-25','ENTREGA',1),(73,'2025-12-17','388','Importada desde planilla separando OC por proveedor',NULL,28,'2026-01-16',NULL,1),(74,'2025-12-17','14','Importada desde planilla separando OC por proveedor',NULL,14,'2026-01-16',NULL,1),(75,'2025-12-10','386','Importada desde planilla separando OC por proveedor',NULL,18,'2026-01-09','CERTIFICACION',1),(76,'2025-11-25','4','Importada desde planilla separando OC por proveedor',NULL,14,'2025-12-25',NULL,1),(77,'2025-11-25','376','Importada desde planilla separando OC por proveedor',NULL,27,'2025-12-25',NULL,1),(78,'2025-11-20','374','Importada desde planilla separando OC por proveedor',NULL,2,'2025-12-20',NULL,1),(79,'2025-11-19','373','Importada desde planilla separando OC por proveedor',NULL,2,'2025-12-19',NULL,1),(80,'2025-11-19','372','Importada desde planilla separando OC por proveedor',NULL,20,'2025-12-19','ENTREGA',1),(81,'2025-11-13','458','Importada desde planilla separando OC por proveedor',NULL,29,'2025-12-13',NULL,1),(82,'2025-11-12','457','Importada desde planilla separando OC por proveedor',NULL,30,'2025-12-12',NULL,1),(83,'2025-11-12','455','Importada desde planilla separando OC por proveedor',NULL,25,'2025-12-12',NULL,1),(84,'2025-11-12','370','Importada desde planilla separando OC por proveedor',NULL,30,'2025-12-12',NULL,1),(85,'2025-11-11','459','Importada desde planilla separando OC por proveedor',NULL,31,'2025-12-11',NULL,1),(86,'2025-11-10','2','Importada desde planilla separando OC por proveedor',NULL,14,'2025-12-10',NULL,1),(87,'2025-11-07','456','Importada desde planilla separando OC por proveedor',NULL,32,'2025-12-07',NULL,1),(88,'2025-11-04','454','Importada desde planilla separando OC por proveedor',NULL,22,'2025-12-04',NULL,1),(89,'2025-11-04','368','Importada desde planilla separando OC por proveedor',NULL,28,'2025-12-04',NULL,1),(90,'2025-11-04','363','Importada desde planilla separando OC por proveedor',NULL,33,'2025-12-04',NULL,1),(91,'2025-11-04','365','Importada desde planilla separando OC por proveedor',NULL,20,'2025-12-04','ENTREGA',1),(92,'2025-11-04','366','Importada desde planilla separando OC por proveedor',NULL,2,'2025-12-04',NULL,1),(93,'2025-11-04','362','Importada desde planilla separando OC por proveedor',NULL,20,'2025-12-04','ENTREGA',1),(94,'2025-11-02','383','Importada desde planilla separando OC por proveedor',NULL,6,'2025-12-02',NULL,1),(95,'2025-10-28','361','Importada desde planilla separando OC por proveedor',NULL,2,'2025-11-27',NULL,1),(96,'2025-10-28','364','Importada desde planilla separando OC por proveedor',NULL,2,'2025-11-27',NULL,1),(97,'2025-10-22','359','Importada desde planilla separando OC por proveedor',NULL,18,'2025-11-21','CERTIFICACION',1),(98,'2025-10-16','353','Importada desde planilla separando OC por proveedor',NULL,34,'2025-11-15',NULL,1),(99,'2025-10-16','352','Importada desde planilla separando OC por proveedor',NULL,23,'2025-11-15','CERTIFICACION',1),(100,'2025-10-15','453','Importada desde planilla separando OC por proveedor',NULL,14,'2025-11-14',NULL,1),(101,'2025-10-15','351','Importada desde planilla separando OC por proveedor',NULL,6,'2025-11-14',NULL,1),(102,'2025-10-08','350','Importada desde planilla separando OC por proveedor',NULL,35,'2025-11-07',NULL,1),(103,'2025-10-08','349','Importada desde planilla separando OC por proveedor',NULL,2,'2025-11-07',NULL,1),(104,'2025-10-08','348','Importada desde planilla separando OC por proveedor',NULL,36,'2025-11-07',NULL,1),(105,'2025-10-06','449','Importada desde planilla separando OC por proveedor',NULL,14,'2025-11-05',NULL,1),(106,'2025-09-30','448','Importada desde planilla separando OC por proveedor',NULL,37,'2025-10-30',NULL,1),(107,'2025-09-30','346','Importada desde planilla separando OC por proveedor',NULL,18,'2025-10-30','REGISTRO',1),(108,'2025-09-26','442','Importada desde planilla separando OC por proveedor',NULL,22,'2025-10-26',NULL,1),(109,'2025-09-26','345','Importada desde planilla separando OC por proveedor',NULL,6,'2025-10-26',NULL,1),(110,'2025-09-25','446','Importada desde planilla separando OC por proveedor',NULL,14,'2025-10-25',NULL,1),(111,'2025-09-23','342-439','Importada desde planilla separando OC por proveedor',NULL,30,'2025-10-23',NULL,1),(112,'2025-09-22','441','Importada desde planilla separando OC por proveedor',NULL,14,'2025-10-22',NULL,1),(113,'2025-09-12','339','Importada desde planilla separando OC por proveedor',NULL,2,'2025-10-12',NULL,1),(114,'2025-09-12','340','Importada desde planilla separando OC por proveedor',NULL,6,'2025-10-12',NULL,1),(115,'2025-09-11','434','Importada desde planilla separando OC por proveedor',NULL,14,'2025-10-11',NULL,1),(116,'2025-09-03','430','Importada desde planilla separando OC por proveedor',NULL,38,'2025-10-03',NULL,1),(117,'2025-08-29','334','Importada desde planilla separando OC por proveedor',NULL,39,'2025-09-28',NULL,1),(118,'2025-08-28','428','Importada desde planilla separando OC por proveedor',NULL,40,'2025-09-27',NULL,1),(119,'2025-08-28','427','Importada desde planilla separando OC por proveedor',NULL,4,'2025-09-27',NULL,1),(120,'2025-08-26','426','Importada desde planilla separando OC por proveedor',NULL,14,'2025-09-25',NULL,1),(121,'2025-08-21','326','Importada desde planilla separando OC por proveedor',NULL,2,'2025-09-20',NULL,1),(122,'2025-08-21','422','Importada desde planilla separando OC por proveedor',NULL,41,'2025-09-20',NULL,1),(123,'2025-08-21','327','Importada desde planilla separando OC por proveedor',NULL,15,'2025-09-20',NULL,1),(124,'2025-08-19','421','Importada desde planilla separando OC por proveedor',NULL,21,'2025-09-18',NULL,1),(125,'2025-08-18','419','Importada desde planilla separando OC por proveedor',NULL,42,'2025-09-17',NULL,1),(126,'2025-08-18','418','Importada desde planilla separando OC por proveedor',NULL,14,'2025-09-17',NULL,1),(127,'2025-08-12','415','Importada desde planilla separando OC por proveedor',NULL,40,'2025-09-11',NULL,1),(128,'2025-08-01','317','Importada desde planilla separando OC por proveedor',NULL,6,'2025-08-31',NULL,1),(129,'2025-07-31','412','Importada desde planilla separando OC por proveedor',NULL,14,'2025-08-30',NULL,1),(130,'2025-07-31','411','Importada desde planilla separando OC por proveedor',NULL,24,'2025-08-30',NULL,1),(131,'2025-07-30','316','Importada desde planilla separando OC por proveedor',NULL,43,'2025-08-29',NULL,1),(132,'2025-07-30','314','Importada desde planilla separando OC por proveedor',NULL,44,'2025-08-29','ENTREGA',1),(133,'2025-07-30','313','Importada desde planilla separando OC por proveedor',NULL,45,'2025-08-29',NULL,1),(134,'2025-07-30','312','Importada desde planilla separando OC por proveedor',NULL,13,'2025-08-29',NULL,1),(135,'2025-07-30','311','Importada desde planilla separando OC por proveedor',NULL,46,'2025-08-29',NULL,1),(136,'2025-07-30','300','Importada desde planilla separando OC por proveedor',NULL,28,'2025-08-29',NULL,1),(137,'2025-07-28','409','Importada desde planilla separando OC por proveedor',NULL,48,'2025-08-27',NULL,1),(138,'2025-07-25','404','Importada desde planilla separando OC por proveedor',NULL,40,'2025-08-24',NULL,1),(139,'2025-07-23','407','Importada desde planilla separando OC por proveedor',NULL,14,'2025-08-22',NULL,1),(140,'2025-07-22','309','Importada desde planilla separando OC por proveedor',NULL,2,'2025-08-21',NULL,1),(141,'2025-07-21','405','Importada desde planilla separando OC por proveedor',NULL,49,'2025-08-20',NULL,1),(142,'2025-07-10','402','Importada desde planilla separando OC por proveedor',NULL,14,'2025-08-09',NULL,1),(143,'2025-07-03','400','Importada desde planilla separando OC por proveedor',NULL,40,'2025-08-02',NULL,1),(144,'2025-07-03','307','Importada desde planilla separando OC por proveedor',NULL,35,'2025-08-02',NULL,1),(145,'2025-07-02','399','Importada desde planilla separando OC por proveedor',NULL,50,'2025-08-01',NULL,1),(146,'2025-07-02','398','Importada desde planilla separando OC por proveedor',NULL,14,'2025-08-01',NULL,1),(147,'2025-06-24','394','Importada desde planilla separando OC por proveedor',NULL,51,'2025-07-24',NULL,1),(148,'2025-06-18','389','Importada desde planilla separando OC por proveedor',NULL,14,'2025-07-18',NULL,1),(149,'2025-06-17','301','Importada desde planilla separando OC por proveedor',NULL,6,'2025-07-17',NULL,1),(150,'2025-06-13','385','Importada desde planilla separando OC por proveedor',NULL,50,'2025-07-13',NULL,1),(151,'2025-06-13','384','Importada desde planilla separando OC por proveedor',NULL,33,'2025-07-13',NULL,1),(152,'2025-06-13','381','Importada desde planilla separando OC por proveedor',NULL,52,'2025-07-13',NULL,1),(153,'2025-06-12','387','Importada desde planilla separando OC por proveedor',NULL,14,'2025-07-12',NULL,1),(154,'2025-06-09','382','Importada desde planilla separando OC por proveedor',NULL,53,'2025-07-09',NULL,1),(155,'2025-06-06','380','Importada desde planilla separando OC por proveedor',NULL,14,'2025-07-06',NULL,1),(156,'2025-06-04','379','Importada desde planilla separando OC por proveedor',NULL,54,'2025-07-04',NULL,1),(157,'2025-06-03','378','Importada desde planilla separando OC por proveedor',NULL,14,'2025-07-03',NULL,1),(158,'2025-06-03','377','Importada desde planilla separando OC por proveedor',NULL,33,'2025-07-03',NULL,1),(159,'2025-06-03','376','Importada desde planilla separando OC por proveedor',NULL,55,'2025-07-03',NULL,1),(160,'2025-06-03','375','Importada desde planilla separando OC por proveedor',NULL,56,'2025-07-03',NULL,1),(161,'2025-06-03','374','Importada desde planilla separando OC por proveedor',NULL,57,'2025-07-03',NULL,1),(162,'2025-06-02','373','Importada desde planilla separando OC por proveedor',NULL,58,'2025-07-02',NULL,1),(163,'2025-05-22','296','Importada desde planilla separando OC por proveedor',NULL,59,'2025-06-21',NULL,1),(164,'2025-05-21','371','Importada desde planilla separando OC por proveedor',NULL,42,'2025-06-20',NULL,1),(165,'2025-05-21','370','Importada desde planilla separando OC por proveedor',NULL,53,'2025-06-20',NULL,1),(166,'2025-05-21','369','Importada desde planilla separando OC por proveedor',NULL,42,'2025-06-20',NULL,1),(167,'2025-05-19','368','Importada desde planilla separando OC por proveedor',NULL,60,'2025-06-18',NULL,1),(168,'2025-05-18','292','Importada desde planilla separando OC por proveedor',NULL,2,'2025-06-17',NULL,1),(169,'2025-05-16','367','Importada desde planilla separando OC por proveedor',NULL,53,'2025-06-15',NULL,1),(170,'2025-05-16','366','Importada desde planilla separando OC por proveedor',NULL,61,'2025-06-15',NULL,1),(171,'2025-05-16','365','Importada desde planilla separando OC por proveedor',NULL,61,'2025-06-15',NULL,1),(172,'2025-05-15','293','Importada desde planilla separando OC por proveedor',NULL,2,'2025-06-14',NULL,1),(173,'2025-05-15','362','Importada desde planilla separando OC por proveedor',NULL,62,'2025-06-14',NULL,1),(174,'2025-05-15','361','Importada desde planilla separando OC por proveedor',NULL,56,'2025-06-14',NULL,1),(175,'2025-05-15','288','Importada desde planilla separando OC por proveedor',NULL,63,'2025-06-14',NULL,1),(176,'2025-05-13','359','Importada desde planilla separando OC por proveedor',NULL,64,'2025-06-12',NULL,1),(177,'2025-05-12','294','Importada desde planilla separando OC por proveedor',NULL,2,'2025-06-11',NULL,1),(178,'2025-05-12','295','Importada desde planilla separando OC por proveedor',NULL,2,'2025-06-11',NULL,1),(179,'2025-04-30','285','Importada desde planilla separando OC por proveedor',NULL,2,'2025-05-30',NULL,1),(180,'2025-04-22','352','Importada desde planilla separando OC por proveedor',NULL,33,'2025-05-22',NULL,1),(181,'2025-04-22','351','Importada desde planilla separando OC por proveedor',NULL,21,'2025-05-22',NULL,1),(182,'2025-04-21','280','Importada desde planilla separando OC por proveedor',NULL,13,'2025-05-21',NULL,1),(183,'2025-04-17','349','Importada desde planilla separando OC por proveedor',NULL,25,'2025-05-17',NULL,1),(184,'2025-04-16','279','Importada desde planilla separando OC por proveedor',NULL,39,'2025-05-16',NULL,1),(185,'2025-04-04','277','Importada desde planilla separando OC por proveedor',NULL,2,'2025-05-04',NULL,1),(186,'2025-04-04','342','Importada desde planilla separando OC por proveedor',NULL,25,'2025-05-04',NULL,1),(187,'2025-04-04','341','Importada desde planilla separando OC por proveedor',NULL,21,'2025-05-04',NULL,1),(188,'2025-03-14','271','Importada desde planilla separando OC por proveedor',NULL,2,'2025-04-13',NULL,1),(189,'2025-03-12','270','Importada desde planilla separando OC por proveedor',NULL,2,'2025-04-11',NULL,1),(190,'2025-03-10','335','Importada desde planilla separando OC por proveedor',NULL,25,'2025-04-09',NULL,1),(191,'2025-03-06','332','Importada desde planilla separando OC por proveedor',NULL,33,'2025-04-05',NULL,1),(192,'2025-03-06','331','Importada desde planilla separando OC por proveedor',NULL,24,'2025-04-05',NULL,1),(193,'2025-03-06','330','Importada desde planilla separando OC por proveedor',NULL,42,'2025-04-05',NULL,1),(194,'2025-03-06','329','Importada desde planilla separando OC por proveedor',NULL,65,'2025-04-05',NULL,1),(195,'2025-03-05','268','Importada desde planilla separando OC por proveedor',NULL,13,'2025-04-04',NULL,1),(196,'2025-03-05','267','Importada desde planilla separando OC por proveedor',NULL,66,'2025-04-04',NULL,1),(197,'2025-02-27','328','Importada desde planilla separando OC por proveedor',NULL,67,'2025-03-29',NULL,1),(198,'2025-02-27','327','Importada desde planilla separando OC por proveedor',NULL,68,'2025-03-29',NULL,1),(199,'2025-02-21','264','Importada desde planilla separando OC por proveedor',NULL,2,'2025-03-23',NULL,1),(200,'2025-02-21','265','Importada desde planilla separando OC por proveedor',NULL,39,'2025-03-23',NULL,1),(201,'2025-02-17','262','Importada desde planilla separando OC por proveedor',NULL,45,'2025-03-19',NULL,1),(202,'2025-02-17','261','Importada desde planilla separando OC por proveedor',NULL,15,'2025-03-19',NULL,1),(203,'2025-02-16','322','Importada desde planilla separando OC por proveedor',NULL,25,'2025-03-18',NULL,1),(204,'2025-02-14','324','Importada desde planilla separando OC por proveedor',NULL,57,'2025-03-16',NULL,1),(205,'2025-02-14','260','Importada desde planilla separando OC por proveedor',NULL,39,'2025-03-16',NULL,1),(206,'2025-02-13','323','Importada desde planilla separando OC por proveedor',NULL,68,'2025-03-15',NULL,1),(207,'2025-02-13','321','Importada desde planilla separando OC por proveedor',NULL,42,'2025-03-15',NULL,1),(208,'2025-02-11','319','Importada desde planilla separando OC por proveedor',NULL,68,'2025-03-13',NULL,1),(209,'2025-02-10','318','Importada desde planilla separando OC por proveedor',NULL,69,'2025-03-12',NULL,1),(210,'2025-11-04','367','',NULL,23,'2025-11-04','CERTIFICACION',1),(211,'2026-06-24','455','',NULL,23,'2026-06-24','CERTIFICACION',1),(212,'2026-07-02','456','',NULL,18,'2026-07-02','CERTIFICACION',1),(214,'2026-02-11','411','',NULL,44,NULL,'ENTREGA',1),(215,'2026-06-23','33','Importado desde OC_2_0000000000033.pdf',NULL,9,'2026-06-17','ENTREGA',1);
+/*!40000 ALTER TABLE `orden_compra` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
--- Estructura de tabla para la tabla `proveedor`
+-- Table structure for table `proveedor`
 --
 
+DROP TABLE IF EXISTS `proveedor`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `proveedor` (
-  `id` bigint(20) NOT NULL,
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `activo` bit(1) NOT NULL,
   `contacto` varchar(255) DEFAULT NULL,
   `cuit` varchar(255) DEFAULT NULL,
   `email` varchar(255) DEFAULT NULL,
   `nombre` varchar(500) DEFAULT NULL,
   `observacion` varchar(255) DEFAULT NULL,
-  `telefono` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `telefono` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=70 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Volcado de datos para la tabla `proveedor`
+-- Dumping data for table `proveedor`
 --
 
-INSERT INTO `proveedor` (`id`, `activo`, `contacto`, `cuit`, `email`, `nombre`, `observacion`, `telefono`) VALUES
-(1, b'1', NULL, NULL, NULL, 'Aljez', NULL, NULL),
-(2, b'1', NULL, NULL, NULL, 'Miguel Muriel', NULL, NULL),
-(3, b'1', NULL, NULL, NULL, 'Maria Cabrera', NULL, NULL),
-(4, b'1', NULL, NULL, NULL, 'Dacomat', NULL, NULL),
-(5, b'1', NULL, NULL, NULL, 'Fedan S.A.', NULL, NULL),
-(6, b'1', NULL, NULL, NULL, 'Gloria Cristina Coronel', NULL, NULL),
-(7, b'1', NULL, NULL, NULL, 'Franchi Ruben Eduardo', NULL, NULL),
-(8, b'1', NULL, NULL, NULL, 'Tomografía de Hormigón Armado', NULL, NULL),
-(9, b'1', NULL, NULL, NULL, 'Mairas y red construcciones S.R.L.', NULL, NULL),
-(10, b'1', NULL, NULL, NULL, 'Bara Diseño S.A.', NULL, NULL),
-(11, b'1', NULL, NULL, NULL, 'Alfredo Rondinoni', NULL, NULL),
-(12, b'1', NULL, NULL, NULL, 'Daniela Paz', NULL, NULL),
-(13, b'1', NULL, NULL, NULL, 'Di Toro Hnos S.A.', NULL, NULL),
-(14, b'1', NULL, NULL, NULL, 'Mairas y Red Construcciones', NULL, NULL),
-(15, b'1', NULL, NULL, NULL, 'Segunor', NULL, NULL),
-(16, b'1', NULL, NULL, NULL, 'Anibal Benitez', NULL, NULL),
-(17, b'1', NULL, NULL, NULL, 'Constructora Fagua S.A.', NULL, NULL),
-(18, b'1', NULL, NULL, NULL, 'Osvaldo Marcelo Lagos', NULL, NULL),
-(19, b'1', NULL, NULL, NULL, 'Gomez Eliana Teraza', NULL, NULL),
-(20, b'1', NULL, NULL, NULL, 'Rondini Alfredo Filomeno', NULL, NULL),
-(21, b'1', NULL, NULL, NULL, 'Annacondia Jose Maria', NULL, NULL),
-(22, b'1', NULL, NULL, NULL, 'Indus Electric S.A.', NULL, NULL),
-(23, b'1', NULL, NULL, NULL, 'Daniela Marisol Paz', NULL, NULL),
-(24, b'1', NULL, NULL, NULL, 'Prokrete Argentina S.A.', NULL, NULL),
-(25, b'1', NULL, NULL, NULL, 'El Galpón Sanitario', NULL, NULL),
-(26, b'1', NULL, NULL, NULL, 'Chapaferro S.A.', NULL, NULL),
-(27, b'1', NULL, NULL, NULL, 'Segunor S.R.L', NULL, NULL),
-(28, b'1', NULL, NULL, NULL, 'Aljez Soluciones Proyectables S.A.', NULL, NULL),
-(29, b'1', NULL, NULL, NULL, 'Maof S.R.L', NULL, NULL),
-(30, b'1', NULL, NULL, NULL, 'Daniela Agustina Gomez', NULL, NULL),
-(31, b'1', NULL, NULL, NULL, 'Cadiem S.R.L.', NULL, NULL),
-(32, b'1', NULL, NULL, NULL, 'Bombas Ranelagh S.A.', NULL, NULL),
-(33, b'1', NULL, NULL, NULL, 'Segunor S.A.', NULL, NULL),
-(34, b'1', NULL, NULL, NULL, 'Sebastian Ignacio Perata', NULL, NULL),
-(35, b'1', NULL, NULL, NULL, 'Carla Prost', NULL, NULL),
-(36, b'1', NULL, NULL, NULL, 'Alberto Mario Somoza', NULL, NULL),
-(37, b'1', NULL, NULL, NULL, 'Pol Hnos. S.A.', NULL, NULL),
-(38, b'1', NULL, NULL, NULL, 'Instituto Tecnológico del Hormigón', NULL, NULL),
-(39, b'1', NULL, NULL, NULL, 'Motorcisa', NULL, NULL),
-(40, b'1', NULL, NULL, NULL, 'Mauricio Daniel Rodriguez', NULL, NULL),
-(41, b'1', NULL, NULL, NULL, 'La Lucía Hnas. S.A', NULL, NULL),
-(42, b'1', NULL, NULL, NULL, 'Gersur S.A.', NULL, NULL),
-(43, b'1', NULL, NULL, NULL, 'Blanco Construcciones S.A.S', NULL, NULL),
-(44, b'1', NULL, NULL, NULL, 'Alfredo Filomeno Rondinoni', NULL, NULL),
-(45, b'1', NULL, NULL, NULL, 'Guillermo Juan Montanari', NULL, NULL),
-(46, b'1', NULL, NULL, NULL, 'Alej Soluciones Proyectables S.A.', NULL, NULL),
-(47, b'1', NULL, NULL, NULL, 'ALJEZ SOLUCIONES PROYECTABLES S.A.', NULL, NULL),
-(48, b'1', NULL, NULL, NULL, 'Electricidad Cabrera S.R.L.', NULL, NULL),
-(49, b'1', NULL, NULL, NULL, 'Electro Calchaqui S.A.', NULL, NULL),
-(50, b'1', NULL, NULL, NULL, 'Jose Maria Annacondia', NULL, NULL),
-(51, b'1', NULL, NULL, NULL, 'Miguel Roberto Suarez', NULL, NULL),
-(52, b'1', NULL, NULL, NULL, 'Pablo Alejandro Rizzo', NULL, NULL),
-(53, b'1', NULL, NULL, NULL, 'Ruben Eduardo y Franchi', NULL, NULL),
-(54, b'1', NULL, NULL, NULL, 'Geobauen S.R.L', NULL, NULL),
-(55, b'1', NULL, NULL, NULL, 'Gabriel Carlos Woicik', NULL, NULL),
-(56, b'1', NULL, NULL, NULL, 'Corralón Laprida S.R.L', NULL, NULL),
-(57, b'1', NULL, NULL, NULL, 'Sider Group S.A.', NULL, NULL),
-(58, b'1', NULL, NULL, NULL, 'Distribuidora Mei S.R.L', NULL, NULL),
-(59, b'1', NULL, NULL, NULL, 'Alvarez Hector Adolfo', NULL, NULL),
-(60, b'1', NULL, NULL, NULL, 'Federación Patronal Seguros S.A', NULL, NULL),
-(61, b'1', NULL, NULL, NULL, 'Pilisar Sociedad Anonima', NULL, NULL),
-(62, b'1', NULL, NULL, NULL, 'El Galón Sanitario', NULL, NULL),
-(63, b'1', NULL, NULL, NULL, 'Cradem', NULL, NULL),
-(64, b'1', NULL, NULL, NULL, 'Tripiciano Natalia Cecilia', NULL, NULL),
-(65, b'1', NULL, NULL, NULL, 'Extintor Sur S.R.L', NULL, NULL),
-(66, b'1', NULL, NULL, NULL, 'Hector Adolfo Alvarez', NULL, NULL),
-(67, b'1', NULL, NULL, NULL, 'Jose Maria Mandile', NULL, NULL),
-(68, b'1', NULL, NULL, NULL, 'Digital Lugano S.R.L.', NULL, NULL),
-(69, b'1', NULL, NULL, NULL, 'Sanitarios Cacho S.A.C.I.F.I', NULL, NULL);
-
--- --------------------------------------------------------
+LOCK TABLES `proveedor` WRITE;
+/*!40000 ALTER TABLE `proveedor` DISABLE KEYS */;
+INSERT INTO `proveedor` VALUES (1,'',NULL,NULL,NULL,'Aljez',NULL,NULL),(2,'',NULL,NULL,NULL,'Miguel Muriel',NULL,NULL),(3,'',NULL,NULL,NULL,'Maria Cabrera',NULL,NULL),(4,'',NULL,NULL,NULL,'Dacomat',NULL,NULL),(5,'',NULL,NULL,NULL,'Fedan S.A.',NULL,NULL),(6,'',NULL,NULL,NULL,'Gloria Cristina Coronel',NULL,NULL),(7,'',NULL,NULL,NULL,'Franchi Ruben Eduardo',NULL,NULL),(8,'',NULL,NULL,NULL,'Tomografía de Hormigón Armado',NULL,NULL),(9,'',NULL,NULL,NULL,'Mairas y red construcciones S.R.L.',NULL,NULL),(10,'',NULL,NULL,NULL,'Bara Diseño S.A.',NULL,NULL),(11,'',NULL,NULL,NULL,'Alfredo Rondinoni',NULL,NULL),(12,'',NULL,NULL,NULL,'Daniela Paz',NULL,NULL),(13,'',NULL,NULL,NULL,'Di Toro Hnos S.A.',NULL,NULL),(14,'',NULL,NULL,NULL,'Mairas y Red Construcciones',NULL,NULL),(15,'',NULL,NULL,NULL,'Segunor',NULL,NULL),(16,'',NULL,NULL,NULL,'Anibal Benitez',NULL,NULL),(17,'',NULL,NULL,NULL,'Constructora Fagua S.A.',NULL,NULL),(18,'',NULL,NULL,NULL,'Osvaldo Marcelo Lagos',NULL,NULL),(19,'',NULL,NULL,NULL,'Gomez Eliana Teraza',NULL,NULL),(20,'',NULL,NULL,NULL,'Rondini Alfredo Filomeno',NULL,NULL),(21,'',NULL,NULL,NULL,'Annacondia Jose Maria',NULL,NULL),(22,'',NULL,NULL,NULL,'Indus Electric S.A.',NULL,NULL),(23,'',NULL,NULL,NULL,'Daniela Marisol Paz',NULL,NULL),(24,'',NULL,NULL,NULL,'Prokrete Argentina S.A.',NULL,NULL),(25,'',NULL,NULL,NULL,'El Galpón Sanitario',NULL,NULL),(26,'',NULL,NULL,NULL,'Chapaferro S.A.',NULL,NULL),(27,'',NULL,NULL,NULL,'Segunor S.R.L',NULL,NULL),(28,'',NULL,NULL,NULL,'Aljez Soluciones Proyectables S.A.',NULL,NULL),(29,'',NULL,NULL,NULL,'Maof S.R.L',NULL,NULL),(30,'',NULL,NULL,NULL,'Daniela Agustina Gomez',NULL,NULL),(31,'',NULL,NULL,NULL,'Cadiem S.R.L.',NULL,NULL),(32,'',NULL,NULL,NULL,'Bombas Ranelagh S.A.',NULL,NULL),(33,'',NULL,NULL,NULL,'Segunor S.A.',NULL,NULL),(34,'',NULL,NULL,NULL,'Sebastian Ignacio Perata',NULL,NULL),(35,'',NULL,NULL,NULL,'Carla Prost',NULL,NULL),(36,'',NULL,NULL,NULL,'Alberto Mario Somoza',NULL,NULL),(37,'',NULL,NULL,NULL,'Pol Hnos. S.A.',NULL,NULL),(38,'',NULL,NULL,NULL,'Instituto Tecnológico del Hormigón',NULL,NULL),(39,'',NULL,NULL,NULL,'Motorcisa',NULL,NULL),(40,'',NULL,NULL,NULL,'Mauricio Daniel Rodriguez',NULL,NULL),(41,'',NULL,NULL,NULL,'La Lucía Hnas. S.A',NULL,NULL),(42,'',NULL,NULL,NULL,'Gersur S.A.',NULL,NULL),(43,'',NULL,NULL,NULL,'Blanco Construcciones S.A.S',NULL,NULL),(44,'',NULL,NULL,NULL,'Alfredo Filomeno Rondinoni',NULL,NULL),(45,'',NULL,NULL,NULL,'Guillermo Juan Montanari',NULL,NULL),(46,'',NULL,NULL,NULL,'Alej Soluciones Proyectables S.A.',NULL,NULL),(48,'',NULL,NULL,NULL,'Electricidad Cabrera S.R.L.',NULL,NULL),(49,'',NULL,NULL,NULL,'Electro Calchaqui S.A.',NULL,NULL),(50,'',NULL,NULL,NULL,'Jose Maria Annacondia',NULL,NULL),(51,'',NULL,NULL,NULL,'Miguel Roberto Suarez',NULL,NULL),(52,'',NULL,NULL,NULL,'Pablo Alejandro Rizzo',NULL,NULL),(53,'',NULL,NULL,NULL,'Ruben Eduardo y Franchi',NULL,NULL),(54,'',NULL,NULL,NULL,'Geobauen S.R.L',NULL,NULL),(55,'',NULL,NULL,NULL,'Gabriel Carlos Woicik',NULL,NULL),(56,'',NULL,NULL,NULL,'Corralón Laprida S.R.L',NULL,NULL),(57,'',NULL,NULL,NULL,'Sider Group S.A.',NULL,NULL),(58,'',NULL,NULL,NULL,'Distribuidora Mei S.R.L',NULL,NULL),(59,'',NULL,NULL,NULL,'Alvarez Hector Adolfo',NULL,NULL),(60,'',NULL,NULL,NULL,'Federación Patronal Seguros S.A',NULL,NULL),(61,'',NULL,NULL,NULL,'Pilisar Sociedad Anonima',NULL,NULL),(62,'',NULL,NULL,NULL,'El Galón Sanitario',NULL,NULL),(63,'',NULL,NULL,NULL,'Cradem',NULL,NULL),(64,'',NULL,NULL,NULL,'Tripiciano Natalia Cecilia',NULL,NULL),(65,'',NULL,NULL,NULL,'Extintor Sur S.R.L',NULL,NULL),(66,'',NULL,NULL,NULL,'Hector Adolfo Alvarez',NULL,NULL),(67,'',NULL,NULL,NULL,'Jose Maria Mandile',NULL,NULL),(68,'',NULL,NULL,NULL,'Digital Lugano S.R.L.',NULL,NULL),(69,'',NULL,NULL,NULL,'Sanitarios Cacho S.A.C.I.F.I',NULL,NULL);
+/*!40000 ALTER TABLE `proveedor` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
--- Estructura de tabla para la tabla `recepcion_material`
+-- Table structure for table `recepcion_material`
 --
 
+DROP TABLE IF EXISTS `recepcion_material`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `recepcion_material` (
-  `id` bigint(20) NOT NULL,
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `fecha` date DEFAULT NULL,
   `observacion` varchar(255) DEFAULT NULL,
   `remito` varchar(255) DEFAULT NULL,
-  `orden_compra_id` bigint(20) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
+  `orden_compra_id` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK7uvo8pfw8t4q1hhopj9ksh6xb` (`orden_compra_id`),
+  CONSTRAINT `FK7uvo8pfw8t4q1hhopj9ksh6xb` FOREIGN KEY (`orden_compra_id`) REFERENCES `orden_compra` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Estructura de tabla para la tabla `rubro`
+-- Dumping data for table `recepcion_material`
 --
 
+LOCK TABLES `recepcion_material` WRITE;
+/*!40000 ALTER TABLE `recepcion_material` DISABLE KEYS */;
+INSERT INTO `recepcion_material` VALUES (1,'2025-11-04','','',93),(2,'2025-07-30','','',132),(3,'2025-11-04','','',91),(4,'2025-11-19','','',80),(5,'2025-12-26','','',72),(6,'2026-02-10','','',47),(7,'2025-10-15','','',89),(8,'2025-11-14','','',90),(9,'2025-11-27','','',77),(10,'2025-12-10','','',77),(11,'2025-12-26','','',70),(12,'2026-03-04','','',214),(13,'2026-05-24','','',215),(14,'2026-05-28','','',215),(15,'2026-07-01','','',11);
+/*!40000 ALTER TABLE `recepcion_material` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `rubro`
+--
+
+DROP TABLE IF EXISTS `rubro`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `rubro` (
-  `id` bigint(20) NOT NULL,
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `activo` bit(1) NOT NULL,
   `categoria` enum('MANO_OBRA','MATERIAL') DEFAULT NULL,
   `nombre` varchar(1000) DEFAULT NULL,
   `codigo` varchar(255) DEFAULT NULL,
-  `padre_id` bigint(20) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `padre_id` bigint(20) DEFAULT NULL,
+  `orden_itemizado` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK7w2k4qbxfr2u28a1e52s82h15` (`padre_id`),
+  CONSTRAINT `FK7w2k4qbxfr2u28a1e52s82h15` FOREIGN KEY (`padre_id`) REFERENCES `rubro` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=691 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Volcado de datos para la tabla `rubro`
+-- Dumping data for table `rubro`
 --
 
-INSERT INTO `rubro` (`id`, `activo`, `categoria`, `nombre`, `codigo`, `padre_id`) VALUES
-(1, b'1', NULL, 'REVOQUE EXTERIOR', '1', NULL),
-(2, b'1', NULL, 'ALBAÑILERÍA GENERAL', '2', NULL),
-(3, b'1', NULL, 'MANTENIMIENTO', '3', NULL),
-(4, b'1', NULL, 'CARPETAS Y CONTRAPISOS', '4', NULL),
-(5, b'1', NULL, 'JUNTA DE DILATACIÓN', '5', NULL),
-(6, b'1', NULL, 'REPARACIÓN DE REVOQUE Y BUÑAS', '6', NULL),
-(7, b'1', NULL, 'TOMOGRAFÍA DE HORMIGÓN', '7', NULL),
-(8, b'1', NULL, 'COLOCACIÓN DE TEJUELA', '8', NULL),
-(9, b'1', NULL, 'Sin rubro', '9', NULL),
-(10, b'1', NULL, 'ENCHAPADO EXTERNO', '10', NULL),
-(11, b'1', NULL, 'MAMPOSTERÍA', '11', NULL),
-(12, b'1', NULL, 'MATERIALES', '12', NULL),
-(13, b'1', NULL, 'AISLACIONES E IMPERMEABILIZACIONES', '13', NULL),
-(14, b'1', NULL, 'COLOCACIÓN DE PORCELANATO', '14', NULL),
-(15, b'1', NULL, 'PATOLOGÍAS', '15', NULL),
-(16, b'1', NULL, 'COLOCACIÓN DE DURLOCK', '16', NULL),
-(17, b'1', NULL, 'PINTURA', '17', NULL),
-(18, b'1', NULL, 'FLETES', '18', NULL),
-(19, b'1', NULL, 'ASCENSOR', '19', NULL),
-(20, b'1', NULL, 'COLOCACIÓN DE ZOCALOS', '20', NULL),
-(21, b'1', NULL, 'LOCALES COMERCIALES', '21', NULL),
-(22, b'1', NULL, 'SERVICIO', '22', NULL),
-(23, b'1', NULL, 'COLOCACIÓN DE TEJUELAS', '23', NULL),
-(24, b'1', NULL, 'CONTRAPISOS Y CARPETAS', '24', NULL),
-(25, b'1', NULL, 'REVESTIMIENTOS', '25', NULL),
-(26, b'1', NULL, 'ESTRUCTURA', '26', NULL),
-(27, b'1', NULL, 'IMPERMEABILIZACIONES', '27', NULL),
-(28, b'1', NULL, 'REVOQUES', '28', NULL),
-(29, b'1', NULL, 'DEMOLICIONES', '29', NULL),
-(30, b'1', NULL, 'REVOQUE INTERIOR', '30', NULL),
-(31, b'1', NULL, 'UNIDAD MODELO', '31', NULL),
-(32, b'1', NULL, 'CONSTRUCCIÓN DE CASETA', '32', NULL),
-(33, b'1', NULL, 'INFRAESTRUCTURA DE OBRA', '33', NULL),
-(34, b'1', NULL, 'HERRERÍA', '34', NULL),
-(35, b'1', NULL, 'REPLANTEO', '35', NULL),
-(36, b'1', NULL, 'Limpieza', '36', NULL),
-(37, b'1', NULL, 'COLOCACIÓN DE DUCTOS', '37', NULL),
-(38, b'1', NULL, 'COLOCACIÓN PROVISIONAL', '38', NULL),
-(39, b'1', NULL, 'PREINSTALACION AA 3 SPLIT', '39', NULL),
-(40, b'1', NULL, 'PREINSTALACION AA 4 SPLIT', '40', NULL),
-(41, b'1', NULL, 'Extracción de Muestras y Laboratorio - Por la concurrencia a obra inc luyendo la extracció n de hasta cuarenta (40) testigos con máquina caladora apropiada y broca (Ø75mm .) con corona diaman tada refrigerada, cuya longitu d max. de 15 cm cada uno. Los mismos se extraerán en sectores, que pre viamente indicará el solicitan te. Sobre cada testi go se efectuarán las siguiente s tareas y determina ciones: ? Aserrado de sus base s con disco diamanta do refrigerado ? Carbonatación ? Densidad ? Absor ción de agua ? Encabezado y en sayo a la compresión ? Informe técnico', '41', NULL),
-(42, b'1', NULL, 'Extracción de Muestras y Laboratorio', '42', NULL),
-(43, b'1', NULL, 'SUBSUELO', '43', NULL),
-(44, b'1', NULL, 'EDIFICIO', '44', NULL),
-(45, b'1', NULL, 'Limpieza General', '45', NULL),
-(46, b'1', NULL, 'FAJAS Y NIVELACIÓN', '46', NULL),
-(47, b'1', NULL, 'REVOQUE INTERNO', '47', NULL),
-(48, b'1', NULL, 'Servicio de Seguridad e Higiene', '48', NULL),
-(49, b'1', NULL, 'PUENTE ADHERENTE', '49', NULL),
-(50, b'1', NULL, 'NIVELACIÓN Y REPLANTEO', '50', NULL),
-(51, b'1', NULL, 'REVOQUE YESO', '51', NULL),
-(52, b'1', NULL, 'PROYECTO/INGENIERIA', '52', NULL),
-(53, b'1', NULL, 'VENTILACIÓN', '53', NULL),
-(54, b'1', NULL, 'Construcción', '54', NULL),
-(55, b'1', NULL, 'Patología', '55', NULL),
-(56, b'1', NULL, 'VISITA', '56', NULL),
-(57, b'1', NULL, 'MOVIMIENTO DE SUELO', '57', NULL),
-(58, b'1', NULL, 'INSTALACIONES SANITARIAS', '58', NULL),
-(59, b'1', NULL, 'REVOQUES Y REPARACIONES', '59', NULL),
-(60, b'1', NULL, 'ENCHAPADO INTERNO', '60', NULL),
-(61, b'1', NULL, 'CONTRAPISOS Y CAERPETAS', '61', NULL),
-(62, b'1', NULL, 'COLOCACIÓN DE BAÑERA', '62', NULL),
-(63, b'1', NULL, 'CARTEL', '63', NULL),
-(64, b'1', NULL, 'HIDROLAVADO', '64', NULL),
-(65, b'1', NULL, 'AISLACIONES E IMPOERMEABILIZACIONES', '65', NULL),
-(66, b'1', NULL, 'ALBAÑILERÍA', '66', NULL),
-(67, b'1', NULL, 'CARTEL PUBLICITARIO', '67', NULL),
-(68, b'1', NULL, 'JORNALES', '68', NULL),
-(69, b'1', NULL, 'COMEDOR', '69', NULL),
-(70, b'1', NULL, 'SEGURIDAD E HIGIENE', '70', NULL),
-(71, b'1', NULL, 'CONTROL/CALIDAD', '71', NULL),
-(72, b'1', NULL, 'BANDEJA PROTECTORA', '72', NULL),
-(73, b'1', NULL, 'LIMPIEZA TECNICA', '73', NULL),
-(74, b'1', NULL, 'OFICINA', '74', NULL),
-(75, b'1', NULL, 'PRELIMINARES', '75', NULL),
-(76, b'1', NULL, 'OBRAS PRELIMINARES', '76', NULL),
-(267, b'1', NULL, 'EXCAVACIÓN Y ESTRUCTURA', '1', NULL),
-(268, b'1', NULL, 'EXCAVACIÓN, SANEAMIENTO Y REACONDICIONAMIENTO', '1.1', 267),
-(269, b'1', NULL, 'MOVIMIENTO DE SUELO: INICIO DE OBRA', '1.1.1', 268),
-(270, b'1', NULL, 'OBRAS PRELIMINARES', '1.1.2', 268),
-(271, b'1', NULL, 'Fabricación y construcción de Cerco Perimetrale', '1.2.1', 268),
-(272, b'1', NULL, 'Replanteo de cercos', '1.2.2', 268),
-(273, b'1', NULL, 'Desmontaje del cerco existente', '1.2.3', 268),
-(274, b'1', NULL, 'Suministro del material necesario: Postes, chapas y accesorios y mano de obra de Simende CO', '1.2.4', 268),
-(275, b'1', NULL, 'Construcción del Comedor, Vestuarios, Baños de obra y aramdo de oficina de obra', '1.2.5', 268),
-(276, b'1', NULL, 'Impermeabilización de Azotea. Seguridad General: Ventanas. Balcones. Palieres y limpieza.', '1.2.6', 268),
-(277, b'1', NULL, 'Instalación de Acometida Eléctrica Principal a la obra: Cableado, Tableros Principales, secundarios y Piezas de protección estandarizadas.', '1.2.7', 268),
-(278, b'1', NULL, 'Construcción de Instalaciones Sanitarias: Incluye red de distribución de aguas blancas y Piezas sanitarias en Baños de obra, comedor y puesta en marcha del baño del local de ventas.', '1.2.8', 268),
-(279, b'1', NULL, 'Fabricación y Construcción de Cartel Publicitario de 80 M2 aprox.', '1.2.9', 268),
-(280, b'1', NULL, 'Cartel de obra', '1.2.10', 268),
-(281, b'1', NULL, 'Material de: Chapas Trapezoidal Galbanizadas y Vinilo para el Cerco promocional.', '1.2.11', 268),
-(282, b'1', NULL, 'Hidro Lavado en Sala de Maquinas-Ascensores', '1.2.12', 268),
-(283, b'1', NULL, 'Construcción de Caseta de Vigilancia y Control de acceso y salida de TQ4. Desmon tar la protección en la zona donde se contruira la rampa de acceso al subsuelo y llevar el caño del desague del subsuelo y amurarlo por debajo de la v ereda.', '1.2.13', 268),
-(284, b'1', NULL, 'ESTRUCTURA', '1.2', 267),
-(285, b'1', NULL, 'ENCHAPADO EXTERNO', '1.2.1', 284),
-(286, b'1', NULL, 'Construcción de enchapado en paredes externas de TQ4', '3.0.4', 284),
-(287, b'1', NULL, 'Enchapado de Paredes de Externas del edificio', '3.0.5', 284),
-(288, b'1', NULL, 'Enchapado de Paredes de Externas del edificio', '3.0.6', 284),
-(289, b'1', NULL, 'Enchapado de paredes exteriores', '3.0.7', 284),
-(290, b'1', NULL, 'Impermeabilización de la unión de las paredes de la ducha con la losa del piso de las duchas de los Dptos A y B de todo el edificio. Incluye la colocación de malla entre la pared y losa de la bañera y 02 manos de protex seal 77 a una altura de 25 cm.', '3.2.1', 284),
-(291, b'1', NULL, 'Sellado de pases del pluvial en cada balcón, colocandole vendas e impermeabilizandolos con Protex Se al 77.', '3.2.2', 284),
-(292, b'1', NULL, 'Impermeabilización (2 manos) de Carpetas y canaletas en balcones.', '3.2.3', 284),
-(293, b'1', NULL, 'Impermeabilización y colocación de vendas en caños de baños y cocina', '3.2.4', 284),
-(294, b'1', NULL, 'Corte, perfilamiento, recuardo e impermeabilización del muro debajo del premarco', '3.2.5', 284),
-(295, b'1', NULL, 'Babeta hidrófuga en balcones (30 cm pared + 15 cm piso, desarrollo 45/50 cm). Incluye colocación de Protex Seal 77 (2 capas)', '3.2.6', 284),
-(296, b'1', NULL, 'Colocación de Dos capas de Protex Seal 77', '3.2.7', 284),
-(297, b'1', NULL, 'ENSAYOS ESTRUCTURALES EN EDIFICIO Y SUBSUELO', '1.2.2', 284),
-(298, b'1', NULL, 'Extracción de muestras y laboratorio de la extracción de 40 testigoscon maquina caladora', '3.3.1', 284),
-(299, b'1', NULL, 'Reparación de las huellas dejadas de los ensayos destructivo en vigas y columnas de la estructura.', '3.3.2', 284),
-(300, b'1', NULL, 'Estudio de suelo en subsuelo. Incluye 3 perferaciones hasta 10 mts de profundidad', '3.3.3', 284),
-(301, b'1', NULL, 'Reparación de cada una de las roturas realizadas en la estructura principal del edificio, tanto en la etapa I y la etapa II. Incluye la colocación de Protex Corrotex y la reposición del hormigpon demolido con mortero PROTEX REP', '3.4.1', 284),
-(302, b'1', NULL, 'Mano de Obra por la ejecución del retiro de recubr imiento de nueve (09) puntos e n elementos estructu rales en edificio: 03 ptos. En subsuelo. 03 ptos. En piso 6 y 03 ptos en piso 12', '3.4.2', 284),
-(303, b'1', NULL, 'Relleno de orificios producidos por la toma de muestras en la Estructura de Hormigón: Vigas y Columnas, tanto del Edificio como en Subsuelo, relladas', '3.4.3', 284),
-(304, b'1', NULL, 'Reparación de patologías por hierro expuesto en losa de techo, columnas y vigas. Incluye: descubrir armaduras, cepillado, aplicación de pintura anticorrosiva y posterior tratamiento con producto Protex', '3.4.4', 284),
-(305, b'1', NULL, 'Limpieza y arreglo de hormigón en losa de balcones', '3.4.6', 284),
-(306, b'1', NULL, 'Construcción de Dinteles en ventanas de habitaciones, baños, cocina y living comedor. Incluye colocación de barras, encofrado requerido y ladrillos hasta la altura de losa de techo.', '4.2.2', 284),
-(307, b'1', NULL, 'Construccion de Columnas de soporte (Machones). Incluye el armado del hierro, colocación del encofrado y llenado con hormigión. Dim: 0.20x9.0', '4.2.4', 284),
-(308, b'1', NULL, 'Construcción de Viga de Encadenado en Muro-Antepecho de Azotea. Incluye el armado del hierro, colocación del encofrado y llenado con hormigón. Dim: 0.12x0.20', '4.2.5', 284),
-(309, b'1', NULL, 'Construcción de 02-Fajas en el lado derecho del nicho central del pleno de palie res en el edificio.', '4.2.7', 284),
-(310, b'1', NULL, 'Construcción de vestuarios, baños, ventanas de ventilación, paños superiores de fachada locales 2 y 3', '4.2.11', 284),
-(311, b'1', NULL, 'Tapado de cañerías electricas en 3 dptos.mas palier del piso2 y en los pisos 3,4,5 y sus respectivos palier', '4.2.12', 284),
-(312, b'1', NULL, 'PUESTA A TIERRA', '2', NULL),
-(313, b'1', NULL, 'GESTIÓN, PUESTA A TIERRA Y PROYECTO ELÉCTRICO', '2.1', 312),
-(314, b'1', NULL, 'ALBAÑILERÍA Y AFINES', '3', NULL),
-(315, b'1', NULL, 'MAMPOSTERÍA', '3.1', 314),
-(316, b'1', NULL, 'ALBAÑILERÍA', '3.2', 314),
-(317, b'1', NULL, 'COLOCACIÓN DE PREMARCOS', '3.2.1', 316),
-(318, b'1', NULL, 'DEMOLICIONES', '3.2.1', 316),
-(319, b'1', NULL, 'REPARACIÓN Y PROTECCIÓN DE PATOLOGÍAS', '3.2.2', 316),
-(320, b'1', NULL, 'ENCHAPADO INTERNO', '3.2.3', 316),
-(321, b'1', NULL, 'NIVELACIÓN', '3.2.4', 316),
-(322, b'1', NULL, 'REVOQUES', '3.3', 314),
-(323, b'1', NULL, 'REVOQUE INTERIOR: TRADICIONAL Y PROYECTADO', '3.3.1', 322),
-(324, b'1', NULL, 'REVOQUE EXTERIOR EN EL EDIFICIO', '3.3.2', 322),
-(325, b'1', NULL, 'REPARACIÓN DE REVOQUE PROYECTADO', '3.3.2.2', 324),
-(326, b'1', NULL, 'COLOCACIÓN DE PUENTE ADHERENTE', '3.3.2.3', 324),
-(327, b'1', NULL, 'HIDROLAVADO DE FACHADAS', '3.3.2.4', 324),
-(328, b'1', NULL, 'REVOQUE DE YESO INTERIOR EN EL EDIFICIO', '3.3.3', 322),
-(329, b'1', NULL, 'YESO PROYECTADO EN DEPARTAMENTOS 4 AMBIENTES (MENOS U.M.)', '7.3.1', 322),
-(330, b'1', NULL, 'Yeso proyectado en Pared en: Sala -Comedor, Pasillo, Habitaciones y Vestidores', '7.3.1.1', 329),
-(331, b'1', NULL, 'Colocación de Cantoneras', '7.3.1.2', 329),
-(332, b'1', NULL, 'Aristas', '7.3.1.3', 329),
-(333, b'1', NULL, 'Buñas', '7.3.1.4', 329),
-(334, b'1', NULL, 'Hidrolavado de las paredes a revocar', '7.3.1.5', 329),
-(335, b'1', NULL, 'Enducido en pared de cocina (25m2)', '7.3.1.6', 329),
-(336, b'1', NULL, 'Yeso Aplicado en techo-Dptos A y B. A=  72,53 m2', '7.3.1.7', 329),
-(337, b'1', NULL, 'YESO PROYECTADO EN DEPARTAMENTOS 3 AMBIENTES', '7.3.2', 322),
-(338, b'1', NULL, 'Yeso proyectado en Pared en: Sala -Comedor, Pasillo, Habitaciones.', '7.3.2.1', 337),
-(339, b'1', NULL, 'Colocación de Cantoneras', '7.3.2.2', 337),
-(340, b'1', NULL, 'Aristas', '7.3.2.3', 337),
-(341, b'1', NULL, 'Buñas', '7.3.2.4', 337),
-(342, b'1', NULL, 'Hidrolavado de las paredes a revocar', '7.3.2.5', 337),
-(343, b'1', NULL, 'Enducido en pared de cocina', '7.3.2.6', 337),
-(344, b'1', NULL, 'Yeso aplicado en losa de techo', '7.3.2.7', 337),
-(345, b'1', NULL, 'YESO PROYECTADO EN DEPARTAMENTO MODELO', '7.3.3', 322),
-(346, b'1', NULL, 'Yeso proyectado en Pared - Unidad Modelo', '7.3.1.1', 345),
-(347, b'1', NULL, 'Arista', '7.3.1.2', 345),
-(348, b'1', NULL, 'Buña', '7.3.1.3', 345),
-(349, b'1', NULL, 'Cantonera', '7.3.1.4', 345),
-(350, b'1', NULL, 'Aplicado en losa', '7.3.1.5', 345),
-(351, b'1', NULL, 'Revoque proyectado hidrófugo', '7.3.1.6', 345),
-(352, b'1', NULL, 'Hidrolavado', '7.3.1.7', 345),
-(353, b'1', NULL, 'Reparación de Yeso', '7.3.1.8', 345),
-(354, b'1', NULL, 'CONTRAPISOS Y CARPETAS', '3.4', 314),
-(355, b'1', NULL, 'CONTRAPISOS Y CARPETAS POR MÉTODO TRADICIONAL', '4.3.1', 354),
-(356, b'1', NULL, 'Construcción de Carpeta en Balcones de Fachada Oeste: P2, P12, P13 Y P14 - Fachada Este: P1, P3, P4 Y P5', '4.3.1.1', 355),
-(357, b'1', NULL, 'Colocación de Carpeta niveladora en escalones del Módulo de Escaleras, desde PB a P2. NO Incluye: Soldar bordes a grampas,', '4.3.1.2', 355),
-(358, b'1', NULL, 'Construcción de carpetas con pendiente de piso en balcones, en Pisos: 2, 6, 7, 8 , 9, 10, 11,12, 13 y 14', '4.3.1.3', 355),
-(359, b'1', NULL, 'Construcción de contrapisos co n pendientes en balc ones: Piso 6, 7, 8, 9, 10, 11, 12, 13 y 14', '4.3.1.4', 355),
-(360, b'1', NULL, 'Ejecución de contrapiso, fajas e impermeabilización con Protex Seal 77 en baños de los pisos 2 al 7.', '4.3.1.5', 355),
-(361, b'1', NULL, 'Construcción de contrapisos con pendientes en balcones de pisos 1, 3, 4 y 5 (91 x $11.000)', '4.3.1.6', 355),
-(362, b'1', NULL, 'Construcción de contrapisos con pendientes en balcones de pisos 1, 3, 4 y 5 (98 x $15.000)', '4.3.1.7', 355),
-(363, b'1', NULL, 'Ejecución con carpeta fratachada tradicional (baños)', '4.3.1.8', 355),
-(364, b'1', NULL, 'Enchapado con ladrillo hueco (escalla) para engrosar las medidas de las bañeras', '4.3.1.9', 355),
-(365, b'1', NULL, 'Ejecución de contrapiso + carpeta con pendiente máx. 7 cm de carga total, incluye subir material en balcones', '4.3.1.10', 355),
-(366, b'1', NULL, 'COLOCACIÓN DE CARPETAS RDC EN EL EDIFICIO', '4.3.2', 354),
-(367, b'1', NULL, 'Piso: P2 - % de P3. Dpto. B- Dpto. Modelo. Incluye palier', '4.3.2.1', 366),
-(368, b'1', NULL, 'Mano de obra Albañilería', '4.3.2.2', 366),
-(369, b'1', NULL, 'Pisos: P3 y P4 - Dpto. B- Dpto. Modelo. Incluye Palier', '4.3.2.3', 366),
-(370, b'1', NULL, 'Mano de obra Albañilería', '4.3.2.4', 366),
-(371, b'1', NULL, 'Colocación de Carpeta RDC-300 en los Pisos: P14 - P13 - P12 - P11 - P10 - P9. Incluye regleo y acabados finales', '4.3.2.5', 366),
-(372, b'1', NULL, 'NIVELACIÓN Y REPLANTEO GENERAL EN EDIFICIO', '4.3.3', 354),
-(373, b'1', NULL, 'Tomar niveles en Sub-Suelo de TQ y colocar los Pun tos de referencia de Corte o R elleno, según sea el caso, en todo el Sub-Suelo. Levantamiento de Niveles en ca da Depto. solicitado s por el estudio de Arquitectu ra y para realizar e l estimado de material de RDC por piso.', '4.3.3.1', 372),
-(374, b'1', NULL, 'Nivelación general de losa de planta baja y patio.', '4.3.3.2', 372),
-(375, b'1', NULL, 'Revisión de mediciones de Cocinas, Baños y Vestidores de 13 pisos', '4.3.3.3', 372),
-(376, b'1', NULL, 'Colocación de calandros y replanteo de ventanas en fachadas.', '4.3.3.4', 372),
-(377, b'1', NULL, 'Niveles de losa de techo por piso.', '4.3.3.5', 372),
-(378, b'1', NULL, 'Nivelación en cada Piso del edificio y verificado nivel de cada dintel. Para conocer el punto más alto - Losa y el Punto mas bajo - Dintel.', '4.3.3.6', 372),
-(379, b'1', NULL, 'Cateo de Vigas, Columnas y Losas de techo. Implica la demolición de 09 cateos más hasta llegar a las barras principales y los estribos para su estudio del soporte de los elementos estructurales (Etapa II).', '4.3.3.7', 372),
-(380, b'1', NULL, 'AISLACIONES E IMPERMEABILIZACIONES', '3.5', 314),
-(381, b'1', NULL, 'Impermeabilización de la unión de las paredes de la ducha con la losa del piso de las duchas de los Dptos A y B de todo el edificio. Incluye la colocación de malla entre la pared y losa de la bañera y 02 manos de protex seal 77 a una altura de 25 cm.', '3.4.1', 380),
-(382, b'1', NULL, 'Sellado de pases del pluvial en cada balcón, colocandole vendas e impermeabilizandolos con Protex Se al 77.', '3.4.2', 380),
-(383, b'1', NULL, 'Impermeabilización (2 manos) de Carpetas y canaletas en balcones.', '3.4.3', 380),
-(384, b'1', NULL, 'Impermeabilización y colocación de vendas en caños de baños y cocina', '3.4.4', 380),
-(385, b'1', NULL, 'Corte, perfilamiento, recuardo e impermeabilización del muro debajo del premarco', '3.4.5', 380),
-(386, b'1', NULL, 'Babeta hidrófuga en balcones (30 cm pared + 15 cm piso, desarrollo 45/50 cm). Incluye colocación de Protex Seal 77 (2 capas)', '3.4.6', 380),
-(387, b'1', NULL, 'Colocación de Dos capas de Protex Seal 77', '3.4.7', 380),
-(388, b'1', NULL, 'COLOCACIÓN REVESTIMIENTOS (SIN PROVISIÓN)', '3.6', 314),
-(389, b'1', NULL, 'COLOCACIÓN DE PORCELANATO Y CERÁMICAS', '3.6.1', 388),
-(390, b'1', NULL, 'Reposición de Porcelanatos y Cerámicas en Dpto: Piso de Sala Comedor-Dpto Modelo y en pared de Baño exterior, por ajuste en el pto. de agua fría/caliente de la Bañera. Incluye: Corte de dos (02) cerámicas con amoladora para evitar daños en las piezs aledañas.', '3.6.1.1', 389),
-(391, b'1', NULL, 'COLOCACIÓN DE TEJUELAS EN UNIDAD MODELO', '3.6.1', 388),
-(392, b'1', NULL, 'Colocación de tejuelas en balcon de piso 2 - Fachada Este. Incluye colocación de la pastina y el sellador.', '3.6.1.1', 391),
-(393, b'1', NULL, 'CIELORRAZOS', '3.7', 314),
-(394, b'1', NULL, 'PINTURA', '3.8', 314),
-(395, b'1', NULL, 'COLOCACIÓN DE PINTURA EN DEPARTAMENTO MODELO', '3.7.1', 394),
-(396, b'1', NULL, 'Mano de obra trabajo de Pintura - latex en Paredes, Techos y Cielo Rasos', '5.1.1', 394),
-(397, b'1', NULL, 'COLOCACIÓN DE PISOS (SIN PROVISIÓN)', '3.9', 314),
-(398, b'1', NULL, 'COLOCACIÓN DE PORCELANATO EN UNIDAD MODELO', '3.9.1', 397),
-(399, b'1', NULL, 'Colocació de Porcelanato en Unidad Modelo', '3.9.1.1', 398),
-(400, b'1', NULL, 'HERRERÍAS', '3.10', 314),
-(401, b'1', NULL, 'FABRICACIÓN DE NARICES DE ESCALERA', '3.8.1', 400),
-(402, b'1', NULL, 'ARTEFACTOS SANITARIOS Y GRIFERÍA', '7', NULL),
-(403, b'1', NULL, 'COLOCACIÓN DE BAÑERAS', '7.1', 402),
-(404, b'1', NULL, 'COLOCACIÓN DE BAÑERA EN UNIDAD MODELO', '7.1.1', 403),
-(405, b'1', NULL, 'Colocación de bañera (incluye relleno y pared de asentamiento con revoque frontal)', '8.1.1.1', 404),
-(406, b'1', NULL, 'COLOCACIÓN DE BAÑERA EN EL EDIFICIO', '7.1.2', 403),
-(407, b'1', NULL, 'MOVIMIENTO DE SUELO EN SUB-SUELO', '8', NULL),
-(408, b'1', NULL, 'EXCAVACIÓN A MÁQUINA EN SUB-SUELO', '9.1', 407),
-(409, b'1', NULL, 'Apuntalamiento de la estructur a de hormigón; para asegurarla al momento de demolición de muro del Su b-Suelo.', '9.2', 407),
-(410, b'1', NULL, 'Cateo para localización de cable alimentador del conjunto aledaño', '9.3', 407),
-(411, b'1', NULL, 'SEÑALÉTICA', '9', NULL),
-(412, b'1', NULL, 'Servicio de Alquiler de Volquetes', '10.1', 411),
-(413, b'1', NULL, 'Servicio de Seguridad e Higiene', '10.2', 411),
-(414, b'1', NULL, 'Colocación de malla electrosoldada y malla naranja de seguridad en zona de fachadas a los balcones en la azotea', '10.3', 411),
-(415, b'1', NULL, 'Elementos utilizados en Seguridad e Higiene', '10.4', 411),
-(416, b'1', NULL, 'INSTALACIÓN EXTINCIÓN INCENDIO', '10', NULL),
-(417, b'1', NULL, 'INSTALACIÓON SANITARIA: $ 454.706.720,00 (INCE-OBRA)', '11', NULL),
-(418, b'1', NULL, 'INSTALACIÓN ELÉCTRICA: $ 532.172.554,53  (ENERCON)', '12', NULL),
-(419, b'1', NULL, 'DEPARTAMENTOS 4 AMBIENTES (40%). Solo Caños en piso', '11.1', 418),
-(420, b'1', NULL, 'TABLERO SECCIONAL: 1 por Dpto.', '12.1.1', 419),
-(421, b'1', NULL, 'BOCAS DE ILUMINACION: 22 bocas por Dpto.', '12.1.2', 419),
-(422, b'1', NULL, 'BOCAS DE TOMAS: 33 por Dpto.', '12.1.3', 419),
-(423, b'1', NULL, 'BOCAS DE ANAFE', '12.1.4', 419),
-(424, b'1', NULL, 'BOCAS DE HORNO', '12.1.5', 419),
-(425, b'1', NULL, 'BOCAS DE TERMOTANQUE', '12.1.6', 419),
-(426, b'1', NULL, 'AIRES ACONDICIONADO', '12.1.7', 419),
-(427, b'1', NULL, 'BOCA BAJA TENION', '12.1.8', 419),
-(428, b'1', NULL, 'CANALIZACIÓN PARA PORTERO ELECTRICO', '12.1.9', 419),
-(429, b'1', NULL, 'DEPARTAMENTOS 3 AMBIENTES (40%). solo Caños en piso', '11.2', 418),
-(430, b'1', NULL, 'TABLERO SECCIONAL', '12.2.1', 429),
-(431, b'1', NULL, 'BOCAS DE ILUMINACION', '12.2.2', 429),
-(432, b'1', NULL, 'BOCAS DE TOMAS', '12.2.3', 429),
-(433, b'1', NULL, 'BOCAS DE ANAFE', '12.2.4', 429),
-(434, b'1', NULL, 'BOCAS DE HORNO', '12.2.5', 429),
-(435, b'1', NULL, 'BOCAS DE TERMOTANQUE', '12.2.6', 429),
-(436, b'1', NULL, 'AIRES ACONDICIONADO', '12.2.7', 429),
-(437, b'1', NULL, 'BOCA BAJA TENION', '12.2.8', 429),
-(438, b'1', NULL, 'CANALIZACIÓN PARA PORTERO ELECTRICO', '12.2.9', 429),
-(439, b'1', NULL, 'INSTALACIÓN TERMOMECÁNICA Y EXTRACCIONES', '13', NULL),
-(440, b'1', NULL, 'EXTRACCIONES', '13.1', 439),
-(441, b'1', NULL, 'kg provision y colocacion de ductos de chapa galvanizada cal 27 colector + ducto de extraccion de baños según planos corresponde a columna cove A,B,C,D,E - kg 1.595,00', '13.1.1', 440),
-(442, b'1', NULL, 'kg provision y colocacion de ductos de chapa galvanizada cal 25 y 27 colector + ducto de extraccion + DUCTO de inyeccion sistema de ventilacion de palieres ( cove ) - kg 859,00', '13.1.2', 440),
-(443, b'1', NULL, 'Mano de obra para la pre instalación de cañerias para unidades con 4 split. provovisión de 42 mts de cañería de cobre con cajas interiores y caja exteriors. Todas las instalaciones se entregan presurizadas con nitrógeno.', '13.1.3', 440),
-(444, b'1', NULL, 'Mano de obra para la pre instalación de cañerias para unidades con 3 split. provovisión de 45 mts de cañería de cobre con cajas interiores y caja exteriors. Todas las instalaciones se entregan presurizadas con nitrógeno.', '13.1.4', 440),
-(445, b'1', NULL, 'INSTALACIONES TERMODINÁMICAS', '13.2', 439),
-(446, b'1', NULL, 'Provisión de mat. para la pre instalación de cañerias para unidades con 4 split. provovisión de 42 mts de cañería de cobre con cajas interiores y caja exteriors. Todas las instalaciones se entregan presurizadas con nitrógeno.', '13.2.1', 445),
-(447, b'1', NULL, 'Provisión de mat. para la pre instalación de cañerias para unidades con 3 split. provovisión de 45 mts de cañería de cobre con cajas interiores y caja exteriors. Todas las instalaciones se entregan presurizadas con nitrógeno.', '13.2.2', 445),
-(448, b'1', NULL, 'CARPINTERIAS FACHADA', '14', NULL),
-(449, b'1', NULL, 'CARPINTERIAS INTERIORES', '15', NULL),
-(450, b'1', NULL, 'ASCENSORES', '16', NULL),
-(451, b'1', NULL, 'CORRIENTES DÉBILES', '17', NULL),
-(452, b'1', NULL, 'PISOS Y REVESTIMIENTOS', '18', NULL),
-(453, b'1', NULL, 'MUEBLES DE COCINA Y FRENTES DE PLACARD', '18', NULL),
-(454, b'1', NULL, 'MARMOLERIA Y GRANITOS', '19', NULL),
-(455, b'1', NULL, 'ARTEFACTOS DE ILUMINACIÓN', '20', NULL),
-(456, b'1', NULL, 'EQUIPOS ITM (MULTI SPLIT + EXTRACCIÓN COCINAS)', '21', NULL);
+LOCK TABLES `rubro` WRITE;
+/*!40000 ALTER TABLE `rubro` DISABLE KEYS */;
+INSERT INTO `rubro` VALUES (611,'',NULL,'ALBAÑILERÍA Y AFINES','3',NULL,30),(612,'',NULL,'MAMPOSTERÍA','3.1',611,10),(613,'',NULL,'HERRERÍA','3.10',611,100),(614,'',NULL,'EXCAVACIÓN Y ESTRUCTURA','1',NULL,10),(615,'',NULL,'PUESTA A TIERRA','2',NULL,20),(616,'',NULL,'PINTURA','3.7',611,70),(617,'',NULL,'REVOQUES','3.2',611,20),(618,'',NULL,'CONTRAPISOS Y CARPETAS','3.3',611,30),(619,'',NULL,'CIELORRASOS','3.4',611,40),(620,'',NULL,'COLOCACIÓN PISOS (SIN PROVISIÓN)','3.8',611,80),(621,'',NULL,'COLOCACIÓN REVESTIMIENTOS (SIN PROVISIÓN)','3.9',611,90),(622,'',NULL,'ALBAÑILERÍA GENERAL','3.6',611,60),(623,'',NULL,'AISLACIONES E IMPERMEABILIZACIONES','3.5',611,50),(624,'',NULL,'INSTALACIÓN SANITARIA','4',NULL,40),(625,'',NULL,'INSTALACIÓN EXTINCIÓN INCENDIO','5',NULL,50),(626,'',NULL,'INSTALACIÓN TERMOMECÁNICA Y EXTRACCIONES','7',NULL,70),(627,'',NULL,'INSTALACIÓN ELÉCTRICA','6',NULL,60),(628,'',NULL,'EQUIPOS ITM (MULTI SPLIT + EXTRACCIÓN COCINAS)','8',NULL,80),(629,'',NULL,'CARPINTERIAS FACHADA','9',NULL,90),(630,'',NULL,'CARPINTERIAS INTERIORES','10',NULL,100),(631,'',NULL,'ASCENSORES','11',NULL,110),(632,'',NULL,'CORRIENTES DÉBILES','12',NULL,120),(633,'',NULL,'ARTEFACTOS SANITARIOS Y GRIFERÍAS','13',NULL,130),(634,'',NULL,'PISOS Y REVESTIMIENTOS','14',NULL,140),(635,'',NULL,'MUEBLES DE COCINA Y FRENTES DE PLACARD','15',NULL,150),(636,'',NULL,'MARMOLERIA Y GRANITOS','16',NULL,160),(637,'',NULL,'ARTEFACTOS DE ILUMINACIÓN','17',NULL,170),(638,'',NULL,'SEÑALÉTICA','18',NULL,180),(639,'',NULL,'EXCAVACIÓN, SANEAMIENTO Y REACONDICIONAMIENTO','1.1',614,10),(640,'',NULL,'MOVIMIENTO DE SUELO: INICIO DE OBRA','1.1.1',639,10),(641,'',NULL,'OBRAS PRELIMINARES','1.1.2',639,20),(642,'',NULL,'ESTRUCTURA','1.2',614,20),(643,'',NULL,'ENCHAPADO EXTERNO','1.2.1',642,10),(644,'',NULL,'ENSAYOS ESTRUCTURALES','1.2.2',642,20),(645,'',NULL,'GESTIÓN, PUESTA A TIERRA Y PROYECTO','2.1',615,10),(646,'',NULL,'COLOCACIÓN DE PREMARCOS','3.6.1',622,10),(647,'',NULL,'DEMOLICIONES','3.6.2',622,20),(648,'',NULL,'REPARACIÓN Y PROTECCIÓN DE PATOLOGÍAS','3.6.3',622,30),(649,'',NULL,'ENCHAPADO INTERNO','3.6.4',622,40),(650,'',NULL,'NIVELACIÓN','3.6.5',622,50),(651,'',NULL,'REVOQUE INTERIOR','3.2.1',617,10),(652,'',NULL,'REVOQUE EXTERIOR','3.2.2',617,20),(653,'',NULL,'REVOQUE DE YESO INTERIOR','3.2.3',617,30),(654,'',NULL,'HIDROLAVADO DE FACHADAS','3.2.2.1',652,10),(655,'',NULL,'COLOCACIÓN DE PUENTE ADHERENTE','3.2.2.2',652,20),(656,'',NULL,'REPARACIÓN DE REVOQUE PROYECTADO','3.2.2.3',652,30),(657,'',NULL,'CONTRAPISOS Y CARPETAS: MÉTODO TRADICIONAL','3.3.1',618,10),(658,'',NULL,'COLOCACIÓN DE CARPETAS RDC','3.3.2',618,20),(659,'',NULL,'COLOCACIÓN DE TEJUELAS EN UNIDAD MODELO','3.9.1',621,10),(660,'',NULL,'COLOCACIÓN DE PORCELANATOS Y CERÁMICAS','3.9.2',621,20),(661,'',NULL,'COLOCACIÓN DE PINTURA EN UNIDAD MODELO','3.7.1',616,10),(662,'',NULL,'COLOCACIÓN DE PORCELANATO EN UNIDAD MODELO','3.8.1',620,10),(663,'',NULL,'FABRICACIÓN DE NARICES DE ESCALERA','3.10.1',613,10),(664,'',NULL,'COLOCACIÓN DE BAÑERAS','13.1',633,10),(665,'',NULL,'COLOCACIÓN DE BAÑERA EN UNIDAD MODELO','13.1.1',664,10),(666,'',NULL,'MOVIMIENTO DE SUELO: SUB-SUELO','19',NULL,190),(668,'',NULL,'APUNTALAMIENTO DE LA ESTRUCTURA','19.1',666,10),(669,'',NULL,'CATEO PARA LOCALIZACIÓN DE CABLE ALIMENTADOR','19.2',666,20),(670,'',NULL,'SERVICIO DE ALQUILER DE VOLQUETES','18.1',638,10),(671,'',NULL,'SERVICIO DE SEGURIDAD E HIGIENE','18.2',638,20),(672,'',NULL,'COLOCACIÓN DE MALLA ELÉCTROSOLDADA','18.3',638,30),(673,'',NULL,'ELEMENTOS DE SEGURIDAD E HIGIENE','18.4',638,40),(674,'',NULL,'DEPARTAMENTOS 4 AMBIENTES: SOLO CAÑOS EN PISO','6.1',627,10),(675,'',NULL,'DEPARTAMENTOS 3 AMBIENTES: SOLO CAÑOS EN PISO','6.2',627,20),(676,'',NULL,'EXTRACCIONES','7.1',626,10),(677,'',NULL,'INSTALACIONES TERMODINÁMICAS','7.2',626,20),(678,'',NULL,'CLIMATIZACIÓN PARA UNIDAD MODELO','8.1',628,10),(679,'',NULL,'ACCESORIOS GENERALES PARA EL PROYECTO','8.2',628,20),(680,'',NULL,'DEPARTAMENTOS 4 AMBIENTES','3.4.1',619,10),(681,'',NULL,'DEPARTAMENTOS 3 AMBIENTES','3.4.2',619,20),(682,'',NULL,'REVOQUE PROYECTADO','3.2.2.4',652,40);
+/*!40000 ALTER TABLE `rubro` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
--- Índices para tablas volcadas
+-- Table structure for table `tablero_certificado`
+--
+
+DROP TABLE IF EXISTS `tablero_certificado`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tablero_certificado` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `fecha_desde` date DEFAULT NULL,
+  `fecha_hasta` date DEFAULT NULL,
+  `nombre` varchar(255) DEFAULT NULL,
+  `observacion` varchar(1200) DEFAULT NULL,
+  `obra_id` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK1fwb0q3cbiuvn4ig7xmhe274x` (`obra_id`),
+  CONSTRAINT `FK1fwb0q3cbiuvn4ig7xmhe274x` FOREIGN KEY (`obra_id`) REFERENCES `obra` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `tablero_certificado`
+--
+
+LOCK TABLES `tablero_certificado` WRITE;
+/*!40000 ALTER TABLE `tablero_certificado` DISABLE KEYS */;
+/*!40000 ALTER TABLE `tablero_certificado` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `tablero_certificado_item`
+--
+
+DROP TABLE IF EXISTS `tablero_certificado_item`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tablero_certificado_item` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `avance_certificado_porcentaje` decimal(38,2) DEFAULT NULL,
+  `beneficio_empresarial_porcentaje` decimal(38,2) DEFAULT NULL,
+  `cantidad` decimal(38,2) DEFAULT NULL,
+  `codigo_tarea` varchar(255) DEFAULT NULL,
+  `contratista` varchar(255) DEFAULT NULL,
+  `costo_estructural_porcentaje` decimal(38,2) DEFAULT NULL,
+  `costo_mano_obra` decimal(38,2) DEFAULT NULL,
+  `descripcion_tarea` varchar(2000) DEFAULT NULL,
+  `grupo` bit(1) NOT NULL,
+  `grupo_nombre` varchar(255) DEFAULT NULL,
+  `item_codigo` varchar(255) DEFAULT NULL,
+  `materiales_asignados` decimal(38,2) DEFAULT NULL,
+  `materiales_suministrados_empresa` decimal(38,2) DEFAULT NULL,
+  `observacion` varchar(1200) DEFAULT NULL,
+  `orden_fila` int(11) DEFAULT NULL,
+  `precio_unitario` decimal(38,2) DEFAULT NULL,
+  `rubro` varchar(255) DEFAULT NULL,
+  `servicios` decimal(38,2) DEFAULT NULL,
+  `subtotal_manual` decimal(38,2) DEFAULT NULL,
+  `unidad` varchar(255) DEFAULT NULL,
+  `item_orden_compra_id` bigint(20) DEFAULT NULL,
+  `tablero_id` bigint(20) DEFAULT NULL,
+  `avance_anterior_porcentaje` decimal(38,2) DEFAULT NULL,
+  `materiales_adicionales_etapa` decimal(38,2) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FKkkejdgcei0nmdb3mlfcphsv88` (`item_orden_compra_id`),
+  KEY `FKmo1q8cr5cis9q75cutuku4o8y` (`tablero_id`),
+  CONSTRAINT `FKkkejdgcei0nmdb3mlfcphsv88` FOREIGN KEY (`item_orden_compra_id`) REFERENCES `item_orden_compra` (`id`),
+  CONSTRAINT `FKmo1q8cr5cis9q75cutuku4o8y` FOREIGN KEY (`tablero_id`) REFERENCES `tablero_certificado` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2102 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `tablero_certificado_item`
+--
+
+LOCK TABLES `tablero_certificado_item` WRITE;
+/*!40000 ALTER TABLE `tablero_certificado_item` DISABLE KEYS */;
+/*!40000 ALTER TABLE `tablero_certificado_item` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Dumping events for database 'certificaciones_obra'
 --
 
 --
--- Indices de la tabla `categoria_orden`
+-- Dumping routines for database 'certificaciones_obra'
 --
-ALTER TABLE `categoria_orden`
-  ADD PRIMARY KEY (`id`);
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
---
--- Indices de la tabla `certificacion`
---
-ALTER TABLE `certificacion`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `FK8v5msi0r4n594mi7gm7qb3c5x` (`orden_compra_id`);
-
---
--- Indices de la tabla `configuracion_sistema`
---
-ALTER TABLE `configuracion_sistema`
-  ADD PRIMARY KEY (`clave`);
-
---
--- Indices de la tabla `item_certificacion`
---
-ALTER TABLE `item_certificacion`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `FKsm8lnil2mrk0drxbst234t3k6` (`certificacion_id`),
-  ADD KEY `FKaan68xur1an6dxksfsc1vf71` (`item_orden_compra_id`);
-
---
--- Indices de la tabla `item_orden_compra`
---
-ALTER TABLE `item_orden_compra`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `FKd4b1br1r65wu48fs51mayg6p0` (`orden_compra_id`),
-  ADD KEY `FKc5asj1kltwnfxmn2s41tw3yq1` (`rubro_entidad_id`),
-  ADD KEY `FK7btyocgqsdk2mygngmjvfcjtc` (`item_mano_obra_vinculado_id`),
-  ADD KEY `FKxnf5yy585nb5nf4d0xcnl38g` (`material_catalogo_id`),
-  ADD KEY `FKmaxlqym62g6tqr83nypuoxofa` (`categoria_entidad_id`);
-
---
--- Indices de la tabla `item_recepcion_material`
---
-ALTER TABLE `item_recepcion_material`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `FK4f1mqivglsvdnuyslrk91bd9m` (`item_orden_compra_id`),
-  ADD KEY `FKk2ypgwoht5qi8a6cjpmhtpb2s` (`recepcion_material_id`);
-
---
--- Indices de la tabla `material_catalogo`
---
-ALTER TABLE `material_catalogo`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indices de la tabla `orden_compra`
---
-ALTER TABLE `orden_compra`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `FK4dhyef6kiav1dkwjxe8mybfvc` (`proveedor_entidad_id`);
-
---
--- Indices de la tabla `proveedor`
---
-ALTER TABLE `proveedor`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indices de la tabla `recepcion_material`
---
-ALTER TABLE `recepcion_material`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `FK7uvo8pfw8t4q1hhopj9ksh6xb` (`orden_compra_id`);
-
---
--- Indices de la tabla `rubro`
---
-ALTER TABLE `rubro`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `FK7w2k4qbxfr2u28a1e52s82h15` (`padre_id`);
-
---
--- AUTO_INCREMENT de las tablas volcadas
---
-
---
--- AUTO_INCREMENT de la tabla `categoria_orden`
---
-ALTER TABLE `categoria_orden`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
-
---
--- AUTO_INCREMENT de la tabla `certificacion`
---
-ALTER TABLE `certificacion`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
-
---
--- AUTO_INCREMENT de la tabla `item_certificacion`
---
-ALTER TABLE `item_certificacion`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
-
---
--- AUTO_INCREMENT de la tabla `item_orden_compra`
---
-ALTER TABLE `item_orden_compra`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=659;
-
---
--- AUTO_INCREMENT de la tabla `item_recepcion_material`
---
-ALTER TABLE `item_recepcion_material`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de la tabla `material_catalogo`
---
-ALTER TABLE `material_catalogo`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=368;
-
---
--- AUTO_INCREMENT de la tabla `orden_compra`
---
-ALTER TABLE `orden_compra`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=210;
-
---
--- AUTO_INCREMENT de la tabla `proveedor`
---
-ALTER TABLE `proveedor`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=70;
-
---
--- AUTO_INCREMENT de la tabla `recepcion_material`
---
-ALTER TABLE `recepcion_material`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de la tabla `rubro`
---
-ALTER TABLE `rubro`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=457;
-
---
--- Restricciones para tablas volcadas
---
-
---
--- Filtros para la tabla `certificacion`
---
-ALTER TABLE `certificacion`
-  ADD CONSTRAINT `FK8v5msi0r4n594mi7gm7qb3c5x` FOREIGN KEY (`orden_compra_id`) REFERENCES `orden_compra` (`id`);
-
---
--- Filtros para la tabla `item_certificacion`
---
-ALTER TABLE `item_certificacion`
-  ADD CONSTRAINT `FKaan68xur1an6dxksfsc1vf71` FOREIGN KEY (`item_orden_compra_id`) REFERENCES `item_orden_compra` (`id`),
-  ADD CONSTRAINT `FKsm8lnil2mrk0drxbst234t3k6` FOREIGN KEY (`certificacion_id`) REFERENCES `certificacion` (`id`);
-
---
--- Filtros para la tabla `item_orden_compra`
---
-ALTER TABLE `item_orden_compra`
-  ADD CONSTRAINT `FK7btyocgqsdk2mygngmjvfcjtc` FOREIGN KEY (`item_mano_obra_vinculado_id`) REFERENCES `item_orden_compra` (`id`),
-  ADD CONSTRAINT `FKc5asj1kltwnfxmn2s41tw3yq1` FOREIGN KEY (`rubro_entidad_id`) REFERENCES `rubro` (`id`),
-  ADD CONSTRAINT `FKd4b1br1r65wu48fs51mayg6p0` FOREIGN KEY (`orden_compra_id`) REFERENCES `orden_compra` (`id`),
-  ADD CONSTRAINT `FKmaxlqym62g6tqr83nypuoxofa` FOREIGN KEY (`categoria_entidad_id`) REFERENCES `categoria_orden` (`id`),
-  ADD CONSTRAINT `FKxnf5yy585nb5nf4d0xcnl38g` FOREIGN KEY (`material_catalogo_id`) REFERENCES `material_catalogo` (`id`);
-
---
--- Filtros para la tabla `item_recepcion_material`
---
-ALTER TABLE `item_recepcion_material`
-  ADD CONSTRAINT `FK4f1mqivglsvdnuyslrk91bd9m` FOREIGN KEY (`item_orden_compra_id`) REFERENCES `item_orden_compra` (`id`),
-  ADD CONSTRAINT `FKk2ypgwoht5qi8a6cjpmhtpb2s` FOREIGN KEY (`recepcion_material_id`) REFERENCES `recepcion_material` (`id`);
-
---
--- Filtros para la tabla `orden_compra`
---
-ALTER TABLE `orden_compra`
-  ADD CONSTRAINT `FK4dhyef6kiav1dkwjxe8mybfvc` FOREIGN KEY (`proveedor_entidad_id`) REFERENCES `proveedor` (`id`);
-
---
--- Filtros para la tabla `recepcion_material`
---
-ALTER TABLE `recepcion_material`
-  ADD CONSTRAINT `FK7uvo8pfw8t4q1hhopj9ksh6xb` FOREIGN KEY (`orden_compra_id`) REFERENCES `orden_compra` (`id`);
-
---
--- Filtros para la tabla `rubro`
---
-ALTER TABLE `rubro`
-  ADD CONSTRAINT `FK7w2k4qbxfr2u28a1e52s82h15` FOREIGN KEY (`padre_id`) REFERENCES `rubro` (`id`);
-COMMIT;
-
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2026-07-12 23:42:11
