@@ -37,7 +37,44 @@ public class AsistenciaPersonal {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Obra obra;
-
     @Column(length = 1200)
     private String observacion;
+
+    public boolean estaEnObra() {
+        return horaIngreso != null && horaSalida == null;
+    }
+
+    public boolean salioDeObra() {
+        return horaIngreso != null && horaSalida != null;
+    }
+
+    public boolean registroIncompleto() {
+        return horaIngreso == null && horaSalida != null;
+    }
+
+    public String getEstadoObra() {
+        if (estaEnObra()) {
+            return "EN OBRA";
+        }
+        if (salioDeObra()) {
+            return "SALIO";
+        }
+        if (registroIncompleto()) {
+            return "REVISAR";
+        }
+        return "AUSENTE";
+    }
+
+    public String getEstadoObraClase() {
+        if (estaEnObra()) {
+            return "is-work-open";
+        }
+        if (salioDeObra()) {
+            return "is-work-closed";
+        }
+        if (registroIncompleto()) {
+            return "is-partial";
+        }
+        return "is-pending";
+    }
 }

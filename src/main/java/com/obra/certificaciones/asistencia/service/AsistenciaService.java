@@ -17,6 +17,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,8 +40,12 @@ public class AsistenciaService {
 
     @Transactional(readOnly = true)
     public Map<Long, AsistenciaPersonal> mapaPorTrabajador(Obra obra, LocalDate fecha) {
+        return mapaPorTrabajador(listarPorFecha(obra, fecha));
+    }
+
+    public Map<Long, AsistenciaPersonal> mapaPorTrabajador(List<AsistenciaPersonal> asistencias) {
         Map<Long, AsistenciaPersonal> mapa = new LinkedHashMap<>();
-        for (AsistenciaPersonal asistencia : listarPorFecha(obra, fecha)) {
+        for (AsistenciaPersonal asistencia : asistencias) {
             if (asistencia.getTrabajadorId() != null) {
                 mapa.put(asistencia.getTrabajadorId(), asistencia);
             }
@@ -84,35 +89,85 @@ public class AsistenciaService {
         return form;
     }
 
-    public List<AsistenciaEmpresaResumen> resumenPorEmpresa(List<AsistenciaPersonal> asistencias) {
-        Map<String, ResumenMutable> resumen = new LinkedHashMap<>();
-        for (AsistenciaPersonal asistencia : asistencias.stream().filter(this::presente).toList()) {
-            String empresa = StringUtils.hasText(asistencia.getEmpresa()) ? asistencia.getEmpresa() : "Sin empresa";
-            ResumenMutable actual = resumen.computeIfAbsent(empresa, key -> new ResumenMutable());
-            actual.personas++;
-            actual.horas = actual.horas.add(valorSeguro(asistencia.getHorasTrabajadas()));
+    public ResumenDia resumenDia(List<AsistenciaPersonal> asistencias) {
+        Map<String, ResumenMutable> resumenEmpresas = new LinkedHashMap<>();
+        long presentes = 0;
+        long enObra = 0;
+        long salieron = 0;
+        long incompletos = 0;
+        BigDecimal totalHoras = BigDecimal.ZERO;
+
+        for (AsistenciaPersonal asistencia : asistencias) {
+            if (asistencia.getHoraIngreso() != null) {
+                presentes++;
+                String empresa = StringUtils.hasText(asistencia.getEmpresa()) ? asistencia.getEmpresa() : "Sin empresa";
+                ResumenMutable actual = resumenEmpresas.computeIfAbsent(empresa, key -> new ResumenMutable());
+                actual.personas++;
+                actual.horas = actual.horas.add(valorSeguro(asistencia.getHorasTrabajadas()));
+            }
+            if (asistencia.estaEnObra()) {
+                enObra++;
+            } else if (asistencia.salioDeObra()) {
+                salieron++;
+                totalHoras = totalHoras.add(valorSeguro(asistencia.getHorasTrabajadas()));
+            } else if (asistencia.registroIncompleto()) {
+                incompletos++;
+            }
         }
-        return resumen.entrySet().stream()
+
+        List<AsistenciaEmpresaResumen> empresas = resumenEmpresas.entrySet().stream()
                 .map(entry -> new AsistenciaEmpresaResumen(entry.getKey(), entry.getValue().personas, entry.getValue().horas))
                 .toList();
+        return new ResumenDia(presentes, enObra, salieron, incompletos, totalHoras, empresas);
+    }
+
+    public List<AsistenciaEmpresaResumen> resumenPorEmpresa(List<AsistenciaPersonal> asistencias) {
+        return resumenDia(asistencias).resumenEmpresas();
     }
 
     public BigDecimal totalHoras(List<AsistenciaPersonal> asistencias) {
-        return asistencias.stream()
-                .filter(this::presente)
-                .map(asistencia -> valorSeguro(asistencia.getHorasTrabajadas()))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        return resumenDia(asistencias).totalHoras();
     }
 
     public long contarPresentes(List<AsistenciaPersonal> asistencias) {
-        return asistencias.stream().filter(this::presente).count();
+        return resumenDia(asistencias).presentes();
+    }
+
+    public long contarEnObra(List<AsistenciaPersonal> asistencias) {
+        return resumenDia(asistencias).enObra();
+    }
+
+    public long contarSalieron(List<AsistenciaPersonal> asistencias) {
+        return resumenDia(asistencias).salieron();
     }
 
     public long contarIncompletos(List<AsistenciaPersonal> asistencias) {
-        return asistencias.stream()
-                .filter(asistencia -> !presente(asistencia))
-                .filter(asistencia -> asistencia.getHoraIngreso() != null || asistencia.getHoraSalida() != null)
-                .count();
+        return resumenDia(asistencias).incompletos();
+    }
+
+    @Transactional
+    public AsistenciaPersonal marcarIngresoAhora(Obra obra, LocalDate fecha, Long trabajadorId) {
+        AsistenciaPersonal asistencia = obtenerOCrearRegistroDia(obra, fecha, trabajadorId);
+        if (asistencia.getHoraIngreso() == null) {
+            asistencia.setHoraIngreso(horaActual());
+        }
+        asistencia.setHorasTrabajadas(BigDecimal.ZERO);
+        return asistenciaRepository.save(asistencia);
+    }
+
+    @Transactional
+    public AsistenciaPersonal marcarSalidaAhora(Obra obra, LocalDate fecha, Long trabajadorId) {
+        AsistenciaPersonal asistencia = obtenerOCrearRegistroDia(obra, fecha, trabajadorId);
+        if (asistencia.getHoraIngreso() == null) {
+            throw new IllegalArgumentException("Primero debe cargarse el ingreso de la persona.");
+        }
+        LocalTime salida = horaActual();
+        if (!salida.isAfter(asistencia.getHoraIngreso())) {
+            throw new IllegalArgumentException("La salida debe ser posterior al ingreso.");
+        }
+        asistencia.setHoraSalida(salida);
+        asistencia.setHorasTrabajadas(calcularHoras(asistencia.getHoraIngreso(), salida));
+        return asistenciaRepository.save(asistencia);
     }
 
     private void aplicar(AsistenciaPersonal asistencia, AsistenciaForm form) {
@@ -151,8 +206,36 @@ public class AsistenciaService {
         if (form.getHorasTrabajadas() != null && form.getHorasTrabajadas().compareTo(BigDecimal.ZERO) > 0) {
             return form.getHorasTrabajadas();
         }
-        long minutos = Duration.between(form.getHoraIngreso(), form.getHoraSalida()).toMinutes();
+        return calcularHoras(form.getHoraIngreso(), form.getHoraSalida());
+    }
+
+    private BigDecimal calcularHoras(LocalTime ingreso, LocalTime salida) {
+        long minutos = Duration.between(ingreso, salida).toMinutes();
         return BigDecimal.valueOf(minutos).divide(BigDecimal.valueOf(60), 2, RoundingMode.HALF_UP);
+    }
+
+    private AsistenciaPersonal obtenerOCrearRegistroDia(Obra obra, LocalDate fecha, Long trabajadorId) {
+        LocalDate fechaTrabajo = fecha == null ? LocalDate.now() : fecha;
+        return asistenciaRepository.findByObraIdAndFechaAndTrabajadorId(obra.getId(), fechaTrabajo, trabajadorId)
+                .orElseGet(() -> crearRegistroDia(obra, fechaTrabajo, trabajadorId));
+    }
+
+    private AsistenciaPersonal crearRegistroDia(Obra obra, LocalDate fecha, Long trabajadorId) {
+        DepositoTrabajador trabajador = trabajadorRepository.findById(trabajadorId)
+                .orElseThrow(() -> new EntityNotFoundException("No existe la persona " + trabajadorId));
+        AsistenciaPersonal asistencia = new AsistenciaPersonal();
+        asistencia.setObra(obra);
+        asistencia.setFecha(fecha);
+        asistencia.setTrabajadorId(trabajador.getId());
+        asistencia.setTrabajadorNombre(trabajador.getNombre());
+        asistencia.setEmpresa(trabajador.getEmpresa());
+        asistencia.setSector(trabajador.getSector());
+        asistencia.setHorasTrabajadas(BigDecimal.ZERO);
+        return asistencia;
+    }
+
+    private LocalTime horaActual() {
+        return LocalTime.now().withSecond(0).withNano(0);
     }
 
     private void validar(AsistenciaForm form) {
@@ -186,8 +269,14 @@ public class AsistenciaService {
         return asistencia.getHoraIngreso() != null && asistencia.getHoraSalida() != null;
     }
 
+    public record ResumenDia(long presentes, long enObra, long salieron, long incompletos, BigDecimal totalHoras, List<AsistenciaEmpresaResumen> resumenEmpresas) {
+    }
+
     private static class ResumenMutable {
         long personas;
         BigDecimal horas = BigDecimal.ZERO;
     }
 }
+
+
+

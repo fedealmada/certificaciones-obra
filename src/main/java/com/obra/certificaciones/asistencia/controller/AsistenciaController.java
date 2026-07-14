@@ -39,9 +39,8 @@ public class AsistenciaController {
         var obra = obraService.obraActiva(session);
         var asistencias = asistenciaService.listarPorFecha(obra, fechaSeleccionada);
         var personas = depositoService.listarTrabajadoresActivos();
-        var asistenciaPorTrabajador = asistenciaService.mapaPorTrabajador(obra, fechaSeleccionada);
-        long presentes = asistenciaService.contarPresentes(asistencias);
-        long incompletos = asistenciaService.contarIncompletos(asistencias);
+        var asistenciaPorTrabajador = asistenciaService.mapaPorTrabajador(asistencias);
+        var resumenDia = asistenciaService.resumenDia(asistencias);
         model.addAttribute("fecha", fechaSeleccionada);
         model.addAttribute("fechaAnterior", fechaSeleccionada.minusDays(1));
         model.addAttribute("fechaSiguiente", fechaSeleccionada.plusDays(1));
@@ -56,11 +55,13 @@ public class AsistenciaController {
         model.addAttribute("asistencias", asistencias);
         model.addAttribute("personas", personas);
         model.addAttribute("asistenciaPorTrabajador", asistenciaPorTrabajador);
-        model.addAttribute("resumenEmpresas", asistenciaService.resumenPorEmpresa(asistencias));
-        model.addAttribute("totalHoras", asistenciaService.totalHoras(asistencias));
-        model.addAttribute("presentes", presentes);
-        model.addAttribute("incompletos", incompletos);
-        model.addAttribute("ausentes", Math.max(0, personas.size() - presentes - incompletos));
+        model.addAttribute("resumenEmpresas", resumenDia.resumenEmpresas());
+        model.addAttribute("totalHoras", resumenDia.totalHoras());
+        model.addAttribute("presentes", resumenDia.presentes());
+        model.addAttribute("enObra", resumenDia.enObra());
+        model.addAttribute("salieron", resumenDia.salieron());
+        model.addAttribute("incompletos", resumenDia.incompletos());
+        model.addAttribute("ausentes", Math.max(0, personas.size() - resumenDia.presentes() - resumenDia.incompletos()));
         model.addAttribute("recientes", asistenciaService.recientes(obra));
         return "asistencia/lista";
     }
@@ -96,6 +97,36 @@ public class AsistenciaController {
         }
     }
 
+    @PostMapping("/personas/{trabajadorId}/ingreso-ahora")
+    public String ingresoAhora(@PathVariable Long trabajadorId,
+                               @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha,
+                               RedirectAttributes redirectAttributes,
+                               HttpSession session) {
+        LocalDate fechaTrabajo = fecha == null ? LocalDate.now() : fecha;
+        try {
+            asistenciaService.marcarIngresoAhora(obraService.obraActiva(session), fechaTrabajo, trabajadorId);
+            redirectAttributes.addFlashAttribute("success", "Ingreso marcado correctamente. La persona quedo en obra.");
+        } catch (IllegalArgumentException ex) {
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        }
+        return "redirect:/asistencia?fecha=" + fechaTrabajo;
+    }
+
+    @PostMapping("/personas/{trabajadorId}/salida-ahora")
+    public String salidaAhora(@PathVariable Long trabajadorId,
+                              @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha,
+                              RedirectAttributes redirectAttributes,
+                              HttpSession session) {
+        LocalDate fechaTrabajo = fecha == null ? LocalDate.now() : fecha;
+        try {
+            asistenciaService.marcarSalidaAhora(obraService.obraActiva(session), fechaTrabajo, trabajadorId);
+            redirectAttributes.addFlashAttribute("success", "Salida marcada correctamente. La persona ya no figura en obra.");
+        } catch (IllegalArgumentException ex) {
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        }
+        return "redirect:/asistencia?fecha=" + fechaTrabajo;
+    }
+
     @PostMapping("/{id}/eliminar")
     public String eliminar(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         var asistencia = asistenciaService.obtener(id);
@@ -104,7 +135,6 @@ public class AsistenciaController {
         redirectAttributes.addFlashAttribute("success", "Asistencia eliminada correctamente.");
         return "redirect:/asistencia?fecha=" + fecha;
     }
-
     private void cargarFormulario(Model model, AsistenciaForm form, boolean modoEdicion) {
         model.addAttribute("form", form);
         model.addAttribute("personas", depositoService.listarTrabajadoresActivos());
@@ -130,3 +160,5 @@ public class AsistenciaController {
     public record DiaAsistencia(LocalDate fecha, boolean finDeSemana, boolean seleccionado) {
     }
 }
+
+

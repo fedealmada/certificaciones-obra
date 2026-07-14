@@ -52,8 +52,7 @@ public class MaterialController {
                 obraService.obraActiva(session),
                 PageRequest.of(Math.max(page, 0), 25, Sort.by(Sort.Direction.DESC, "fecha").and(Sort.by(Sort.Direction.DESC, "id"))));
         List<OrdenCompra> ordenes = ordenesPage.getContent();
-        Map<Long, List<ItemMaterialResumen>> resumenesPorOrden = new HashMap<>();
-        ordenes.forEach(orden -> resumenesPorOrden.put(orden.getId(), materialService.calcularResumenItems(orden.getId())));
+        Map<Long, List<ItemMaterialResumen>> resumenesPorOrden = materialService.calcularResumenOrdenes(ordenes);
         model.addAttribute("ordenes", ordenes);
         model.addAttribute("ordenesPage", ordenesPage);
         model.addAttribute("viajesPorOrden", materialService.contarRecepcionesPorOrdenes(ordenes.stream().map(OrdenCompra::getId).toList()));
@@ -412,3 +411,4 @@ public class MaterialController {
         return itemRecepcion.getItemOrdenCompra().getDetalle();
     }
 }
+

@@ -9410,7 +9410,7 @@ html[data-theme="dark"] body {
 .asistencia-entry-head,
 .asistencia-entry-row {
     display: grid;
-    grid-template-columns: minmax(13rem, 1.35fr) minmax(7.5rem, 0.6fr) minmax(7.2rem, 0.5fr) minmax(7.2rem, 0.5fr) minmax(8.5rem, auto);
+    grid-template-columns: minmax(13rem, 1.3fr) minmax(7.5rem, 0.58fr) minmax(7.2rem, 0.48fr) minmax(7.2rem, 0.48fr) minmax(13rem, auto);
     gap: 0.65rem;
     align-items: center;
 }
@@ -9443,6 +9443,15 @@ html[data-theme="dark"] body {
 
 .asistencia-entry-row.is-present {
     border-left-color: #1b8a5a;
+}
+
+.asistencia-entry-row.is-inside {
+    border-left-color: #16a34a;
+    background: linear-gradient(90deg, rgba(232, 247, 239, 0.9), #ffffff 40%);
+}
+
+.asistencia-entry-row.is-done {
+    border-left-color: #64748b;
 }
 
 .asistencia-entry-person {
@@ -10559,4 +10568,26 @@ html[data-theme="dark"] body {
     background: #334020 !important;
     color: #f5ffd9 !important;
     border-color: #6f8841 !important;
+}
+
+
+.asistencia-status-live {
+    width: 100%;
+}
+
+.asistencia-quick-action {
+    white-space: nowrap;
+}
+
+:root[data-theme="dark"] .asistencia-entry-row.is-inside {
+    background: linear-gradient(90deg, rgba(22, 101, 52, 0.28), #202337 45%);
+}
+@supports (content-visibility: auto) {
+    .panel-section,
+    .table-responsive,
+    .chart-panel,
+    .import-order-card {
+        content-visibility: auto;
+        contain-intrinsic-size: 1px 420px;
+    }
 }
