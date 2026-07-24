@@ -38,6 +38,7 @@ public class InicioController {
                                 "modulo.proveedores",
                                 "modulo.importarCertificados",
                                 "modulo.tableroCertificados",
+                                "modulo.documentacion",
                                 "modulo.reportes"
                         ).contains(modulo.clave())).toList()
                 ),
@@ -89,3 +90,4 @@ public class InicioController {
     ) {
     }
 }
+

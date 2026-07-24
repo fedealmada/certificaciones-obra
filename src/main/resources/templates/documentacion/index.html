@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Documentacion</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script>(()=>{const s=localStorage.getItem('obraControl.theme');const d=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.dataset.theme=s||(d?'dark':'light');})();</script>
+    <link th:href="@{/css/app.css}" rel="stylesheet">
+</head>
+<body>
+<div th:replace="~{fragments/layout :: navbar}"></div>
+<main class="container">
+    <div class="page-navigation mb-3">
+        <a th:href="@{/}"><i class="bi bi-house"></i> Inicio</a><i class="bi bi-chevron-right"></i><span>Documentacion</span>
+    </div>
+
+    <div class="document-header mb-4">
+        <div>
+            <div class="document-kicker">Control documental de contratistas</div>
+            <h1>Documentacion de obra</h1>
+            <div class="text-muted">Vencimientos, pendientes mensuales, personas, contratistas y vehiculos habilitados.</div>
+        </div>
+        <div class="document-actions">
+            <a class="btn btn-primary" th:href="@{/documentacion/nuevo}"><i class="bi bi-plus-lg"></i> Nuevo documento</a>
+        </div>
+    </div>
+
+    <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
+
+    <div class="dashboard-metric-grid mb-3">
+        <div class="metric-card"><div class="metric-head"><div class="metric-label">Aptos</div><i class="bi bi-shield-check"></i></div><div class="metric-value" th:text="${resumen.aptos()}">0</div><small>Documentos vigentes</small></div>
+        <div class="metric-card"><div class="metric-head"><div class="metric-label">Por vencer</div><i class="bi bi-exclamation-triangle"></i></div><div class="metric-value" th:text="${resumen.porVencer()}">0</div><small>Dentro de 15 dias</small></div>
+        <div class="metric-card"><div class="metric-head"><div class="metric-label">Vencidos</div><i class="bi bi-x-octagon"></i></div><div class="metric-value" th:text="${resumen.vencidos()}">0</div><small>Bloquean ingreso</small></div>
+        <div class="metric-card"><div class="metric-head"><div class="metric-label">Mensual</div><i class="bi bi-calendar2-week"></i></div><div class="metric-value" th:text="${resumen.mensualesPendientes()}">0</div><small>Pendiente del mes</small></div>
+    </div>
+
+    <section class="panel-section mb-3">
+        <div class="section-title-row">
+            <h2 class="h5 mb-0"><i class="bi bi-buildings"></i> Semaforo por contratista</h2>
+            <span class="section-total-pill" th:text="${resumen.contratistas().size()} + ' contratistas'">0 contratistas</span>
+        </div>
+        <div class="documentacion-contractor-grid">
+            <article class="documentacion-contractor-card" th:each="contratista : ${resumen.contratistas()}">
+                <span class="doc-status-pill" th:classappend="${' ' + contratista.estado().cssClass}" th:text="${contratista.estado().descripcion}">Apto</span>
+                <strong th:text="${contratista.nombre()}">Contratista</strong>
+                <small th:text="${contratista.total()} + ' docs / ' + ${contratista.vencidos()} + ' vencidos / ' + ${contratista.porVencer()} + ' por vencer'">0 docs</small>
+            </article>
+            <div class="empty-state" th:if="${resumen.contratistas().isEmpty()}">Todavia no hay documentacion cargada.</div>
+        </div>
+    </section>
+
+    <section class="panel-section">
+        <div class="section-title-row">
+            <h2 class="h5 mb-0"><i class="bi bi-folder-check"></i> Documentos controlados</h2>
+            <span class="section-total-pill" th:text="${documentos.size()} + ' registros'">0 registros</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle document-table">
+                <thead><tr><th>Estado</th><th>Documento</th><th>Sujeto</th><th>Contratista</th><th>Vencimiento</th><th>Mensual</th><th>Ingreso</th><th class="text-end">Acciones</th></tr></thead>
+                <tbody>
+                <tr th:each="doc : ${documentos}">
+                    <td><span class="doc-status-pill" th:classappend="${' ' + doc.estado().cssClass}" th:text="${doc.estado().descripcion}">Apto</span></td>
+                    <td><strong th:text="${doc.nombreDocumento()}">Documento</strong><small class="d-block text-muted" th:text="${doc.vinculo.descripcion}">Vinculo</small></td>
+                    <td><span th:text="${doc.sujeto.descripcion}">Sujeto</span><small class="d-block text-muted" th:text="${doc.sujetoNombre()}">Nombre</small></td>
+                    <td th:text="${doc.proveedor == null ? '-' : doc.proveedor.nombre}">Proveedor</td>
+                    <td><strong th:text="${doc.fechaVencimiento == null ? '-' : #temporals.format(doc.fechaVencimiento, 'dd/MM/yyyy')}">-</strong><small class="d-block text-muted" th:if="${doc.fechaVencimiento != null}" th:text="${doc.diasAlVencimiento()} + ' dias'">0 dias</small></td>
+                    <td><span class="badge text-bg-light" th:text="${doc.mensual ? 'Si' : 'No'}">No</span></td>
+                    <td><span class="badge" th:classappend="${doc.obligatorioIngreso ? ' text-bg-warning' : ' text-bg-secondary'}" th:text="${doc.obligatorioIngreso ? 'Controla' : 'No aplica'}">Controla</span></td>
+                    <td class="text-end action-cell">
+                        <a class="btn btn-sm btn-outline-secondary table-icon-action" th:href="@{/documentacion/{id}/editar(id=${doc.id})}" title="Editar" aria-label="Editar"><i class="bi bi-pencil-square"></i></a>
+                        <form method="post" th:action="@{/documentacion/{id}/eliminar(id=${doc.id})}" onsubmit="return confirm('Marcar este documento como inactivo?');"><button class="btn btn-sm btn-outline-danger table-icon-action" type="submit" title="Eliminar" aria-label="Eliminar"><i class="bi bi-trash"></i></button></form>
+                    </td>
+                </tr>
+                <tr th:if="${documentos.isEmpty()}"><td colspan="8" class="text-center text-muted py-4">No hay documentacion registrada.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+</body>
+</html>

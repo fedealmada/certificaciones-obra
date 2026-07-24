@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Detalle Nota de Pedido</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script>
+    (() => {
+        const savedTheme = localStorage.getItem('obraControl.theme');
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.dataset.theme = savedTheme || (prefersDark ? 'dark' : 'light');
+    })();
+    </script>
+    <link th:href="@{/css/app.css}" rel="stylesheet">
+</head>
+<body>
+<div th:replace="~{fragments/layout :: navbar}"></div>
+<main class="container-fluid note-detail-shell">
+    <div class="page-navigation mb-3">
+        <a th:href="@{/}"><i class="bi bi-house"></i> Inicio</a>
+        <i class="bi bi-chevron-right"></i>
+        <a th:href="@{/notas-pedido}">Notas de pedido</a>
+        <i class="bi bi-chevron-right"></i>
+        <span th:text="${'NP ' + nota.numero}">NP</span>
+    </div>
+
+    <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
+
+    <section class="document-header note-detail-header mb-3">
+        <div class="document-title-block">
+            <div class="document-kicker">Nota de pedido</div>
+            <h1 th:text="${'NP ' + nota.numero}">NP 213</h1>
+            <div class="document-subtitle" th:text="${nota.tipo.descripcion}">Pedido</div>
+        </div>
+        <div class="d-flex gap-2 flex-wrap">
+            <a class="btn btn-outline-secondary" th:href="@{/notas-pedido}"><i class="bi bi-arrow-left"></i> Volver</a>
+            <a class="btn btn-primary" th:href="@{/notas-pedido/{id}/editar(id=${nota.id})}"><i class="bi bi-pencil-square"></i> Editar</a>
+        </div>
+    </section>
+
+    <section class="panel-section note-ticket mb-3">
+        <div class="note-ticket-grid">
+            <div><span>Fecha</span><strong th:text="${#temporals.format(nota.fecha, 'dd/MM/yyyy')}">23/07/2026</strong></div>
+            <div th:if="${nota.solicitante != null && !#strings.isEmpty(nota.solicitante)}"><span>Solicita</span><strong th:text="${nota.solicitante}">AGT</strong></div>
+            <div><span>Prioridad</span><strong th:text="${nota.prioridad.descripcion}">Normal</strong></div>
+            <div><span>Estado</span><strong><span class="note-status-pill" th:classappend="${nota.estado.estilo}" th:text="${nota.estado.descripcion}">Estado</span></strong></div>
+            <div th:if="${nota.proveedorEntidad != null}"><span>Proveedor / contratista</span><strong th:text="${nota.proveedorEntidad.nombre}">Proveedor</strong></div>
+            <div th:if="${nota.comparativa}"><span>Comparativa</span><strong>Si</strong></div>
+            <div th:if="${nota.verStock}"><span>Ver stock</span><strong>Si</strong></div>
+            <div th:if="${nota.ordenCompra != null}"><span>OC generada</span><strong><a th:href="@{/oc/{id}(id=${nota.ordenCompra.id})}" th:text="${'OC ' + nota.ordenCompra.numero}">OC</a></strong></div>
+        </div>
+        <div class="note-observations" th:if="${nota.observaciones != null && !#strings.isEmpty(nota.observaciones)}">
+            <span>Observaciones</span>
+            <p th:text="${nota.observaciones}"></p>
+        </div>
+    </section>
+
+    <section class="panel-section note-items-detail-card">
+        <div class="section-title-row">
+            <h2 class="h5 mb-0"><i class="bi bi-list-check"></i> Items solicitados</h2>
+            <span class="section-total-pill" th:if="${nota.usaPrecio()}" th:text="${'Total: ' + #numbers.formatDecimal(nota.total, 1, 'POINT', 2, 'COMMA')}">Total</span>
+        </div>
+        <div class="note-items-detail-scroll">
+            <table class="table align-middle note-items-detail-table" th:classappend="${nota.usaPrecio() ? '' : ' without-price'}">
+                <colgroup>
+                    <col th:if="${mostrarItem}" class="note-detail-col-item">
+                    <col class="note-detail-col-detail">
+                    <col th:if="${mostrarUnidad}" class="note-detail-col-unit">
+                    <col class="note-detail-col-qty">
+                    <col th:if="${nota.usaPrecio()}" class="note-detail-col-price">
+                    <col th:if="${nota.usaPrecio()}" class="note-detail-col-total">
+                    <col th:if="${mostrarObservacionItem}" class="note-detail-col-obs">
+                    <col th:if="${mostrarBase}" class="note-detail-col-base">
+                    <col th:if="${mostrarEntrega}" class="note-detail-col-delivery">
+                </colgroup>
+                <thead>
+                <tr>
+                    <th th:if="${mostrarItem}">Item</th>
+                    <th>Detalle</th>
+                    <th th:if="${mostrarUnidad}">Und</th>
+                    <th class="text-end">Cant.</th>
+                    <th th:if="${nota.usaPrecio()}" class="text-end">$ Unit.</th>
+                    <th th:if="${nota.usaPrecio()}" class="text-end">$ Total</th>
+                    <th th:if="${mostrarObservacionItem}">Obs.</th>
+                    <th th:if="${mostrarBase}">Base</th>
+                    <th th:if="${mostrarEntrega}">Entrega</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="item : ${nota.items}">
+                    <td th:if="${mostrarItem}"><span class="item-code-pill" th:text="${item.item}">1</span></td>
+                    <td class="note-detail-text"><div th:text="${item.detalle}">Detalle</div></td>
+                    <td th:if="${mostrarUnidad}" class="text-center" th:text="${item.unidad}">un</td>
+                    <td class="text-end numeric-cell" th:text="${#numbers.formatDecimal(item.cantidad, 1, 'POINT', 2, 'COMMA')}">0,00</td>
+                    <td th:if="${nota.usaPrecio()}" class="text-end numeric-cell" th:text="${#numbers.formatDecimal(item.precioUnitario, 1, 'POINT', 2, 'COMMA')}">0,00</td>
+                    <td th:if="${nota.usaPrecio()}" class="text-end numeric-cell fw-semibold" th:text="${#numbers.formatDecimal(item.importe, 1, 'POINT', 2, 'COMMA')}">0,00</td>
+                    <td th:if="${mostrarObservacionItem}" th:text="${item.observacion}">Obs</td>
+                    <td th:if="${mostrarBase}" th:text="${item.base}">Base</td>
+                    <td th:if="${mostrarEntrega}" th:text="${item.entrega}">Entrega</td>
+                </tr>
+                </tbody>
+                <tfoot th:if="${nota.usaPrecio()}">
+                <tr>
+                    <td th:colspan="${(mostrarItem ? 1 : 0) + (mostrarUnidad ? 1 : 0) + 3}" class="text-end">Total</td>
+                    <td class="text-end numeric-cell" th:text="${#numbers.formatDecimal(nota.total, 1, 'POINT', 2, 'COMMA')}">0,00</td>
+                    <td th:if="${mostrarObservacionItem || mostrarBase || mostrarEntrega}" th:colspan="${(mostrarObservacionItem ? 1 : 0) + (mostrarBase ? 1 : 0) + (mostrarEntrega ? 1 : 0)}"></td>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+    </section>
+</main>
+</body>
+</html>

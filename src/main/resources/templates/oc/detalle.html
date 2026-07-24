@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
@@ -27,7 +27,7 @@
             <i class="bi bi-check-lg"></i>
         </div>
         <div class="work-action-kicker">Orden de compra</div>
-        <h2 th:text="${accionTitulo ?: '¡Terminaste!'}">¡Terminaste!</h2>
+        <h2 th:text="${accionTitulo ?: 'Â¡Terminaste!'}">Â¡Terminaste!</h2>
         <p th:text="${accionMensaje ?: 'La orden quedo guardada correctamente.'}">La orden quedo guardada correctamente.</p>
         <a class="work-action-link" href="#items-orden">Ver items cargados</a>
     </div>
@@ -177,29 +177,29 @@
             <span class="section-total-pill" th:text="'Total: ' + ${#numbers.formatDecimal(orden.total, 1, 'POINT', 2, 'COMMA')}">Total</span>
         </div>
         <div class="table-responsive">
-            <table class="table table-hover align-middle document-table oc-items-table">
-                <thead><tr><th>Item</th><th>Detalle</th><th>Categoria</th><th>Und</th><th class="text-end">Cant.</th><th class="text-end">$ Unit.</th><th class="text-end">$ Total</th><th class="text-end" th:text="${ordenMaterial ? 'Recepcion' : 'Avance'}">Avance</th><th class="text-end" th:text="${ordenMaterial ? 'Recibido' : '$ Cert.'}">$ Cert.</th><th class="text-end" th:text="${ordenMaterial ? 'Pendiente' : 'Saldo'}">Saldo</th><th>Estado</th><th class="text-end">Accion</th></tr></thead>
+            <table class="table table-hover align-middle document-table oc-items-table sortable-oc-items" id="oc-items-table">
+                <thead><tr><th><button class="table-sort-button" type="button" data-sort-index="0" data-sort-type="natural">Item <i class="bi bi-arrow-down-up"></i></button></th><th><button class="table-sort-button" type="button" data-sort-index="1" data-sort-type="text">Detalle <i class="bi bi-arrow-down-up"></i></button></th><th><button class="table-sort-button" type="button" data-sort-index="2" data-sort-type="text">Categoria <i class="bi bi-arrow-down-up"></i></button></th><th><button class="table-sort-button" type="button" data-sort-index="3" data-sort-type="text">Und <i class="bi bi-arrow-down-up"></i></button></th><th class="text-end"><button class="table-sort-button justify-content-end" type="button" data-sort-index="4" data-sort-type="number">Cant. <i class="bi bi-arrow-down-up"></i></button></th><th class="text-end"><button class="table-sort-button justify-content-end" type="button" data-sort-index="5" data-sort-type="number">$ Unit. <i class="bi bi-arrow-down-up"></i></button></th><th class="text-end"><button class="table-sort-button justify-content-end" type="button" data-sort-index="6" data-sort-type="number">$ Total <i class="bi bi-arrow-down-up"></i></button></th><th class="text-end"><button class="table-sort-button justify-content-end" type="button" data-sort-index="7" data-sort-type="number"><span th:text="${ordenMaterial ? 'Recepcion' : 'Avance'}">Avance</span> <i class="bi bi-arrow-down-up"></i></button></th><th class="text-end"><button class="table-sort-button justify-content-end" type="button" data-sort-index="8" data-sort-type="number"><span th:text="${ordenMaterial ? 'Recibido' : '$ Cert.'}">$ Cert.</span> <i class="bi bi-arrow-down-up"></i></button></th><th class="text-end"><button class="table-sort-button justify-content-end" type="button" data-sort-index="9" data-sort-type="number"><span th:text="${ordenMaterial ? 'Pendiente' : 'Saldo'}">Saldo</span> <i class="bi bi-arrow-down-up"></i></button></th><th><button class="table-sort-button" type="button" data-sort-index="10" data-sort-type="text">Estado <i class="bi bi-arrow-down-up"></i></button></th><th class="text-end">Accion</th></tr></thead>
                 <tbody>
                 <tr th:each="resumen : ${itemsResumen}" th:with="materialResumen=${ordenMaterial ? materialResumenPorItem.get(resumen.itemOrdenCompra.id) : null}">
-                    <td><span class="item-code-pill" th:text="${resumen.itemOrdenCompra.item}">450.1</span></td>
-                    <td class="item-detail-cell">
+                    <td th:attr="data-sort-value=${resumen.itemOrdenCompra.item}"><span class="item-code-pill" th:text="${resumen.itemOrdenCompra.item}">450.1</span></td>
+                    <td class="item-detail-cell" th:attr="data-sort-value=${resumen.itemOrdenCompra.detalle}">
                         <div class="item-detail-title" th:text="${resumen.itemOrdenCompra.detalle}"></div>
                         <small class="item-detail-subtitle" th:text="${resumen.itemOrdenCompra.rubro}"></small>
                     </td>
-                    <td><span class="category-chip" th:text="${resumen.itemOrdenCompra.categoriaEntidad != null ? resumen.itemOrdenCompra.categoriaEntidad.nombre : resumen.itemOrdenCompra.categoria.descripcion}">Categoria</span></td>
-                    <td th:text="${resumen.itemOrdenCompra.unidad}"></td>
-                    <td class="text-end" th:text="${#numbers.formatDecimal(resumen.itemOrdenCompra.cantidad, 1, 'POINT', 2, 'COMMA')}"></td>
-                    <td class="text-end" th:text="${#numbers.formatDecimal(resumen.itemOrdenCompra.precioUnitario, 1, 'POINT', 2, 'COMMA')}"></td>
-                    <td class="text-end fw-semibold" th:text="${#numbers.formatDecimal(resumen.itemOrdenCompra.importe, 1, 'POINT', 2, 'COMMA')}"></td>
-                    <td class="text-end">
+                    <td th:attr="data-sort-value=${resumen.itemOrdenCompra.categoriaEntidad != null ? resumen.itemOrdenCompra.categoriaEntidad.nombre : resumen.itemOrdenCompra.categoria.descripcion}"><span class="category-chip" th:text="${resumen.itemOrdenCompra.categoriaEntidad != null ? resumen.itemOrdenCompra.categoriaEntidad.nombre : resumen.itemOrdenCompra.categoria.descripcion}">Categoria</span></td>
+                    <td th:attr="data-sort-value=${resumen.itemOrdenCompra.unidad}" th:text="${resumen.itemOrdenCompra.unidad}"></td>
+                    <td class="text-end" th:attr="data-sort-value=${resumen.itemOrdenCompra.cantidad == null ? 0 : resumen.itemOrdenCompra.cantidad}" th:text="${#numbers.formatDecimal(resumen.itemOrdenCompra.cantidad, 1, 'POINT', 2, 'COMMA')}"></td>
+                    <td class="text-end" th:attr="data-sort-value=${resumen.itemOrdenCompra.precioUnitario == null ? 0 : resumen.itemOrdenCompra.precioUnitario}" th:text="${#numbers.formatDecimal(resumen.itemOrdenCompra.precioUnitario, 1, 'POINT', 2, 'COMMA')}"></td>
+                    <td class="text-end fw-semibold" th:attr="data-sort-value=${resumen.itemOrdenCompra.importe == null ? 0 : resumen.itemOrdenCompra.importe}" th:text="${#numbers.formatDecimal(resumen.itemOrdenCompra.importe, 1, 'POINT', 2, 'COMMA')}"></td>
+                    <td class="text-end" th:attr="data-sort-value=${ordenMaterial && materialResumen != null ? materialResumen.porcentajeRecibido() : resumen.porcentajeAcumulado}">
                         <div class="oc-progress-number" th:text="${ordenMaterial && materialResumen != null ? #numbers.formatDecimal(materialResumen.porcentajeRecibido(), 1, 'POINT', 2, 'COMMA') + ' %' : resumen.porcentajeAcumulado + ' %'}">0 %</div>
                         <div class="progress progress-thin oc-progress">
                             <div class="progress-bar" th:data-progress="${ordenMaterial && materialResumen != null ? materialResumen.porcentajeRecibido() : (resumen.porcentajeAcumulado > 100 ? 100 : resumen.porcentajeAcumulado)}"></div>
                         </div>
                     </td>
-                    <td class="text-end" th:text="${ordenMaterial && materialResumen != null ? #numbers.formatDecimal(materialResumen.montoRecibido(), 1, 'POINT', 2, 'COMMA') : #numbers.formatDecimal(resumen.montoAcumulado, 1, 'POINT', 2, 'COMMA')}"></td>
-                    <td class="text-end" th:text="${ordenMaterial && materialResumen != null ? #numbers.formatDecimal(materialResumen.montoPendiente(), 1, 'POINT', 2, 'COMMA') : #numbers.formatDecimal(resumen.saldoPendiente, 1, 'POINT', 2, 'COMMA')}"></td>
-                    <td>
+                    <td class="text-end" th:attr="data-sort-value=${ordenMaterial && materialResumen != null ? materialResumen.montoRecibido() : resumen.montoAcumulado}" th:text="${ordenMaterial && materialResumen != null ? #numbers.formatDecimal(materialResumen.montoRecibido(), 1, 'POINT', 2, 'COMMA') : #numbers.formatDecimal(resumen.montoAcumulado, 1, 'POINT', 2, 'COMMA')}"></td>
+                    <td class="text-end" th:attr="data-sort-value=${ordenMaterial && materialResumen != null ? materialResumen.montoPendiente() : resumen.saldoPendiente}" th:text="${ordenMaterial && materialResumen != null ? #numbers.formatDecimal(materialResumen.montoPendiente(), 1, 'POINT', 2, 'COMMA') : #numbers.formatDecimal(resumen.saldoPendiente, 1, 'POINT', 2, 'COMMA')}"></td>
+                    <td th:attr="data-sort-value=${ordenMaterial && materialResumen != null ? materialResumen.estado().descripcion : resumen.estado.descripcion}">
                         <span th:if="${ordenMaterial && materialResumen != null}" class="status-pill" th:classappend="${materialResumen.estado().name() == 'COMPLETO' ? ' status-done' : (materialResumen.estado().name() == 'PARCIAL' ? ' status-progress' : ' status-pending')}" th:text="${materialResumen.estado().descripcion}"></span>
                         <span th:unless="${ordenMaterial && materialResumen != null}" class="status-pill" th:classappend="${resumen.estado.name() == 'TERMINADO' ? ' status-done' : (resumen.estado.name() == 'EN_EJECUCION' ? ' status-progress' : ' status-pending')}" th:text="${resumen.estado.descripcion}"></span>
                     </td>
@@ -334,6 +334,61 @@ document.querySelectorAll('.oc-total-progress-fill, .oc-progress .progress-bar')
     }, delay);
 });
 
+
+document.querySelectorAll('.sortable-oc-items').forEach(table => {
+    const tbody = table.tBodies[0];
+    const collator = new Intl.Collator('es', { numeric: true, sensitivity: 'base' });
+    const parseNumber = value => {
+        const raw = String(value ?? '')
+            .trim()
+            .replace(/\s/g, '')
+            .replace(/%/g, '')
+            .replace(/\$/g, '');
+        if (!raw) return 0;
+
+        const normalized = raw.includes(',')
+            ? raw.replace(/\./g, '').replace(',', '.')
+            : raw;
+        const parsed = Number.parseFloat(normalized);
+        return Number.isFinite(parsed) ? parsed : 0;
+    };
+    const cellValue = (row, index) => {
+        const cell = row.cells[index];
+        return cell?.dataset.sortValue ?? cell?.innerText?.trim() ?? '';
+    };
+
+    table.querySelectorAll('.table-sort-button').forEach(button => {
+        button.addEventListener('click', () => {
+            const index = Number.parseInt(button.dataset.sortIndex || '0', 10);
+            const type = button.dataset.sortType || 'text';
+            const current = button.dataset.direction === 'asc' ? 'desc' : 'asc';
+            const direction = current === 'asc' ? 1 : -1;
+            const rows = Array.from(tbody.rows);
+
+            table.querySelectorAll('.table-sort-button').forEach(item => {
+                item.dataset.direction = '';
+                item.classList.remove('is-asc', 'is-desc');
+                const icon = item.querySelector('i');
+                if (icon) icon.className = 'bi bi-arrow-down-up';
+            });
+
+            rows.sort((a, b) => {
+                const aValue = cellValue(a, index);
+                const bValue = cellValue(b, index);
+                if (type === 'number') {
+                    return (parseNumber(aValue) - parseNumber(bValue)) * direction;
+                }
+                return collator.compare(aValue, bValue) * direction;
+            });
+
+            rows.forEach(row => tbody.appendChild(row));
+            button.dataset.direction = current;
+            button.classList.add(current === 'asc' ? 'is-asc' : 'is-desc');
+            const icon = button.querySelector('i');
+            if (icon) icon.className = current === 'asc' ? 'bi bi-sort-down-alt' : 'bi bi-sort-up';
+        });
+    });
+});
 document.querySelectorAll('.cert-click-row, .delivery-click-row').forEach(row => {
     const abrirDetalle = () => {
         if (row.dataset.href) {
@@ -355,3 +410,4 @@ document.querySelectorAll('.cert-click-row, .delivery-click-row').forEach(row =>
 </script>
 </body>
 </html>
+

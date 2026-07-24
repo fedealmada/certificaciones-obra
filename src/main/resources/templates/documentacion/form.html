@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Documento de obra</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script>(()=>{const s=localStorage.getItem('obraControl.theme');const d=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.dataset.theme=s||(d?'dark':'light');})();</script>
+    <link th:href="@{/css/app.css}" rel="stylesheet">
+</head>
+<body>
+<div th:replace="~{fragments/layout :: navbar}"></div>
+<main class="container">
+    <div class="page-navigation mb-3">
+        <a th:href="@{/}"><i class="bi bi-house"></i> Inicio</a><i class="bi bi-chevron-right"></i>
+        <a th:href="@{/documentacion}">Documentacion</a><i class="bi bi-chevron-right"></i><span th:text="${modoEdicion ? 'Editar' : 'Nuevo'}">Nuevo</span>
+    </div>
+
+    <div class="document-header mb-4">
+        <div>
+            <div class="document-kicker">Control documental</div>
+            <h1 th:text="${modoEdicion ? 'Editar documento' : 'Nuevo documento'}">Nuevo documento</h1>
+            <div class="text-muted">Carga vencimientos, presentacion mensual y si el documento condiciona el ingreso a obra.</div>
+        </div>
+    </div>
+
+    <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+
+    <form method="post" th:action="@{/documentacion}" th:object="${form}">
+        <input type="hidden" th:field="*{id}">
+        <section class="panel-section mb-3">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Corresponde a</label>
+                    <select class="form-select" th:field="*{sujeto}" id="sujeto-select">
+                        <option th:each="sujeto : ${sujetos}" th:value="${sujeto}" th:text="${sujeto.descripcion}"></option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Tipo de vinculo</label>
+                    <select class="form-select" th:field="*{vinculo}">
+                        <option th:each="vinculo : ${vinculos}" th:value="${vinculo}" th:text="${vinculo.descripcion}"></option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Tipo de documento</label>
+                    <select class="form-select" th:field="*{tipo}">
+                        <option th:each="tipo : ${tipos}" th:value="${tipo}" th:text="${tipo.descripcion}"></option>
+                    </select>
+                </div>
+                <div class="col-md-4 doc-field doc-field-contratista">
+                    <label class="form-label">Contratista / proveedor</label>
+                    <select class="form-select" th:field="*{proveedorId}">
+                        <option value="">Sin contratista</option>
+                        <option th:each="proveedor : ${proveedores}" th:value="${proveedor.id}" th:text="${proveedor.nombre}"></option>
+                    </select>
+                </div>
+                <div class="col-md-4 doc-field doc-field-persona">
+                    <label class="form-label">Persona</label>
+                    <select class="form-select" th:field="*{trabajadorId}">
+                        <option value="">Sin persona</option>
+                        <option th:each="persona : ${personas}" th:value="${persona.id}" th:text="${persona.nombre + ' - ' + (persona.empresa ?: 'Sin empresa')}"></option>
+                    </select>
+                </div>
+                <div class="col-md-4 doc-field doc-field-vehiculo">
+                    <label class="form-label">Dominio / identificacion</label>
+                    <input class="form-control" th:field="*{vehiculoDominio}" placeholder="Ej: AB123CD / Retro 01">
+                </div>
+                <div class="col-md-8 doc-field doc-field-vehiculo">
+                    <label class="form-label">Detalle vehiculo / maquinaria</label>
+                    <input class="form-control" th:field="*{vehiculoDetalle}" placeholder="Modelo, tipo, observacion">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Nombre personalizado</label>
+                    <input class="form-control" th:field="*{nombrePersonalizado}" placeholder="Solo si el tipo es Otro">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Fecha emision</label>
+                    <input class="form-control" type="date" th:field="*{fechaEmision}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Fecha vencimiento</label>
+                    <input class="form-control" type="date" th:field="*{fechaVencimiento}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Fecha presentacion</label>
+                    <input class="form-control" type="date" th:field="*{fechaPresentacion}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Referencia archivo</label>
+                    <input class="form-control" th:field="*{referenciaArchivo}" placeholder="PDF, mail, carpeta">
+                </div>
+                <div class="col-md-12">
+                    <div class="documentacion-check-grid">
+                        <label><input type="checkbox" th:field="*{presentado}"> Presentado</label>
+                        <label><input type="checkbox" th:field="*{mensual}"> Control mensual</label>
+                        <label><input type="checkbox" th:field="*{obligatorioIngreso}"> Condiciona ingreso a obra</label>
+                        <label><input type="checkbox" th:field="*{activo}"> Activo</label>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <label class="form-label">Observacion</label>
+                    <input class="form-control" th:field="*{observacion}" placeholder="Clausula, monto, responsable, aclaraciones">
+                </div>
+            </div>
+        </section>
+        <div class="d-flex gap-2 mt-3">
+            <button class="btn btn-primary" type="submit"><i class="bi bi-save"></i> Guardar</button>
+            <a class="btn btn-outline-secondary" th:href="@{/documentacion}">Cancelar</a>
+        </div>
+    </form>
+</main>
+<script>
+const sujetoSelect = document.getElementById('sujeto-select');
+function updateDocFields() {
+    const value = sujetoSelect?.value || 'CONTRATISTA';
+    document.querySelectorAll('.doc-field').forEach(field => field.style.display = 'none');
+    if (value === 'CONTRATISTA') document.querySelectorAll('.doc-field-contratista').forEach(field => field.style.display = 'block');
+    if (value === 'PERSONA') document.querySelectorAll('.doc-field-persona, .doc-field-contratista').forEach(field => field.style.display = 'block');
+    if (value === 'VEHICULO') document.querySelectorAll('.doc-field-vehiculo, .doc-field-contratista').forEach(field => field.style.display = 'block');
+}
+sujetoSelect?.addEventListener('change', updateDocFields);
+updateDocFields();
+</script>
+</body>
+</html>

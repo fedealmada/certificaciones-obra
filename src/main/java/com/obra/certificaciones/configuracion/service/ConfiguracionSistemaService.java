@@ -23,6 +23,7 @@ public class ConfiguracionSistemaService {
         return List.of(
                 new ModuloSistema("modulo.dashboard", "Dashboard", "Indicadores, graficos y resumen de obra.", "/dashboard", "bi-speedometer2", "blue"),
                 new ModuloSistema("modulo.oc", "Ordenes de compra", "Crear, revisar y certificar OC.", "/oc", "bi-receipt", "yellow"),
+                new ModuloSistema("modulo.notasPedido", "Notas de pedido", "Pedidos, presupuestos, aprobaciones y OC generadas.", "/notas-pedido", "bi-journal-check", "green"),
                 new ModuloSistema("modulo.importarOc", "Importar OC", "Cargar ordenes desde PDF o texto.", "/oc/importar", "bi-file-earmark-arrow-up", "blue"),
                 new ModuloSistema("modulo.items", "Items", "Buscador general de items de OC.", "/items", "bi-list-task", "green"),
                 new ModuloSistema("modulo.importarCertificados", "Importar certificados", "Pegar planillas y cargar avances automaticamente.", "/certificaciones/importar", "bi-clipboard-check", "blue"),
@@ -30,6 +31,7 @@ public class ConfiguracionSistemaService {
                 new ModuloSistema("modulo.itemizado", "Itemizado", "Arbol de rubros e itemizado general.", "/itemizado", "bi-diagram-3", "green"),
                 new ModuloSistema("modulo.controlRubros", "Control rubros", "Techos, incidencias y avance economico por rubro.", "/control-rubros", "bi-clipboard-data", "yellow"),
                 new ModuloSistema("modulo.asistencia", "Asistencia", "Control diario de personal, empresas y horas.", "/asistencia", "bi-person-check", "green"),
+                new ModuloSistema("modulo.documentacion", "Documentacion", "Vencimientos, contratistas y habilitacion documental.", "/documentacion", "bi-shield-check", "blue"),
                 new ModuloSistema("modulo.proveedores", "Proveedores", "Contratistas, contactos y OC asociadas.", "/proveedores", "bi-person-lines-fill", "yellow"),
                 new ModuloSistema("modulo.categorias", "Categorias", "Categorias manuales para compras e items.", "/categorias", "bi-tags", "blue"),
                 new ModuloSistema("modulo.rubros", "Rubros", "Estructura jerarquica de rubros de obra.", "/rubros", "bi-folder2-open", "green"),
@@ -74,3 +76,4 @@ public class ConfiguracionSistemaService {
         });
     }
 }
+
