@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <body>
 <nav th:fragment="navbar" class="app-topbar app-sidebar" aria-label="Navegacion principal">
@@ -46,6 +46,7 @@
             <a class="nav-link" th:if="${configuracion.activo('modulo.rubros')}" th:href="@{/rubros}" title="Rubros"><i class="bi bi-folder2-open"></i><span>Rubros</span></a>
             <a class="nav-link" th:href="@{/obras}" title="Obras"><i class="bi bi-buildings"></i><span>Obras</span></a>
             <a class="nav-link" th:href="@{/configuracion}" title="Configuracion"><i class="bi bi-gear"></i><span>Configuracion</span></a>
+            <a class="nav-link" th:if="${configuracion.activo('modulo.sincronizacion')}" th:href="@{/sincronizacion}" title="Sincronizacion"><i class="bi bi-cloud-arrow-up"></i><span>Sync GitHub</span></a>
             <button class="nav-link theme-toggle-button" type="button" title="Modo oscuro" aria-label="Cambiar modo oscuro">
                 <i class="bi bi-moon-stars"></i><span>Modo oscuro</span>
             </button>
@@ -60,6 +61,39 @@
         const button = document.querySelector('.theme-toggle-button');
         const icon = button?.querySelector('i');
 
+        const markActiveNav = () => {
+            const currentPath = window.location.pathname.replace(/\/$/, '') || '/';
+            const navLinks = sidebar?.querySelectorAll('.app-nav-links a.nav-link[href]') || [];
+            let bestLink = null;
+            let bestLength = -1;
+
+            navLinks.forEach(link => {
+                const href = link.getAttribute('href');
+                if (!href || href === '#') {
+                    return;
+                }
+                const url = new URL(href, window.location.origin);
+                const linkPath = url.pathname.replace(/\/$/, '') || '/';
+                const isMatch = linkPath === '/'
+                        ? currentPath === '/'
+                        : (currentPath === linkPath || currentPath.startsWith(linkPath + '/'));
+
+                link.classList.remove('is-active');
+                link.removeAttribute('aria-current');
+
+                if (isMatch && linkPath.length > bestLength) {
+                    bestLink = link;
+                    bestLength = linkPath.length;
+                }
+            });
+
+            if (bestLink) {
+                bestLink.classList.add('is-active');
+                bestLink.setAttribute('aria-current', 'page');
+            }
+        };
+
+        markActiveNav();
         if (sidebar) {
             let closeTimer;
 

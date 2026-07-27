@@ -11,8 +11,10 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,6 +24,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Table(indexes = {
+        @Index(name = "idx_oc_obra_fecha_id", columnList = "obra_id, fecha, id"),
+        @Index(name = "idx_oc_obra_numero", columnList = "obra_id, numero"),
+        @Index(name = "idx_oc_proveedor_numero", columnList = "proveedor_entidad_id, numero"),
+        @Index(name = "idx_oc_modo_seguimiento", columnList = "modo_seguimiento")
+})
 @Getter
 @Setter
 public class OrdenCompra {

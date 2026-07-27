@@ -34,7 +34,7 @@
         <div>
             <div class="document-kicker">Estructura de obra</div>
             <h1>Itemizado de Obra</h1>
-            <div class="text-muted">Rubros, subrubros e items vinculados a ordenes de compra</div>
+            <div class="text-muted">Rubros, subrubros, items de OC e items manuales propios del itemizado</div>
         </div>
         <div class="d-flex flex-wrap gap-2">
             <a class="btn btn-primary" th:href="@{/itemizado/exportar/avances-sheets}"><i class="bi bi-google"></i> Avances Sheets</a>
@@ -51,6 +51,29 @@
         <div class="col-md-3"><div class="metric-card"><div class="metric-label">Materiales</div><div class="metric-value metric-value-sm" th:text="${#numbers.formatDecimal(itemizado.totalMateriales, 1, 'POINT', 2, 'COMMA')}">0</div></div></div>
     </div>
 
+
+    <section class="panel-section itemizado-manual-panel mb-3">
+        <div class="section-title-row">
+            <h2 class="h5 mb-0"><i class="bi bi-plus-square-dotted"></i> Item manual del itemizado</h2>
+            <span class="section-total-pill">No afecta OC</span>
+        </div>
+        <form class="row g-2 align-items-end" method="post" th:action="@{/itemizado/manuales}">
+            <div class="col-md-3">
+                <label class="form-label">Rubro</label>
+                <select class="form-select" name="rubroId" required>
+                    <option value="">Seleccionar rubro</option>
+                    <option th:each="rubro : ${rubros}" th:value="${rubro.id}" th:text="${rubro.nombreCompleto}"></option>
+                </select>
+            </div>
+            <div class="col-md-1"><label class="form-label">Item</label><input class="form-control" name="item" placeholder="Manual"></div>
+            <div class="col-md-3"><label class="form-label">Detalle</label><input class="form-control" name="detalle" required placeholder="Tarea fuera de OC"></div>
+            <div class="col-md-1"><label class="form-label">Und</label><input class="form-control" name="unidad" placeholder="GL"></div>
+            <div class="col-md-1"><label class="form-label">Cant.</label><input class="form-control" type="number" step="0.01" name="cantidad" value="1"></div>
+            <div class="col-md-2"><label class="form-label">Precio</label><input class="form-control" type="number" step="0.01" name="precioUnitario" value="0"></div>
+            <div class="col-md-1"><button class="btn btn-primary w-100" type="submit" title="Agregar item manual"><i class="bi bi-plus-lg"></i></button></div>
+        </form>
+    </section>
+
     <section class="itemizado-shell itemizado-planilla">
         <div class="itemizado-toolbar">
             <strong>Total general</strong>
@@ -60,6 +83,7 @@
                 <button class="itemizado-history-button" id="itemizado-undo" type="button" title="Deshacer movimiento" disabled><i class="bi bi-arrow-counterclockwise"></i></button>
                 <button class="itemizado-history-button" id="itemizado-redo" type="button" title="Rehacer movimiento" disabled><i class="bi bi-arrow-clockwise"></i></button>
             </div>
+            <button class="itemizado-inline-button" id="itemizado-new-manual" type="button"><i class="bi bi-plus-square-dotted"></i> Item manual</button>
             <button class="itemizado-inline-button" id="itemizado-new-root" type="button"><i class="bi bi-plus-lg"></i> Rubro</button>
             <small class="itemizado-drag-status" id="itemizado-drag-status" aria-live="polite"></small>
         </div>
@@ -81,6 +105,7 @@
                     <col class="col-importe">
                     <col class="col-importe">
                     <col class="col-importe">
+                    <col class="col-acciones">
                 </colgroup>
                 <thead>
                 <tr>
@@ -94,12 +119,13 @@
                     <th class="text-end">Mano de Obra</th>
                     <th class="text-end">Materiales</th>
                     <th class="text-end">Total</th>
+                    <th>Acciones</th>
                 </tr>
                 </thead>
                 <tbody>
                 <th:block th:each="nodo : ${itemizado.nodos}">
                     <tr class="rubro-row itemizado-toggle-row itemizado-drop-target itemizado-context-rubro itemizado-draggable-rubro" draggable="true" th:data-level="${nodo.nivel}" th:data-rubro-id="${nodo.rubro.id}" th:data-rubro-code="${nodo.rubro.codigo}" th:data-rubro-name="${nodo.rubro.nombre}" th:data-rubro-full-name="${nodo.rubro.nombreCompleto}" th:classappend="${nodo.nivel == 0 ? ' rubro-root' : (nodo.nivel == 1 ? ' rubro-middle' : ' rubro-leaf')}">
-                        <td><span class="itemizado-rubro-drag-handle" title="Mover rubro"><i class="bi bi-grip-vertical"></i></span><button class="itemizado-toggle" type="button" onclick="toggleItemizadoRubro(this)">−</button><span th:text="${nodo.rubro.codigo ?: '-'}"></span></td>
+                        <td><span class="itemizado-rubro-drag-handle" title="Mover rubro"><i class="bi bi-grip-vertical"></i></span><button class="itemizado-toggle" type="button" onclick="toggleItemizadoRubro(this)">-</button><span th:text="${nodo.rubro.codigo ?: '-'}"></span></td>
                         <td></td>
                         <td class="rubro-name" th:style="'padding-left:' + ${nodo.nivel * 18 + 8} + 'px'" th:text="${nodo.rubro.nombre}"></td>
                         <td></td>
@@ -109,21 +135,34 @@
                         <td class="text-end" th:text="${#numbers.formatDecimal(nodo.totalManoObra, 1, 'POINT', 2, 'COMMA')}"></td>
                         <td class="text-end" th:text="${#numbers.formatDecimal(nodo.totalMateriales, 1, 'POINT', 2, 'COMMA')}"></td>
                         <td class="text-end total-cell" th:text="${#numbers.formatDecimal(nodo.totalGeneral, 1, 'POINT', 2, 'COMMA')}"></td>
+                        <td></td>
                     </tr>
-                    <tr th:each="item : ${nodo.items}" class="item-row itemizado-child-row itemizado-draggable-row" draggable="true" th:data-level="${nodo.nivel + 1}" th:data-item-id="${item.manoObra.id}" th:data-current-rubro-id="${nodo.rubro.id}">
-                        <td><span class="itemizado-drag-handle" title="Mover item"><i class="bi bi-grip-vertical"></i></span><span th:text="${item.codigoItemizado}"></span></td>
-                        <td th:text="${item.manoObra.item}"></td>
+                    <tr th:each="item : ${nodo.items}" class="item-row itemizado-child-row" th:classappend="${item.esManual()} ? ' itemizado-manual-row' : ' itemizado-draggable-row'" th:attr="draggable=${!item.esManual()}" th:data-level="${nodo.nivel + 1}" th:data-item-id="${item.idVista()}" th:data-current-rubro-id="${nodo.rubro.id}">
+                        <td><span class="itemizado-drag-handle" th:if="${!item.esManual()}" title="Mover item"><i class="bi bi-grip-vertical"></i></span><span th:text="${item.codigoItemizado}"></span></td>
+                        <td><span th:text="${item.item() ?: '-'}"></span><span class="manual-chip" th:if="${item.esManual()}">Manual</span></td>
                         <td th:style="'padding-left:' + ${(nodo.nivel + 1) * 18 + 8} + 'px'">
-                            <span th:text="${item.manoObra.detalle}"></span>
-                            <small class="itemizado-materiales-vinculados" th:if="${!item.materiales.isEmpty()}" th:text="${'Materiales: ' + item.materialesDescripcion()}"></small>
+                            <span th:text="${item.detalle()}"></span>
+                            <small class="itemizado-materiales-vinculados" th:if="${item.tieneMateriales()}" th:text="${'Materiales: ' + item.materialesDescripcion()}"></small>
+                            <form class="itemizado-material-form" th:if="${item.esManual()}" method="post" th:action="@{/itemizado/manuales/{id}/materiales(id=${item.idVista()})}">
+                                <input name="detalle" required placeholder="Material asociado">
+                                <input name="unidad" placeholder="Und">
+                                <input type="number" step="0.01" name="cantidad" value="1" aria-label="Cantidad material">
+                                <input type="number" step="0.01" name="precioUnitario" value="0" aria-label="Precio material">
+                                <button type="submit" title="Agregar material"><i class="bi bi-plus-lg"></i></button>
+                            </form>
                         </td>
-                        <td><a th:href="@{/oc/{id}(id=${item.manoObra.ordenCompra.id})}" th:text="${item.manoObra.ordenCompra.numero}">OC</a></td>
-                        <td th:text="${item.manoObra.unidad}"></td>
-                        <td class="text-end" th:text="${item.manoObra.cantidad}"></td>
-                        <td class="text-end" th:text="${#numbers.formatDecimal(item.manoObra.precioUnitario, 1, 'POINT', 2, 'COMMA')}"></td>
-                        <td class="text-end" th:text="${#numbers.formatDecimal(item.manoObra.importe, 1, 'POINT', 2, 'COMMA')}"></td>
+                        <td><a th:if="${!item.esManual()}" th:href="@{/oc/{id}(id=${item.ocId()})}" th:text="${item.ocNumero()}">OC</a><span th:if="${item.esManual()}" class="manual-chip">Manual</span></td>
+                        <td th:text="${item.unidad()}"></td>
+                        <td class="text-end" th:text="${item.cantidad()}"></td>
+                        <td class="text-end" th:text="${#numbers.formatDecimal(item.precioUnitario(), 1, 'POINT', 2, 'COMMA')}"></td>
+                        <td class="text-end" th:text="${#numbers.formatDecimal(item.importeManoObra(), 1, 'POINT', 2, 'COMMA')}"></td>
                         <td class="text-end" th:text="${#numbers.formatDecimal(item.totalMateriales, 1, 'POINT', 2, 'COMMA')}"></td>
                         <td class="text-end total-cell" th:text="${#numbers.formatDecimal(item.totalGeneral, 1, 'POINT', 2, 'COMMA')}"></td>
+                        <td class="itemizado-actions-cell">
+                            <form th:if="${item.esManual()}" method="post" th:action="@{/itemizado/manuales/{id}/eliminar(id=${item.idVista()})}" onsubmit="return confirm('Eliminar este item manual y sus materiales asociados?');">
+                                <button class="table-icon-action btn btn-sm btn-outline-danger" type="submit" title="Eliminar item manual" aria-label="Eliminar item manual"><i class="bi bi-trash"></i></button>
+                            </form>
+                        </td>
                     </tr>
                 </th:block>
                 </tbody>
@@ -133,6 +172,7 @@
                     <td class="text-end" th:text="${#numbers.formatDecimal(itemizado.totalManoObra, 1, 'POINT', 2, 'COMMA')}"></td>
                     <td class="text-end" th:text="${#numbers.formatDecimal(itemizado.totalMateriales, 1, 'POINT', 2, 'COMMA')}"></td>
                     <td class="text-end" th:text="${#numbers.formatDecimal(itemizado.totalGeneral, 1, 'POINT', 2, 'COMMA')}"></td>
+                    <td></td>
                 </tr>
                 </tfoot>
             </table>
@@ -140,6 +180,7 @@
 
         <div class="itemizado-context-menu d-none" id="itemizado-rubro-menu" role="menu">
             <button type="button" data-action="rename"><i class="bi bi-pencil-square"></i> Cambiar nombre</button>
+            <button type="button" data-action="manual-item"><i class="bi bi-plus-square-dotted"></i> Agregar item sin OC</button>
             <button type="button" data-action="subrubro"><i class="bi bi-node-plus"></i> Crear subrubro</button>
             <button type="button" data-action="move-root"><i class="bi bi-arrow-bar-up"></i> Llevar a raiz</button>
             <button type="button" data-action="delete"><i class="bi bi-trash"></i> Eliminar vacio</button>
@@ -163,14 +204,53 @@
                 </div>
             </form>
         </div>
+
+        <div class="itemizado-editor-backdrop d-none" id="itemizado-manual-editor">
+            <form class="itemizado-editor-panel itemizado-manual-editor-panel">
+                <div>
+                    <div class="document-kicker" id="itemizado-manual-kicker">Item sin OC</div>
+                    <h2>Nuevo item manual</h2>
+                </div>
+                <input type="hidden" id="itemizado-manual-rubro-id">
+                <label class="form-label" for="itemizado-manual-rubro-select">Rubro</label>
+                <select class="form-select" id="itemizado-manual-rubro-select" required>
+                    <option value="">Seleccionar rubro</option>
+                    <option th:each="rubro : ${rubros}" th:value="${rubro.id}" th:text="${rubro.nombreCompleto}"></option>
+                </select>
+                <div class="itemizado-manual-editor-grid">
+                    <div>
+                        <label class="form-label" for="itemizado-manual-item">Item</label>
+                        <input class="form-control" id="itemizado-manual-item" placeholder="Manual">
+                    </div>
+                    <div>
+                        <label class="form-label" for="itemizado-manual-unidad">Und</label>
+                        <input class="form-control" id="itemizado-manual-unidad" placeholder="GL">
+                    </div>
+                    <div>
+                        <label class="form-label" for="itemizado-manual-cantidad">Cant.</label>
+                        <input class="form-control" id="itemizado-manual-cantidad" type="number" step="0.01" value="1">
+                    </div>
+                    <div>
+                        <label class="form-label" for="itemizado-manual-precio">Precio</label>
+                        <input class="form-control" id="itemizado-manual-precio" type="number" step="0.01" value="0">
+                    </div>
+                </div>
+                <label class="form-label" for="itemizado-manual-detalle">Detalle</label>
+                <textarea class="form-control" id="itemizado-manual-detalle" rows="3" required placeholder="Tarea fuera de orden de compra"></textarea>
+                <div class="itemizado-editor-actions">
+                    <button class="btn btn-outline-secondary" type="button" id="itemizado-manual-cancel">Cancelar</button>
+                    <button class="btn btn-primary" type="submit">Agregar item</button>
+                </div>
+            </form>
+        </div>
     </section>
 </main>
 <script>
 function toggleItemizadoRubro(button) {
     const row = button.closest('tr');
     const level = Number.parseInt(row.dataset.level, 10);
-    const collapse = button.textContent === '−';
-    button.textContent = collapse ? '+' : '−';
+    const collapse = button.textContent === '-';
+    button.textContent = collapse ? '+' : '-';
 
     let next = row.nextElementSibling;
     while (next) {
@@ -297,6 +377,17 @@ function guardarRubroArbol({ mode, rubroId, padreId, nombre }) {
     });
 }
 
+function guardarItemManualItemizado({ rubroId, item, detalle, unidad, cantidad, precioUnitario }) {
+    return itemizadoFormPost('/itemizado/manuales', {
+        rubroId,
+        item,
+        detalle,
+        unidad,
+        cantidad,
+        precioUnitario
+    });
+}
+
 function moverRubroArbol(rubroId, padreId) {
     return itemizadoFormPost(`/rubros/${rubroId}/mover/async`, { padreId });
 }
@@ -365,7 +456,7 @@ function moverFilaVisualmente(row, target) {
 
     const toggle = target.querySelector('.itemizado-toggle');
     if (toggle && toggle.textContent === '+') {
-        toggle.textContent = '−';
+        toggle.textContent = '-';
     }
     row.classList.remove('d-none');
     target.parentNode.insertBefore(row, target.nextElementSibling);
@@ -424,7 +515,7 @@ function abrirMenuRubro(row, event) {
     itemizadoContextRow = row;
     menu.classList.remove('d-none');
     const menuWidth = 210;
-    const menuHeight = 220;
+    const menuHeight = 260;
     const left = Math.min(event.clientX, window.innerWidth - menuWidth - 12);
     const top = Math.min(event.clientY, window.innerHeight - menuHeight - 12);
     menu.style.left = `${Math.max(12, left)}px`;
@@ -433,6 +524,10 @@ function abrirMenuRubro(row, event) {
 
 function cerrarEditorRubro() {
     document.querySelector('#itemizado-rubro-editor')?.classList.add('d-none');
+}
+
+function cerrarEditorManual() {
+    document.querySelector('#itemizado-manual-editor')?.classList.add('d-none');
 }
 
 function abrirEditorRubro(mode, row = null) {
@@ -454,6 +549,31 @@ function abrirEditorRubro(mode, row = null) {
         : (mode === 'subrubro' ? 'Nuevo subrubro' : 'Nuevo rubro raiz');
     editor.classList.remove('d-none');
     setTimeout(() => nameInput.focus(), 40);
+}
+
+function abrirEditorManual(row = null) {
+    const editor = document.querySelector('#itemizado-manual-editor');
+    if (!editor) return;
+    const rubroSelect = document.querySelector('#itemizado-manual-rubro-select');
+    const rubroInput = document.querySelector('#itemizado-manual-rubro-id');
+    const kicker = document.querySelector('#itemizado-manual-kicker');
+    const itemInput = document.querySelector('#itemizado-manual-item');
+    const detalleInput = document.querySelector('#itemizado-manual-detalle');
+    const unidadInput = document.querySelector('#itemizado-manual-unidad');
+    const cantidadInput = document.querySelector('#itemizado-manual-cantidad');
+    const precioInput = document.querySelector('#itemizado-manual-precio');
+    const rubroId = row?.dataset.rubroId || '';
+
+    rubroInput.value = rubroId;
+    rubroSelect.value = rubroId;
+    kicker.textContent = row?.dataset.rubroFullName || 'Item sin OC';
+    itemInput.value = '';
+    detalleInput.value = '';
+    unidadInput.value = 'GL';
+    cantidadInput.value = '1';
+    precioInput.value = '0';
+    editor.classList.remove('d-none');
+    setTimeout(() => (rubroId ? detalleInput : rubroSelect).focus(), 40);
 }
 
 async function guardarEditorRubro(event) {
@@ -481,6 +601,35 @@ async function guardarEditorRubro(event) {
     } catch (error) {
         setItemizadoStatus('No se pudo guardar el rubro.', 'is-error');
         mostrarAvisoItemizado('No se pudo guardar', 'Revisa el nombre e intenta nuevamente.', 'error');
+    }
+}
+
+async function guardarEditorManual(event) {
+    event.preventDefault();
+    const rubroSelect = document.querySelector('#itemizado-manual-rubro-select');
+    const rubroId = rubroSelect.value || document.querySelector('#itemizado-manual-rubro-id').value;
+    const item = document.querySelector('#itemizado-manual-item').value.trim();
+    const detalle = document.querySelector('#itemizado-manual-detalle').value.trim();
+    const unidad = document.querySelector('#itemizado-manual-unidad').value.trim();
+    const cantidad = document.querySelector('#itemizado-manual-cantidad').value || '1';
+    const precioUnitario = document.querySelector('#itemizado-manual-precio').value || '0';
+    if (!rubroId || !detalle) {
+        setItemizadoStatus('El rubro y el detalle son obligatorios.', 'is-error');
+        return;
+    }
+    setItemizadoStatus('Agregando item sin OC...', 'is-saving');
+    try {
+        const response = await guardarItemManualItemizado({ rubroId, item, detalle, unidad, cantidad, precioUnitario });
+        if (!response.ok) {
+            throw new Error('No se pudo crear el item manual.');
+        }
+        cerrarEditorManual();
+        await refrescarItemizado({ rubroId });
+        setItemizadoStatus('Item manual agregado.', 'is-saved');
+        mostrarAvisoItemizado('Item agregado', 'El item sin OC se sumo al itemizado.');
+    } catch (error) {
+        setItemizadoStatus('No se pudo agregar el item manual.', 'is-error');
+        mostrarAvisoItemizado('No se pudo agregar', 'Revisa los datos e intenta nuevamente.', 'error');
     }
 }
 
@@ -674,11 +823,19 @@ function inicializarItemizadoDrag() {
     document.querySelector('#itemizado-undo')?.addEventListener('click', deshacerMovimientoItemizado);
     document.querySelector('#itemizado-redo')?.addEventListener('click', rehacerMovimientoItemizado);
     document.querySelector('#itemizado-new-root')?.addEventListener('click', () => abrirEditorRubro('root'));
+    document.querySelector('#itemizado-new-manual')?.addEventListener('click', () => abrirEditorManual());
     document.querySelector('#itemizado-editor-cancel')?.addEventListener('click', cerrarEditorRubro);
     document.querySelector('#itemizado-rubro-editor form')?.addEventListener('submit', guardarEditorRubro);
     document.querySelector('#itemizado-rubro-editor')?.addEventListener('click', event => {
         if (event.target.id === 'itemizado-rubro-editor') {
             cerrarEditorRubro();
+        }
+    });
+    document.querySelector('#itemizado-manual-cancel')?.addEventListener('click', cerrarEditorManual);
+    document.querySelector('#itemizado-manual-editor form')?.addEventListener('submit', guardarEditorManual);
+    document.querySelector('#itemizado-manual-editor')?.addEventListener('click', event => {
+        if (event.target.id === 'itemizado-manual-editor') {
+            cerrarEditorManual();
         }
     });
     document.querySelector('#itemizado-rubro-menu')?.addEventListener('click', event => {
@@ -690,6 +847,8 @@ function inicializarItemizadoDrag() {
             eliminarRubroDesdeItemizado(itemizadoContextRow);
         } else if (action === 'move-root') {
             moverRubroARaiz(itemizadoContextRow);
+        } else if (action === 'manual-item') {
+            abrirEditorManual(itemizadoContextRow);
         } else {
             abrirEditorRubro(action === 'root' ? 'root' : action, itemizadoContextRow);
         }
@@ -821,6 +980,7 @@ document.addEventListener('keydown', event => {
     if (event.key === 'Escape') {
         cerrarMenuRubro();
         cerrarEditorRubro();
+        cerrarEditorManual();
     }
 });
 

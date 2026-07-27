@@ -11,7 +11,9 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,6 +21,11 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
 @Entity
+@Table(indexes = {
+        @Index(name = "idx_doc_obra_activo_vencimiento", columnList = "obra_id, activo, fecha_vencimiento, id"),
+        @Index(name = "idx_doc_proveedor_activo", columnList = "proveedor_id, activo"),
+        @Index(name = "idx_doc_trabajador_activo", columnList = "trabajador_id, activo")
+})
 @Getter
 @Setter
 public class DocumentoObra {

@@ -12,6 +12,8 @@ import com.obra.certificaciones.obra.entity.Obra;
 import com.obra.certificaciones.proveedor.service.ProveedorService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -32,6 +34,16 @@ public class DocumentacionService {
     @Transactional(readOnly = true)
     public List<DocumentoObra> listar(Obra obra) {
         return repository.findByObraIdAndActivoTrueOrderByFechaVencimientoAscIdDesc(obra.getId());
+    }
+
+    @Transactional(readOnly = true)
+    public Page<DocumentoObra> listar(Obra obra, Pageable pageable) {
+        return repository.findByObraIdAndActivoTrueOrderByFechaVencimientoAscIdDesc(obra.getId(), pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public DocumentacionResumen resumen(Obra obra) {
+        return resumen(listar(obra));
     }
 
     @Transactional(readOnly = true)

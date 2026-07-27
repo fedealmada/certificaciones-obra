@@ -4,7 +4,8 @@
     [string]$BaseDatos = "certificaciones_obra",
     [string]$Usuario = "root",
     [string]$Password = "",
-    [string]$BackupPath = "backups\certificaciones_obra.sql"
+    [string]$BackupPath = "backups\certificaciones_obra.sql",
+    [switch]$NoPush
 )
 
 $ErrorActionPreference = "Stop"
@@ -56,5 +57,13 @@ if ($LASTEXITCODE -ne 0) {
     throw "Fallo el commit. Codigo: $LASTEXITCODE"
 }
 
-Write-Host "Listo. Commit local creado: $commitMessage" -ForegroundColor Green
-Write-Host "Para subirlo a GitHub, ejecuta manualmente: git push origin main" -ForegroundColor Yellow
+$branch = git branch --show-current
+if (-not $NoPush) {
+    Write-Host "Subiendo a GitHub..." -ForegroundColor Cyan
+    git push origin $branch
+    if ($LASTEXITCODE -ne 0) {
+        throw "Fallo el push a GitHub. Codigo: $LASTEXITCODE"
+    }
+}
+
+Write-Host "Listo. Backup, commit y push completados: $commitMessage" -ForegroundColor Green

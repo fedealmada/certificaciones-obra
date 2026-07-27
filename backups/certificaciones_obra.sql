@@ -249,9 +249,9 @@ CREATE TABLE `documento_obra` (
   `proveedor_id` bigint(20) DEFAULT NULL,
   `trabajador_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `FKfnwump2hatdkei0a5o0ti7q7o` (`obra_id`),
-  KEY `FKhu4os8n1w365l3feclnvpyfls` (`proveedor_id`),
-  KEY `FKlmaeb03wgfn05md79824v09l5` (`trabajador_id`),
+  KEY `idx_doc_obra_activo_vencimiento` (`obra_id`,`activo`,`fecha_vencimiento`,`id`),
+  KEY `idx_doc_proveedor_activo` (`proveedor_id`,`activo`),
+  KEY `idx_doc_trabajador_activo` (`trabajador_id`,`activo`),
   CONSTRAINT `FKfnwump2hatdkei0a5o0ti7q7o` FOREIGN KEY (`obra_id`) REFERENCES `obra` (`id`),
   CONSTRAINT `FKhu4os8n1w365l3feclnvpyfls` FOREIGN KEY (`proveedor_id`) REFERENCES `proveedor` (`id`),
   CONSTRAINT `FKlmaeb03wgfn05md79824v09l5` FOREIGN KEY (`trabajador_id`) REFERENCES `deposito_trabajador` (`id`)
@@ -320,7 +320,7 @@ CREATE TABLE `item_nota_pedido` (
   PRIMARY KEY (`id`),
   KEY `FKjg4pv7dn2hm4tjju1551pc0yu` (`nota_pedido_id`),
   CONSTRAINT `FKjg4pv7dn2hm4tjju1551pc0yu` FOREIGN KEY (`nota_pedido_id`) REFERENCES `nota_pedido` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -329,7 +329,7 @@ CREATE TABLE `item_nota_pedido` (
 
 LOCK TABLES `item_nota_pedido` WRITE;
 /*!40000 ALTER TABLE `item_nota_pedido` DISABLE KEYS */;
-INSERT INTO `item_nota_pedido` VALUES (1,'',58.63,'Construcción de Contrapiso en pasillo Palier-Escalera - Módulo de Escaleras','',1172600.00,'1','',20000.00,'m2',1),(2,'',831.66,'Colocación de Carpeta RDC-300 en pisos: P6, P7 y P8.  (Ajustado 21m2)','',5821620.00,'2','',7000.00,'m2',1),(3,'',28.00,'Amure de caños de electricidad sobre losa de piso en: P2, P3, P4, P5. P6, P7 y P8. Incluye la subida del material, hiladas de ladrillos comunes en fosa de ascensores y plenos.','',2800000.00,'3','',100000.00,'un',1),(4,'',80.00,'Tapar pases de losas, existentes y no utilizado y caños 110, en cocinas y habitaciones, dptos C y D, para en nicho de lavarropas en pisos: P8, P7, P6 y P5.','',2400000.00,'4','',30000.00,'un',1),(5,'',8.00,'Tapado de cañeria de electricidad en paredes, ancho max. de 5cm por caño. En los Pisos: P4, P5.','',1600000.00,'5','',200000.00,'Dpto',1),(6,'',28.00,'Revoque con 3en1, Mapei de paredes, Impermeabilización de piso y tapar cañerias de plomeria, de los Nicho del Termotanque.','',7000000.00,'6','',250000.00,'un',1),(7,'',1.00,'Demolición de paredes en el Módulo de Bauleras (N-15). Incluye bajada de escomberos.','',900000.00,'7','',900000.00,'',1),(8,'',62.03,'Construcción de paredes en Módulo de Baulera: Lavanderia, Sala de bombas y la divisoria con la azotea. Incluye la subida de los ladrillos','',2046990.00,'8','',33000.00,'',1),(9,'',13.00,'Construcción e mochetas de puertas de entrada a los dptos y ascenasores en Palieres. ','',11700000.00,'9','',900000.00,'un',1),(10,'',15.00,'Rollo de Alambre Recocido','',0.00,'1','',0.00,'kg',2),(11,'',5.00,'Ficha eléctrica macho 10A 220V','',0.00,'2','',0.00,'un',2),(12,'',5.00,'Fichas eléctrica hembra 10A 220V','',0.00,'3','',0.00,'un',2),(13,'',1.00,'Film Stretch Transparente de 50 cm de 4,5 kg','',0.00,'4','',0.00,'rollo',2),(14,'',3.00,'Ladrillo #8','',0.00,'1','',0.00,'Pallet',3),(15,'',4.00,'Ladrillo #12','',0.00,'2','',0.00,'Pallet',3),(16,'',2.00,'Cemento','',0.00,'3','',0.00,'Pallet',3),(17,'',3.00,'Barra de hierro #8 x 12m','',0.00,'4','',0.00,'un',3),(18,'',3.00,'Barras de hierro #6 x 12m','',0.00,'5','',0.00,'un',3),(24,'',1.00,'SERVICIO TECNICO DE SEGURIDAD EN ALTURA/EXCAVACIÓN Y SOPORTE DE HyS EN OBRA TERRAZAS DE QUILMES','',1800000.00,'1','',1800000.00,'un',5),(25,'',170.00,'Revoque de moldura (detalle lineal-base de viga invertida. En los techos de balcones está en zona exterior del mismo) en la azotea (nivel 15)','',8670000.00,'1','',51000.00,'ml',6),(26,'',53.00,'Tapa y detalle: Revoque delineado de todas las vigas invertidas (techo-modulo bauleras) nivel 16','',3604000.00,'2','',68000.00,'ml',6),(27,'',201.00,'Revoque exterior proyectado (3 en 1) en pared del módulo de bauleras','',3417000.00,'3','',17000.00,'m2',6),(28,'',25.00,'Construcción de Carpeta con RDC-300, en los pisos: P5 y P6 y sus respectivos Palieres. Incluye las Fajas en departamentos y palieres.','',0.00,'','Fecha de reserva: 29/07/2026	 Horario: 07:30 AM	 Recorrido en PB: 15 mts	 Altura estimada: 21 mts	 Longitud máxima a la habitación más alejada: 15 mts	',0.00,'m3',7),(29,'',30.00,'Guantes de hilo moteado','',0.00,'1','',0.00,'un',8),(30,'',5.00,'Barbijo de tipo copa','',0.00,'2','',0.00,'un',8),(31,'',25.00,'Construcción de Carpeta con RDC-300,  en los pisos: P7 y P8 y sus respectivos Palieres. Incluye las Fajas en departamentos y palieres.','',0.00,'1','Fecha de reserva: 14/07/2026	 Horario: 07:30 AM	 Recorrido en PB: 15 mts	 Altura estimada: 21 mts	 Longitud máxima a la habitación más alejada: 15 mts	',0.00,'m3',9);
+INSERT INTO `item_nota_pedido` VALUES (1,'',58.63,'Construcción de Contrapiso en pasillo Palier-Escalera - Módulo de Escaleras','',1172600.00,'1','',20000.00,'m2',1),(2,'',831.66,'Colocación de Carpeta RDC-300 en pisos: P6, P7 y P8.  (Ajustado 21m2)','',5821620.00,'2','',7000.00,'m2',1),(3,'',28.00,'Amure de caños de electricidad sobre losa de piso en: P2, P3, P4, P5. P6, P7 y P8. Incluye la subida del material, hiladas de ladrillos comunes en fosa de ascensores y plenos.','',2800000.00,'3','',100000.00,'un',1),(4,'',80.00,'Tapar pases de losas, existentes y no utilizado y caños 110, en cocinas y habitaciones, dptos C y D, para en nicho de lavarropas en pisos: P8, P7, P6 y P5.','',2400000.00,'4','',30000.00,'un',1),(5,'',8.00,'Tapado de cañeria de electricidad en paredes, ancho max. de 5cm por caño. En los Pisos: P4, P5.','',1600000.00,'5','',200000.00,'Dpto',1),(6,'',28.00,'Revoque con 3en1, Mapei de paredes, Impermeabilización de piso y tapar cañerias de plomeria, de los Nicho del Termotanque.','',7000000.00,'6','',250000.00,'un',1),(7,'',1.00,'Demolición de paredes en el Módulo de Bauleras (N-15). Incluye bajada de escomberos.','',900000.00,'7','',900000.00,'',1),(8,'',62.03,'Construcción de paredes en Módulo de Baulera: Lavanderia, Sala de bombas y la divisoria con la azotea. Incluye la subida de los ladrillos','',2046990.00,'8','',33000.00,'',1),(9,'',13.00,'Construcción e mochetas de puertas de entrada a los dptos y ascenasores en Palieres. ','',11700000.00,'9','',900000.00,'un',1),(10,'',15.00,'Rollo de Alambre Recocido','',0.00,'1','',0.00,'kg',2),(11,'',5.00,'Ficha eléctrica macho 10A 220V','',0.00,'2','',0.00,'un',2),(12,'',5.00,'Fichas eléctrica hembra 10A 220V','',0.00,'3','',0.00,'un',2),(13,'',1.00,'Film Stretch Transparente de 50 cm de 4,5 kg','',0.00,'4','',0.00,'rollo',2),(14,'',3.00,'Ladrillo #8','',0.00,'1','',0.00,'Pallet',3),(15,'',4.00,'Ladrillo #12','',0.00,'2','',0.00,'Pallet',3),(16,'',2.00,'Cemento','',0.00,'3','',0.00,'Pallet',3),(17,'',3.00,'Barra de hierro #8 x 12m','',0.00,'4','',0.00,'un',3),(18,'',3.00,'Barras de hierro #6 x 12m','',0.00,'5','',0.00,'un',3),(24,'',1.00,'SERVICIO TECNICO DE SEGURIDAD EN ALTURA/EXCAVACIÓN Y SOPORTE DE HyS EN OBRA TERRAZAS DE QUILMES','',1800000.00,'1','',1800000.00,'un',5),(25,'',170.00,'Revoque de moldura (detalle lineal-base de viga invertida. En los techos de balcones está en zona exterior del mismo) en la azotea (nivel 15)','',8670000.00,'1','',51000.00,'ml',6),(26,'',53.00,'Tapa y detalle: Revoque delineado de todas las vigas invertidas (techo-modulo bauleras) nivel 16','',3604000.00,'2','',68000.00,'ml',6),(27,'',201.00,'Revoque exterior proyectado (3 en 1) en pared del módulo de bauleras','',3417000.00,'3','',17000.00,'m2',6),(28,'',25.00,'Construcción de Carpeta con RDC-300, en los pisos: P5 y P6 y sus respectivos Palieres. Incluye las Fajas en departamentos y palieres.','',0.00,'','Fecha de reserva: 29/07/2026	 Horario: 07:30 AM	 Recorrido en PB: 15 mts	 Altura estimada: 21 mts	 Longitud máxima a la habitación más alejada: 15 mts	',0.00,'m3',7),(29,'',30.00,'Guantes de hilo moteado','',0.00,'1','',0.00,'un',8),(30,'',5.00,'Barbijo de tipo copa','',0.00,'2','',0.00,'un',8),(31,'',25.00,'Construcción de Carpeta con RDC-300,  en los pisos: P7 y P8 y sus respectivos Palieres. Incluye las Fajas en departamentos y palieres.','',0.00,'1','Fecha de reserva: 14/07/2026	 Horario: 07:30 AM	 Recorrido en PB: 15 mts	 Altura estimada: 21 mts	 Longitud máxima a la habitación más alejada: 15 mts	',0.00,'m3',9),(32,'',80.00,'Perfil cantonera metálica galvanizada tipo Durlock, largo 2,60 m, ala perforada','',0.00,'1','',0.00,'un',10),(33,'',500.00,'Tarugo (taco) de expansión de nylon Ø6 × 30 mm','',0.00,'2','',0.00,'un',10),(34,'',500.00,'Tornillo zincado Ø5 × 50 mm, cabeza avellanada Phillips, compatible con tarugo Ø6','',0.00,'3','',0.00,'un',10),(35,'',2.00,'Disco Copa Muela Diamantada Turbo Rhein 7 - 178mm','',0.00,'1','',0.00,'un',11),(36,'',2.00,'Disco de limpieza Fibra Abrasiva 115x14x22,2 mm Color negro','',0.00,'2','',0.00,'un',11),(37,'',15.00,'Lámpara LED Focos 12W o 15W','',0.00,'1','',0.00,'un',12);
 /*!40000 ALTER TABLE `item_nota_pedido` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -362,6 +362,11 @@ CREATE TABLE `item_orden_compra` (
   KEY `FK7btyocgqsdk2mygngmjvfcjtc` (`item_mano_obra_vinculado_id`),
   KEY `FKxnf5yy585nb5nf4d0xcnl38g` (`material_catalogo_id`),
   KEY `FKmaxlqym62g6tqr83nypuoxofa` (`categoria_entidad_id`),
+  KEY `idx_item_oc_categoria` (`orden_compra_id`,`categoria`),
+  KEY `idx_item_categoria_entidad` (`categoria_entidad_id`),
+  KEY `idx_item_rubro_entidad` (`rubro_entidad_id`),
+  KEY `idx_item_material_catalogo` (`material_catalogo_id`),
+  KEY `idx_item_mo_vinculado` (`item_mano_obra_vinculado_id`),
   CONSTRAINT `FK7btyocgqsdk2mygngmjvfcjtc` FOREIGN KEY (`item_mano_obra_vinculado_id`) REFERENCES `item_orden_compra` (`id`),
   CONSTRAINT `FKc5asj1kltwnfxmn2s41tw3yq1` FOREIGN KEY (`rubro_entidad_id`) REFERENCES `rubro` (`id`),
   CONSTRAINT `FKd4b1br1r65wu48fs51mayg6p0` FOREIGN KEY (`orden_compra_id`) REFERENCES `orden_compra` (`id`),
@@ -408,6 +413,43 @@ LOCK TABLES `item_recepcion_material` WRITE;
 /*!40000 ALTER TABLE `item_recepcion_material` DISABLE KEYS */;
 INSERT INTO `item_recepcion_material` VALUES (1,1.00,256,1),(2,1.00,371,2),(3,1.00,251,3),(4,1.00,224,4),(5,1.00,202,5),(7,15.00,249,7),(8,10.00,250,8),(9,10.00,252,8),(10,10.00,253,8),(11,1.00,254,8),(17,5.00,215,9),(18,3.00,216,9),(19,2.00,217,9),(20,2.00,218,9),(21,1.00,217,10),(22,15.00,194,11),(23,1.00,129,6),(24,1.00,667,12),(25,8.00,668,13),(26,240.00,670,13),(27,3.00,671,13),(28,720.00,669,14),(29,7.00,26,15),(30,1.00,27,15),(31,80.00,675,16),(32,500.00,676,16),(33,500.00,677,16),(34,6.00,1,17),(35,5.00,51,18),(36,1000.00,52,18),(37,1.00,53,18),(38,41.00,188,19),(39,1.00,189,20),(40,300.00,190,20),(41,5.00,191,20),(42,300.00,192,20),(43,300.00,193,20),(44,1.00,246,21),(45,25.00,228,22),(46,10.00,229,22),(47,1.00,230,22),(48,1.00,231,22),(49,25.00,232,22),(50,6.00,247,23),(51,15.00,248,23),(52,1000.00,275,24),(53,2.00,276,24),(54,2000.00,277,24),(55,12.00,278,24),(56,5.00,279,24),(57,8.00,245,25),(58,432.00,239,26),(59,1000.00,244,26),(60,100.00,240,27),(61,7.00,241,27),(62,2.00,242,27),(63,2.00,243,27),(64,10.00,48,28),(65,1120.00,46,29),(66,8.00,34,30),(67,4.00,37,30),(68,432.00,35,31),(69,648.00,36,31),(70,25.00,31,32),(71,25.00,32,32),(72,1.00,33,32),(73,1.00,74,33),(74,57.00,128,34),(75,1.00,159,35),(76,1.00,160,35),(77,1.00,161,35),(78,2.00,162,35),(79,4.00,163,35),(80,5.00,164,35),(81,1.00,165,35),(82,10.00,166,36),(83,3.00,167,36),(84,5.00,168,37),(85,5.00,169,37),(86,5.00,170,37),(87,1.00,171,38),(88,5.00,172,38),(89,20.00,173,38),(90,3.00,174,38),(91,1.00,175,39),(92,1.00,176,39),(93,1.00,177,39),(94,5.00,178,40),(95,3.00,179,40),(96,2.00,180,40),(97,10.00,678,41),(98,110.00,679,41),(99,160.00,680,41),(100,1120.00,681,41),(101,1.00,682,41),(102,432.00,683,41),(107,240.00,211,42),(108,648.00,212,42),(109,288.00,213,42),(110,9.00,214,42),(111,3.00,214,43),(112,8.00,209,44),(113,77.00,205,45),(114,1080.00,206,45),(115,80.00,208,45),(116,1120.00,207,46),(117,4.00,187,47),(118,4.00,156,48),(119,160.00,157,48),(120,154.00,158,48),(121,5.00,120,49),(122,1.00,122,49),(123,1.00,123,49),(124,10.00,124,49),(125,15.00,125,49),(126,1120.00,121,50),(127,480.00,121,51),(128,1.00,67,52),(129,2.00,68,52),(130,648.00,75,53),(131,432.00,76,53),(132,480.00,77,54),(133,480.00,77,55),(135,1000.00,92,57),(136,432.00,93,57),(137,2.00,91,56),(138,8.00,94,56),(139,1120.00,25,58),(140,1120.00,25,59);
 /*!40000 ALTER TABLE `item_recepcion_material` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `itemizado_manual_item`
+--
+
+DROP TABLE IF EXISTS `itemizado_manual_item`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `itemizado_manual_item` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `activo` bit(1) NOT NULL,
+  `cantidad` decimal(38,2) DEFAULT NULL,
+  `detalle` varchar(2000) NOT NULL,
+  `importe` decimal(38,2) DEFAULT NULL,
+  `item` varchar(80) DEFAULT NULL,
+  `orden` int(11) DEFAULT NULL,
+  `precio_unitario` decimal(38,2) DEFAULT NULL,
+  `tipo` enum('MANO_OBRA','MATERIAL') NOT NULL,
+  `unidad` varchar(40) DEFAULT NULL,
+  `item_padre_id` bigint(20) DEFAULT NULL,
+  `rubro_id` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_itemizado_manual_rubro_tipo` (`rubro_id`,`tipo`),
+  KEY `idx_itemizado_manual_padre` (`item_padre_id`),
+  CONSTRAINT `FKcwh06mn3a3p29pwvf2eequ3c` FOREIGN KEY (`rubro_id`) REFERENCES `rubro` (`id`),
+  CONSTRAINT `FKknos9y0x4iacn7tthct26qvf2` FOREIGN KEY (`item_padre_id`) REFERENCES `itemizado_manual_item` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `itemizado_manual_item`
+--
+
+LOCK TABLES `itemizado_manual_item` WRITE;
+/*!40000 ALTER TABLE `itemizado_manual_item` DISABLE KEYS */;
+/*!40000 ALTER TABLE `itemizado_manual_item` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -508,7 +550,7 @@ CREATE TABLE `nota_pedido` (
   CONSTRAINT `FKb84kjacv0eiwdyqbq2yvaasv2` FOREIGN KEY (`obra_id`) REFERENCES `obra` (`id`),
   CONSTRAINT `FKc9rsg1insu1o6y62admdggjus` FOREIGN KEY (`proveedor_entidad_id`) REFERENCES `proveedor` (`id`),
   CONSTRAINT `FKgpw8reoupsyqpt6mt0jxoaw7c` FOREIGN KEY (`orden_compra_id`) REFERENCES `orden_compra` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -517,7 +559,7 @@ CREATE TABLE `nota_pedido` (
 
 LOCK TABLES `nota_pedido` WRITE;
 /*!40000 ALTER TABLE `nota_pedido` DISABLE KEYS */;
-INSERT INTO `nota_pedido` VALUES (1,'\0','ENVIADA','2026-07-23','213','','NORMAL','AGT','MANO_OBRA_CON_PRECIO','\0',1,NULL,2),(2,'\0','APROBADA','2026-07-22','212','','NORMAL','AGT','MATERIALES','',1,NULL,NULL),(3,'\0','ENVIADA','2026-07-22','211','','NORMAL','AGT','MATERIALES','\0',1,NULL,NULL),(5,'\0','CONVERTIDA_OC','2026-07-21','210','CORRESPONDE A ABONO POR 30 DIAS A CERTIFICARSE EN FORMA QUINCENAL. JORNADA DE 7:30 A 17:30 HS LUNES A VIERNES.	','NORMAL','AGT','MANO_OBRA_CON_PRECIO','\0',1,211,12),(6,'\0','ENVIADA','2026-07-17','209','','NORMAL','AGT','MANO_OBRA_CON_PRECIO','\0',1,NULL,6),(7,'\0','ENVIADA','2026-07-15','208','','NORMAL','AGT','MATERIALES','\0',1,NULL,4),(8,'\0','APROBADA','2026-07-17','207','','NORMAL','AGT','MATERIALES','',1,NULL,NULL),(9,'\0','APROBADA','2026-06-30','206','','NORMAL','AGT','MATERIALES','\0',1,NULL,4);
+INSERT INTO `nota_pedido` VALUES (1,'\0','ENVIADA','2026-07-23','213','','NORMAL','AGT','MANO_OBRA_CON_PRECIO','\0',1,NULL,2),(2,'\0','APROBADA','2026-07-22','212','','NORMAL','AGT','MATERIALES','',1,NULL,NULL),(3,'\0','ENVIADA','2026-07-22','211','','NORMAL','AGT','MATERIALES','\0',1,NULL,NULL),(5,'\0','CONVERTIDA_OC','2026-07-21','210','CORRESPONDE A ABONO POR 30 DIAS A CERTIFICARSE EN FORMA QUINCENAL. JORNADA DE 7:30 A 17:30 HS LUNES A VIERNES.	','NORMAL','AGT','MANO_OBRA_CON_PRECIO','\0',1,211,12),(6,'\0','ENVIADA','2026-07-17','209','','NORMAL','AGT','MANO_OBRA_CON_PRECIO','\0',1,NULL,6),(7,'\0','ENVIADA','2026-07-15','208','','NORMAL','AGT','MATERIALES','\0',1,NULL,4),(8,'\0','APROBADA','2026-07-17','207','','NORMAL','AGT','MATERIALES','',1,NULL,NULL),(9,'\0','APROBADA','2026-06-30','206','','NORMAL','AGT','MATERIALES','\0',1,NULL,4),(10,'\0','ENVIADA','2026-06-29','205','','NORMAL','AGT','MATERIALES','\0',1,NULL,NULL),(11,'\0','ENVIADA','2026-06-25','204','','NORMAL','AGT','MATERIALES','\0',1,NULL,NULL),(12,'\0','APROBADA','2026-06-24','203','','URGENTE','AGT','MATERIALES','',1,NULL,NULL);
 /*!40000 ALTER TABLE `nota_pedido` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -568,6 +610,10 @@ CREATE TABLE `orden_compra` (
   PRIMARY KEY (`id`),
   KEY `FK4dhyef6kiav1dkwjxe8mybfvc` (`proveedor_entidad_id`),
   KEY `FK1f0syscsa5oeg2wmpyxt8ycua` (`obra_id`),
+  KEY `idx_oc_obra_fecha_id` (`obra_id`,`fecha`,`id`),
+  KEY `idx_oc_obra_numero` (`obra_id`,`numero`),
+  KEY `idx_oc_proveedor_numero` (`proveedor_entidad_id`,`numero`),
+  KEY `idx_oc_modo_seguimiento` (`modo_seguimiento`),
   CONSTRAINT `FK1f0syscsa5oeg2wmpyxt8ycua` FOREIGN KEY (`obra_id`) REFERENCES `obra` (`id`),
   CONSTRAINT `FK4dhyef6kiav1dkwjxe8mybfvc` FOREIGN KEY (`proveedor_entidad_id`) REFERENCES `proveedor` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=221 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -771,4 +817,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-07-24 16:21:09
+-- Dump completed on 2026-07-27 17:15:09

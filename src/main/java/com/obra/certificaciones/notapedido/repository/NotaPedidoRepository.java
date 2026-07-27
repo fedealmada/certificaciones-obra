@@ -27,6 +27,7 @@ public interface NotaPedidoRepository extends JpaRepository<NotaPedido, Long> {
                    or lower(coalesce(proveedor.nombre, '')) like lower(concat('%', :termino, '%')))
               and (:tipo is null or nota.tipo = :tipo)
               and (:estado is null or nota.estado = :estado)
+            order by length(nota.numero) desc, nota.numero desc, nota.id desc
             """,
             countQuery = """
             select count(distinct nota.id) from NotaPedido nota

@@ -13,7 +13,6 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.ui.Model;
@@ -29,7 +28,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequiredArgsConstructor
 @RequestMapping("/notas-pedido")
 public class NotaPedidoController {
-    private static final int PAGE_SIZE = 100;
+    private static final int PAGE_SIZE = 25;
 
     private final NotaPedidoService notaPedidoService;
     private final ObraService obraService;
@@ -47,7 +46,7 @@ public class NotaPedidoController {
                 busqueda,
                 tipo,
                 estado,
-                PageRequest.of(Math.max(page, 0), PAGE_SIZE, Sort.by(Sort.Direction.DESC, "fecha", "id")));
+                PageRequest.of(Math.max(page, 0), PAGE_SIZE));
         model.addAttribute("notasPage", notasPage);
         model.addAttribute("notas", notasPage.getContent());
         model.addAttribute("busqueda", busqueda);

@@ -10,6 +10,7 @@ import com.obra.certificaciones.obra.service.ObraService;
 import com.obra.certificaciones.proveedor.service.ProveedorService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
@@ -29,11 +31,12 @@ public class DocumentacionController {
     private final ObraService obraService;
 
     @GetMapping
-    public String index(Model model, HttpSession session) {
+    public String index(@RequestParam(defaultValue = "0") int page, Model model, HttpSession session) {
         var obra = obraService.obraActiva(session);
-        var documentos = documentacionService.listar(obra);
-        model.addAttribute("documentos", documentos);
-        model.addAttribute("resumen", documentacionService.resumen(documentos));
+        var documentosPage = documentacionService.listar(obra, PageRequest.of(Math.max(page, 0), 25));
+        model.addAttribute("documentos", documentosPage.getContent());
+        model.addAttribute("documentosPage", documentosPage);
+        model.addAttribute("resumen", documentacionService.resumen(obra));
         return "documentacion/index";
     }
 

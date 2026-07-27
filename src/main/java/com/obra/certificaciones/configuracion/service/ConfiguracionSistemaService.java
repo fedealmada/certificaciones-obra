@@ -38,7 +38,8 @@ public class ConfiguracionSistemaService {
                 new ModuloSistema("modulo.materiales", "Entregas y viajes", "Entregas, viajes y seguimiento por unidades.", "/materiales", "bi-truck", "yellow"),
                 new ModuloSistema("modulo.deposito", "Deposito", "Stock de panol, movimientos y devoluciones.", "/deposito", "bi-boxes", "green"),
                 new ModuloSistema("modulo.catalogo", "Catalogo", "Catalogo maestro de materiales.", "/catalogo-materiales", "bi-archive", "blue"),
-                new ModuloSistema("modulo.reportes", "Reportes", "Gastos, evolucion mensual y analisis.", "/reportes", "bi-graph-up-arrow", "green")
+                new ModuloSistema("modulo.reportes", "Reportes", "Gastos, evolucion mensual y analisis.", "/reportes", "bi-graph-up-arrow", "green"),
+                new ModuloSistema("modulo.sincronizacion", "Sincronizacion", "Backup de base, commit y subida a GitHub.", "/sincronizacion", "bi-cloud-arrow-up", "blue")
         );
     }
 

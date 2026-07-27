@@ -87,13 +87,13 @@ public class ItemizadoExportService {
             for (ItemizadoItemFila item : nodo.getItems()) {
                 html.append("<tr>")
                         .append(celda(item.codigoItemizado()))
-                        .append(celda(item.manoObra().getItem()))
-                        .append(celda(conIndentacion(nodo.getNivel() + 1, item.manoObra().getDetalle())))
-                        .append(celda(item.manoObra().getOrdenCompra().getNumero()))
-                        .append(celda(item.manoObra().getUnidad()))
-                        .append(celdaNumero(item.manoObra().getCantidad()))
-                        .append(celdaNumero(item.manoObra().getPrecioUnitario()))
-                        .append(celdaNumero(item.manoObra().getImporte()))
+                        .append(celda(item.item()))
+                        .append(celda(conIndentacion(nodo.getNivel() + 1, item.detalle())))
+                        .append(celda(item.ocNumero()))
+                        .append(celda(item.unidad()))
+                        .append(celdaNumero(item.cantidad()))
+                        .append(celdaNumero(item.precioUnitario()))
+                        .append(celdaNumero(item.importeManoObra()))
                         .append(celdaNumero(item.totalMateriales()))
                         .append(celdaNumero(item.totalGeneral()))
                         .append("</tr>");
@@ -138,13 +138,13 @@ public class ItemizadoExportService {
                 for (ItemizadoItemFila item : nodo.getItems()) {
                     agregarFilaPdf(tabla, Color.WHITE, Color.BLACK, false, List.of(
                             texto(item.codigoItemizado()),
-                            texto(item.manoObra().getItem()),
-                            conIndentacion(nodo.getNivel() + 1, item.manoObra().getDetalle()),
-                            texto(item.manoObra().getOrdenCompra().getNumero()),
-                            texto(item.manoObra().getUnidad()),
-                            formato(item.manoObra().getCantidad()),
-                            formato(item.manoObra().getPrecioUnitario()),
-                            formato(item.manoObra().getImporte()),
+                            texto(item.item()),
+                            conIndentacion(nodo.getNivel() + 1, item.detalle()),
+                            texto(item.ocNumero()),
+                            texto(item.unidad()),
+                            formato(item.cantidad()),
+                            formato(item.precioUnitario()),
+                            formato(item.importeManoObra()),
                             formato(item.totalMateriales()),
                             formato(item.totalGeneral())
                     ));
@@ -335,8 +335,8 @@ public class ItemizadoExportService {
                 .append("</tr>");
 
         for (ItemizadoItemFila item : nodo.getItems()) {
-            BigDecimal avanceItem = avancesPorItem.getOrDefault(item.manoObra().getId(), BigDecimal.ZERO);
-            BigDecimal importeManoObra = item.manoObra().getImporte() == null ? BigDecimal.ZERO : item.manoObra().getImporte();
+            BigDecimal avanceItem = item.esManual() ? BigDecimal.ZERO : avancesPorItem.getOrDefault(item.manoObra().getId(), BigDecimal.ZERO);
+            BigDecimal importeManoObra = item.importeManoObra() == null ? BigDecimal.ZERO : item.importeManoObra();
             int itemRow = ++fila[0];
             filasDirectas.add(itemRow);
             int primerMaterialRow = itemRow + 1;
@@ -346,12 +346,12 @@ public class ItemizadoExportService {
                     .append(celda("Item"))
                     .append(celda(item.codigoItemizado()))
                     .append(celda(nodo.getRubro().getNombre()))
-                    .append(celda(item.manoObra().getItem()))
-                    .append(celda(item.manoObra().getOrdenCompra().getNumero()))
-                    .append(celda(item.manoObra().getOrdenCompra().getProveedorEntidad() == null ? "" : item.manoObra().getOrdenCompra().getProveedorEntidad().getNombre()))
-                    .append(celda(conIndentacion(nodo.getNivel() + 1, item.manoObra().getDetalle())))
-                    .append(celda(item.manoObra().getUnidad()))
-                    .append(celdaNumeroPlano(item.manoObra().getCantidad()))
+                    .append(celda(item.item()))
+                    .append(celda(item.ocNumero()))
+                    .append(celda(item.esManual() ? "Manual" : (item.manoObra().getOrdenCompra().getProveedorEntidad() == null ? "" : item.manoObra().getOrdenCompra().getProveedorEntidad().getNombre())))
+                    .append(celda(conIndentacion(nodo.getNivel() + 1, item.detalle())))
+                    .append(celda(item.unidad()))
+                    .append(celdaNumeroPlano(item.cantidad()))
                     .append(celdaNumeroPlano(importeManoObra))
                     .append(celdaFormula(tokenItemL, "num"))
                     .append(celdaFormula("K" + itemRow + "+L" + itemRow, "num"))

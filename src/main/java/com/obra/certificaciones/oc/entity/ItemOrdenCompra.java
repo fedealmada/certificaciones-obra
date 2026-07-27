@@ -11,8 +11,10 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Transient;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,6 +22,13 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 @Entity
+@Table(indexes = {
+        @Index(name = "idx_item_oc_categoria", columnList = "orden_compra_id, categoria"),
+        @Index(name = "idx_item_categoria_entidad", columnList = "categoria_entidad_id"),
+        @Index(name = "idx_item_rubro_entidad", columnList = "rubro_entidad_id"),
+        @Index(name = "idx_item_material_catalogo", columnList = "material_catalogo_id"),
+        @Index(name = "idx_item_mo_vinculado", columnList = "item_mano_obra_vinculado_id")
+})
 @Getter
 @Setter
 public class ItemOrdenCompra {

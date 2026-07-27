@@ -137,7 +137,7 @@
         </div>
         <nav class="pagination-strip note-pagination-strip">
             <a class="btn btn-sm btn-outline-secondary" th:classappend="${notasPage.first ? ' disabled' : ''}" th:href="@{/notas-pedido(page=${notasPage.number - 1}, busqueda=${busqueda}, tipo=${tipoSeleccionado}, estado=${estadoSeleccionado})}"><i class="bi bi-chevron-left"></i> Anterior</a>
-            <span th:text="${'Pagina ' + (notasPage.totalPages == 0 ? 0 : notasPage.number + 1) + ' de ' + notasPage.totalPages + ' - mostrando ' + notas.size() + ' de ' + notasPage.totalElements + ' - 100 por pagina'}">Pagina</span>
+            <span th:text="${'Pagina ' + (notasPage.totalPages == 0 ? 0 : notasPage.number + 1) + ' de ' + notasPage.totalPages + ' - mostrando ' + notas.size() + ' de ' + notasPage.totalElements + ' - 25 por pagina'}">Pagina</span>
             <a class="btn btn-sm btn-outline-secondary" th:classappend="${notasPage.last ? ' disabled' : ''}" th:href="@{/notas-pedido(page=${notasPage.number + 1}, busqueda=${busqueda}, tipo=${tipoSeleccionado}, estado=${estadoSeleccionado})}">Siguiente <i class="bi bi-chevron-right"></i></a>
         </nav>
     </section>
