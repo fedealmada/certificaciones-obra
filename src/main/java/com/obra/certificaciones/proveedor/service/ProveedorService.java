@@ -47,6 +47,14 @@ public class ProveedorService {
     }
 
     @Transactional
+    public Proveedor renombrar(Long id, String nombre) {
+        Proveedor proveedor = obtener(id);
+        proveedor.setNombre(nombre);
+        validar(proveedor);
+        return proveedorRepository.save(proveedor);
+    }
+
+    @Transactional
     public void eliminar(Long id) {
         Proveedor proveedor = obtener(id);
         if (!ordenesProveedor(id).isEmpty()) {

@@ -1,0 +1,22 @@
+package com.obra.certificaciones.documentacion.dto;
+
+import com.obra.certificaciones.documentacion.entity.DocumentoObra;
+import com.obra.certificaciones.documentacion.entity.EstadoDocumentoObra;
+
+import java.util.List;
+
+public record GrupoDocumentacionContratista(
+        Long proveedorId,
+        String nombre,
+        EstadoDocumentoObra estado,
+        long total,
+        long aptos,
+        long porVencer,
+        long vencidos,
+        long pendientes,
+        String tipoCss,
+        String tipoDescripcion,
+        boolean general,
+        List<DocumentoObra> documentos
+) {
+}

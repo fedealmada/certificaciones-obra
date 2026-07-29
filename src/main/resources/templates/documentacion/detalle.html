@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Detalle documento</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script>(()=>{const s=localStorage.getItem('obraControl.theme');const d=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.dataset.theme=s||(d?'dark':'light');})();</script>
+    <link th:href="@{/css/app.css}" rel="stylesheet">
+</head>
+<body>
+<div th:replace="~{fragments/layout :: navbar}"></div>
+<main class="container">
+    <div class="page-navigation mb-3">
+        <a th:href="@{/}"><i class="bi bi-house"></i> Inicio</a><i class="bi bi-chevron-right"></i>
+        <a th:href="@{/documentacion}">Documentacion</a><i class="bi bi-chevron-right"></i>
+        <span th:text="${documento.nombreDocumento()}">Documento</span>
+    </div>
+
+    <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
+    <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+
+    <section class="document-detail-hero mb-3">
+        <div class="document-detail-icon"><i class="bi bi-file-earmark-check"></i></div>
+        <div>
+            <div class="document-kicker" th:text="${documento.vinculo.descripcion}">Vinculo</div>
+            <h1 th:text="${documento.nombreDocumento()}">Documento</h1>
+            <div class="text-muted" th:text="${documento.sujetoNombre()}">Sujeto</div>
+        </div>
+        <span class="doc-status-pill" th:classappend="${' ' + documento.estado().cssClass}" th:text="${documento.estado().descripcion}">Apto</span>
+    </section>
+
+    <section class="document-physical-alert mb-3" th:classappend="${documento.faltaCopiaImpresa() ? ' is-missing' : ' is-ok'}">
+        <i th:class="${documento.faltaCopiaImpresa() ? 'bi bi-folder-x' : 'bi bi-folder-check'}"></i>
+        <div>
+            <strong th:text="${documento.faltaCopiaImpresa() ? 'Falta copia impresa en el legajo' : 'Copia impresa controlada'}">Legajo</strong>
+            <small th:text="${documento.ubicacionFisica == null ? 'Usa este control para saber si el papel esta en la carpeta fisica.' : documento.ubicacionFisica}">Ubicacion</small>
+        </div>
+    </section>
+
+    <section class="document-detail-grid mb-3">
+        <article>
+            <span>Contratista</span>
+            <strong th:text="${documento.proveedor == null ? '-' : documento.proveedor.nombre}">Proveedor</strong>
+        </article>
+        <article>
+            <span>Corresponde a</span>
+            <strong th:text="${documento.sujeto.descripcion}">Sujeto</strong>
+        </article>
+        <article>
+            <span>Fecha presentacion</span>
+            <strong th:text="${documento.fechaPresentacion == null ? '-' : #temporals.format(documento.fechaPresentacion, 'dd/MM/yyyy')}">-</strong>
+        </article>
+        <article>
+            <span>Vencimiento</span>
+            <strong th:text="${documento.fechaVencimiento == null ? '-' : #temporals.format(documento.fechaVencimiento, 'dd/MM/yyyy')}">-</strong>
+            <small th:if="${documento.fechaVencimiento != null}" th:text="${documento.diasAlVencimiento()} + ' dias'">0 dias</small>
+        </article>
+        <article>
+            <span>Control mensual</span>
+            <strong th:text="${documento.mensual ? 'Si' : 'No'}">No</strong>
+        </article>
+        <article>
+            <span>Ingreso a obra</span>
+            <strong th:text="${documento.obligatorioIngreso ? 'Condiciona ingreso' : 'No condiciona'}">Condiciona</strong>
+        </article>
+        <article>
+            <span>PDF digital</span>
+            <strong th:text="${documento.tienePdf() ? 'Adjuntado' : 'Sin PDF'}">Sin PDF</strong>
+        </article>
+        <article>
+            <span>Legajo fisico</span>
+            <strong th:text="${documento.impresoLegajo ? 'Impreso al dia' : 'Falta copia impresa'}">Falta copia</strong>
+            <small th:if="${documento.ubicacionFisica != null}" th:text="${documento.ubicacionFisica}">Ubicacion</small>
+        </article>
+        <article>
+            <span>Creado</span>
+            <strong th:text="${documento.fechaCreacion == null ? '-' : #temporals.format(documento.fechaCreacion, 'dd/MM/yyyy HH:mm')}">-</strong>
+        </article>
+        <article>
+            <span>Ultima actualizacion</span>
+            <strong th:text="${documento.fechaUltimaActualizacion == null ? '-' : #temporals.format(documento.fechaUltimaActualizacion, 'dd/MM/yyyy HH:mm')}">-</strong>
+        </article>
+    </section>
+
+    <section class="panel-section mb-3" th:if="${documento.referenciaArchivo != null || documento.ubicacionFisica != null || documento.observacion != null || documento.vehiculoDetalle != null}">
+        <div class="section-title-row">
+            <h2 class="h5 mb-0"><i class="bi bi-card-text"></i> Resumen</h2>
+        </div>
+        <div class="document-detail-notes">
+            <p th:if="${documento.referenciaArchivo != null}"><strong>Archivo:</strong> <span th:text="${documento.referenciaArchivo}">archivo</span></p>
+            <p th:if="${documento.ubicacionFisica != null}"><strong>Ubicacion fisica:</strong> <span th:text="${documento.ubicacionFisica}">ubicacion</span></p>
+            <p th:if="${documento.vehiculoDetalle != null}"><strong>Vehiculo / maquinaria:</strong> <span th:text="${documento.vehiculoDetalle}">detalle</span></p>
+            <p th:if="${documento.observacion != null}"><strong>Observacion:</strong> <span th:text="${documento.observacion}">obs</span></p>
+        </div>
+    </section>
+
+    <section class="document-attachment-panel mb-3">
+        <div class="document-attachment-card">
+            <span class="document-attachment-icon"><i class="bi bi-filetype-pdf"></i></span>
+            <div>
+                <strong>Adjunto PDF</strong>
+                <small th:text="${documento.referenciaArchivo == null ? 'Todavia no hay PDF adjunto.' : documento.referenciaArchivo}">Archivo</small>
+            </div>
+            <div class="document-attachment-actions">
+                <a class="btn btn-outline-primary" th:if="${documento.referenciaArchivo != null}" th:href="@{/documentacion/{id}/archivo(id=${documento.id})}" target="_blank"><i class="bi bi-eye"></i> Abrir PDF</a>
+                <form method="post" th:action="@{/documentacion/{id}/archivo(id=${documento.id})}" enctype="multipart/form-data">
+                    <input class="form-control" type="file" name="archivo" accept="application/pdf,.pdf" required>
+                    <button class="btn btn-primary" type="submit"><i class="bi bi-paperclip"></i> Adjuntar</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <div class="d-flex flex-wrap gap-2">
+        <a class="btn btn-outline-secondary" th:href="@{/documentacion}"><i class="bi bi-arrow-left"></i> Volver</a>
+        <a class="btn btn-primary" th:href="@{/documentacion/{id}/editar(id=${documento.id})}"><i class="bi bi-pencil-square"></i> Editar</a>
+        <a class="btn btn-outline-primary" th:href="@{/documentacion/{id}/duplicar(id=${documento.id})}"><i class="bi bi-copy"></i> Cargar similar</a>
+        <form method="post" th:action="@{/documentacion/{id}/eliminar(id=${documento.id})}" onsubmit="return confirm('Marcar este documento como inactivo?');">
+            <button class="btn btn-outline-danger" type="submit"><i class="bi bi-trash"></i> Eliminar</button>
+        </form>
+    </div>
+</main>
+</body>
+</html>

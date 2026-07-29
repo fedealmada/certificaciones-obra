@@ -51,6 +51,38 @@ INSERT INTO `asistencia_personal` VALUES (2,'Simende','2026-07-14','07:30:00.000
 UNLOCK TABLES;
 
 --
+-- Table structure for table `carpeta_documentacion`
+--
+
+DROP TABLE IF EXISTS `carpeta_documentacion`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `carpeta_documentacion` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `activo` bit(1) NOT NULL,
+  `general` bit(1) NOT NULL,
+  `nombre` varchar(255) DEFAULT NULL,
+  `obra_id` bigint(20) DEFAULT NULL,
+  `proveedor_id` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_carpeta_doc_obra_activo` (`obra_id`,`activo`),
+  KEY `idx_carpeta_doc_proveedor` (`proveedor_id`),
+  CONSTRAINT `FK3d1lg2ykqcn6isqw2mv56s4n1` FOREIGN KEY (`obra_id`) REFERENCES `obra` (`id`),
+  CONSTRAINT `FK5wbfv2g57d8pucghhijf9m37j` FOREIGN KEY (`proveedor_id`) REFERENCES `proveedor` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `carpeta_documentacion`
+--
+
+LOCK TABLES `carpeta_documentacion` WRITE;
+/*!40000 ALTER TABLE `carpeta_documentacion` DISABLE KEYS */;
+INSERT INTO `carpeta_documentacion` VALUES (1,'','','Simende (Obra)',1,NULL),(2,'','\0','Enercon',1,72),(3,'','\0','Miguel Muriel',1,2),(4,'','\0','Gloria Cristina Coronel',1,6),(5,'','\0','El Artesano (Gomez Eliana)',1,19);
+/*!40000 ALTER TABLE `carpeta_documentacion` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `categoria_orden`
 --
 
@@ -125,7 +157,7 @@ CREATE TABLE `configuracion_sistema` (
 
 LOCK TABLES `configuracion_sistema` WRITE;
 /*!40000 ALTER TABLE `configuracion_sistema` DISABLE KEYS */;
-INSERT INTO `configuracion_sistema` VALUES ('alertas.dashboard','\0'),('alertas.oc','\0'),('modulo.catalogo',''),('modulo.categorias',''),('modulo.dashboard',''),('modulo.importarCertificados',''),('modulo.importarOc',''),('modulo.itemizado',''),('modulo.items',''),('modulo.materiales',''),('modulo.oc',''),('modulo.proveedores',''),('modulo.reportes',''),('modulo.rubros','');
+INSERT INTO `configuracion_sistema` VALUES ('alertas.dashboard','\0'),('alertas.oc','\0'),('modulo.asistencia','\0'),('modulo.catalogo','\0'),('modulo.categorias','\0'),('modulo.controlRubros',''),('modulo.dashboard',''),('modulo.deposito',''),('modulo.documentacion',''),('modulo.importarCertificados','\0'),('modulo.importarOc',''),('modulo.itemizado',''),('modulo.items',''),('modulo.materiales',''),('modulo.notasPedido',''),('modulo.oc',''),('modulo.proveedores',''),('modulo.reportes',''),('modulo.rubros',''),('modulo.sincronizacion',''),('modulo.tableroCertificados','');
 /*!40000 ALTER TABLE `configuracion_sistema` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -248,6 +280,10 @@ CREATE TABLE `documento_obra` (
   `obra_id` bigint(20) DEFAULT NULL,
   `proveedor_id` bigint(20) DEFAULT NULL,
   `trabajador_id` bigint(20) DEFAULT NULL,
+  `impreso_legajo` bit(1) NOT NULL,
+  `ubicacion_fisica` varchar(500) DEFAULT NULL,
+  `fecha_creacion` datetime(6) DEFAULT NULL,
+  `fecha_ultima_actualizacion` datetime(6) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `idx_doc_obra_activo_vencimiento` (`obra_id`,`activo`,`fecha_vencimiento`,`id`),
   KEY `idx_doc_proveedor_activo` (`proveedor_id`,`activo`),
@@ -255,7 +291,7 @@ CREATE TABLE `documento_obra` (
   CONSTRAINT `FKfnwump2hatdkei0a5o0ti7q7o` FOREIGN KEY (`obra_id`) REFERENCES `obra` (`id`),
   CONSTRAINT `FKhu4os8n1w365l3feclnvpyfls` FOREIGN KEY (`proveedor_id`) REFERENCES `proveedor` (`id`),
   CONSTRAINT `FKlmaeb03wgfn05md79824v09l5` FOREIGN KEY (`trabajador_id`) REFERENCES `deposito_trabajador` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -264,7 +300,7 @@ CREATE TABLE `documento_obra` (
 
 LOCK TABLES `documento_obra` WRITE;
 /*!40000 ALTER TABLE `documento_obra` DISABLE KEYS */;
-INSERT INTO `documento_obra` VALUES (1,'','2025-05-21','2025-05-22','2026-05-31','\0','Seguro de obra','',NULL,'',NULL,'OBRA','OTRO',NULL,NULL,'GENERAL',1,NULL,NULL),(2,'','2025-04-01','2025-03-21','2026-09-30','\0',NULL,'',NULL,'',NULL,'OBRA','AVISO_OBRA',NULL,NULL,'GENERAL',1,NULL,NULL),(3,'','2026-07-21','2026-07-21','2026-08-21','','Certificado de afiliación de ART','',NULL,'',NULL,'OBRA','ART',NULL,NULL,'GENERAL',1,NULL,NULL);
+INSERT INTO `documento_obra` VALUES (1,'','2025-05-21','2025-05-22','2026-05-31','\0','Seguro de obra','',NULL,'',NULL,'OBRA','OTRO',NULL,NULL,'GENERAL',1,NULL,NULL,'\0',NULL,NULL,NULL),(2,'','2025-04-01','2025-03-21','2026-09-30','\0',NULL,'',NULL,'',NULL,'OBRA','AVISO_OBRA',NULL,NULL,'GENERAL',1,NULL,NULL,'\0',NULL,NULL,NULL),(3,'','2026-07-21','2026-07-21','2026-08-21','','Certificado de afiliación de ART','',NULL,'',NULL,'OBRA','ART',NULL,NULL,'GENERAL',1,NULL,NULL,'\0',NULL,NULL,NULL),(4,'','2025-10-18','2026-01-20','2026-06-30','\0','El Artesano','',NULL,'',NULL,'CONTRATISTA','ACCIDENTES_PERSONALES',NULL,NULL,'MONOTRIBUTISTA',1,19,NULL,'\0',NULL,NULL,NULL),(5,'','2025-10-20','2025-10-20','2026-10-20','\0','El Artesano','',NULL,'',NULL,'CONTRATISTA','ATS',NULL,NULL,'MONOTRIBUTISTA',1,19,NULL,'\0',NULL,NULL,NULL),(6,'','2019-11-01','2019-11-01','2026-10-31','\0',NULL,'',NULL,'',NULL,'CONTRATISTA','ART',NULL,NULL,'RELACION_DEPENDENCIA',1,72,NULL,'\0',NULL,NULL,NULL),(7,'','2026-07-02','2026-07-07','2026-07-31','',NULL,'',NULL,'',NULL,'CONTRATISTA','SVO',NULL,NULL,'RELACION_DEPENDENCIA',1,72,NULL,'\0',NULL,NULL,NULL);
 /*!40000 ALTER TABLE `documento_obra` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -646,7 +682,7 @@ CREATE TABLE `proveedor` (
   `observacion` varchar(255) DEFAULT NULL,
   `telefono` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=72 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=73 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -655,7 +691,7 @@ CREATE TABLE `proveedor` (
 
 LOCK TABLES `proveedor` WRITE;
 /*!40000 ALTER TABLE `proveedor` DISABLE KEYS */;
-INSERT INTO `proveedor` VALUES (1,'',NULL,NULL,NULL,'Aljez',NULL,NULL),(2,'',NULL,NULL,NULL,'Miguel Muriel',NULL,NULL),(3,'',NULL,NULL,NULL,'Maria Cabrera',NULL,NULL),(4,'',NULL,NULL,NULL,'Dacomat',NULL,NULL),(5,'',NULL,NULL,NULL,'Fedan S.A.',NULL,NULL),(6,'',NULL,NULL,NULL,'Gloria Cristina Coronel',NULL,NULL),(7,'',NULL,NULL,NULL,'Franchi Ruben Eduardo',NULL,NULL),(8,'',NULL,NULL,NULL,'Tomografía de Hormigón Armado',NULL,NULL),(9,'',NULL,NULL,NULL,'Mairas y red construcciones S.R.L.',NULL,NULL),(10,'',NULL,NULL,NULL,'Bara Diseño S.A.',NULL,NULL),(11,'',NULL,NULL,NULL,'Alfredo Rondinoni',NULL,NULL),(12,'',NULL,NULL,NULL,'Daniela Paz',NULL,NULL),(13,'',NULL,NULL,NULL,'Di Toro Hnos S.A.',NULL,NULL),(14,'',NULL,NULL,NULL,'Mairas y Red Construcciones',NULL,NULL),(15,'',NULL,NULL,NULL,'Segunor',NULL,NULL),(16,'',NULL,NULL,NULL,'Anibal Benitez',NULL,NULL),(17,'',NULL,NULL,NULL,'Constructora Fagua S.A.',NULL,NULL),(18,'',NULL,NULL,NULL,'Osvaldo Marcelo Lagos',NULL,NULL),(19,'',NULL,NULL,NULL,'Gomez Eliana Teraza',NULL,NULL),(20,'',NULL,NULL,NULL,'Rondini Alfredo Filomeno',NULL,NULL),(21,'',NULL,NULL,NULL,'Annacondia Jose Maria',NULL,NULL),(22,'',NULL,NULL,NULL,'Indus Electric S.A.',NULL,NULL),(23,'',NULL,NULL,NULL,'Daniela Marisol Paz',NULL,NULL),(24,'',NULL,NULL,NULL,'Prokrete Argentina S.A.',NULL,NULL),(25,'',NULL,NULL,NULL,'El Galpón Sanitario',NULL,NULL),(26,'',NULL,NULL,NULL,'Chapaferro S.A.',NULL,NULL),(27,'',NULL,NULL,NULL,'Segunor S.R.L',NULL,NULL),(28,'',NULL,NULL,NULL,'Aljez Soluciones Proyectables S.A.',NULL,NULL),(29,'',NULL,NULL,NULL,'Maof S.R.L',NULL,NULL),(30,'',NULL,NULL,NULL,'Daniela Agustina Gomez',NULL,NULL),(31,'',NULL,NULL,NULL,'Cadiem S.R.L.',NULL,NULL),(32,'',NULL,NULL,NULL,'Bombas Ranelagh S.A.',NULL,NULL),(33,'',NULL,NULL,NULL,'Segunor S.A.',NULL,NULL),(34,'',NULL,NULL,NULL,'Sebastian Ignacio Perata',NULL,NULL),(35,'',NULL,NULL,NULL,'Carla Prost',NULL,NULL),(36,'',NULL,NULL,NULL,'Alberto Mario Somoza',NULL,NULL),(37,'',NULL,NULL,NULL,'Pol Hnos. S.A.',NULL,NULL),(38,'',NULL,NULL,NULL,'Instituto Tecnológico del Hormigón',NULL,NULL),(39,'',NULL,NULL,NULL,'Motorcisa',NULL,NULL),(40,'',NULL,NULL,NULL,'Mauricio Daniel Rodriguez',NULL,NULL),(41,'',NULL,NULL,NULL,'La Lucía Hnas. S.A',NULL,NULL),(42,'',NULL,NULL,NULL,'Gersur S.A.',NULL,NULL),(43,'',NULL,NULL,NULL,'Blanco Construcciones S.A.S',NULL,NULL),(44,'',NULL,NULL,NULL,'Alfredo Filomeno Rondinoni',NULL,NULL),(45,'',NULL,NULL,NULL,'Guillermo Juan Montanari',NULL,NULL),(46,'',NULL,NULL,NULL,'Alej Soluciones Proyectables S.A.',NULL,NULL),(48,'',NULL,NULL,NULL,'Electricidad Cabrera S.R.L.',NULL,NULL),(49,'',NULL,NULL,NULL,'Electro Calchaqui S.A.',NULL,NULL),(50,'',NULL,NULL,NULL,'Jose Maria Annacondia',NULL,NULL),(51,'',NULL,NULL,NULL,'Miguel Roberto Suarez',NULL,NULL),(52,'',NULL,NULL,NULL,'Pablo Alejandro Rizzo',NULL,NULL),(53,'',NULL,NULL,NULL,'Ruben Eduardo y Franchi',NULL,NULL),(54,'',NULL,NULL,NULL,'Geobauen S.R.L',NULL,NULL),(55,'',NULL,NULL,NULL,'Gabriel Carlos Woicik',NULL,NULL),(56,'',NULL,NULL,NULL,'Corralón Laprida S.R.L',NULL,NULL),(57,'',NULL,NULL,NULL,'Sider Group S.A.',NULL,NULL),(58,'',NULL,NULL,NULL,'Distribuidora Mei S.R.L',NULL,NULL),(59,'',NULL,NULL,NULL,'Alvarez Hector Adolfo',NULL,NULL),(60,'',NULL,NULL,NULL,'Federación Patronal Seguros S.A',NULL,NULL),(61,'',NULL,NULL,NULL,'Pilisar Sociedad Anonima',NULL,NULL),(62,'',NULL,NULL,NULL,'El Galón Sanitario',NULL,NULL),(63,'',NULL,NULL,NULL,'Cradem',NULL,NULL),(64,'',NULL,NULL,NULL,'Tripiciano Natalia Cecilia',NULL,NULL),(65,'',NULL,NULL,NULL,'Extintor Sur S.R.L',NULL,NULL),(66,'',NULL,NULL,NULL,'Hector Adolfo Alvarez',NULL,NULL),(67,'',NULL,NULL,NULL,'Jose Maria Mandile',NULL,NULL),(68,'',NULL,NULL,NULL,'Digital Lugano S.R.L.',NULL,NULL),(69,'',NULL,NULL,NULL,'Sanitarios Cacho S.A.C.I.F.I',NULL,NULL),(70,'',NULL,NULL,NULL,'CONSTRUCTORA FAGUA S.A. : PAGO ANTICIPADO',NULL,NULL),(71,'',NULL,NULL,NULL,'Luis Adrian Bezzana',NULL,NULL);
+INSERT INTO `proveedor` VALUES (1,'',NULL,NULL,NULL,'Aljez',NULL,NULL),(2,'',NULL,NULL,NULL,'Miguel Muriel',NULL,NULL),(3,'',NULL,NULL,NULL,'Maria Cabrera',NULL,NULL),(4,'',NULL,NULL,NULL,'Dacomat',NULL,NULL),(5,'',NULL,NULL,NULL,'Fedan S.A.',NULL,NULL),(6,'',NULL,NULL,NULL,'Gloria Cristina Coronel',NULL,NULL),(7,'',NULL,NULL,NULL,'Franchi Ruben Eduardo',NULL,NULL),(8,'',NULL,NULL,NULL,'Tomografía de Hormigón Armado',NULL,NULL),(9,'',NULL,NULL,NULL,'Mairas y red construcciones S.R.L.',NULL,NULL),(10,'',NULL,NULL,NULL,'Bara Diseño S.A.',NULL,NULL),(11,'',NULL,NULL,NULL,'Alfredo Rondinoni',NULL,NULL),(12,'',NULL,NULL,NULL,'Daniela Paz',NULL,NULL),(13,'',NULL,NULL,NULL,'Di Toro Hnos S.A.',NULL,NULL),(14,'',NULL,NULL,NULL,'Mairas y Red Construcciones',NULL,NULL),(15,'',NULL,NULL,NULL,'Segunor',NULL,NULL),(16,'',NULL,NULL,NULL,'Anibal Benitez',NULL,NULL),(17,'',NULL,NULL,NULL,'Constructora Fagua S.A.',NULL,NULL),(18,'',NULL,NULL,NULL,'Osvaldo Marcelo Lagos',NULL,NULL),(19,'',NULL,NULL,NULL,'Gomez Eliana Teraza',NULL,NULL),(20,'',NULL,NULL,NULL,'Rondini Alfredo Filomeno',NULL,NULL),(21,'',NULL,NULL,NULL,'Annacondia Jose Maria',NULL,NULL),(22,'',NULL,NULL,NULL,'Indus Electric S.A.',NULL,NULL),(23,'',NULL,NULL,NULL,'Daniela Marisol Paz',NULL,NULL),(24,'',NULL,NULL,NULL,'Prokrete Argentina S.A.',NULL,NULL),(25,'',NULL,NULL,NULL,'El Galpón Sanitario',NULL,NULL),(26,'',NULL,NULL,NULL,'Chapaferro S.A.',NULL,NULL),(27,'',NULL,NULL,NULL,'Segunor S.R.L',NULL,NULL),(28,'',NULL,NULL,NULL,'Aljez Soluciones Proyectables S.A.',NULL,NULL),(29,'',NULL,NULL,NULL,'Maof S.R.L',NULL,NULL),(30,'',NULL,NULL,NULL,'Daniela Agustina Gomez',NULL,NULL),(31,'',NULL,NULL,NULL,'Cadiem S.R.L.',NULL,NULL),(32,'',NULL,NULL,NULL,'Bombas Ranelagh S.A.',NULL,NULL),(33,'',NULL,NULL,NULL,'Segunor S.A.',NULL,NULL),(34,'',NULL,NULL,NULL,'Sebastian Ignacio Perata',NULL,NULL),(35,'',NULL,NULL,NULL,'Carla Prost',NULL,NULL),(36,'',NULL,NULL,NULL,'Alberto Mario Somoza',NULL,NULL),(37,'',NULL,NULL,NULL,'Pol Hnos. S.A.',NULL,NULL),(38,'',NULL,NULL,NULL,'Instituto Tecnológico del Hormigón',NULL,NULL),(39,'',NULL,NULL,NULL,'Motorcisa',NULL,NULL),(40,'',NULL,NULL,NULL,'Mauricio Daniel Rodriguez',NULL,NULL),(41,'',NULL,NULL,NULL,'La Lucía Hnas. S.A',NULL,NULL),(42,'',NULL,NULL,NULL,'Gersur S.A.',NULL,NULL),(43,'',NULL,NULL,NULL,'Blanco Construcciones S.A.S',NULL,NULL),(44,'',NULL,NULL,NULL,'Alfredo Filomeno Rondinoni',NULL,NULL),(45,'',NULL,NULL,NULL,'Guillermo Juan Montanari',NULL,NULL),(46,'',NULL,NULL,NULL,'Alej Soluciones Proyectables S.A.',NULL,NULL),(48,'',NULL,NULL,NULL,'Electricidad Cabrera S.R.L.',NULL,NULL),(49,'',NULL,NULL,NULL,'Electro Calchaqui S.A.',NULL,NULL),(50,'',NULL,NULL,NULL,'Jose Maria Annacondia',NULL,NULL),(51,'',NULL,NULL,NULL,'Miguel Roberto Suarez',NULL,NULL),(52,'',NULL,NULL,NULL,'Pablo Alejandro Rizzo',NULL,NULL),(53,'',NULL,NULL,NULL,'Ruben Eduardo y Franchi',NULL,NULL),(54,'',NULL,NULL,NULL,'Geobauen S.R.L',NULL,NULL),(55,'',NULL,NULL,NULL,'Gabriel Carlos Woicik',NULL,NULL),(56,'',NULL,NULL,NULL,'Corralón Laprida S.R.L',NULL,NULL),(57,'',NULL,NULL,NULL,'Sider Group S.A.',NULL,NULL),(58,'',NULL,NULL,NULL,'Distribuidora Mei S.R.L',NULL,NULL),(59,'',NULL,NULL,NULL,'Alvarez Hector Adolfo',NULL,NULL),(60,'',NULL,NULL,NULL,'Federación Patronal Seguros S.A',NULL,NULL),(61,'',NULL,NULL,NULL,'Pilisar Sociedad Anonima',NULL,NULL),(62,'',NULL,NULL,NULL,'El Galón Sanitario',NULL,NULL),(63,'',NULL,NULL,NULL,'Cradem',NULL,NULL),(64,'',NULL,NULL,NULL,'Tripiciano Natalia Cecilia',NULL,NULL),(65,'',NULL,NULL,NULL,'Extintor Sur S.R.L',NULL,NULL),(66,'',NULL,NULL,NULL,'Hector Adolfo Alvarez',NULL,NULL),(67,'',NULL,NULL,NULL,'Jose Maria Mandile',NULL,NULL),(68,'',NULL,NULL,NULL,'Digital Lugano S.R.L.',NULL,NULL),(69,'',NULL,NULL,NULL,'Sanitarios Cacho S.A.C.I.F.I',NULL,NULL),(70,'',NULL,NULL,NULL,'CONSTRUCTORA FAGUA S.A. : PAGO ANTICIPADO',NULL,NULL),(71,'',NULL,NULL,NULL,'Luis Adrian Bezzana',NULL,NULL),(72,'','','','','Enercon','','');
 /*!40000 ALTER TABLE `proveedor` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -817,4 +853,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-07-27 17:15:09
+-- Dump completed on 2026-07-29 17:13:03

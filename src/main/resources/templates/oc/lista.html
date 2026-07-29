@@ -106,6 +106,11 @@
                     th:data-items="${orden.items.size()}"
                     th:data-importe="${orden.total}"
                     th:data-avance="${avancesPorOrden.get(orden.id)}"
+                    th:data-tipo="${ordenesSoloRegistro.getOrDefault(orden.id, false) ? 'Solo registro' : (ordenesMateriales.getOrDefault(orden.id, false) ? 'Materiales / entregas' : 'Mano de obra / certificados')}"
+                    th:data-seguimiento="${ordenesSoloRegistro.getOrDefault(orden.id, false) ? 'Sin seguimiento' : (ordenesMateriales.getOrDefault(orden.id, false) ? (viajesPorOrden.getOrDefault(orden.id, 0) == 1 ? '1 viaje' : viajesPorOrden.getOrDefault(orden.id, 0) + ' viajes') : (certificadosPorOrden.getOrDefault(orden.id, 0) == 1 ? '1 certificado' : certificadosPorOrden.getOrDefault(orden.id, 0) + ' certificados'))}"
+                    th:data-estado="${ordenesSoloRegistro.getOrDefault(orden.id, false) ? 'SOLO REGISTRO' : (ordenesMateriales.getOrDefault(orden.id, false) ? (estadosEntregaPorOrden.get(orden.id).name() == 'COMPLETO' ? 'ENTREGA COMPLETA' : (estadosEntregaPorOrden.get(orden.id).name() == 'PARCIAL' ? 'ENTREGA PARCIAL' : 'ENTREGA PENDIENTE')) : (ordenesCerradas.getOrDefault(orden.id, false) ? 'CERRADA' : 'ABIERTA'))}"
+                    th:data-edit-url="@{/oc/{id}/editar(id=${orden.id})}"
+                    th:data-item-lines="${#strings.listJoin(orden.items.![item + '||' + detalle + '||' + unidad + '||' + cantidad + '||' + precioUnitario + '||' + importe], '~~')}"
                     th:data-certificados="${ordenesSoloRegistro.getOrDefault(orden.id, false) ? 0 : (ordenesMateriales.getOrDefault(orden.id, false) ? viajesPorOrden.getOrDefault(orden.id, 0) : certificadosPorOrden.getOrDefault(orden.id, 0))}">
                     <td><span class="item-code-pill" th:text="${orden.numero}"></span></td>
                     <td th:text="${#temporals.format(orden.fecha, 'dd/MM/yyyy')}"></td>
@@ -153,6 +158,42 @@
             <a class="btn btn-sm btn-outline-secondary" th:classappend="${ordenesPage.last ? ' disabled' : ''}" th:href="@{/oc(page=${ordenesPage.number + 1}, proveedor=${proveedor}, categoriaId=${categoriaSeleccionada}, rubro=${rubro})}">Siguiente <i class="bi bi-chevron-right"></i></a>
         </nav>
     </section>
+    <div class="document-quick-view d-none" id="oc-quick-view" aria-hidden="true">
+        <div class="document-quick-backdrop" data-quick-close></div>
+        <section class="document-quick-modal" role="dialog" aria-modal="true" aria-labelledby="oc-quick-title" tabindex="-1">
+            <button class="document-quick-close" type="button" data-quick-close aria-label="Cerrar resumen"><i class="bi bi-x-lg"></i></button>
+            <header class="document-quick-header">
+                <span class="document-quick-icon"><i class="bi bi-receipt"></i></span>
+                <div>
+                    <div class="document-kicker">Resumen de orden de compra</div>
+                    <h2 id="oc-quick-title">OC</h2>
+                    <p id="oc-quick-subtitle">Proveedor</p>
+                </div>
+                <span class="doc-status-pill is-info" id="oc-quick-status">Estado</span>
+            </header>
+            <div class="document-quick-grid">
+                <article><span>Fecha</span><strong data-quick-field="fecha">-</strong></article>
+                <article><span>Tipo</span><strong data-quick-field="tipo">-</strong></article>
+                <article><span>Items</span><strong data-quick-field="items">-</strong></article>
+                <article><span>Importe total</span><strong data-quick-field="importe">-</strong></article>
+                <article><span>Avance</span><strong data-quick-field="avance">-</strong></article>
+                <article><span>Seguimiento</span><strong data-quick-field="seguimiento">-</strong></article>
+                <article><span>Categorias</span><strong data-quick-field="categorias">-</strong></article>
+                <article><span>Rubros</span><strong data-quick-field="rubros">-</strong></article>
+            </div>
+            <section class="quick-items-panel">
+                <div class="quick-items-head">
+                    <h3><i class="bi bi-list-check"></i> Items de la orden</h3>
+                    <span id="oc-quick-items-count">0 items</span>
+                </div>
+                <div class="quick-items-list" id="oc-quick-items-list"></div>
+            </section>
+            <footer class="document-quick-actions">
+                <a class="btn btn-primary" id="oc-quick-full" href="#"><i class="bi bi-box-arrow-up-right"></i> Ver OC completa</a>
+                <a class="btn btn-outline-primary" id="oc-quick-edit" href="#"><i class="bi bi-pencil-square"></i> Editar</a>
+            </footer>
+        </section>
+    </div>
 </main>
 <script>
 const ocTable = document.querySelector('#oc-table');
@@ -163,6 +204,105 @@ const ocFilterIndicator = document.querySelector('#oc-filter-indicator');
 const ocStorageKey = 'obraControl.oc.filters';
 let currentSort = { key: 'fecha', direction: 'desc', type: 'date' };
 let ocSubmitTimer;
+const ocQuickView = document.getElementById('oc-quick-view');
+const ocQuickModal = ocQuickView?.querySelector('.document-quick-modal');
+const ocQuickFull = document.getElementById('oc-quick-full');
+const ocQuickEdit = document.getElementById('oc-quick-edit');
+const ocQuickItemsList = document.getElementById('oc-quick-items-list');
+const ocQuickItemsCount = document.getElementById('oc-quick-items-count');
+
+function setOcQuickField(name, value) {
+    const element = ocQuickView?.querySelector(`[data-quick-field="${name}"]`);
+    if (element) element.textContent = value || '-';
+}
+
+function formatOcMoney(value) {
+    const number = Number.parseFloat(String(value || '0').replace(',', '.'));
+    return Number.isFinite(number) ? number.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0,00';
+}
+
+function formatOcPercent(value) {
+    const number = Number.parseFloat(String(value || '0').replace(',', '.'));
+    return Number.isFinite(number) ? `${number.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%` : '-';
+}
+
+function renderQuickItems(container, countElement, rawItems) {
+    if (!container) return;
+    const rows = (rawItems || '').split('~~').filter(Boolean).map(line => {
+        const [codigo, detalle, unidad, cantidad, precio, importe] = line.split('||');
+        return { codigo, detalle, unidad, cantidad, precio, importe };
+    });
+    container.replaceChildren();
+    if (countElement) countElement.textContent = rows.length === 1 ? '1 item' : `${rows.length} items`;
+    if (rows.length === 0) {
+        const empty = document.createElement('div');
+        empty.className = 'quick-items-empty';
+        empty.textContent = 'No hay items cargados.';
+        container.appendChild(empty);
+        return;
+    }
+    rows.slice(0, 12).forEach(item => {
+        const row = document.createElement('article');
+        row.className = 'quick-item-row';
+        row.innerHTML = `
+            <span class="quick-item-code"></span>
+            <div class="quick-item-main">
+                <strong></strong>
+                <small></small>
+            </div>
+            <div class="quick-item-money">
+                <strong></strong>
+                <small></small>
+            </div>`;
+        row.querySelector('.quick-item-code').textContent = item.codigo || '-';
+        row.querySelector('.quick-item-main strong').textContent = item.detalle || '-';
+        row.querySelector('.quick-item-main small').textContent = `${item.unidad || '-'} · Cant. ${formatOcMoney(item.cantidad)}`;
+        row.querySelector('.quick-item-money strong').textContent = formatOcMoney(item.importe);
+        row.querySelector('.quick-item-money small').textContent = `$ Unit. ${formatOcMoney(item.precio)}`;
+        container.appendChild(row);
+    });
+    if (rows.length > 12) {
+        const more = document.createElement('div');
+        more.className = 'quick-items-more';
+        more.textContent = `+ ${rows.length - 12} items mas. Abrir la vista completa para ver todo.`;
+        container.appendChild(more);
+    }
+}
+
+function openOcQuickView(row) {
+    if (!ocQuickView || !row) return;
+    document.getElementById('oc-quick-title').textContent = `OC ${row.dataset.numero || '-'}`;
+    document.getElementById('oc-quick-subtitle').textContent = row.dataset.proveedor || '-';
+    document.getElementById('oc-quick-status').textContent = row.dataset.estado || 'Estado';
+    setOcQuickField('fecha', row.children[1]?.textContent?.trim() || row.dataset.fecha);
+    setOcQuickField('tipo', row.dataset.tipo);
+    setOcQuickField('items', row.dataset.items);
+    setOcQuickField('importe', formatOcMoney(row.dataset.importe));
+    setOcQuickField('avance', row.dataset.avance ? formatOcPercent(row.dataset.avance) : '-');
+    setOcQuickField('seguimiento', row.dataset.seguimiento);
+    setOcQuickField('categorias', row.children[3]?.textContent?.trim() || row.dataset.categorias);
+    setOcQuickField('rubros', row.children[4]?.textContent?.trim() || row.dataset.rubros);
+    renderQuickItems(ocQuickItemsList, ocQuickItemsCount, row.dataset.itemLines);
+    ocQuickFull.href = row.dataset.href || '#';
+    ocQuickEdit.href = row.dataset.editUrl || '#';
+    ocQuickView.classList.remove('d-none', 'is-closing');
+    ocQuickView.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('document-modal-open');
+    requestAnimationFrame(() => ocQuickView.classList.add('is-open'));
+    setTimeout(() => ocQuickModal?.focus?.(), 80);
+}
+
+function closeOcQuickView() {
+    if (!ocQuickView || ocQuickView.classList.contains('d-none')) return;
+    ocQuickView.classList.add('is-closing');
+    ocQuickView.classList.remove('is-open');
+    ocQuickView.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('document-modal-open');
+    setTimeout(() => {
+        ocQuickView.classList.add('d-none');
+        ocQuickView.classList.remove('is-closing');
+    }, 180);
+}
 
 function normalizeText(value) {
     return (value || '').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
@@ -274,14 +414,19 @@ ocRows.forEach(row => {
         if (event.target.closest('a, button, input, select, textarea, form')) {
             return;
         }
-        window.location.href = row.dataset.href;
+        openOcQuickView(row);
     });
     row.addEventListener('keydown', event => {
         if ((event.key === 'Enter' || event.key === ' ') && !event.target.closest('a, button, input, select, textarea, form')) {
             event.preventDefault();
-            window.location.href = row.dataset.href;
+            openOcQuickView(row);
         }
     });
+});
+
+ocQuickView?.querySelectorAll('[data-quick-close]').forEach(element => element.addEventListener('click', closeOcQuickView));
+document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') closeOcQuickView();
 });
 
 // La pagina ya llega filtrada y paginada desde el servidor; ordenamos solo si el usuario lo pide.

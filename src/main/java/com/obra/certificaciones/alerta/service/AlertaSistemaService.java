@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -51,6 +52,7 @@ public class AlertaSistemaService {
     private List<AlertaSistema> alertasOrden(OrdenCompra orden, Map<Long, BigDecimal> acumuladosPorItem) {
         List<AlertaSistema> alertas = new ArrayList<>();
         String enlace = "/oc/" + orden.getId();
+        String enlaceEditar = enlace + "/editar";
 
         if (orden.getProveedorEntidad() == null) {
             alertas.add(alerta("alta", "OC sin proveedor", "La OC " + orden.getNumero() + " no tiene proveedor asociado.", enlace, "bi-person-x"));
@@ -78,12 +80,18 @@ public class AlertaSistemaService {
             alertas.add(alerta("media", "Mano de obra sin rubro", manoObraSinRubro + " items de mano de obra no estan vinculados a rubro.", enlace, "bi-diagram-3"));
         }
 
-        long materialesSinVincular = orden.getItems().stream()
+        List<ItemOrdenCompra> materialesSinVincular = orden.getItems().stream()
                 .filter(item -> item.getCategoria() == CategoriaItem.MATERIAL)
                 .filter(item -> item.getItemManoObraVinculado() == null)
-                .count();
-        if (materialesSinVincular > 0) {
-            alertas.add(alerta("baja", "Materiales sin mano de obra", materialesSinVincular + " materiales no estan vinculados a un item de mano de obra.", enlace, "bi-link-45deg"));
+                .toList();
+        if (!materialesSinVincular.isEmpty()) {
+            BigDecimal importeSinJustificar = materialesSinVincular.stream()
+                    .map(ItemOrdenCompra::getImporte)
+                    .filter(Objects::nonNull)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            String detalle = materialesSinVincular.size() + " materiales por " + moneda(importeSinJustificar)
+                    + " no estan asociados a mano de obra. Conviene vincularlos para justificar ese costo en el itemizado.";
+            alertas.add(alerta("media", "Materiales sin justificar", detalle, enlaceEditar, "bi-link-45deg"));
         }
 
         orden.getItems().stream()
@@ -98,5 +106,12 @@ public class AlertaSistemaService {
 
     private AlertaSistema alerta(String prioridad, String titulo, String detalle, String enlace, String icono) {
         return new AlertaSistema(prioridad, titulo, detalle, enlace, icono);
+    }
+
+    private String moneda(BigDecimal valor) {
+        NumberFormat formatter = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"));
+        formatter.setMaximumFractionDigits(2);
+        formatter.setMinimumFractionDigits(2);
+        return formatter.format(valor == null ? BigDecimal.ZERO : valor);
     }
 }

@@ -78,6 +78,8 @@
             th:data-pendiente="${pendientePorOrden.getOrDefault(orden.id, cero)}"
             th:data-avance="${avancePorOrden.getOrDefault(orden.id, cero)}"
             th:data-estado="${estadosPorOrden.get(orden.id) != null ? estadosPorOrden.get(orden.id).name() : 'PENDIENTE'}"
+            th:data-estado-texto="${estadosPorOrden.get(orden.id) != null && estadosPorOrden.get(orden.id).name() == 'COMPLETO' ? 'ENTREGA COMPLETA' : (estadosPorOrden.get(orden.id) != null && estadosPorOrden.get(orden.id).name() == 'PARCIAL' ? 'ENTREGA PARCIAL' : 'ENTREGA PENDIENTE')}"
+            th:data-item-lines="${#strings.listJoin(orden.items.![item + '||' + detalle + '||' + unidad + '||' + cantidad + '||' + precioUnitario + '||' + importe], '~~')}"
             tabindex="0"
             role="link">
             <td><a class="cert-row-link" th:href="@{/materiales/oc/{id}(id=${orden.id}, origen='entregas')}" th:text="${orden.numero}">OC</a></td>
@@ -111,6 +113,46 @@
             <a class="btn btn-sm btn-outline-secondary" th:classappend="${ordenesPage.last ? ' disabled' : ''}" th:href="@{/materiales(page=${ordenesPage.number + 1})}">Siguiente <i class="bi bi-chevron-right"></i></a>
         </nav>
     </section>
+    <div class="document-quick-view d-none" id="delivery-quick-view" aria-hidden="true">
+        <div class="document-quick-backdrop" data-delivery-quick-close></div>
+        <section class="document-quick-modal" role="dialog" aria-modal="true" aria-labelledby="delivery-quick-title" tabindex="-1">
+            <button class="document-quick-close" type="button" data-delivery-quick-close aria-label="Cerrar resumen"><i class="bi bi-x-lg"></i></button>
+            <header class="document-quick-header">
+                <span class="document-quick-icon"><i class="bi bi-truck"></i></span>
+                <div>
+                    <div class="document-kicker">Resumen de entrega</div>
+                    <h2 id="delivery-quick-title">OC</h2>
+                    <p id="delivery-quick-subtitle">Proveedor</p>
+                </div>
+                <span class="doc-status-pill is-info" id="delivery-quick-status">Estado</span>
+            </header>
+            <div class="document-quick-print-alert is-ok" id="delivery-quick-progress">
+                <i class="bi bi-box-seam"></i>
+                <div>
+                    <strong>Recepcion acumulada</strong>
+                    <small>0,00 % recibido</small>
+                </div>
+            </div>
+            <div class="document-quick-grid">
+                <article><span>Fecha OC</span><strong data-delivery-field="fecha">-</strong></article>
+                <article><span>Viajes</span><strong data-delivery-field="viajes">-</strong></article>
+                <article><span>Previsto</span><strong data-delivery-field="previsto">-</strong></article>
+                <article><span>Recibido</span><strong data-delivery-field="recibido">-</strong></article>
+                <article><span>Pendiente</span><strong data-delivery-field="pendiente">-</strong></article>
+                <article><span>Avance</span><strong data-delivery-field="avance">-</strong></article>
+            </div>
+            <section class="quick-items-panel">
+                <div class="quick-items-head">
+                    <h3><i class="bi bi-box-seam"></i> Items a recepcionar</h3>
+                    <span id="delivery-quick-items-count">0 items</span>
+                </div>
+                <div class="quick-items-list" id="delivery-quick-items-list"></div>
+            </section>
+            <footer class="document-quick-actions">
+                <a class="btn btn-primary" id="delivery-quick-full" href="#"><i class="bi bi-box-arrow-up-right"></i> Ver entregas</a>
+            </footer>
+        </section>
+    </div>
 </main>
 <script>
 const deliveryTable = document.querySelector('#delivery-table');
@@ -121,6 +163,13 @@ const deliveryFilterIndicator = document.querySelector('#delivery-filter-indicat
 const deliveryStorageKey = 'obraControl.entregas.filters';
 const deliverySearch = document.querySelector('#delivery-search');
 let currentDeliverySort = { key: 'fecha', direction: 'desc', type: 'date' };
+const deliveryQuickView = document.getElementById('delivery-quick-view');
+const deliveryQuickModal = deliveryQuickView?.querySelector('.document-quick-modal');
+const deliveryQuickFull = document.getElementById('delivery-quick-full');
+const deliveryQuickStatus = document.getElementById('delivery-quick-status');
+const deliveryQuickProgress = document.getElementById('delivery-quick-progress');
+const deliveryQuickItemsList = document.getElementById('delivery-quick-items-list');
+const deliveryQuickItemsCount = document.getElementById('delivery-quick-items-count');
 
 function normalizeDeliveryText(value) {
     return (value || '').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
@@ -130,6 +179,97 @@ function numberDeliveryValue(value) {
     const normalized = (value || '').toString().replace(/[^\d.,-]/g, '').replace(',', '.');
     const parsed = Number.parseFloat(normalized);
     return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function formatDeliveryNumber(value) {
+    const number = numberDeliveryValue(value);
+    return number.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function setDeliveryQuickField(name, value) {
+    const element = deliveryQuickView?.querySelector(`[data-delivery-field="${name}"]`);
+    if (element) element.textContent = value || '-';
+}
+
+function renderDeliveryQuickItems(rawItems) {
+    if (!deliveryQuickItemsList) return;
+    const rows = (rawItems || '').split('~~').filter(Boolean).map(line => {
+        const [codigo, detalle, unidad, cantidad, precio, importe] = line.split('||');
+        return { codigo, detalle, unidad, cantidad, precio, importe };
+    });
+    deliveryQuickItemsList.replaceChildren();
+    if (deliveryQuickItemsCount) deliveryQuickItemsCount.textContent = rows.length === 1 ? '1 item' : `${rows.length} items`;
+    if (rows.length === 0) {
+        const empty = document.createElement('div');
+        empty.className = 'quick-items-empty';
+        empty.textContent = 'No hay items de material cargados.';
+        deliveryQuickItemsList.appendChild(empty);
+        return;
+    }
+    rows.slice(0, 12).forEach(item => {
+        const row = document.createElement('article');
+        row.className = 'quick-item-row';
+        row.innerHTML = `
+            <span class="quick-item-code"></span>
+            <div class="quick-item-main">
+                <strong></strong>
+                <small></small>
+            </div>
+            <div class="quick-item-money">
+                <strong></strong>
+                <small></small>
+            </div>`;
+        row.querySelector('.quick-item-code').textContent = item.codigo || '-';
+        row.querySelector('.quick-item-main strong').textContent = item.detalle || '-';
+        row.querySelector('.quick-item-main small').textContent = `${item.unidad || '-'} · Previsto ${formatDeliveryNumber(item.cantidad)}`;
+        row.querySelector('.quick-item-money strong').textContent = formatDeliveryNumber(item.importe);
+        row.querySelector('.quick-item-money small').textContent = `$ Unit. ${formatDeliveryNumber(item.precio)}`;
+        deliveryQuickItemsList.appendChild(row);
+    });
+    if (rows.length > 12) {
+        const more = document.createElement('div');
+        more.className = 'quick-items-more';
+        more.textContent = `+ ${rows.length - 12} items mas. Abrir entregas para ver todo.`;
+        deliveryQuickItemsList.appendChild(more);
+    }
+}
+
+function openDeliveryQuickView(row) {
+    if (!deliveryQuickView || !row) return;
+    const avance = numberDeliveryValue(row.dataset.avance);
+    document.getElementById('delivery-quick-title').textContent = `OC ${row.dataset.numero || '-'}`;
+    document.getElementById('delivery-quick-subtitle').textContent = row.dataset.proveedor || '-';
+    deliveryQuickStatus.textContent = row.dataset.estadoTexto || 'Estado';
+    deliveryQuickStatus.className = `doc-status-pill ${avance >= 100 ? 'is-ok' : (avance > 0 ? 'is-warning' : 'is-pending')}`;
+    setDeliveryQuickField('fecha', row.children[1]?.textContent?.trim() || row.dataset.fecha);
+    setDeliveryQuickField('viajes', row.dataset.viajes);
+    setDeliveryQuickField('previsto', formatDeliveryNumber(row.dataset.previsto));
+    setDeliveryQuickField('recibido', formatDeliveryNumber(row.dataset.recibido));
+    setDeliveryQuickField('pendiente', formatDeliveryNumber(row.dataset.pendiente));
+    setDeliveryQuickField('avance', `${formatDeliveryNumber(row.dataset.avance)} %`);
+    deliveryQuickProgress.className = `document-quick-print-alert ${avance >= 100 ? 'is-ok' : 'is-missing'}`;
+    deliveryQuickProgress.querySelector('i').className = avance >= 100 ? 'bi bi-check2-circle' : 'bi bi-truck';
+    deliveryQuickProgress.querySelector('strong').textContent = avance >= 100 ? 'Recepcion completa' : 'Recepcion en seguimiento';
+    deliveryQuickProgress.querySelector('small').textContent = `${formatDeliveryNumber(row.dataset.avance)} % recibido`;
+    renderDeliveryQuickItems(row.dataset.itemLines);
+    deliveryQuickFull.href = row.dataset.href || '#';
+    deliveryQuickView.classList.remove('d-none', 'is-closing');
+    deliveryQuickView.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('document-modal-open');
+    requestAnimationFrame(() => deliveryQuickView.classList.add('is-open'));
+    setTimeout(() => deliveryQuickModal?.focus?.(), 80);
+}
+
+function closeDeliveryQuickView() {
+    if (!deliveryQuickView || deliveryQuickView.classList.contains('d-none')) return;
+    deliveryQuickView.classList.add('is-closing');
+    deliveryQuickView.classList.remove('is-open');
+    deliveryQuickView.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('document-modal-open');
+    setTimeout(() => {
+        deliveryQuickView.classList.add('d-none');
+        deliveryQuickView.classList.remove('is-closing');
+    }, 180);
 }
 
 function deliverySortValue(row, key, type) {
@@ -222,9 +362,7 @@ document.querySelectorAll('.oc-progress .progress-bar').forEach(progressFill => 
 
 deliveryRows.forEach(row => {
     const abrirDetalle = () => {
-        if (row.dataset.href) {
-            window.location.href = row.dataset.href;
-        }
+        openDeliveryQuickView(row);
     };
     row.addEventListener('click', event => {
         if (!event.target.closest('a, button, form')) {
@@ -237,6 +375,11 @@ deliveryRows.forEach(row => {
             abrirDetalle();
         }
     });
+});
+
+deliveryQuickView?.querySelectorAll('[data-delivery-quick-close]').forEach(element => element.addEventListener('click', closeDeliveryQuickView));
+document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') closeDeliveryQuickView();
 });
 
 deliverySearch.addEventListener('input', () => {

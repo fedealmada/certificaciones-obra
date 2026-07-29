@@ -21,6 +21,10 @@
             <h1 th:text="${modoEdicion ? 'Editar documento' : 'Nuevo documento'}">Nuevo documento</h1>
             <div class="text-muted">Carga vencimientos, presentacion mensual y si el documento condiciona el ingreso a obra.</div>
         </div>
+        <div class="document-form-tip" th:if="${modoEdicion}">
+            <i class="bi bi-clock-history"></i>
+            <span>Al guardar, el sistema actualiza automaticamente la fecha de ultima modificacion.</span>
+        </div>
     </div>
 
     <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
@@ -37,15 +41,16 @@
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">Tipo de vinculo</label>
-                    <select class="form-select" th:field="*{vinculo}">
+                    <select class="form-select" th:field="*{vinculo}" id="vinculo-select">
                         <option th:each="vinculo : ${vinculos}" th:value="${vinculo}" th:text="${vinculo.descripcion}"></option>
                     </select>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">Tipo de documento</label>
-                    <select class="form-select" th:field="*{tipo}">
-                        <option th:each="tipo : ${tipos}" th:value="${tipo}" th:text="${tipo.descripcion}"></option>
+                    <select class="form-select" th:field="*{tipo}" id="tipo-documento-select">
+                        <option th:each="tipo : ${tipos}" th:value="${tipo}" th:text="${tipo.descripcion}" th:data-vinculos="${tipo.vinculosCsv}"></option>
                     </select>
+                    <small class="text-muted">Las opciones se filtran segun el vinculo seleccionado.</small>
                 </div>
                 <div class="col-md-4 doc-field doc-field-contratista">
                     <label class="form-label">Contratista / proveedor</label>
@@ -89,9 +94,14 @@
                     <label class="form-label">Referencia archivo</label>
                     <input class="form-control" th:field="*{referenciaArchivo}" placeholder="PDF, mail, carpeta">
                 </div>
+                <div class="col-md-3">
+                    <label class="form-label">Ubicacion fisica</label>
+                    <input class="form-control" th:field="*{ubicacionFisica}" placeholder="Ej: Legajo oficina / Carpeta A">
+                </div>
                 <div class="col-md-12">
                     <div class="documentacion-check-grid">
                         <label><input type="checkbox" th:field="*{presentado}"> Presentado</label>
+                        <label><input type="checkbox" th:field="*{impresoLegajo}"> Impreso en legajo</label>
                         <label><input type="checkbox" th:field="*{mensual}"> Control mensual</label>
                         <label><input type="checkbox" th:field="*{obligatorioIngreso}"> Condiciona ingreso a obra</label>
                         <label><input type="checkbox" th:field="*{activo}"> Activo</label>
@@ -111,6 +121,10 @@
 </main>
 <script>
 const sujetoSelect = document.getElementById('sujeto-select');
+const vinculoSelect = document.getElementById('vinculo-select');
+const tipoDocumentoSelect = document.getElementById('tipo-documento-select');
+const tipoDocumentoOptions = Array.from(tipoDocumentoSelect?.options || []).map(option => option.cloneNode(true));
+
 function updateDocFields() {
     const value = sujetoSelect?.value || 'CONTRATISTA';
     document.querySelectorAll('.doc-field').forEach(field => field.style.display = 'none');
@@ -118,8 +132,26 @@ function updateDocFields() {
     if (value === 'PERSONA') document.querySelectorAll('.doc-field-persona, .doc-field-contratista').forEach(field => field.style.display = 'block');
     if (value === 'VEHICULO') document.querySelectorAll('.doc-field-vehiculo, .doc-field-contratista').forEach(field => field.style.display = 'block');
 }
+
+function updateTipoDocumentoOptions() {
+    if (!tipoDocumentoSelect || !vinculoSelect) return;
+    const selectedValue = tipoDocumentoSelect.value;
+    const vinculo = vinculoSelect.value || 'GENERAL';
+    tipoDocumentoSelect.innerHTML = '';
+    tipoDocumentoOptions
+        .filter(option => vinculo === 'GENERAL' || (option.dataset.vinculos || '').split(',').includes(vinculo))
+        .forEach(option => tipoDocumentoSelect.appendChild(option.cloneNode(true)));
+    if (Array.from(tipoDocumentoSelect.options).some(option => option.value === selectedValue)) {
+        tipoDocumentoSelect.value = selectedValue;
+    } else if (tipoDocumentoSelect.options.length > 0) {
+        tipoDocumentoSelect.selectedIndex = 0;
+    }
+}
+
 sujetoSelect?.addEventListener('change', updateDocFields);
+vinculoSelect?.addEventListener('change', updateTipoDocumentoOptions);
 updateDocFields();
+updateTipoDocumentoOptions();
 </script>
 </body>
 </html>

@@ -34,7 +34,9 @@ public class DocumentoObraForm {
     private boolean mensual;
     private boolean obligatorioIngreso = true;
     private boolean presentado = true;
+    private boolean impresoLegajo;
     private boolean activo = true;
     private String referenciaArchivo;
+    private String ubicacionFisica;
     private String observacion;
 }

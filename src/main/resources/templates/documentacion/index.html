@@ -14,73 +14,573 @@
         <a th:href="@{/}"><i class="bi bi-house"></i> Inicio</a><i class="bi bi-chevron-right"></i><span>Documentacion</span>
     </div>
 
-    <div class="document-header mb-4">
+    <div class="document-header documentacion-hero mb-4">
         <div>
-            <div class="document-kicker">Control documental de contratistas</div>
+            <div class="document-kicker"><i class="bi bi-shield-check"></i> Control documental de contratistas</div>
             <h1>Documentacion de obra</h1>
             <div class="text-muted">Vencimientos, pendientes mensuales, personas, contratistas y vehiculos habilitados.</div>
         </div>
         <div class="document-actions">
+            <button class="btn btn-outline-primary" type="button" data-create-document-folder><i class="bi bi-folder-plus"></i> Nueva carpeta documental</button>
             <a class="btn btn-primary" th:href="@{/documentacion/nuevo}"><i class="bi bi-plus-lg"></i> Nuevo documento</a>
         </div>
     </div>
 
     <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
+    <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
 
-    <div class="dashboard-metric-grid mb-3">
-        <div class="metric-card"><div class="metric-head"><div class="metric-label">Aptos</div><i class="bi bi-shield-check"></i></div><div class="metric-value" th:text="${resumen.aptos()}">0</div><small>Documentos vigentes</small></div>
-        <div class="metric-card"><div class="metric-head"><div class="metric-label">Por vencer</div><i class="bi bi-exclamation-triangle"></i></div><div class="metric-value" th:text="${resumen.porVencer()}">0</div><small>Dentro de 15 dias</small></div>
-        <div class="metric-card"><div class="metric-head"><div class="metric-label">Vencidos</div><i class="bi bi-x-octagon"></i></div><div class="metric-value" th:text="${resumen.vencidos()}">0</div><small>Bloquean ingreso</small></div>
-        <div class="metric-card"><div class="metric-head"><div class="metric-label">Mensual</div><i class="bi bi-calendar2-week"></i></div><div class="metric-value" th:text="${resumen.mensualesPendientes()}">0</div><small>Pendiente del mes</small></div>
+    <div class="document-semaforo-kpis mb-3">
+        <article class="document-semaforo-kpi is-ok">
+            <span class="semaforo-light"></span>
+            <div><span>Vigentes</span><strong th:text="${resumen.aptos()}">0</strong><small>Documentos al dia</small></div>
+        </article>
+        <article class="document-semaforo-kpi is-warning">
+            <span class="semaforo-light"></span>
+            <div><span>Por vencer</span><strong th:text="${resumen.porVencer()}">0</strong><small>Vencen en <= 15 dias</small></div>
+        </article>
+        <article class="document-semaforo-kpi is-danger">
+            <span class="semaforo-light"></span>
+            <div><span>Vencidos</span><strong th:text="${resumen.vencidos()}">0</strong><small>Documentos vencidos</small></div>
+        </article>
+        <article class="document-semaforo-kpi is-pending">
+            <span class="semaforo-light"></span>
+            <div><span>Sin cargar</span><strong th:text="${resumen.pendientes()}">0</strong><small>Falta documentacion</small></div>
+        </article>
+        <article class="document-semaforo-kpi is-total">
+            <span class="semaforo-light"><i class="bi bi-file-earmark-text"></i></span>
+            <div><span>Total</span><strong th:text="${resumen.total()}">0</strong><small>Documentos controlados</small></div>
+        </article>
     </div>
 
-    <section class="panel-section mb-3">
-        <div class="section-title-row">
-            <h2 class="h5 mb-0"><i class="bi bi-buildings"></i> Semaforo por contratista</h2>
-            <span class="section-total-pill" th:text="${resumen.contratistas().size()} + ' contratistas'">0 contratistas</span>
+    <section class="panel-section document-priority-panel mb-3">
+        <div class="section-title-row document-priority-title">
+            <div>
+                <h2 class="h5 mb-0"><i class="bi bi-stars"></i> Prioridades documentales</h2>
+                <small>Una vista limpia para decidir que revisar primero.</small>
+            </div>
+            <span class="section-total-pill">Control rapido</span>
         </div>
-        <div class="documentacion-contractor-grid">
-            <article class="documentacion-contractor-card" th:each="contratista : ${resumen.contratistas()}">
-                <span class="doc-status-pill" th:classappend="${' ' + contratista.estado().cssClass}" th:text="${contratista.estado().descripcion}">Apto</span>
-                <strong th:text="${contratista.nombre()}">Contratista</strong>
-                <small th:text="${contratista.total()} + ' docs / ' + ${contratista.vencidos()} + ' vencidos / ' + ${contratista.porVencer()} + ' por vencer'">0 docs</small>
+        <div class="document-priority-grid">
+            <article class="document-priority-card is-danger" th:if="${resumen.vencidos() > 0}">
+                <span class="priority-icon"><i class="bi bi-exclamation-octagon"></i></span>
+                <div>
+                    <strong th:text="${resumen.vencidos()} + ' vencidos'">0 vencidos</strong>
+                    <small>Revisar antes de autorizar ingreso o continuidad.</small>
+                </div>
             </article>
-            <div class="empty-state" th:if="${resumen.contratistas().isEmpty()}">Todavia no hay documentacion cargada.</div>
+            <article class="document-priority-card is-warning" th:if="${resumen.porVencer() > 0}">
+                <span class="priority-icon"><i class="bi bi-calendar-event"></i></span>
+                <div>
+                    <strong th:text="${resumen.porVencer()} + ' por vencer'">0 por vencer</strong>
+                    <small>Conviene pedir renovacion antes de que bloquee la carpeta.</small>
+                </div>
+            </article>
+            <article class="document-priority-card is-pending" th:if="${resumen.pendientes() > 0}">
+                <span class="priority-icon"><i class="bi bi-folder-x"></i></span>
+                <div>
+                    <strong th:text="${resumen.pendientes()} + ' sin cargar'">0 sin cargar</strong>
+                    <small>Documentacion requerida que todavia no fue presentada.</small>
+                </div>
+            </article>
+            <article class="document-priority-card is-info" th:if="${resumen.mensualesPendientes() > 0}">
+                <span class="priority-icon"><i class="bi bi-arrow-repeat"></i></span>
+                <div>
+                    <strong th:text="${resumen.mensualesPendientes()} + ' mensuales a actualizar'">0 mensuales</strong>
+                    <small>Control administrativo de vencimientos periodicos.</small>
+                </div>
+            </article>
+            <article class="document-priority-card is-ok" th:if="${resumen.vencidos() == 0 && resumen.porVencer() == 0 && resumen.pendientes() == 0 && resumen.mensualesPendientes() == 0}">
+                <span class="priority-icon"><i class="bi bi-check2-circle"></i></span>
+                <div>
+                    <strong>Sin urgencias documentales</strong>
+                    <small>Las carpetas no tienen vencimientos ni faltantes criticos.</small>
+                </div>
+            </article>
         </div>
     </section>
 
-    <section class="panel-section">
-        <div class="section-title-row">
-            <h2 class="h5 mb-0"><i class="bi bi-folder-check"></i> Documentos controlados</h2>
-            <span class="section-total-pill" th:text="${documentosPage.totalElements} + ' registros'">0 registros</span>
+    <section class="panel-section document-explorer-section">
+        <div class="section-title-row document-explorer-title">
+            <div>
+                <h2 class="h5 mb-0"><i class="bi bi-folder-check"></i> Carpetas documentales</h2>
+                <small>Cada carpeta representa un contratista activo. General queda reservado para documentos de obra.</small>
+            </div>
+            <div class="document-explorer-actions">
+                <span class="section-total-pill" th:text="${gruposDocumentacion.size()} + ' carpetas'">0 carpetas</span>
+                <span class="section-total-pill" th:text="${totalDocumentos} + ' documentos'">0 documentos</span>
+            </div>
         </div>
-        <div class="table-responsive">
-            <table class="table table-hover align-middle document-table">
-                <thead><tr><th>Estado</th><th>Documento</th><th>Sujeto</th><th>Contratista</th><th>Vencimiento</th><th>Mensual</th><th>Ingreso</th><th class="text-end">Acciones</th></tr></thead>
-                <tbody>
-                <tr th:each="doc : ${documentos}">
-                    <td><span class="doc-status-pill" th:classappend="${' ' + doc.estado().cssClass}" th:text="${doc.estado().descripcion}">Apto</span></td>
-                    <td><strong th:text="${doc.nombreDocumento()}">Documento</strong><small class="d-block text-muted" th:text="${doc.vinculo.descripcion}">Vinculo</small></td>
-                    <td><span th:text="${doc.sujeto.descripcion}">Sujeto</span><small class="d-block text-muted" th:text="${doc.sujetoNombre()}">Nombre</small></td>
-                    <td th:text="${doc.proveedor == null ? '-' : doc.proveedor.nombre}">Proveedor</td>
-                    <td><strong th:text="${doc.fechaVencimiento == null ? '-' : #temporals.format(doc.fechaVencimiento, 'dd/MM/yyyy')}">-</strong><small class="d-block text-muted" th:if="${doc.fechaVencimiento != null}" th:text="${doc.diasAlVencimiento()} + ' dias'">0 dias</small></td>
-                    <td><span class="badge text-bg-light" th:text="${doc.mensual ? 'Si' : 'No'}">No</span></td>
-                    <td><span class="badge" th:classappend="${doc.obligatorioIngreso ? ' text-bg-warning' : ' text-bg-secondary'}" th:text="${doc.obligatorioIngreso ? 'Controla' : 'No aplica'}">Controla</span></td>
-                    <td class="text-end action-cell">
-                        <a class="btn btn-sm btn-outline-secondary table-icon-action" th:href="@{/documentacion/{id}/editar(id=${doc.id})}" title="Editar" aria-label="Editar"><i class="bi bi-pencil-square"></i></a>
-                        <form method="post" th:action="@{/documentacion/{id}/eliminar(id=${doc.id})}" onsubmit="return confirm('Marcar este documento como inactivo?');"><button class="btn btn-sm btn-outline-danger table-icon-action" type="submit" title="Eliminar" aria-label="Eliminar"><i class="bi bi-trash"></i></button></form>
-                    </td>
-                </tr>
-                <tr th:if="${documentos.isEmpty()}"><td colspan="8" class="text-center text-muted py-4">No hay documentacion registrada.</td></tr>
-                </tbody>
-            </table>
+        <div class="document-control-bar" th:if="${!gruposDocumentacion.isEmpty()}">
+            <label class="document-search-box">
+                <i class="bi bi-search"></i>
+                <input type="search" id="documentacion-search" placeholder="Buscar carpeta, documento, persona o proveedor...">
+            </label>
+            <select class="form-select" id="documentacion-status-filter" aria-label="Filtrar por estado">
+                <option value="">Todos los estados</option>
+                <option value="is-danger">Vencidos</option>
+                <option value="is-warning">Por vencer</option>
+                <option value="is-pending">Sin cargar</option>
+                <option value="is-ok">Vigentes</option>
+            </select>
+            <div class="document-control-actions">
+                <button class="btn btn-outline-secondary btn-sm" type="button" data-doc-expand="all"><i class="bi bi-arrows-expand"></i> Abrir</button>
+                <button class="btn btn-outline-secondary btn-sm" type="button" data-doc-expand="none"><i class="bi bi-arrows-collapse"></i> Cerrar</button>
+            </div>
         </div>
-        <nav class="pagination-strip mt-3" th:if="${documentosPage.totalPages > 1}">
-            <a class="btn btn-sm btn-outline-secondary" th:classappend="${documentosPage.first ? ' disabled' : ''}" th:href="@{/documentacion(page=${documentosPage.number - 1})}"><i class="bi bi-chevron-left"></i> Anterior</a>
-            <span th:text="${'Pagina ' + (documentosPage.number + 1) + ' de ' + documentosPage.totalPages + ' - mostrando ' + documentos.size() + ' de ' + documentosPage.totalElements}">Pagina 1</span>
-            <a class="btn btn-sm btn-outline-secondary" th:classappend="${documentosPage.last ? ' disabled' : ''}" th:href="@{/documentacion(page=${documentosPage.number + 1})}">Siguiente <i class="bi bi-chevron-right"></i></a>
-        </nav>
+        <div class="documentacion-group-list">
+            <article class="documentacion-group document-folder" th:each="grupo : ${gruposDocumentacion}" th:classappend="${' ' + grupo.tipoCss()}" th:data-proveedor-id="${grupo.proveedorId()}" th:data-folder-name="${grupo.nombre()}" th:data-folder-general="${grupo.general()}">
+                <button class="documentacion-group-header document-folder-header" type="button" onclick="toggleDocumentacionGrupo(this)" title="Click para abrir/cerrar carpeta">
+                    <span class="documentacion-group-main">
+                        <span class="document-folder-icon"><i class="bi bi-folder2-open"></i></span>
+                        <strong class="document-folder-name" th:text="${grupo.nombre()}" title="Click derecho: acciones del contratista">Contratista</strong>
+                    </span>
+                    <span class="documentacion-group-kpis">
+                        <span class="doc-status-pill" th:classappend="${' ' + grupo.estado().cssClass}" th:text="${grupo.estado().descripcion}">Apto</span>
+                        <span th:text="${grupo.total()} + ' documentos'">0 documentos</span>
+                        <span th:if="${grupo.vencidos() > 0}" class="doc-mini-kpi is-danger" th:text="${grupo.vencidos()} + ' vencidos'">0 vencidos</span>
+                        <span th:if="${grupo.porVencer() > 0}" class="doc-mini-kpi is-warning" th:text="${grupo.porVencer()} + ' por vencer'">0 por vencer</span>
+                        <span class="doc-folder-type-pill" th:text="${grupo.tipoDescripcion()}">Tipo</span>
+                        <i class="bi bi-chevron-down document-folder-chevron"></i>
+                    </span>
+                </button>
+                <div class="documentacion-group-body">
+                    <div class="document-explorer-head" th:if="${!grupo.documentos().isEmpty()}">
+                        <span>Documento</span>
+                        <span>Vencimiento</span>
+                        <span>Dias</span>
+                        <span>Estado</span>
+                        <span>Soporte</span>
+                        <span>Acciones</span>
+                    </div>
+                    <div class="document-tree">
+                        <article class="document-branch" th:each="doc : ${grupo.documentos()}" th:data-doc-id="${doc.id}" th:data-doc-name="${doc.nombreDocumento()}"
+                                 th:attr="data-doc-status=${doc.estado().descripcion},
+                                          data-doc-status-class=${doc.estado().cssClass},
+                                          data-doc-vinculo=${doc.vinculo.descripcion},
+                                          data-doc-sujeto=${doc.sujeto.descripcion},
+                                          data-doc-sujeto-nombre=${doc.sujetoNombre()},
+                                          data-doc-proveedor=${doc.proveedor == null ? '-' : doc.proveedor.nombre},
+                                          data-doc-presentacion=${doc.fechaPresentacion == null ? '-' : #temporals.format(doc.fechaPresentacion, 'dd/MM/yyyy')},
+                                          data-doc-vencimiento=${doc.fechaVencimiento == null ? 'Sin vencimiento' : #temporals.format(doc.fechaVencimiento, 'dd/MM/yyyy')},
+                                          data-doc-dias=${doc.fechaVencimiento == null ? '-' : doc.diasAlVencimiento() + ' dias'},
+                                          data-doc-creacion=${doc.fechaCreacion == null ? '-' : #temporals.format(doc.fechaCreacion, 'dd/MM/yyyy HH:mm')},
+                                          data-doc-actualizacion=${doc.fechaUltimaActualizacion == null ? '-' : #temporals.format(doc.fechaUltimaActualizacion, 'dd/MM/yyyy HH:mm')},
+                                          data-doc-mensual=${doc.mensual ? 'Si' : 'No'},
+                                          data-doc-ingreso=${doc.obligatorioIngreso ? 'Condiciona ingreso' : 'No condiciona'},
+                                          data-doc-pdf=${doc.tienePdf() ? 'Adjuntado' : 'Sin PDF'},
+                                          data-doc-print=${doc.impresoLegajo ? 'Impreso al dia' : 'Falta copia impresa'},
+                                          data-doc-print-missing=${doc.faltaCopiaImpresa()},
+                                          data-doc-ubicacion=${doc.ubicacionFisica == null ? 'Sin ubicacion fisica cargada' : doc.ubicacionFisica},
+                                          data-doc-archivo=${doc.referenciaArchivo == null ? '' : doc.referenciaArchivo},
+                                          data-doc-observacion=${doc.observacion == null ? '' : doc.observacion},
+                                          data-doc-vehiculo=${doc.vehiculoDetalle == null ? '' : doc.vehiculoDetalle},
+                                          data-doc-url=@{/documentacion/{id}(id=${doc.id})},
+                                          data-doc-edit-url=@{/documentacion/{id}/editar(id=${doc.id})},
+                                          data-doc-duplicate-url=@{/documentacion/{id}/duplicar(id=${doc.id})},
+                                          data-doc-pdf-url=${doc.tienePdf() ? '/documentacion/' + doc.id + '/archivo' : ''}">
+                            <a class="document-leaf document-open-trigger" th:href="@{/documentacion/{id}(id=${doc.id})}" title="Abrir ficha del documento">
+                                <span class="document-leaf-line"></span>
+                                <span class="document-leaf-icon"><i th:class="${doc.referenciaArchivo == null ? 'bi bi-file-earmark-text' : 'bi bi-file-earmark-pdf'}"></i></span>
+                                <span class="document-leaf-main">
+                                    <strong th:text="${doc.nombreDocumento()}">Documento</strong>
+                                    <small><span th:text="${doc.vinculo.descripcion}">Vinculo</span> - <span th:text="${doc.sujetoNombre()}">Sujeto</span></small>
+                                    <span class="document-leaf-tags">
+                                        <span th:if="${doc.mensual}" class="doc-tag is-monthly"><i class="bi bi-calendar2-check"></i> Mensual</span>
+                                        <span th:if="${doc.obligatorioIngreso}" class="doc-tag is-access"><i class="bi bi-door-open"></i> Ingreso</span>
+                                        <span th:if="${!doc.presentado}" class="doc-tag is-pending"><i class="bi bi-hourglass-split"></i> Falta presentar</span>
+                                        <span class="doc-tag is-updated" th:if="${doc.fechaUltimaActualizacion != null}"><i class="bi bi-clock-history"></i> <span th:text="${#temporals.format(doc.fechaUltimaActualizacion, 'dd/MM')}">Actualizado</span></span>
+                                    </span>
+                                </span>
+                                <span class="document-leaf-meta">
+                                    <strong th:text="${doc.fechaVencimiento == null ? 'Sin vencimiento' : #temporals.format(doc.fechaVencimiento, 'dd/MM/yyyy')}">-</strong>
+                                    <small th:if="${doc.fechaPresentacion != null}" th:text="${'Presentado ' + #temporals.format(doc.fechaPresentacion, 'dd/MM/yyyy')}">Presentado</small>
+                                </span>
+                                <span class="document-leaf-days" th:classappend="${doc.estado().cssClass}">
+                                    <strong th:text="${doc.fechaVencimiento == null ? '-' : doc.diasAlVencimiento()}">0</strong>
+                                    <small th:text="${doc.fechaVencimiento == null ? 'sin fecha' : 'dias'}">dias</small>
+                                </span>
+                                <span class="document-leaf-state">
+                                    <span class="doc-status-pill" th:classappend="${' ' + doc.estado().cssClass}" th:text="${doc.estado().descripcion}">Apto</span>
+                                </span>
+                                <span class="document-leaf-support">
+                                    <span th:if="${doc.tienePdf()}" class="doc-tag is-pdf"><i class="bi bi-filetype-pdf"></i> PDF</span>
+                                    <span th:if="${doc.impresoLegajo}" class="doc-tag is-printed"><i class="bi bi-printer"></i> Impreso</span>
+                                    <span th:if="${doc.faltaCopiaImpresa()}" class="doc-tag is-print-missing"><i class="bi bi-folder-x"></i> Falta impreso</span>
+                                </span>
+                            </a>
+                            <span class="document-leaf-actions">
+                                <a class="btn btn-sm btn-outline-secondary table-icon-action" th:href="@{/documentacion/{id}/editar(id=${doc.id})}" title="Editar" aria-label="Editar"><i class="bi bi-pencil-square"></i></a>
+                                <form method="post" th:action="@{/documentacion/{id}/eliminar(id=${doc.id})}" onsubmit="return confirm('Marcar este documento como inactivo?');"><button class="btn btn-sm btn-outline-danger table-icon-action" type="submit" title="Eliminar" aria-label="Eliminar"><i class="bi bi-trash"></i></button></form>
+                            </span>
+                        </article>
+                        <div class="document-empty-folder" th:if="${grupo.documentos().isEmpty()}">
+                            <i class="bi bi-folder2-open"></i>
+                            <div>
+                                <strong>Carpeta sin documentos</strong>
+                                <small th:text="${grupo.general() ? 'Carga documentos generales de obra aca.' : 'Este contratista existe, pero todavia no tiene documentacion cargada.'}">Sin documentos</small>
+                            </div>
+                            <a class="btn btn-sm btn-primary" th:href="${grupo.proveedorId() == null ? '/documentacion/nuevo?sujeto=OBRA' : '/documentacion/nuevo?proveedorId=' + grupo.proveedorId()}"><i class="bi bi-file-earmark-plus"></i> Agregar documento</a>
+                        </div>
+                    </div>
+                </div>
+            </article>
+            <div class="empty-state" th:if="${gruposDocumentacion.isEmpty()}">No hay documentacion registrada.</div>
+        </div>
     </section>
+    <div class="document-quick-view d-none" id="document-quick-view" aria-hidden="true">
+        <div class="document-quick-backdrop" data-doc-modal-close></div>
+        <section class="document-quick-modal" role="dialog" aria-modal="true" aria-labelledby="document-quick-title" tabindex="-1">
+            <button class="document-quick-close" type="button" data-doc-modal-close aria-label="Cerrar ficha"><i class="bi bi-x-lg"></i></button>
+            <header class="document-quick-header">
+                <span class="document-quick-icon"><i class="bi bi-file-earmark-check"></i></span>
+                <div>
+                    <div class="document-kicker" id="document-quick-kicker">Vinculo</div>
+                    <h2 id="document-quick-title">Documento</h2>
+                    <p id="document-quick-subtitle">Sujeto</p>
+                </div>
+                <span class="doc-status-pill" id="document-quick-status">Apto</span>
+            </header>
+            <div class="document-quick-print-alert" id="document-quick-print-alert">
+                <i class="bi bi-folder-check"></i>
+                <div>
+                    <strong>Legajo fisico</strong>
+                    <small>Ubicacion</small>
+                </div>
+            </div>
+            <div class="document-quick-grid">
+                <article><span>Contratista</span><strong data-doc-field="proveedor">-</strong></article>
+                <article><span>Corresponde a</span><strong data-doc-field="sujeto">-</strong></article>
+                <article><span>Presentacion</span><strong data-doc-field="presentacion">-</strong></article>
+                <article><span>Vencimiento</span><strong data-doc-field="vencimiento">-</strong><small data-doc-field="dias">-</small></article>
+                <article><span>Control mensual</span><strong data-doc-field="mensual">No</strong></article>
+                <article><span>Ingreso a obra</span><strong data-doc-field="ingreso">-</strong></article>
+                <article><span>PDF digital</span><strong data-doc-field="pdf">Sin PDF</strong></article>
+                <article><span>Legajo fisico</span><strong data-doc-field="print">-</strong></article>
+                <article><span>Creado</span><strong data-doc-field="creacion">-</strong></article>
+                <article><span>Ultima actualizacion</span><strong data-doc-field="actualizacion">-</strong></article>
+            </div>
+            <div class="document-quick-notes d-none" id="document-quick-notes">
+                <h3><i class="bi bi-card-text"></i> Resumen</h3>
+                <p data-doc-note="archivo"></p>
+                <p data-doc-note="vehiculo"></p>
+                <p data-doc-note="observacion"></p>
+            </div>
+            <footer class="document-quick-actions">
+                <a class="btn btn-outline-primary" id="document-quick-pdf" href="#" target="_blank"><i class="bi bi-filetype-pdf"></i> Abrir PDF</a>
+                <a class="btn btn-primary" id="document-quick-edit" href="#"><i class="bi bi-pencil-square"></i> Editar</a>
+                <a class="btn btn-outline-secondary" id="document-quick-duplicate" href="#"><i class="bi bi-copy"></i> Cargar similar</a>
+                <a class="btn btn-outline-secondary" id="document-quick-full" href="#"><i class="bi bi-box-arrow-up-right"></i> Ver ficha completa</a>
+            </footer>
+        </section>
+    </div>
+    <div class="document-folder-menu d-none" id="document-folder-menu" role="menu" aria-label="Acciones del contratista">
+        <div class="document-menu-title"><i class="bi bi-building"></i> <span id="document-folder-menu-title">Contratista</span></div>
+        <button type="button" data-action="new-doc"><i class="bi bi-file-earmark-plus"></i> Nuevo documento</button>
+        <button type="button" data-action="new-folder"><i class="bi bi-folder-plus"></i> Nueva carpeta documental</button>
+        <button type="button" data-action="rename-folder"><i class="bi bi-pencil-square"></i> Cambiar nombre</button>
+    </div>
+    <div class="document-folder-menu d-none" id="document-file-menu" role="menu" aria-label="Acciones del documento">
+        <div class="document-menu-title"><i class="bi bi-file-earmark-text"></i> Documento</div>
+        <button type="button" data-action="open-doc"><i class="bi bi-eye"></i> Abrir ficha</button>
+        <button type="button" data-action="edit-doc"><i class="bi bi-pencil-square"></i> Editar</button>
+        <button type="button" data-action="delete-doc"><i class="bi bi-trash"></i> Eliminar</button>
+    </div>
 </main>
+<script>
+function toggleDocumentacionGrupo(button) {
+    button.closest('.documentacion-group')?.classList.toggle('is-collapsed');
+}
+
+let documentacionFolderTarget = null;
+let documentacionDocTarget = null;
+const folderMenu = document.getElementById('document-folder-menu');
+const docMenu = document.getElementById('document-file-menu');
+const quickView = document.getElementById('document-quick-view');
+const quickModal = quickView?.querySelector('.document-quick-modal');
+const quickStatus = document.getElementById('document-quick-status');
+const quickPrintAlert = document.getElementById('document-quick-print-alert');
+const quickPdf = document.getElementById('document-quick-pdf');
+const quickEdit = document.getElementById('document-quick-edit');
+const quickDuplicate = document.getElementById('document-quick-duplicate');
+const quickFull = document.getElementById('document-quick-full');
+const documentacionSearch = document.getElementById('documentacion-search');
+const documentacionStatusFilter = document.getElementById('documentacion-status-filter');
+
+function setQuickText(selector, value) {
+    const element = quickView?.querySelector(selector);
+    if (element) element.textContent = value || '-';
+}
+
+function setQuickField(name, value) {
+    setQuickText(`[data-doc-field="${name}"]`, value);
+}
+
+function createDocumentFolder() {
+    const nombre = prompt('Nombre del contratista existente para crear su carpeta documental');
+    if (!nombre || !nombre.trim()) return;
+    const form = document.createElement('form');
+    form.method = 'post';
+    form.action = '/documentacion/contratistas';
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'nombre';
+    input.value = nombre.trim();
+    form.appendChild(input);
+    document.body.appendChild(form);
+    form.submit();
+}
+
+function setQuickNote(name, label, value) {
+    const element = quickView?.querySelector(`[data-doc-note="${name}"]`);
+    if (!element) return false;
+    const hasValue = Boolean(value && value.trim());
+    element.classList.toggle('d-none', !hasValue);
+    element.replaceChildren();
+    if (hasValue) {
+        const strong = document.createElement('strong');
+        strong.textContent = `${label}:`;
+        element.append(strong, ` ${value}`);
+    }
+    return hasValue;
+}
+
+function openDocumentQuickView(branch) {
+    if (!quickView || !branch) return;
+    const data = branch.dataset;
+    setQuickText('#document-quick-kicker', data.docVinculo);
+    setQuickText('#document-quick-title', data.docName);
+    setQuickText('#document-quick-subtitle', data.docSujetoNombre);
+    quickStatus.textContent = data.docStatus || 'Estado';
+    quickStatus.className = `doc-status-pill ${data.docStatusClass || 'is-muted'}`;
+    setQuickField('proveedor', data.docProveedor);
+    setQuickField('sujeto', data.docSujeto);
+    setQuickField('presentacion', data.docPresentacion);
+    setQuickField('vencimiento', data.docVencimiento);
+    setQuickField('dias', data.docDias);
+    setQuickField('mensual', data.docMensual);
+    setQuickField('ingreso', data.docIngreso);
+    setQuickField('pdf', data.docPdf);
+    setQuickField('print', data.docPrint);
+    setQuickField('creacion', data.docCreacion);
+    setQuickField('actualizacion', data.docActualizacion);
+
+    const printMissing = data.docPrintMissing === 'true';
+    quickPrintAlert.className = `document-quick-print-alert ${printMissing ? 'is-missing' : 'is-ok'}`;
+    quickPrintAlert.querySelector('i').className = printMissing ? 'bi bi-folder-x' : 'bi bi-folder-check';
+    quickPrintAlert.querySelector('strong').textContent = printMissing ? 'Falta copia impresa en el legajo' : 'Copia impresa controlada';
+    quickPrintAlert.querySelector('small').textContent = data.docUbicacion || 'Sin ubicacion fisica cargada';
+
+    const hasArchivo = setQuickNote('archivo', 'Archivo', data.docArchivo);
+    const hasVehiculo = setQuickNote('vehiculo', 'Vehiculo / maquinaria', data.docVehiculo);
+    const hasObservacion = setQuickNote('observacion', 'Observacion', data.docObservacion);
+    document.getElementById('document-quick-notes')?.classList.toggle('d-none', !(hasArchivo || hasVehiculo || hasObservacion));
+
+    quickPdf.href = data.docPdfUrl || '#';
+    quickPdf.classList.toggle('disabled', !data.docPdfUrl);
+    quickPdf.setAttribute('aria-disabled', data.docPdfUrl ? 'false' : 'true');
+    quickEdit.href = data.docEditUrl || '#';
+    quickDuplicate.href = data.docDuplicateUrl || '#';
+    quickFull.href = data.docUrl || '#';
+
+    folderMenu?.classList.add('d-none');
+    docMenu?.classList.add('d-none');
+    quickView.classList.remove('d-none', 'is-closing');
+    quickView.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('document-modal-open');
+    requestAnimationFrame(() => quickView.classList.add('is-open'));
+    setTimeout(() => quickModal?.focus?.(), 80);
+}
+
+function closeDocumentQuickView() {
+    if (!quickView || quickView.classList.contains('d-none')) return;
+    quickView.classList.add('is-closing');
+    quickView.classList.remove('is-open');
+    quickView.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('document-modal-open');
+    setTimeout(() => {
+        quickView.classList.add('d-none');
+        quickView.classList.remove('is-closing');
+    }, 180);
+}
+
+function openDocumentFolderMenu(folder, event) {
+    if (!folderMenu) return;
+    documentacionFolderTarget = folder;
+    const isGeneral = folder?.dataset.folderGeneral === 'true';
+    const title = document.getElementById('document-folder-menu-title');
+    if (title) title.textContent = isGeneral ? 'Carpeta general' : 'Contratista';
+    const renameButton = folderMenu.querySelector('[data-action="rename-folder"]');
+    renameButton?.classList.toggle('d-none', isGeneral);
+    if (renameButton) renameButton.innerHTML = '<i class="bi bi-pencil-square"></i> Cambiar nombre de contratista';
+    docMenu?.classList.add('d-none');
+    folderMenu.classList.remove('d-none');
+    folderMenu.style.left = `${Math.min(event.clientX, window.innerWidth - 230)}px`;
+    folderMenu.style.top = `${Math.min(event.clientY, window.innerHeight - 132)}px`;
+}
+
+function openDocumentFileMenu(branch, event) {
+    if (!docMenu) return;
+    documentacionDocTarget = branch;
+    folderMenu?.classList.add('d-none');
+    docMenu.classList.remove('d-none');
+    docMenu.style.left = `${Math.min(event.clientX, window.innerWidth - 230)}px`;
+    docMenu.style.top = `${Math.min(event.clientY, window.innerHeight - 160)}px`;
+}
+
+document.querySelectorAll('.document-folder-name').forEach(name => {
+    name.addEventListener('contextmenu', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        const folder = name.closest('.document-folder');
+        openDocumentFolderMenu(folder, event);
+    });
+});
+
+document.querySelectorAll('.document-folder-header').forEach(header => {
+    header.addEventListener('contextmenu', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        openDocumentFolderMenu(header.closest('.document-folder'), event);
+    });
+});
+
+document.querySelectorAll('.document-branch').forEach(branch => {
+    branch.addEventListener('contextmenu', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        openDocumentFileMenu(branch, event);
+    });
+});
+
+document.querySelectorAll('.document-open-trigger').forEach(link => {
+    link.addEventListener('click', event => {
+        if (event.ctrlKey || event.metaKey || event.shiftKey || event.button !== 0) return;
+        event.preventDefault();
+        openDocumentQuickView(link.closest('.document-branch'));
+    });
+});
+
+document.querySelectorAll('[data-create-document-folder]').forEach(button => {
+    button.addEventListener('click', createDocumentFolder);
+});
+
+function filterDocumentacion() {
+    const search = (documentacionSearch?.value || '').trim().toLowerCase();
+    const status = documentacionStatusFilter?.value || '';
+    document.querySelectorAll('.document-folder').forEach(folder => {
+        let visibleDocs = 0;
+        const folderText = [
+            folder.dataset.folderName || '',
+            folder.textContent || ''
+        ].join(' ').toLowerCase();
+        folder.querySelectorAll('.document-branch').forEach(branch => {
+            const branchText = [
+                branch.dataset.docName || '',
+                branch.dataset.docSujetoNombre || '',
+                branch.dataset.docProveedor || '',
+                branch.dataset.docStatus || '',
+                branch.dataset.docVinculo || ''
+            ].join(' ').toLowerCase();
+            const matchesSearch = !search || folderText.includes(search) || branchText.includes(search);
+            const matchesStatus = !status || branch.dataset.docStatusClass === status;
+            const visible = matchesSearch && matchesStatus;
+            branch.classList.toggle('d-none', !visible);
+            if (visible) visibleDocs++;
+        });
+        const hasDocs = folder.querySelectorAll('.document-branch').length > 0;
+        const folderMatches = !search || folderText.includes(search);
+        const shouldShowFolder = hasDocs ? visibleDocs > 0 || (folderMatches && !status) : folderMatches && !status;
+        folder.classList.toggle('d-none', !shouldShowFolder);
+        if ((search || status) && shouldShowFolder) {
+            folder.classList.remove('is-collapsed');
+        }
+    });
+}
+
+documentacionSearch?.addEventListener('input', filterDocumentacion);
+documentacionStatusFilter?.addEventListener('change', filterDocumentacion);
+
+document.querySelectorAll('[data-doc-expand]').forEach(button => {
+    button.addEventListener('click', () => {
+        const collapse = button.dataset.docExpand === 'none';
+        document.querySelectorAll('.document-folder:not(.d-none)').forEach(folder => {
+            folder.classList.toggle('is-collapsed', collapse);
+        });
+    });
+});
+
+quickView?.querySelectorAll('[data-doc-modal-close]').forEach(element => {
+    element.addEventListener('click', closeDocumentQuickView);
+});
+
+quickPdf?.addEventListener('click', event => {
+    if (quickPdf.classList.contains('disabled')) event.preventDefault();
+});
+
+document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') {
+        closeDocumentQuickView();
+        folderMenu?.classList.add('d-none');
+        docMenu?.classList.add('d-none');
+    }
+});
+
+folderMenu?.addEventListener('click', event => {
+    const action = event.target.closest('button')?.dataset.action;
+    if (action === 'new-doc' && documentacionFolderTarget) {
+        const proveedorId = documentacionFolderTarget.dataset.proveedorId;
+        window.location.href = proveedorId ? `/documentacion/nuevo?proveedorId=${proveedorId}` : '/documentacion/nuevo?sujeto=OBRA';
+    }
+    if (action === 'new-folder') {
+        createDocumentFolder();
+    }
+    if (action === 'rename-folder' && documentacionFolderTarget) {
+        const proveedorId = documentacionFolderTarget.dataset.proveedorId;
+        if (!proveedorId) {
+            alert('Esta carpeta no tiene contratista asociado para renombrar.');
+            return;
+        }
+        const actual = documentacionFolderTarget.dataset.folderName || '';
+        const nombre = prompt('Nuevo nombre del contratista', actual);
+        if (!nombre || !nombre.trim()) return;
+        const form = document.createElement('form');
+        form.method = 'post';
+        form.action = `/documentacion/contratistas/${proveedorId}/renombrar`;
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'nombre';
+        input.value = nombre.trim();
+        form.appendChild(input);
+        document.body.appendChild(form);
+        form.submit();
+    }
+});
+
+docMenu?.addEventListener('click', event => {
+    const action = event.target.closest('button')?.dataset.action;
+    const docId = documentacionDocTarget?.dataset.docId;
+    if (!action || !docId) return;
+    if (action === 'open-doc') {
+        openDocumentQuickView(documentacionDocTarget);
+    }
+    if (action === 'edit-doc') {
+        window.location.href = `/documentacion/${docId}/editar`;
+    }
+    if (action === 'delete-doc' && confirm('Marcar este documento como inactivo?')) {
+        const form = document.createElement('form');
+        form.method = 'post';
+        form.action = `/documentacion/${docId}/eliminar`;
+        document.body.appendChild(form);
+        form.submit();
+    }
+});
+
+document.addEventListener('click', event => {
+    if (!event.target.closest('#document-folder-menu') && !event.target.closest('#document-file-menu')) {
+        folderMenu?.classList.add('d-none');
+        docMenu?.classList.add('d-none');
+    }
+});
+</script>
 </body>
 </html>

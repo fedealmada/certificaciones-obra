@@ -91,7 +91,20 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="nota : ${notas}" class="clickable-table-row note-list-row" tabindex="0" th:data-href="@{/notas-pedido/{id}(id=${nota.id})}">
+                <tr th:each="nota : ${notas}" class="clickable-table-row note-list-row" tabindex="0"
+                    th:data-href="@{/notas-pedido/{id}(id=${nota.id})}"
+                    th:data-edit-url="@{/notas-pedido/{id}/editar(id=${nota.id})}"
+                    th:data-numero="${nota.numero}"
+                    th:data-fecha="${#temporals.format(nota.fecha, 'dd/MM/yyyy')}"
+                    th:data-tipo="${nota.tipo.descripcion}"
+                    th:data-proveedor="${nota.proveedorEntidad != null ? nota.proveedorEntidad.nombre : 'Sin proveedor'}"
+                    th:data-solicitante="${nota.solicitante ?: 'sin cargar'}"
+                    th:data-items="${nota.items.size()}"
+                    th:data-total="${nota.usaPrecio() ? #numbers.formatDecimal(nota.total, 1, 'POINT', 2, 'COMMA') : 'Sin precio'}"
+                    th:data-estado="${nota.estado.descripcion}"
+                    th:data-oc="${nota.ordenCompra != null ? 'OC ' + nota.ordenCompra.numero : 'OC pendiente'}"
+                    th:data-oc-url="${nota.ordenCompra != null ? '/oc/' + nota.ordenCompra.id : ''}"
+                    th:data-item-lines="${#strings.listJoin(nota.items.![item + '||' + detalle + '||' + unidad + '||' + cantidad + '||' + precioUnitario + '||' + importe], '~~')}">
                     <td>
                         <div class="note-number-cell">
                             <small>NP</small>
@@ -141,16 +154,160 @@
             <a class="btn btn-sm btn-outline-secondary" th:classappend="${notasPage.last ? ' disabled' : ''}" th:href="@{/notas-pedido(page=${notasPage.number + 1}, busqueda=${busqueda}, tipo=${tipoSeleccionado}, estado=${estadoSeleccionado})}">Siguiente <i class="bi bi-chevron-right"></i></a>
         </nav>
     </section>
+    <div class="document-quick-view d-none" id="note-quick-view" aria-hidden="true">
+        <div class="document-quick-backdrop" data-note-quick-close></div>
+        <section class="document-quick-modal" role="dialog" aria-modal="true" aria-labelledby="note-quick-title" tabindex="-1">
+            <button class="document-quick-close" type="button" data-note-quick-close aria-label="Cerrar resumen"><i class="bi bi-x-lg"></i></button>
+            <header class="document-quick-header">
+                <span class="document-quick-icon"><i class="bi bi-journal-check"></i></span>
+                <div>
+                    <div class="document-kicker">Resumen de nota de pedido</div>
+                    <h2 id="note-quick-title">NP</h2>
+                    <p id="note-quick-subtitle">Proveedor</p>
+                </div>
+                <span class="doc-status-pill is-info" id="note-quick-status">Estado</span>
+            </header>
+            <div class="document-quick-grid">
+                <article><span>Fecha</span><strong data-note-field="fecha">-</strong></article>
+                <article><span>Tipo</span><strong data-note-field="tipo">-</strong></article>
+                <article><span>Solicita</span><strong data-note-field="solicitante">-</strong></article>
+                <article><span>Items</span><strong data-note-field="items">-</strong></article>
+                <article><span>Total</span><strong data-note-field="total">-</strong></article>
+                <article><span>OC generada</span><strong data-note-field="oc">-</strong></article>
+            </div>
+            <section class="quick-items-panel">
+                <div class="quick-items-head">
+                    <h3><i class="bi bi-list-check"></i> Items solicitados</h3>
+                    <span id="note-quick-items-count">0 items</span>
+                </div>
+                <div class="quick-items-list" id="note-quick-items-list"></div>
+            </section>
+            <footer class="document-quick-actions">
+                <a class="btn btn-primary" id="note-quick-full" href="#"><i class="bi bi-box-arrow-up-right"></i> Ver nota completa</a>
+                <a class="btn btn-outline-primary" id="note-quick-edit" href="#"><i class="bi bi-pencil-square"></i> Editar</a>
+                <a class="btn btn-outline-secondary" id="note-quick-oc" href="#"><i class="bi bi-receipt"></i> Abrir OC</a>
+            </footer>
+        </section>
+    </div>
 </main>
 <script>
+const noteQuickView = document.getElementById('note-quick-view');
+const noteQuickModal = noteQuickView?.querySelector('.document-quick-modal');
+const noteQuickFull = document.getElementById('note-quick-full');
+const noteQuickEdit = document.getElementById('note-quick-edit');
+const noteQuickOc = document.getElementById('note-quick-oc');
+const noteQuickItemsList = document.getElementById('note-quick-items-list');
+const noteQuickItemsCount = document.getElementById('note-quick-items-count');
+
+function setNoteQuickField(name, value) {
+    const element = noteQuickView?.querySelector(`[data-note-field="${name}"]`);
+    if (element) element.textContent = value || '-';
+}
+
+function noteNumberValue(value) {
+    const normalized = (value || '').toString().replace(/[^\d.,-]/g, '').replace(',', '.');
+    const parsed = Number.parseFloat(normalized);
+    return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function formatNoteNumber(value) {
+    return noteNumberValue(value).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function renderNoteQuickItems(rawItems) {
+    if (!noteQuickItemsList) return;
+    const rows = (rawItems || '').split('~~').filter(Boolean).map(line => {
+        const [codigo, detalle, unidad, cantidad, precio, importe] = line.split('||');
+        return { codigo, detalle, unidad, cantidad, precio, importe };
+    });
+    noteQuickItemsList.replaceChildren();
+    if (noteQuickItemsCount) noteQuickItemsCount.textContent = rows.length === 1 ? '1 item' : `${rows.length} items`;
+    if (rows.length === 0) {
+        const empty = document.createElement('div');
+        empty.className = 'quick-items-empty';
+        empty.textContent = 'No hay items solicitados.';
+        noteQuickItemsList.appendChild(empty);
+        return;
+    }
+    rows.slice(0, 12).forEach(item => {
+        const row = document.createElement('article');
+        row.className = 'quick-item-row';
+        row.innerHTML = `
+            <span class="quick-item-code"></span>
+            <div class="quick-item-main">
+                <strong></strong>
+                <small></small>
+            </div>
+            <div class="quick-item-money">
+                <strong></strong>
+                <small></small>
+            </div>`;
+        row.querySelector('.quick-item-code').textContent = item.codigo || '-';
+        row.querySelector('.quick-item-main strong').textContent = item.detalle || '-';
+        row.querySelector('.quick-item-main small').textContent = `${item.unidad || '-'} · Cant. ${formatNoteNumber(item.cantidad)}`;
+        row.querySelector('.quick-item-money strong').textContent = formatNoteNumber(item.importe);
+        row.querySelector('.quick-item-money small').textContent = `$ Unit. ${formatNoteNumber(item.precio)}`;
+        noteQuickItemsList.appendChild(row);
+    });
+    if (rows.length > 12) {
+        const more = document.createElement('div');
+        more.className = 'quick-items-more';
+        more.textContent = `+ ${rows.length - 12} items mas. Abrir la vista completa para ver todo.`;
+        noteQuickItemsList.appendChild(more);
+    }
+}
+
+function openNoteQuickView(row) {
+    if (!noteQuickView || !row) return;
+    document.getElementById('note-quick-title').textContent = `NP ${row.dataset.numero || '-'}`;
+    document.getElementById('note-quick-subtitle').textContent = row.dataset.proveedor || '-';
+    document.getElementById('note-quick-status').textContent = row.dataset.estado || 'Estado';
+    setNoteQuickField('fecha', row.dataset.fecha);
+    setNoteQuickField('tipo', row.dataset.tipo);
+    setNoteQuickField('solicitante', row.dataset.solicitante);
+    setNoteQuickField('items', row.dataset.items);
+    setNoteQuickField('total', row.dataset.total);
+    setNoteQuickField('oc', row.dataset.oc);
+    renderNoteQuickItems(row.dataset.itemLines);
+    noteQuickFull.href = row.dataset.href || '#';
+    noteQuickEdit.href = row.dataset.editUrl || '#';
+    noteQuickOc.href = row.dataset.ocUrl || '#';
+    noteQuickOc.classList.toggle('disabled', !row.dataset.ocUrl);
+    noteQuickOc.setAttribute('aria-disabled', row.dataset.ocUrl ? 'false' : 'true');
+    noteQuickView.classList.remove('d-none', 'is-closing');
+    noteQuickView.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('document-modal-open');
+    requestAnimationFrame(() => noteQuickView.classList.add('is-open'));
+    setTimeout(() => noteQuickModal?.focus?.(), 80);
+}
+
+function closeNoteQuickView() {
+    if (!noteQuickView || noteQuickView.classList.contains('d-none')) return;
+    noteQuickView.classList.add('is-closing');
+    noteQuickView.classList.remove('is-open');
+    noteQuickView.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('document-modal-open');
+    setTimeout(() => {
+        noteQuickView.classList.add('d-none');
+        noteQuickView.classList.remove('is-closing');
+    }, 180);
+}
+
 document.querySelectorAll('.clickable-table-row').forEach(row => {
-    const open = () => { if (row.dataset.href) window.location.href = row.dataset.href; };
+    const open = () => openNoteQuickView(row);
     row.addEventListener('click', event => {
         if (!event.target.closest('a, button, form')) open();
     });
     row.addEventListener('keydown', event => {
         if (event.key === 'Enter') open();
     });
+});
+noteQuickView?.querySelectorAll('[data-note-quick-close]').forEach(element => element.addEventListener('click', closeNoteQuickView));
+noteQuickOc?.addEventListener('click', event => {
+    if (noteQuickOc.classList.contains('disabled')) event.preventDefault();
+});
+document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') closeNoteQuickView();
 });
 </script>
 </body>

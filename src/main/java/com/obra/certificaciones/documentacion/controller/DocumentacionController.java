@@ -10,16 +10,22 @@ import com.obra.certificaciones.obra.service.ObraService;
 import com.obra.certificaciones.proveedor.service.ProveedorService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.net.MalformedURLException;
 
 @Controller
 @RequestMapping("/documentacion")
@@ -31,18 +37,39 @@ public class DocumentacionController {
     private final ObraService obraService;
 
     @GetMapping
-    public String index(@RequestParam(defaultValue = "0") int page, Model model, HttpSession session) {
+    public String index(Model model, HttpSession session) {
         var obra = obraService.obraActiva(session);
-        var documentosPage = documentacionService.listar(obra, PageRequest.of(Math.max(page, 0), 25));
-        model.addAttribute("documentos", documentosPage.getContent());
-        model.addAttribute("documentosPage", documentosPage);
+        var grupos = documentacionService.agruparPorContratista(obra);
+        model.addAttribute("gruposDocumentacion", grupos);
+        model.addAttribute("totalDocumentos", grupos.stream().mapToLong(grupo -> grupo.total()).sum());
         model.addAttribute("resumen", documentacionService.resumen(obra));
         return "documentacion/index";
     }
 
     @GetMapping("/nuevo")
-    public String nuevo(Model model) {
-        cargarFormulario(model, new DocumentoObraForm(), false);
+    public String nuevo(@RequestParam(required = false) Long proveedorId,
+                        @RequestParam(required = false) SujetoDocumental sujeto,
+                        Model model) {
+        DocumentoObraForm form = new DocumentoObraForm();
+        form.setProveedorId(proveedorId);
+        if (sujeto != null) {
+            form.setSujeto(sujeto);
+        }
+        cargarFormulario(model, form, false);
+        return "documentacion/form";
+    }
+
+    @GetMapping("/{id}")
+    public String detalle(@PathVariable Long id, Model model) {
+        model.addAttribute("documento", documentacionService.obtener(id));
+        return "documentacion/detalle";
+    }
+
+    @GetMapping("/{id}/duplicar")
+    public String duplicar(@PathVariable Long id, Model model) {
+        DocumentoObraForm form = documentacionService.formDesde(documentacionService.obtener(id));
+        form.setId(null);
+        cargarFormulario(model, form, false);
         return "documentacion/form";
     }
 
@@ -73,6 +100,55 @@ public class DocumentacionController {
         documentacionService.eliminar(id);
         redirectAttributes.addFlashAttribute("success", "Documento marcado como inactivo.");
         return "redirect:/documentacion";
+    }
+
+    @PostMapping("/{id}/archivo")
+    public String adjuntarArchivo(@PathVariable Long id,
+                                  @RequestParam("archivo") MultipartFile archivo,
+                                  RedirectAttributes redirectAttributes) {
+        try {
+            documentacionService.adjuntarPdf(id, archivo);
+            redirectAttributes.addFlashAttribute("success", "PDF adjuntado correctamente.");
+        } catch (Exception ex) {
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        }
+        return "redirect:/documentacion/" + id;
+    }
+
+    @GetMapping("/{id}/archivo")
+    public ResponseEntity<Resource> descargarArchivo(@PathVariable Long id) throws MalformedURLException {
+        Resource archivo = documentacionService.archivo(id);
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + archivo.getFilename() + "\"")
+                .body(archivo);
+    }
+
+    @PostMapping("/contratistas/{id}/renombrar")
+    public String renombrarContratista(@PathVariable Long id,
+                                       @RequestParam String nombre,
+                                       RedirectAttributes redirectAttributes) {
+        try {
+            proveedorService.renombrar(id, nombre);
+            redirectAttributes.addFlashAttribute("success", "Contratista actualizado correctamente.");
+        } catch (IllegalArgumentException ex) {
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        }
+        return "redirect:/documentacion";
+    }
+
+    @PostMapping("/contratistas")
+    public String crearContratista(@RequestParam String nombre,
+                                   HttpSession session,
+                                   RedirectAttributes redirectAttributes) {
+        try {
+            var carpeta = documentacionService.crearCarpetaContratista(nombre, obraService.obraActiva(session));
+            redirectAttributes.addFlashAttribute("success", "Carpeta documental creada correctamente.");
+            return "redirect:/documentacion/nuevo?proveedorId=" + carpeta.getProveedor().getId();
+        } catch (IllegalArgumentException ex) {
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+            return "redirect:/documentacion";
+        }
     }
 
     private void cargarFormulario(Model model, DocumentoObraForm form, boolean modoEdicion) {

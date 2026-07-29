@@ -13,11 +13,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
 @Entity
@@ -66,16 +69,36 @@ public class DocumentoObra {
     private LocalDate fechaEmision;
     private LocalDate fechaVencimiento;
     private LocalDate fechaPresentacion;
+    private LocalDateTime fechaCreacion;
+    private LocalDateTime fechaUltimaActualizacion;
     private boolean mensual;
     private boolean obligatorioIngreso = true;
     private boolean presentado;
+    private boolean impresoLegajo;
     private boolean activo = true;
 
     @Column(length = 700)
     private String referenciaArchivo;
 
+    @Column(length = 500)
+    private String ubicacionFisica;
+
     @Column(length = 1200)
     private String observacion;
+
+    @PrePersist
+    public void prePersist() {
+        LocalDateTime ahora = LocalDateTime.now();
+        if (fechaCreacion == null) {
+            fechaCreacion = ahora;
+        }
+        fechaUltimaActualizacion = ahora;
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        fechaUltimaActualizacion = LocalDateTime.now();
+    }
 
     public EstadoDocumentoObra estado() {
         if (!activo) {
@@ -102,6 +125,14 @@ public class DocumentoObra {
             return 99999;
         }
         return ChronoUnit.DAYS.between(LocalDate.now(), fechaVencimiento);
+    }
+
+    public boolean tienePdf() {
+        return referenciaArchivo != null && !referenciaArchivo.isBlank();
+    }
+
+    public boolean faltaCopiaImpresa() {
+        return activo && presentado && !impresoLegajo;
     }
 
     public String nombreDocumento() {
