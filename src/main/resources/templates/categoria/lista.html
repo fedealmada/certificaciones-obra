@@ -8,10 +8,13 @@
     (() => {
         const savedTheme = localStorage.getItem('obraControl.theme');
         const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-        document.documentElement.dataset.theme = savedTheme || (prefersDark ? 'dark' : 'light');
+        const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+        document.documentElement.dataset.theme = theme;
+        document.documentElement.dataset.bsTheme = theme;
     })();
     </script>
-    <link th:href="@{/css/app.css}" rel="stylesheet">
+    <link th:href="@{/css/app.css(v='20260730-dark2')}" rel="stylesheet">
+    <link th:href="@{/css/theme.css(v='20260730-theme10')}" rel="stylesheet">
 </head>
 <body>
 <div th:replace="~{fragments/layout :: navbar}"></div>

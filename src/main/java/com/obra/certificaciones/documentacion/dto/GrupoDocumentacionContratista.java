@@ -6,8 +6,14 @@ import com.obra.certificaciones.documentacion.entity.EstadoDocumentoObra;
 import java.util.List;
 
 public record GrupoDocumentacionContratista(
+        Long carpetaId,
+        Long carpetaPadreId,
         Long proveedorId,
         String nombre,
+        String nombreContratista,
+        String apodo,
+        String color,
+        Integer orden,
         EstadoDocumentoObra estado,
         long total,
         long aptos,

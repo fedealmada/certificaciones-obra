@@ -8,10 +8,13 @@
     (() => {
         const savedTheme = localStorage.getItem('obraControl.theme');
         const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-        document.documentElement.dataset.theme = savedTheme || (prefersDark ? 'dark' : 'light');
+        const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+        document.documentElement.dataset.theme = theme;
+        document.documentElement.dataset.bsTheme = theme;
     })();
     </script>
-    <link th:href="@{/css/app.css}" rel="stylesheet">
+    <link th:href="@{/css/app.css(v='20260730-dark2')}" rel="stylesheet">
+    <link th:href="@{/css/theme.css(v='20260730-theme10')}" rel="stylesheet">
 </head>
 <body>
 <div th:replace="~{fragments/layout :: navbar}"></div>
@@ -86,7 +89,7 @@
         <form class="row g-2 align-items-end" method="post" th:action="@{/tablero-certificados/{id}/grupos(id=${tablero.id})}">
             <div class="col-md-10">
                 <label class="form-label">Nombre del grupo</label>
-                <input class="form-control" name="nombreGrupo" placeholder="Ej: Albañileria banios PB">
+                <input class="form-control" name="nombreGrupo" placeholder="Ej: AlbaÃ±ileria banios PB">
             </div>
             <div class="col-md-2">
                 <button class="btn btn-outline-primary w-100" type="submit"><i class="bi bi-plus-lg"></i> Grupo</button>

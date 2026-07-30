@@ -12,6 +12,7 @@
         const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
         const theme = savedTheme || (prefersDark ? 'dark' : 'light');
         document.documentElement.dataset.theme = theme;
+        document.documentElement.dataset.bsTheme = theme;
     })();
     </script>
     <div class="app-nav-container">
@@ -128,6 +129,7 @@
 
         function setTheme(theme) {
             document.documentElement.dataset.theme = theme;
+            document.documentElement.dataset.bsTheme = theme;
             localStorage.setItem('obraControl.theme', theme);
             if (icon) {
                 icon.className = theme === 'dark' ? 'bi bi-sun' : 'bi bi-moon-stars';
@@ -147,4 +149,3 @@
 </nav>
 </body>
 </html>
-

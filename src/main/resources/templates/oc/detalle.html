@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,10 +8,13 @@
     (() => {
         const savedTheme = localStorage.getItem('obraControl.theme');
         const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-        document.documentElement.dataset.theme = savedTheme || (prefersDark ? 'dark' : 'light');
+        const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+        document.documentElement.dataset.theme = theme;
+        document.documentElement.dataset.bsTheme = theme;
     })();
     </script>
-    <link th:href="@{/css/app.css}" rel="stylesheet">
+    <link th:href="@{/css/app.css(v='20260730-dark2')}" rel="stylesheet">
+    <link th:href="@{/css/theme.css(v='20260730-theme10')}" rel="stylesheet">
 </head>
 <body>
 <div th:replace="~{fragments/layout :: navbar}"></div>
@@ -27,7 +30,7 @@
             <i class="bi bi-check-lg"></i>
         </div>
         <div class="work-action-kicker">Orden de compra</div>
-        <h2 th:text="${accionTitulo ?: 'Â¡Terminaste!'}">Â¡Terminaste!</h2>
+        <h2 th:text="${accionTitulo ?: '¡Terminaste!'}">¡Terminaste!</h2>
         <p th:text="${accionMensaje ?: 'La orden quedo guardada correctamente.'}">La orden quedo guardada correctamente.</p>
         <a class="work-action-link" href="#items-orden">Ver items cargados</a>
     </div>
@@ -410,4 +413,3 @@ document.querySelectorAll('.cert-click-row, .delivery-click-row').forEach(row =>
 </script>
 </body>
 </html>
-

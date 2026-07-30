@@ -94,19 +94,15 @@ public class DocumentacionService {
         List<GrupoDocumentacionContratista> grupos = new java.util.ArrayList<>();
         for (CarpetaDocumentacion carpeta : carpetasActivas(obra)) {
             if (carpeta.isGeneral()) {
-                grupos.add(toGrupo(null, carpeta.getNombre(), generales, true));
+                grupos.add(toGrupo(carpeta, null, generales, true));
             } else if (carpeta.getProveedor() != null) {
                 Proveedor proveedor = carpeta.getProveedor();
-                grupos.add(toGrupo(proveedor.getId(), carpeta.getNombre(), porProveedor.getOrDefault(proveedor.getId(), List.of()), false));
+                grupos.add(toGrupo(carpeta, proveedor.getId(), porProveedor.getOrDefault(proveedor.getId(), List.of()), false));
+            } else {
+                grupos.add(toGrupo(carpeta, null, List.of(), false));
             }
         }
-        return grupos.stream()
-                .sorted(Comparator.comparing(GrupoDocumentacionContratista::vencidos).reversed()
-                        .thenComparing(GrupoDocumentacionContratista::porVencer, Comparator.reverseOrder())
-                        .thenComparing(GrupoDocumentacionContratista::pendientes, Comparator.reverseOrder())
-                        .thenComparing(GrupoDocumentacionContratista::general)
-                        .thenComparing(GrupoDocumentacionContratista::nombre))
-                .toList();
+        return grupos;
     }
 
     @Transactional
@@ -119,9 +115,12 @@ public class DocumentacionService {
             throw new IllegalArgumentException("Ese contratista ya tiene carpeta documental.");
         }
         CarpetaDocumentacion carpeta = new CarpetaDocumentacion();
+        int orden = siguienteOrdenCarpeta(obra);
         carpeta.setObra(obra);
         carpeta.setProveedor(proveedor);
         carpeta.setNombre(proveedor.getNombre());
+        carpeta.setColor(colorPorOrden(orden));
+        carpeta.setOrden(orden);
         carpeta.setGeneral(false);
         return carpetaRepository.save(carpeta);
     }
@@ -137,6 +136,150 @@ public class DocumentacionService {
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("No encontre un contratista existente con ese nombre. Primero crealo en Proveedores."));
         return crearCarpetaContratista(proveedor.getId(), obra);
+    }
+
+    @Transactional
+    public CarpetaDocumentacion crearCarpetaLibre(String nombre, Long proveedorId, String apodo, String color, Long carpetaPadreId, Obra obra) {
+        Proveedor proveedor = proveedorId == null ? null : proveedorService.obtener(proveedorId);
+        CarpetaDocumentacion carpetaPadre = carpetaPadreId == null ? null : carpetaRepository.findById(carpetaPadreId)
+                .orElseThrow(() -> new EntityNotFoundException("No existe la carpeta padre " + carpetaPadreId));
+        if (carpetaPadre != null && (carpetaPadre.getObra() == null || !carpetaPadre.getObra().getId().equals(obra.getId()) || !carpetaPadre.isActivo())) {
+            throw new IllegalArgumentException("La carpeta padre no pertenece a la obra activa.");
+        }
+        String nombreNormalizado = texto(nombre);
+        if (!StringUtils.hasText(nombreNormalizado) && proveedor != null) {
+            nombreNormalizado = proveedor.getNombre();
+        }
+        if (!StringUtils.hasText(nombreNormalizado)) {
+            throw new IllegalArgumentException("Debe indicar un nombre para la carpeta.");
+        }
+        if (proveedor != null && carpetaRepository.existsByObraIdAndProveedorIdAndActivoTrue(obra.getId(), proveedor.getId())) {
+            throw new IllegalArgumentException("Ese contratista ya tiene carpeta documental.");
+        }
+        int orden = siguienteOrdenCarpeta(obra);
+        CarpetaDocumentacion carpeta = new CarpetaDocumentacion();
+        carpeta.setObra(obra);
+        carpeta.setProveedor(proveedor);
+        carpeta.setPadre(carpetaPadre);
+        carpeta.setNombre(nombreNormalizado);
+        carpeta.setApodo(texto(apodo));
+        carpeta.setColor(colorValido(color) ? color.trim() : colorPorOrden(orden));
+        carpeta.setOrden(orden);
+        carpeta.setGeneral(false);
+        return carpetaRepository.save(carpeta);
+    }
+
+    @Transactional
+    public void personalizarCarpeta(Long carpetaId, String nombre, String apodo, String color, Long proveedorId) {
+        CarpetaDocumentacion carpeta = carpetaRepository.findById(carpetaId)
+                .orElseThrow(() -> new EntityNotFoundException("No existe la carpeta documental " + carpetaId));
+        if (StringUtils.hasText(nombre)) {
+            carpeta.setNombre(nombre.trim());
+        }
+        carpeta.setApodo(texto(apodo));
+        if (colorValido(color)) {
+            carpeta.setColor(color.trim());
+        }
+        if (!carpeta.isGeneral()) {
+            Proveedor proveedor = proveedorId == null ? null : proveedorService.obtener(proveedorId);
+            if (proveedor != null) {
+                boolean duplicada = carpetasActivas(carpeta.getObra()).stream()
+                        .anyMatch(otra -> !otra.getId().equals(carpeta.getId())
+                                && otra.getProveedor() != null
+                                && otra.getProveedor().getId().equals(proveedor.getId()));
+                if (duplicada) {
+                    throw new IllegalArgumentException("Ese contratista ya esta vinculado a otra carpeta documental.");
+                }
+            }
+            carpeta.setProveedor(proveedor);
+        }
+        carpetaRepository.save(carpeta);
+    }
+
+    @Transactional
+    public void eliminarCarpeta(Long carpetaId) {
+        CarpetaDocumentacion carpeta = carpetaRepository.findById(carpetaId)
+                .orElseThrow(() -> new EntityNotFoundException("No existe la carpeta documental " + carpetaId));
+        if (carpeta.isGeneral()) {
+            throw new IllegalArgumentException("La carpeta general de obra no se puede eliminar.");
+        }
+        carpeta.setActivo(false);
+        carpetaRepository.save(carpeta);
+    }
+
+    @Transactional
+    public void moverCarpeta(Long carpetaId, int direccion, Obra obra) {
+        List<CarpetaDocumentacion> carpetas = new java.util.ArrayList<>(carpetasActivas(obra));
+        for (int i = 0; i < carpetas.size(); i++) {
+            carpetas.get(i).setOrden(i);
+        }
+        int indice = java.util.stream.IntStream.range(0, carpetas.size())
+                .filter(i -> carpetas.get(i).getId().equals(carpetaId))
+                .findFirst()
+                .orElseThrow(() -> new EntityNotFoundException("No existe la carpeta documental " + carpetaId));
+        int destino = Math.max(0, Math.min(carpetas.size() - 1, indice + direccion));
+        if (indice == destino) {
+            return;
+        }
+        java.util.Collections.swap(carpetas, indice, destino);
+        for (int i = 0; i < carpetas.size(); i++) {
+            carpetas.get(i).setOrden(i);
+        }
+        carpetaRepository.saveAll(carpetas);
+    }
+
+    @Transactional
+    public void moverCarpetas(List<Long> carpetaIds, Long carpetaPadreId, Obra obra) {
+        if (carpetaIds == null || carpetaIds.isEmpty()) {
+            return;
+        }
+        CarpetaDocumentacion destino = carpetaPadreId == null ? null : carpetaRepository.findById(carpetaPadreId)
+                .orElseThrow(() -> new EntityNotFoundException("No existe la carpeta destino " + carpetaPadreId));
+        if (destino != null && (destino.getObra() == null || !destino.getObra().getId().equals(obra.getId()) || !destino.isActivo())) {
+            throw new IllegalArgumentException("La carpeta destino no pertenece a la obra activa.");
+        }
+        List<CarpetaDocumentacion> carpetas = carpetaIds.stream()
+                .map(id -> carpetaRepository.findById(id)
+                        .orElseThrow(() -> new EntityNotFoundException("No existe la carpeta documental " + id)))
+                .toList();
+        for (CarpetaDocumentacion carpeta : carpetas) {
+            if (carpeta.isGeneral()) {
+                throw new IllegalArgumentException("La carpeta general de obra no se puede mover.");
+            }
+            if (carpeta.getObra() == null || !carpeta.getObra().getId().equals(obra.getId())) {
+                throw new IllegalArgumentException("Una de las carpetas seleccionadas no pertenece a la obra activa.");
+            }
+            if (destino != null && carpeta.getId().equals(destino.getId())) {
+                throw new IllegalArgumentException("No podes mover una carpeta dentro de si misma.");
+            }
+            if (destino != null && esDescendiente(destino, carpeta)) {
+                throw new IllegalArgumentException("No podes mover una carpeta dentro de una subcarpeta propia.");
+            }
+            carpeta.setPadre(destino);
+            carpeta.setOrden(siguienteOrdenCarpeta(obra));
+        }
+        carpetaRepository.saveAll(carpetas);
+    }
+
+    @Transactional
+    public void reordenarCarpetas(List<Long> carpetaIds, Obra obra) {
+        if (carpetaIds == null || carpetaIds.isEmpty()) {
+            return;
+        }
+        Map<Long, CarpetaDocumentacion> carpetasPorId = carpetasActivas(obra).stream()
+                .collect(java.util.stream.Collectors.toMap(CarpetaDocumentacion::getId, carpeta -> carpeta));
+        List<CarpetaDocumentacion> reordenadas = new java.util.ArrayList<>();
+        for (Long carpetaId : carpetaIds) {
+            CarpetaDocumentacion carpeta = carpetasPorId.remove(carpetaId);
+            if (carpeta != null) {
+                reordenadas.add(carpeta);
+            }
+        }
+        reordenadas.addAll(carpetasPorId.values());
+        for (int i = 0; i < reordenadas.size(); i++) {
+            reordenadas.get(i).setOrden(i);
+        }
+        carpetaRepository.saveAll(reordenadas);
     }
 
     @Transactional(readOnly = true)
@@ -159,6 +302,8 @@ public class DocumentacionService {
         documento.setFechaEmision(form.getFechaEmision());
         documento.setFechaVencimiento(form.getFechaVencimiento());
         documento.setFechaPresentacion(form.getFechaPresentacion());
+        documento.setFechaVencimientoFisico(form.getFechaVencimientoFisico());
+        documento.setFechaUltimaVerificacionFisica(form.getFechaUltimaVerificacionFisica());
         documento.setMensual(form.isMensual());
         documento.setObligatorioIngreso(form.isObligatorioIngreso());
         documento.setPresentado(form.isPresentado());
@@ -233,6 +378,8 @@ public class DocumentacionService {
         form.setFechaEmision(documento.getFechaEmision());
         form.setFechaVencimiento(documento.getFechaVencimiento());
         form.setFechaPresentacion(documento.getFechaPresentacion());
+        form.setFechaVencimientoFisico(documento.getFechaVencimientoFisico());
+        form.setFechaUltimaVerificacionFisica(documento.getFechaUltimaVerificacionFisica());
         form.setMensual(documento.isMensual());
         form.setObligatorioIngreso(documento.isObligatorioIngreso());
         form.setPresentado(documento.isPresentado());
@@ -249,7 +396,7 @@ public class DocumentacionService {
     }
 
     public DocumentacionResumen resumen(List<DocumentoObra> documentos, List<Proveedor> proveedores) {
-        long aptos = 0, porVencer = 0, vencidos = 0, pendientes = 0, mensualesPendientes = 0;
+        long aptos = 0, porVencer = 0, vencidos = 0, pendientes = 0, mensualesPendientes = 0, carpetaFisicaPendiente = 0;
         Map<String, MutableContratista> porContratista = new LinkedHashMap<>();
         LocalDate hoy = LocalDate.now();
         for (DocumentoObra documento : documentos) {
@@ -258,6 +405,7 @@ public class DocumentacionService {
             if (estado == EstadoDocumentoObra.POR_VENCER) porVencer++;
             if (estado == EstadoDocumentoObra.VENCIDO) vencidos++;
             if (estado == EstadoDocumentoObra.PENDIENTE) pendientes++;
+            if (documento.carpetaFisicaPendiente()) carpetaFisicaPendiente++;
             if (documento.isMensual() && (documento.getFechaPresentacion() == null
                     || documento.getFechaPresentacion().getMonth() != hoy.getMonth()
                     || documento.getFechaPresentacion().getYear() != hoy.getYear())) {
@@ -278,7 +426,7 @@ public class DocumentacionService {
                 .sorted(Comparator.comparing(ContratistaDocumentacionResumen::vencidos).reversed()
                         .thenComparing(ContratistaDocumentacionResumen::porVencer).reversed())
                 .toList();
-        return new DocumentacionResumen(documentos.size(), aptos, porVencer, vencidos, pendientes, mensualesPendientes, contratistas);
+        return new DocumentacionResumen(documentos.size(), aptos, porVencer, vencidos, pendientes, mensualesPendientes, carpetaFisicaPendiente, contratistas);
     }
 
     private void validar(DocumentoObraForm form) {
@@ -306,6 +454,23 @@ public class DocumentacionService {
         return StringUtils.hasText(valor) ? valor.trim() : null;
     }
 
+    private boolean colorValido(String color) {
+        return StringUtils.hasText(color) && color.trim().matches("^#[0-9a-fA-F]{6}$");
+    }
+
+    private boolean esDescendiente(CarpetaDocumentacion posibleDescendiente, CarpetaDocumentacion carpeta) {
+        CarpetaDocumentacion cursor = posibleDescendiente;
+        int guard = 0;
+        while (cursor != null && guard < 100) {
+            if (cursor.getId() != null && cursor.getId().equals(carpeta.getId())) {
+                return true;
+            }
+            cursor = cursor.getPadre();
+            guard++;
+        }
+        return false;
+    }
+
     private Path carpetaAdjuntos() {
         return Path.of(uploadDir).toAbsolutePath().normalize();
     }
@@ -319,7 +484,7 @@ public class DocumentacionService {
     }
 
     private List<CarpetaDocumentacion> carpetasActivas(Obra obra) {
-        return carpetaRepository.findByObraIdAndActivoTrueOrderByGeneralDescNombreAsc(obra.getId());
+        return carpetaRepository.findByObraIdAndActivoTrueOrderByOrdenAscGeneralDescNombreAsc(obra.getId());
     }
 
     private void asegurarCarpetasIniciales(Obra obra) {
@@ -327,6 +492,9 @@ public class DocumentacionService {
             CarpetaDocumentacion general = new CarpetaDocumentacion();
             general.setObra(obra);
             general.setNombre("Simende (Obra)");
+            general.setApodo("Obra");
+            general.setColor("#2563eb");
+            general.setOrden(0);
             general.setGeneral(true);
             carpetaRepository.save(general);
         }
@@ -337,11 +505,15 @@ public class DocumentacionService {
                     carpeta.setObra(obra);
                     carpeta.setProveedor(proveedor);
                     carpeta.setNombre(nombreBase.equals("El Artesano") ? "El Artesano (Gomez Eliana)" : proveedor.getNombre());
+                    carpeta.setApodo(nombreBase.equals("El Artesano") ? "El Artesano" : null);
+                    carpeta.setOrden(siguienteOrdenCarpeta(obra));
+                    carpeta.setColor(colorPorOrden(carpeta.getOrden()));
                     carpeta.setGeneral(false);
                     carpetaRepository.save(carpeta);
                 }
             });
         }
+        normalizarCarpetas(obra);
     }
 
     private java.util.Optional<Proveedor> buscarProveedorParaCarpeta(String nombreBase) {
@@ -357,7 +529,7 @@ public class DocumentacionService {
                 .findFirst();
     }
 
-    private GrupoDocumentacionContratista toGrupo(Long proveedorId, String nombre, List<DocumentoObra> documentos, boolean general) {
+    private GrupoDocumentacionContratista toGrupo(CarpetaDocumentacion carpeta, Long proveedorId, List<DocumentoObra> documentos, boolean general) {
         long aptos = 0, porVencer = 0, vencidos = 0, pendientes = 0;
         for (DocumentoObra documento : documentos) {
             EstadoDocumentoObra estado = documento.estado();
@@ -373,19 +545,57 @@ public class DocumentacionService {
         else if (porVencer > 0) estadoGrupo = EstadoDocumentoObra.POR_VENCER;
         TipoVinculoDocumental vinculoPrincipal = vinculoPrincipal(documentos);
         return new GrupoDocumentacionContratista(
+                carpeta.getId(),
+                carpeta.getPadre() == null ? null : carpeta.getPadre().getId(),
                 proveedorId,
-                nombre,
+                carpeta.nombreVisible(),
+                carpeta.getNombre(),
+                carpeta.getApodo(),
+                StringUtils.hasText(carpeta.getColor()) ? carpeta.getColor() : "#facc15",
+                carpeta.getOrden() == null ? 0 : carpeta.getOrden(),
                 estadoGrupo,
                 documentos.size(),
                 aptos,
                 porVencer,
                 vencidos,
                 pendientes,
-                general ? "is-general" : cssVinculo(vinculoPrincipal),
-                general ? "General" : vinculoPrincipal.getDescripcion(),
+                general ? "is-general" : (proveedorId == null ? "is-libre" : cssVinculo(vinculoPrincipal)),
+                general ? "General" : (proveedorId == null ? "Carpeta libre" : vinculoPrincipal.getDescripcion()),
                 general,
                 documentos
         );
+    }
+
+    private int siguienteOrdenCarpeta(Obra obra) {
+        return carpetasActivas(obra).stream()
+                .map(CarpetaDocumentacion::getOrden)
+                .filter(java.util.Objects::nonNull)
+                .max(Integer::compareTo)
+                .orElse(-1) + 1;
+    }
+
+    private String colorPorOrden(int orden) {
+        List<String> colores = List.of("#2563eb", "#16a34a", "#f59e0b", "#dc2626", "#7c3aed", "#0891b2", "#db2777");
+        return colores.get(Math.floorMod(orden, colores.size()));
+    }
+
+    private void normalizarCarpetas(Obra obra) {
+        List<CarpetaDocumentacion> carpetas = carpetasActivas(obra);
+        boolean guardar = false;
+        for (int i = 0; i < carpetas.size(); i++) {
+            CarpetaDocumentacion carpeta = carpetas.get(i);
+            if (carpeta.getOrden() == null) {
+                carpeta.setOrden(i);
+                guardar = true;
+            }
+            if (!StringUtils.hasText(carpeta.getColor())) {
+                carpeta.setColor(colorPorOrden(i));
+                guardar = true;
+            }
+        }
+        if (guardar) {
+            carpetaRepository.saveAll(carpetas);
+        }
     }
 
     private TipoVinculoDocumental vinculoPrincipal(List<DocumentoObra> documentos) {

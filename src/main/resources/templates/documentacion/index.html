@@ -4,8 +4,9 @@
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Documentacion</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script>(()=>{const s=localStorage.getItem('obraControl.theme');const d=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.dataset.theme=s||(d?'dark':'light');})();</script>
-    <link th:href="@{/css/app.css}" rel="stylesheet">
+    <script>(()=>{const s=localStorage.getItem('obraControl.theme');const d=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;const t=s||(d?'dark':'light');document.documentElement.dataset.theme=t;document.documentElement.dataset.bsTheme=t;})();</script>
+    <link th:href="@{/css/app.css(v='20260730-dark2')}" rel="stylesheet">
+    <link th:href="@{/css/theme.css(v='20260730-theme10')}" rel="stylesheet">
 </head>
 <body>
 <div th:replace="~{fragments/layout :: navbar}"></div>
@@ -89,7 +90,14 @@
                     <small>Control administrativo de vencimientos periodicos.</small>
                 </div>
             </article>
-            <article class="document-priority-card is-ok" th:if="${resumen.vencidos() == 0 && resumen.porVencer() == 0 && resumen.pendientes() == 0 && resumen.mensualesPendientes() == 0}">
+            <article class="document-priority-card is-warning" th:if="${resumen.carpetaFisicaPendiente() > 0}">
+                <span class="priority-icon"><i class="bi bi-printer"></i></span>
+                <div>
+                    <strong th:text="${resumen.carpetaFisicaPendiente()} + ' carpetas fisicas pendientes'">0 carpetas</strong>
+                    <small>Documentos vigentes que requieren imprimir, actualizar o revisar legajo.</small>
+                </div>
+            </article>
+            <article class="document-priority-card is-ok" th:if="${resumen.vencidos() == 0 && resumen.porVencer() == 0 && resumen.pendientes() == 0 && resumen.mensualesPendientes() == 0 && resumen.carpetaFisicaPendiente() == 0}">
                 <span class="priority-icon"><i class="bi bi-check2-circle"></i></span>
                 <div>
                     <strong>Sin urgencias documentales</strong>
@@ -103,7 +111,7 @@
         <div class="section-title-row document-explorer-title">
             <div>
                 <h2 class="h5 mb-0"><i class="bi bi-folder-check"></i> Carpetas documentales</h2>
-                <small>Cada carpeta representa un contratista activo. General queda reservado para documentos de obra.</small>
+                <small>Organiza legajos como carpetas: pueden estar vacias, tener apodo y vincularse a un contratista cuando haga falta.</small>
             </div>
             <div class="document-explorer-actions">
                 <span class="section-total-pill" th:text="${gruposDocumentacion.size()} + ' carpetas'">0 carpetas</span>
@@ -127,12 +135,17 @@
                 <button class="btn btn-outline-secondary btn-sm" type="button" data-doc-expand="none"><i class="bi bi-arrows-collapse"></i> Cerrar</button>
             </div>
         </div>
-        <div class="documentacion-group-list">
-            <article class="documentacion-group document-folder" th:each="grupo : ${gruposDocumentacion}" th:classappend="${' ' + grupo.tipoCss()}" th:data-proveedor-id="${grupo.proveedorId()}" th:data-folder-name="${grupo.nombre()}" th:data-folder-general="${grupo.general()}">
-                <button class="documentacion-group-header document-folder-header" type="button" onclick="toggleDocumentacionGrupo(this)" title="Click para abrir/cerrar carpeta">
+        <div class="documentacion-group-list" id="document-folder-list">
+            <article class="documentacion-group document-folder" draggable="true" th:each="grupo : ${gruposDocumentacion}" th:classappend="${' ' + grupo.tipoCss()}" th:style="${'--folder-color:' + grupo.color()}" th:data-carpeta-id="${grupo.carpetaId()}" th:data-folder-parent-id="${grupo.carpetaPadreId()}" th:data-proveedor-id="${grupo.proveedorId()}" th:data-folder-name="${grupo.nombre()}" th:data-folder-real-name="${grupo.nombreContratista()}" th:data-folder-apodo="${grupo.apodo()}" th:data-folder-color="${grupo.color()}" th:data-folder-general="${grupo.general()}" th:data-folder-total="${grupo.total()}" th:data-folder-vigentes="${grupo.aptos()}" th:data-folder-por-vencer="${grupo.porVencer()}" th:data-folder-vencidos="${grupo.vencidos()}" th:data-folder-pendientes="${grupo.pendientes()}" th:data-folder-tipo="${grupo.tipoDescripcion()}" th:data-folder-estado="${grupo.estado().descripcion}" th:data-folder-estado-class="${grupo.estado().cssClass}">
+                <div class="documentacion-group-header document-folder-header" role="button" tabindex="0" title="Ver resumen de carpeta">
                     <span class="documentacion-group-main">
+                        <span class="document-folder-drag" title="Arrastrar para ordenar"><i class="bi bi-grip-vertical"></i></span>
                         <span class="document-folder-icon"><i class="bi bi-folder2-open"></i></span>
-                        <strong class="document-folder-name" th:text="${grupo.nombre()}" title="Click derecho: acciones del contratista">Contratista</strong>
+                        <span class="document-folder-title-stack">
+                                <strong class="document-folder-name" th:text="${grupo.nombre()}" title="Click derecho: acciones de carpeta">Carpeta</strong>
+                                <small th:if="${grupo.apodo() != null && !#strings.isEmpty(grupo.apodo())}" th:text="${grupo.nombreContratista()}">Nombre real</small>
+                                <small th:if="${grupo.proveedorId() == null && !grupo.general()}">Sin contratista vinculado</small>
+                        </span>
                     </span>
                     <span class="documentacion-group-kpis">
                         <span class="doc-status-pill" th:classappend="${' ' + grupo.estado().cssClass}" th:text="${grupo.estado().descripcion}">Apto</span>
@@ -140,9 +153,9 @@
                         <span th:if="${grupo.vencidos() > 0}" class="doc-mini-kpi is-danger" th:text="${grupo.vencidos()} + ' vencidos'">0 vencidos</span>
                         <span th:if="${grupo.porVencer() > 0}" class="doc-mini-kpi is-warning" th:text="${grupo.porVencer()} + ' por vencer'">0 por vencer</span>
                         <span class="doc-folder-type-pill" th:text="${grupo.tipoDescripcion()}">Tipo</span>
-                        <i class="bi bi-chevron-down document-folder-chevron"></i>
+                        <button class="document-folder-toggle" type="button" onclick="event.stopPropagation(); toggleDocumentacionGrupo(this);" title="Abrir/cerrar documentos" aria-label="Abrir/cerrar documentos"><i class="bi bi-chevron-down document-folder-chevron"></i></button>
                     </span>
-                </button>
+                </div>
                 <div class="documentacion-group-body">
                     <div class="document-explorer-head" th:if="${!grupo.documentos().isEmpty()}">
                         <span>Documento</span>
@@ -163,12 +176,17 @@
                                           data-doc-presentacion=${doc.fechaPresentacion == null ? '-' : #temporals.format(doc.fechaPresentacion, 'dd/MM/yyyy')},
                                           data-doc-vencimiento=${doc.fechaVencimiento == null ? 'Sin vencimiento' : #temporals.format(doc.fechaVencimiento, 'dd/MM/yyyy')},
                                           data-doc-dias=${doc.fechaVencimiento == null ? '-' : doc.diasAlVencimiento() + ' dias'},
+                                          data-doc-fisico=${doc.estadoCarpetaFisica().descripcion},
+                                          data-doc-fisico-class=${doc.estadoCarpetaFisica().cssClass},
+                                          data-doc-fisico-hasta=${doc.fechaVencimientoFisico == null ? '-' : #temporals.format(doc.fechaVencimientoFisico, 'dd/MM/yyyy')},
+                                          data-doc-fisico-verificado=${doc.fechaUltimaVerificacionFisica == null ? '-' : #temporals.format(doc.fechaUltimaVerificacionFisica, 'dd/MM/yyyy')},
+                                          data-doc-fisico-accion=${doc.accionCarpetaFisica()},
                                           data-doc-creacion=${doc.fechaCreacion == null ? '-' : #temporals.format(doc.fechaCreacion, 'dd/MM/yyyy HH:mm')},
                                           data-doc-actualizacion=${doc.fechaUltimaActualizacion == null ? '-' : #temporals.format(doc.fechaUltimaActualizacion, 'dd/MM/yyyy HH:mm')},
                                           data-doc-mensual=${doc.mensual ? 'Si' : 'No'},
                                           data-doc-ingreso=${doc.obligatorioIngreso ? 'Condiciona ingreso' : 'No condiciona'},
                                           data-doc-pdf=${doc.tienePdf() ? 'Adjuntado' : 'Sin PDF'},
-                                          data-doc-print=${doc.impresoLegajo ? 'Impreso al dia' : 'Falta copia impresa'},
+                                          data-doc-print=${doc.estadoCarpetaFisica().descripcion},
                                           data-doc-print-missing=${doc.faltaCopiaImpresa()},
                                           data-doc-ubicacion=${doc.ubicacionFisica == null ? 'Sin ubicacion fisica cargada' : doc.ubicacionFisica},
                                           data-doc-archivo=${doc.referenciaArchivo == null ? '' : doc.referenciaArchivo},
@@ -204,8 +222,7 @@
                                 </span>
                                 <span class="document-leaf-support">
                                     <span th:if="${doc.tienePdf()}" class="doc-tag is-pdf"><i class="bi bi-filetype-pdf"></i> PDF</span>
-                                    <span th:if="${doc.impresoLegajo}" class="doc-tag is-printed"><i class="bi bi-printer"></i> Impreso</span>
-                                    <span th:if="${doc.faltaCopiaImpresa()}" class="doc-tag is-print-missing"><i class="bi bi-folder-x"></i> Falta impreso</span>
+                                    <span class="doc-tag" th:classappend="${' is-physical-' + doc.estadoCarpetaFisica().cssClass}" th:text="${doc.estadoCarpetaFisica().descripcion}">Fisico</span>
                                 </span>
                             </a>
                             <span class="document-leaf-actions">
@@ -217,7 +234,7 @@
                             <i class="bi bi-folder2-open"></i>
                             <div>
                                 <strong>Carpeta sin documentos</strong>
-                                <small th:text="${grupo.general() ? 'Carga documentos generales de obra aca.' : 'Este contratista existe, pero todavia no tiene documentacion cargada.'}">Sin documentos</small>
+                                <small th:text="${grupo.general() ? 'Carga documentos generales de obra aca.' : (grupo.proveedorId() == null ? 'Carpeta libre: podes dejarla vacia o vincularle un contratista desde Personalizar.' : 'Este contratista existe, pero todavia no tiene documentacion cargada.')}">Sin documentos</small>
                             </div>
                             <a class="btn btn-sm btn-primary" th:href="${grupo.proveedorId() == null ? '/documentacion/nuevo?sujeto=OBRA' : '/documentacion/nuevo?proveedorId=' + grupo.proveedorId()}"><i class="bi bi-file-earmark-plus"></i> Agregar documento</a>
                         </div>
@@ -256,6 +273,8 @@
                 <article><span>Ingreso a obra</span><strong data-doc-field="ingreso">-</strong></article>
                 <article><span>PDF digital</span><strong data-doc-field="pdf">Sin PDF</strong></article>
                 <article><span>Legajo fisico</span><strong data-doc-field="print">-</strong></article>
+                <article><span>Version fisica hasta</span><strong data-doc-field="fisicoHasta">-</strong></article>
+                <article><span>Ultima verificacion fisica</span><strong data-doc-field="fisicoVerificado">-</strong></article>
                 <article><span>Creado</span><strong data-doc-field="creacion">-</strong></article>
                 <article><span>Ultima actualizacion</span><strong data-doc-field="actualizacion">-</strong></article>
             </div>
@@ -275,9 +294,102 @@
     </div>
     <div class="document-folder-menu d-none" id="document-folder-menu" role="menu" aria-label="Acciones del contratista">
         <div class="document-menu-title"><i class="bi bi-building"></i> <span id="document-folder-menu-title">Contratista</span></div>
+        <button type="button" data-action="folder-summary"><i class="bi bi-eye"></i> Ver resumen</button>
+        <button type="button" data-action="customize-folder"><i class="bi bi-palette"></i> Personalizar carpeta</button>
         <button type="button" data-action="new-doc"><i class="bi bi-file-earmark-plus"></i> Nuevo documento</button>
         <button type="button" data-action="new-folder"><i class="bi bi-folder-plus"></i> Nueva carpeta documental</button>
-        <button type="button" data-action="rename-folder"><i class="bi bi-pencil-square"></i> Cambiar nombre</button>
+        <button type="button" data-action="move-up"><i class="bi bi-arrow-up"></i> Mover arriba</button>
+        <button type="button" data-action="move-down"><i class="bi bi-arrow-down"></i> Mover abajo</button>
+        <button type="button" data-action="rename-folder"><i class="bi bi-pencil-square"></i> Cambiar nombre de carpeta</button>
+        <button type="button" data-action="delete-folder" class="is-danger-action"><i class="bi bi-trash"></i> Eliminar carpeta</button>
+    </div>
+    <div class="document-quick-view d-none" id="folder-quick-view" aria-hidden="true">
+        <div class="document-quick-backdrop" data-folder-modal-close></div>
+        <section class="document-quick-modal" role="dialog" aria-modal="true" aria-labelledby="folder-quick-title" tabindex="-1">
+            <button class="document-quick-close" type="button" data-folder-modal-close aria-label="Cerrar resumen"><i class="bi bi-x-lg"></i></button>
+            <header class="document-quick-header">
+                <span class="document-quick-icon folder-summary-icon" id="folder-quick-icon"><i class="bi bi-folder2-open"></i></span>
+                <div>
+                    <div class="document-kicker" id="folder-quick-kicker">Carpeta documental</div>
+                    <h2 id="folder-quick-title">Carpeta</h2>
+                    <p id="folder-quick-subtitle">Contratista</p>
+                </div>
+                <span class="doc-status-pill" id="folder-quick-status">Estado</span>
+            </header>
+            <div class="document-quick-grid">
+                <article><span>Documentos</span><strong data-folder-field="total">-</strong></article>
+                <article><span>Vigentes</span><strong data-folder-field="vigentes">-</strong></article>
+                <article><span>Por vencer</span><strong data-folder-field="porVencer">-</strong></article>
+                <article><span>Vencidos</span><strong data-folder-field="vencidos">-</strong></article>
+                <article><span>Pendientes</span><strong data-folder-field="pendientes">-</strong></article>
+                <article><span>Tipo principal</span><strong data-folder-field="tipo">-</strong></article>
+                <article><span>Contratista vinculado</span><strong data-folder-field="contratista">-</strong></article>
+                <article><span>Apodo</span><strong data-folder-field="apodo">-</strong></article>
+                <article><span>Color</span><strong data-folder-field="color">-</strong></article>
+            </div>
+            <footer class="document-quick-actions">
+                <a class="btn btn-primary" id="folder-quick-new-doc" href="#"><i class="bi bi-file-earmark-plus"></i> Nuevo documento</a>
+                <button class="btn btn-outline-primary" type="button" data-folder-customize><i class="bi bi-palette"></i> Personalizar</button>
+                <button class="btn btn-outline-danger" type="button" data-folder-delete><i class="bi bi-trash"></i> Eliminar</button>
+                <button class="btn btn-outline-secondary" type="button" data-folder-modal-close><i class="bi bi-x-lg"></i> Cerrar</button>
+            </footer>
+        </section>
+    </div>
+    <div class="document-quick-view d-none" id="folder-customize-view" aria-hidden="true">
+        <div class="document-quick-backdrop" data-customize-close></div>
+        <section class="document-quick-modal folder-customize-modal" role="dialog" aria-modal="true" aria-labelledby="folder-customize-title" tabindex="-1">
+            <button class="document-quick-close" type="button" data-customize-close aria-label="Cerrar personalizacion"><i class="bi bi-x-lg"></i></button>
+            <header class="document-quick-header">
+                <span class="document-quick-icon folder-summary-icon" id="folder-customize-icon"><i class="bi bi-palette"></i></span>
+                <div>
+                    <div class="document-kicker" id="folder-customize-kicker">Personalizar carpeta</div>
+                    <h2 id="folder-customize-title">Carpeta</h2>
+                    <p id="folder-customize-subtitle">Cambia nombre, apodo, color y contratista vinculado.</p>
+                </div>
+            </header>
+            <form method="post" id="folder-customize-form" class="folder-customize-form">
+                <input type="hidden" name="carpetaPadreId" id="folder-customize-parent">
+                <label>
+                    <span>Nombre de carpeta</span>
+                    <input class="form-control" name="nombre" id="folder-customize-nombre" placeholder="Ej: Enercon, Legajo obra, Pendientes">
+                    <small>Puede ser distinto al nombre del contratista.</small>
+                </label>
+                <label>
+                    <span>Contratista vinculado</span>
+                    <select class="form-select" name="proveedorId" id="folder-customize-proveedor">
+                        <option value="">Sin contratista vinculado</option>
+                        <option th:each="proveedor : ${proveedores}" th:value="${proveedor.id}" th:text="${proveedor.nombre}">Proveedor</option>
+                    </select>
+                    <small>Opcional. Si lo vinculas, la carpeta muestra la documentacion de ese contratista.</small>
+                </label>
+                <label>
+                    <span>Apodo visible</span>
+                    <input class="form-control" name="apodo" id="folder-customize-apodo" placeholder="Ej: Muriel, Enercon, Carpeta obra">
+                    <small>Si lo dejas vacio se muestra el nombre real del contratista.</small>
+                </label>
+                <label>
+                    <span>Color de carpeta</span>
+                    <div class="folder-color-control">
+                        <input type="color" name="color" id="folder-customize-color" value="#facc15" aria-label="Color de carpeta">
+                        <input class="form-control" id="folder-customize-color-text" value="#facc15" maxlength="7" pattern="#[0-9a-fA-F]{6}">
+                    </div>
+                </label>
+                <div class="folder-color-swatches" aria-label="Colores rapidos">
+                    <button type="button" data-folder-color="#2563eb" style="--swatch:#2563eb"></button>
+                    <button type="button" data-folder-color="#16a34a" style="--swatch:#16a34a"></button>
+                    <button type="button" data-folder-color="#f59e0b" style="--swatch:#f59e0b"></button>
+                    <button type="button" data-folder-color="#dc2626" style="--swatch:#dc2626"></button>
+                    <button type="button" data-folder-color="#7c3aed" style="--swatch:#7c3aed"></button>
+                    <button type="button" data-folder-color="#0891b2" style="--swatch:#0891b2"></button>
+                    <button type="button" data-folder-color="#db2777" style="--swatch:#db2777"></button>
+                    <button type="button" data-folder-color="#64748b" style="--swatch:#64748b"></button>
+                </div>
+                <footer class="document-quick-actions">
+                    <button class="btn btn-primary" type="submit"><i class="bi bi-check-lg"></i> Guardar cambios</button>
+                    <button class="btn btn-outline-secondary" type="button" data-customize-close><i class="bi bi-x-lg"></i> Cancelar</button>
+                </footer>
+            </form>
+        </section>
     </div>
     <div class="document-folder-menu d-none" id="document-file-menu" role="menu" aria-label="Acciones del documento">
         <div class="document-menu-title"><i class="bi bi-file-earmark-text"></i> Documento</div>
@@ -296,6 +408,17 @@ let documentacionDocTarget = null;
 const folderMenu = document.getElementById('document-folder-menu');
 const docMenu = document.getElementById('document-file-menu');
 const quickView = document.getElementById('document-quick-view');
+const folderQuickView = document.getElementById('folder-quick-view');
+const folderQuickModal = folderQuickView?.querySelector('.document-quick-modal');
+const folderCustomizeView = document.getElementById('folder-customize-view');
+const folderCustomizeModal = folderCustomizeView?.querySelector('.document-quick-modal');
+const folderCustomizeForm = document.getElementById('folder-customize-form');
+const folderCustomizeParent = document.getElementById('folder-customize-parent');
+const folderCustomizeNombre = document.getElementById('folder-customize-nombre');
+const folderCustomizeProveedor = document.getElementById('folder-customize-proveedor');
+const folderCustomizeApodo = document.getElementById('folder-customize-apodo');
+const folderCustomizeColor = document.getElementById('folder-customize-color');
+const folderCustomizeColorText = document.getElementById('folder-customize-color-text');
 const quickModal = quickView?.querySelector('.document-quick-modal');
 const quickStatus = document.getElementById('document-quick-status');
 const quickPrintAlert = document.getElementById('document-quick-print-alert');
@@ -303,6 +426,7 @@ const quickPdf = document.getElementById('document-quick-pdf');
 const quickEdit = document.getElementById('document-quick-edit');
 const quickDuplicate = document.getElementById('document-quick-duplicate');
 const quickFull = document.getElementById('document-quick-full');
+const folderQuickNewDoc = document.getElementById('folder-quick-new-doc');
 const documentacionSearch = document.getElementById('documentacion-search');
 const documentacionStatusFilter = document.getElementById('documentacion-status-filter');
 
@@ -315,19 +439,146 @@ function setQuickField(name, value) {
     setQuickText(`[data-doc-field="${name}"]`, value);
 }
 
-function createDocumentFolder() {
-    const nombre = prompt('Nombre del contratista existente para crear su carpeta documental');
-    if (!nombre || !nombre.trim()) return;
+function setFolderQuickText(selector, value) {
+    const element = folderQuickView?.querySelector(selector);
+    if (element) element.textContent = value || '-';
+}
+
+function setFolderQuickField(name, value) {
+    setFolderQuickText(`[data-folder-field="${name}"]`, value);
+}
+
+function folderNewDocUrl(folder) {
+    const proveedorId = folder?.dataset.proveedorId;
+    return proveedorId ? `/documentacion/nuevo?proveedorId=${proveedorId}` : '/documentacion/nuevo?sujeto=OBRA';
+}
+
+function submitFolderForm(folder, action, fields = {}) {
+    if (!folder?.dataset.carpetaId) return;
     const form = document.createElement('form');
     form.method = 'post';
-    form.action = '/documentacion/contratistas';
-    const input = document.createElement('input');
-    input.type = 'hidden';
-    input.name = 'nombre';
-    input.value = nombre.trim();
-    form.appendChild(input);
+    form.action = action.replace('{id}', folder.dataset.carpetaId);
+    Object.entries(fields).forEach(([name, value]) => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = name;
+        input.value = value ?? '';
+        form.appendChild(input);
+    });
     document.body.appendChild(form);
     form.submit();
+}
+
+function customizeFolder(folder = null) {
+    documentacionFolderTarget = folder;
+    const creando = !folder;
+    const apodoActual = folder?.dataset.folderApodo || '';
+    const colorActual = folder?.dataset.folderColor || '#facc15';
+    const proveedorActual = folder?.dataset.proveedorId || '';
+    document.getElementById('folder-customize-kicker').textContent = creando ? 'Nueva carpeta documental' : 'Personalizar carpeta';
+    document.getElementById('folder-customize-title').textContent = creando ? 'Nueva carpeta' : (folder.dataset.folderName || 'Carpeta');
+    document.getElementById('folder-customize-subtitle').textContent = creando ? 'Puede quedar vacia y sin contratista asociado.' : (folder.dataset.folderRealName || 'Carpeta libre');
+    document.getElementById('folder-customize-icon').style.setProperty('--folder-color', colorActual);
+    folderCustomizeForm.action = creando ? '/documentacion/carpetas' : `/documentacion/carpetas/${folder.dataset.carpetaId}/personalizar`;
+    if (folderCustomizeParent) folderCustomizeParent.value = '';
+    folderCustomizeNombre.value = creando ? '' : (folder.dataset.folderRealName || folder.dataset.folderName || '');
+    folderCustomizeNombre.required = creando;
+    if (folderCustomizeProveedor) {
+        folderCustomizeProveedor.value = proveedorActual;
+        folderCustomizeProveedor.disabled = folder?.dataset.folderGeneral === 'true';
+    }
+    folderCustomizeApodo.value = apodoActual;
+    folderCustomizeColor.value = colorActual;
+    folderCustomizeColorText.value = colorActual;
+    folderMenu?.classList.add('d-none');
+    folderQuickView?.classList.add('d-none');
+    folderCustomizeView.classList.remove('d-none', 'is-closing');
+    folderCustomizeView.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('document-modal-open');
+    requestAnimationFrame(() => folderCustomizeView.classList.add('is-open'));
+    setTimeout(() => folderCustomizeModal?.focus?.(), 80);
+}
+
+function closeCustomizeFolder() {
+    if (!folderCustomizeView || folderCustomizeView.classList.contains('d-none')) return;
+    folderCustomizeView.classList.add('is-closing');
+    folderCustomizeView.classList.remove('is-open');
+    folderCustomizeView.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('document-modal-open');
+    setTimeout(() => {
+        folderCustomizeView.classList.add('d-none');
+        folderCustomizeView.classList.remove('is-closing');
+    }, 180);
+}
+
+function syncFolderColor(color) {
+    const safeColor = /^#[0-9a-fA-F]{6}$/.test(color || '') ? color : '#facc15';
+    folderCustomizeColor.value = safeColor;
+    folderCustomizeColorText.value = safeColor;
+    document.getElementById('folder-customize-icon')?.style.setProperty('--folder-color', safeColor);
+}
+
+function moveFolder(folder, direction) {
+    submitFolderForm(folder, '/documentacion/carpetas/{id}/mover', { direccion: direction });
+}
+
+function deleteFolder(folder) {
+    if (!folder?.dataset.carpetaId) return;
+    if (folder.dataset.folderGeneral === 'true') {
+        alert('La carpeta general de obra no se puede eliminar.');
+        return;
+    }
+    const nombre = folder.dataset.folderName || 'esta carpeta';
+    if (!confirm(`Eliminar "${nombre}"? No se borran documentos ni contratistas.`)) return;
+    submitFolderForm(folder, '/documentacion/carpetas/{id}/eliminar');
+}
+
+function openFolderQuickView(folder) {
+    if (!folderQuickView || !folder) return;
+    const data = folder.dataset;
+    setFolderQuickText('#folder-quick-title', data.folderName);
+    setFolderQuickText('#folder-quick-subtitle', data.folderRealName || (data.folderGeneral === 'true' ? 'Carpeta general de obra' : 'Contratista'));
+    setFolderQuickText('#folder-quick-kicker', data.folderGeneral === 'true' ? 'Carpeta general' : 'Carpeta documental');
+    const status = document.getElementById('folder-quick-status');
+    status.textContent = data.folderEstado || 'Estado';
+    status.className = `doc-status-pill ${data.folderEstadoClass || 'is-muted'}`;
+    const icon = document.getElementById('folder-quick-icon');
+    icon.style.setProperty('--folder-color', data.folderColor || '#facc15');
+    setFolderQuickField('total', data.folderTotal);
+    setFolderQuickField('vigentes', data.folderVigentes);
+    setFolderQuickField('porVencer', data.folderPorVencer);
+    setFolderQuickField('vencidos', data.folderVencidos);
+    setFolderQuickField('pendientes', data.folderPendientes);
+    setFolderQuickField('tipo', data.folderTipo);
+    setFolderQuickField('contratista', data.proveedorId ? (data.folderRealName || data.folderName) : 'Sin contratista vinculado');
+    setFolderQuickField('apodo', data.folderApodo || 'Sin apodo');
+    setFolderQuickField('color', data.folderColor);
+    folderQuickNewDoc.href = folderNewDocUrl(folder);
+    folderQuickView.querySelectorAll('[data-folder-delete]').forEach(button => button.classList.toggle('d-none', data.folderGeneral === 'true'));
+    documentacionFolderTarget = folder;
+    folderMenu?.classList.add('d-none');
+    docMenu?.classList.add('d-none');
+    folderQuickView.classList.remove('d-none', 'is-closing');
+    folderQuickView.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('document-modal-open');
+    requestAnimationFrame(() => folderQuickView.classList.add('is-open'));
+    setTimeout(() => folderQuickModal?.focus?.(), 80);
+}
+
+function closeFolderQuickView() {
+    if (!folderQuickView || folderQuickView.classList.contains('d-none')) return;
+    folderQuickView.classList.add('is-closing');
+    folderQuickView.classList.remove('is-open');
+    folderQuickView.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('document-modal-open');
+    setTimeout(() => {
+        folderQuickView.classList.add('d-none');
+        folderQuickView.classList.remove('is-closing');
+    }, 180);
+}
+
+function createDocumentFolder() {
+    customizeFolder(null);
 }
 
 function setQuickNote(name, label, value) {
@@ -361,13 +612,15 @@ function openDocumentQuickView(branch) {
     setQuickField('ingreso', data.docIngreso);
     setQuickField('pdf', data.docPdf);
     setQuickField('print', data.docPrint);
+    setQuickField('fisicoHasta', data.docFisicoHasta);
+    setQuickField('fisicoVerificado', data.docFisicoVerificado);
     setQuickField('creacion', data.docCreacion);
     setQuickField('actualizacion', data.docActualizacion);
 
-    const printMissing = data.docPrintMissing === 'true';
-    quickPrintAlert.className = `document-quick-print-alert ${printMissing ? 'is-missing' : 'is-ok'}`;
-    quickPrintAlert.querySelector('i').className = printMissing ? 'bi bi-folder-x' : 'bi bi-folder-check';
-    quickPrintAlert.querySelector('strong').textContent = printMissing ? 'Falta copia impresa en el legajo' : 'Copia impresa controlada';
+    const physicalClass = data.docFisicoClass || 'is-danger';
+    quickPrintAlert.className = `document-quick-print-alert ${physicalClass === 'is-ok' ? 'is-ok' : 'is-missing'}`;
+    quickPrintAlert.querySelector('i').className = physicalClass === 'is-ok' ? 'bi bi-folder-check' : (physicalClass === 'is-warning' ? 'bi bi-printer' : 'bi bi-folder-x');
+    quickPrintAlert.querySelector('strong').textContent = `${data.docFisico || 'Carpeta fisica'} - ${data.docFisicoAccion || ''}`;
     quickPrintAlert.querySelector('small').textContent = data.docUbicacion || 'Sin ubicacion fisica cargada';
 
     const hasArchivo = setQuickNote('archivo', 'Archivo', data.docArchivo);
@@ -408,14 +661,15 @@ function openDocumentFolderMenu(folder, event) {
     documentacionFolderTarget = folder;
     const isGeneral = folder?.dataset.folderGeneral === 'true';
     const title = document.getElementById('document-folder-menu-title');
-    if (title) title.textContent = isGeneral ? 'Carpeta general' : 'Contratista';
+    if (title) title.textContent = isGeneral ? 'Carpeta general' : 'Carpeta';
     const renameButton = folderMenu.querySelector('[data-action="rename-folder"]');
     renameButton?.classList.toggle('d-none', isGeneral);
-    if (renameButton) renameButton.innerHTML = '<i class="bi bi-pencil-square"></i> Cambiar nombre de contratista';
+    const deleteButton = folderMenu.querySelector('[data-action="delete-folder"]');
+    deleteButton?.classList.toggle('d-none', isGeneral);
     docMenu?.classList.add('d-none');
     folderMenu.classList.remove('d-none');
     folderMenu.style.left = `${Math.min(event.clientX, window.innerWidth - 230)}px`;
-    folderMenu.style.top = `${Math.min(event.clientY, window.innerHeight - 132)}px`;
+    folderMenu.style.top = `${Math.min(event.clientY, window.innerHeight - 300)}px`;
 }
 
 function openDocumentFileMenu(branch, event) {
@@ -427,21 +681,93 @@ function openDocumentFileMenu(branch, event) {
     docMenu.style.top = `${Math.min(event.clientY, window.innerHeight - 160)}px`;
 }
 
-document.querySelectorAll('.document-folder-name').forEach(name => {
-    name.addEventListener('contextmenu', event => {
-        event.preventDefault();
-        event.stopPropagation();
-        const folder = name.closest('.document-folder');
-        openDocumentFolderMenu(folder, event);
-    });
-});
-
 document.querySelectorAll('.document-folder-header').forEach(header => {
+    header.addEventListener('click', event => {
+        if (event.target.closest('a, button, form, input, select, textarea')) return;
+        openFolderQuickView(header.closest('.document-folder'));
+    });
+    header.addEventListener('keydown', event => {
+        if ((event.key === 'Enter' || event.key === ' ') && !event.target.closest('a, button, form, input, select, textarea')) {
+            event.preventDefault();
+            openFolderQuickView(header.closest('.document-folder'));
+        }
+    });
     header.addEventListener('contextmenu', event => {
         event.preventDefault();
         event.stopPropagation();
         openDocumentFolderMenu(header.closest('.document-folder'), event);
     });
+});
+
+document.querySelectorAll('.document-folder-name').forEach(name => {
+    name.addEventListener('contextmenu', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        openDocumentFolderMenu(name.closest('.document-folder'), event);
+    });
+});
+
+let draggedFolder = null;
+
+function folderAfterDrag(container, y) {
+    const folders = [...container.querySelectorAll('.document-folder:not(.is-dragging):not(.d-none)')];
+    return folders.reduce((closest, child) => {
+        const box = child.getBoundingClientRect();
+        const offset = y - box.top - box.height / 2;
+        if (offset < 0 && offset > closest.offset) {
+            return { offset, element: child };
+        }
+        return closest;
+    }, { offset: Number.NEGATIVE_INFINITY, element: null }).element;
+}
+
+function submitFolderOrder() {
+    const folders = [...document.querySelectorAll('#document-folder-list .document-folder[data-carpeta-id]')];
+    if (folders.length === 0) return;
+    const form = document.createElement('form');
+    form.method = 'post';
+    form.action = '/documentacion/carpetas/reordenar';
+    folders.forEach(folder => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'carpetaIds';
+        input.value = folder.dataset.carpetaId;
+        form.appendChild(input);
+    });
+    document.body.appendChild(form);
+    form.submit();
+}
+
+document.querySelectorAll('.document-folder[draggable="true"]').forEach(folder => {
+    folder.addEventListener('dragstart', event => {
+        if (event.target.closest('a, button, form, input, select, textarea')) {
+            event.preventDefault();
+            return;
+        }
+        draggedFolder = folder;
+        folder.classList.add('is-dragging');
+        event.dataTransfer.effectAllowed = 'move';
+    });
+    folder.addEventListener('dragend', () => {
+        folder.classList.remove('is-dragging');
+        draggedFolder = null;
+        document.querySelectorAll('.document-folder.is-drop-target').forEach(item => item.classList.remove('is-drop-target'));
+        submitFolderOrder();
+    });
+});
+
+const folderList = document.getElementById('document-folder-list');
+folderList?.addEventListener('dragover', event => {
+    event.preventDefault();
+    if (!draggedFolder) return;
+    const afterElement = folderAfterDrag(folderList, event.clientY);
+    document.querySelectorAll('.document-folder.is-drop-target').forEach(item => item.classList.remove('is-drop-target'));
+    if (afterElement == null) {
+        folderList.appendChild(draggedFolder);
+    } else {
+        afterElement.classList.add('is-drop-target');
+        folderList.insertBefore(draggedFolder, afterElement);
+    }
 });
 
 document.querySelectorAll('.document-branch').forEach(branch => {
@@ -469,18 +795,9 @@ function filterDocumentacion() {
     const status = documentacionStatusFilter?.value || '';
     document.querySelectorAll('.document-folder').forEach(folder => {
         let visibleDocs = 0;
-        const folderText = [
-            folder.dataset.folderName || '',
-            folder.textContent || ''
-        ].join(' ').toLowerCase();
+        const folderText = [folder.dataset.folderName || '', folder.dataset.folderRealName || '', folder.textContent || ''].join(' ').toLowerCase();
         folder.querySelectorAll('.document-branch').forEach(branch => {
-            const branchText = [
-                branch.dataset.docName || '',
-                branch.dataset.docSujetoNombre || '',
-                branch.dataset.docProveedor || '',
-                branch.dataset.docStatus || '',
-                branch.dataset.docVinculo || ''
-            ].join(' ').toLowerCase();
+            const branchText = [branch.dataset.docName || '', branch.dataset.docSujetoNombre || '', branch.dataset.docProveedor || '', branch.dataset.docStatus || '', branch.dataset.docVinculo || ''].join(' ').toLowerCase();
             const matchesSearch = !search || folderText.includes(search) || branchText.includes(search);
             const matchesStatus = !status || branch.dataset.docStatusClass === status;
             const visible = matchesSearch && matchesStatus;
@@ -509,10 +826,14 @@ document.querySelectorAll('[data-doc-expand]').forEach(button => {
     });
 });
 
-quickView?.querySelectorAll('[data-doc-modal-close]').forEach(element => {
-    element.addEventListener('click', closeDocumentQuickView);
-});
-
+quickView?.querySelectorAll('[data-doc-modal-close]').forEach(element => element.addEventListener('click', closeDocumentQuickView));
+folderQuickView?.querySelectorAll('[data-folder-modal-close]').forEach(element => element.addEventListener('click', closeFolderQuickView));
+folderQuickView?.querySelectorAll('[data-folder-customize]').forEach(element => element.addEventListener('click', () => customizeFolder(documentacionFolderTarget)));
+folderQuickView?.querySelectorAll('[data-folder-delete]').forEach(element => element.addEventListener('click', () => deleteFolder(documentacionFolderTarget)));
+folderCustomizeView?.querySelectorAll('[data-customize-close]').forEach(element => element.addEventListener('click', closeCustomizeFolder));
+folderCustomizeColor?.addEventListener('input', event => syncFolderColor(event.target.value));
+folderCustomizeColorText?.addEventListener('input', event => syncFolderColor(event.target.value));
+document.querySelectorAll('.folder-color-swatches [data-folder-color]').forEach(button => button.addEventListener('click', () => syncFolderColor(button.dataset.folderColor)));
 quickPdf?.addEventListener('click', event => {
     if (quickPdf.classList.contains('disabled')) event.preventDefault();
 });
@@ -520,6 +841,8 @@ quickPdf?.addEventListener('click', event => {
 document.addEventListener('keydown', event => {
     if (event.key === 'Escape') {
         closeDocumentQuickView();
+        closeFolderQuickView();
+        closeCustomizeFolder();
         folderMenu?.classList.add('d-none');
         docMenu?.classList.add('d-none');
     }
@@ -527,45 +850,22 @@ document.addEventListener('keydown', event => {
 
 folderMenu?.addEventListener('click', event => {
     const action = event.target.closest('button')?.dataset.action;
-    if (action === 'new-doc' && documentacionFolderTarget) {
-        const proveedorId = documentacionFolderTarget.dataset.proveedorId;
-        window.location.href = proveedorId ? `/documentacion/nuevo?proveedorId=${proveedorId}` : '/documentacion/nuevo?sujeto=OBRA';
-    }
-    if (action === 'new-folder') {
-        createDocumentFolder();
-    }
-    if (action === 'rename-folder' && documentacionFolderTarget) {
-        const proveedorId = documentacionFolderTarget.dataset.proveedorId;
-        if (!proveedorId) {
-            alert('Esta carpeta no tiene contratista asociado para renombrar.');
-            return;
-        }
-        const actual = documentacionFolderTarget.dataset.folderName || '';
-        const nombre = prompt('Nuevo nombre del contratista', actual);
-        if (!nombre || !nombre.trim()) return;
-        const form = document.createElement('form');
-        form.method = 'post';
-        form.action = `/documentacion/contratistas/${proveedorId}/renombrar`;
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = 'nombre';
-        input.value = nombre.trim();
-        form.appendChild(input);
-        document.body.appendChild(form);
-        form.submit();
-    }
+    if (action === 'folder-summary' && documentacionFolderTarget) openFolderQuickView(documentacionFolderTarget);
+    if (action === 'customize-folder' && documentacionFolderTarget) customizeFolder(documentacionFolderTarget);
+    if (action === 'new-doc' && documentacionFolderTarget) window.location.href = folderNewDocUrl(documentacionFolderTarget);
+    if (action === 'new-folder') createDocumentFolder();
+    if (action === 'delete-folder' && documentacionFolderTarget) deleteFolder(documentacionFolderTarget);
+    if (action === 'rename-folder' && documentacionFolderTarget) customizeFolder(documentacionFolderTarget);
+    if (action === 'move-up' && documentacionFolderTarget) moveFolder(documentacionFolderTarget, -1);
+    if (action === 'move-down' && documentacionFolderTarget) moveFolder(documentacionFolderTarget, 1);
 });
 
 docMenu?.addEventListener('click', event => {
     const action = event.target.closest('button')?.dataset.action;
     const docId = documentacionDocTarget?.dataset.docId;
     if (!action || !docId) return;
-    if (action === 'open-doc') {
-        openDocumentQuickView(documentacionDocTarget);
-    }
-    if (action === 'edit-doc') {
-        window.location.href = `/documentacion/${docId}/editar`;
-    }
+    if (action === 'open-doc') openDocumentQuickView(documentacionDocTarget);
+    if (action === 'edit-doc') window.location.href = `/documentacion/${docId}/editar`;
     if (action === 'delete-doc' && confirm('Marcar este documento como inactivo?')) {
         const form = document.createElement('form');
         form.method = 'post';

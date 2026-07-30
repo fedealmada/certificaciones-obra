@@ -9,6 +9,7 @@ public record DocumentacionResumen(
         long vencidos,
         long pendientes,
         long mensualesPendientes,
+        long carpetaFisicaPendiente,
         List<ContratistaDocumentacionResumen> contratistas
 ) {
 }

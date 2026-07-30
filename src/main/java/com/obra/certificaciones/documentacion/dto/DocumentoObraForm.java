@@ -31,6 +31,12 @@ public class DocumentoObraForm {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate fechaPresentacion = LocalDate.now();
 
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private LocalDate fechaVencimientoFisico;
+
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private LocalDate fechaUltimaVerificacionFisica;
+
     private boolean mensual;
     private boolean obligatorioIngreso = true;
     private boolean presentado = true;

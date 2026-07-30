@@ -69,6 +69,8 @@ public class DocumentoObra {
     private LocalDate fechaEmision;
     private LocalDate fechaVencimiento;
     private LocalDate fechaPresentacion;
+    private LocalDate fechaVencimientoFisico;
+    private LocalDate fechaUltimaVerificacionFisica;
     private LocalDateTime fechaCreacion;
     private LocalDateTime fechaUltimaActualizacion;
     private boolean mensual;
@@ -132,7 +134,40 @@ public class DocumentoObra {
     }
 
     public boolean faltaCopiaImpresa() {
-        return activo && presentado && !impresoLegajo;
+        return estadoCarpetaFisica() == EstadoCarpetaFisica.FALTANTE;
+    }
+
+    public boolean carpetaFisicaPendiente() {
+        return estadoCarpetaFisica() != EstadoCarpetaFisica.ACTUALIZADA;
+    }
+
+    public EstadoCarpetaFisica estadoCarpetaFisica() {
+        if (!activo || !presentado) {
+            return EstadoCarpetaFisica.FALTANTE;
+        }
+        if (!impresoLegajo) {
+            return EstadoCarpetaFisica.FALTANTE;
+        }
+        if (fechaVencimiento == null) {
+            return EstadoCarpetaFisica.ACTUALIZADA;
+        }
+        if (fechaVencimientoFisico == null) {
+            return EstadoCarpetaFisica.DESACTUALIZADA;
+        }
+        return fechaVencimientoFisico.isBefore(fechaVencimiento)
+                ? EstadoCarpetaFisica.DESACTUALIZADA
+                : EstadoCarpetaFisica.ACTUALIZADA;
+    }
+
+    public String accionCarpetaFisica() {
+        EstadoCarpetaFisica estadoFisico = estadoCarpetaFisica();
+        if (estadoFisico == EstadoCarpetaFisica.ACTUALIZADA) {
+            return "Carpeta fisica al dia";
+        }
+        if (estadoFisico == EstadoCarpetaFisica.DESACTUALIZADA) {
+            return "Pendiente imprimir actualizacion";
+        }
+        return "Pendiente archivar copia fisica";
     }
 
     public String nombreDocumento() {

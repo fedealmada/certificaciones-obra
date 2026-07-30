@@ -26,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.net.MalformedURLException;
+import java.util.List;
 
 @Controller
 @RequestMapping("/documentacion")
@@ -43,6 +44,7 @@ public class DocumentacionController {
         model.addAttribute("gruposDocumentacion", grupos);
         model.addAttribute("totalDocumentos", grupos.stream().mapToLong(grupo -> grupo.total()).sum());
         model.addAttribute("resumen", documentacionService.resumen(obra));
+        model.addAttribute("proveedores", proveedorService.listarActivos());
         return "documentacion/index";
     }
 
@@ -149,6 +151,91 @@ public class DocumentacionController {
             redirectAttributes.addFlashAttribute("error", ex.getMessage());
             return "redirect:/documentacion";
         }
+    }
+
+    @PostMapping("/carpetas/{id}/personalizar")
+    public String personalizarCarpeta(@PathVariable Long id,
+                                      @RequestParam(required = false) String nombre,
+                                      @RequestParam(required = false) String apodo,
+                                      @RequestParam(required = false) String color,
+                                      @RequestParam(required = false) Long proveedorId,
+                                      RedirectAttributes redirectAttributes) {
+        try {
+            documentacionService.personalizarCarpeta(id, nombre, apodo, color, proveedorId);
+            redirectAttributes.addFlashAttribute("success", "Carpeta personalizada correctamente.");
+        } catch (IllegalArgumentException ex) {
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        }
+        return "redirect:/documentacion";
+    }
+
+    @PostMapping("/carpetas")
+    public String crearCarpeta(@RequestParam String nombre,
+                               @RequestParam(required = false) String apodo,
+                               @RequestParam(required = false) String color,
+                               @RequestParam(required = false) Long proveedorId,
+                               @RequestParam(required = false) Long carpetaPadreId,
+                               HttpSession session,
+                               RedirectAttributes redirectAttributes) {
+        try {
+            documentacionService.crearCarpetaLibre(nombre, proveedorId, apodo, color, carpetaPadreId, obraService.obraActiva(session));
+            redirectAttributes.addFlashAttribute("success", "Carpeta documental creada correctamente.");
+        } catch (IllegalArgumentException ex) {
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        }
+        return "redirect:/documentacion";
+    }
+
+    @PostMapping("/carpetas/{id}/eliminar")
+    public String eliminarCarpeta(@PathVariable Long id,
+                                  RedirectAttributes redirectAttributes) {
+        try {
+            documentacionService.eliminarCarpeta(id);
+            redirectAttributes.addFlashAttribute("success", "Carpeta eliminada. Los documentos y contratistas no fueron borrados.");
+        } catch (IllegalArgumentException ex) {
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        }
+        return "redirect:/documentacion";
+    }
+
+    @PostMapping("/carpetas/{id}/mover")
+    public String moverCarpeta(@PathVariable Long id,
+                               @RequestParam int direccion,
+                               HttpSession session,
+                               RedirectAttributes redirectAttributes) {
+        try {
+            documentacionService.moverCarpeta(id, direccion, obraService.obraActiva(session));
+        } catch (IllegalArgumentException ex) {
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        }
+        return "redirect:/documentacion";
+    }
+
+    @PostMapping("/carpetas/mover-a")
+    public String moverCarpetas(@RequestParam("carpetaIds") List<Long> carpetaIds,
+                                @RequestParam(required = false) Long carpetaPadreId,
+                                HttpSession session,
+                                RedirectAttributes redirectAttributes) {
+        try {
+            documentacionService.moverCarpetas(carpetaIds, carpetaPadreId, obraService.obraActiva(session));
+            redirectAttributes.addFlashAttribute("success", "Carpetas movidas correctamente.");
+        } catch (IllegalArgumentException ex) {
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        }
+        return "redirect:/documentacion";
+    }
+
+    @PostMapping("/carpetas/reordenar")
+    public String reordenarCarpetas(@RequestParam("carpetaIds") List<Long> carpetaIds,
+                                    HttpSession session,
+                                    RedirectAttributes redirectAttributes) {
+        try {
+            documentacionService.reordenarCarpetas(carpetaIds, obraService.obraActiva(session));
+            redirectAttributes.addFlashAttribute("success", "Orden de carpetas actualizado.");
+        } catch (IllegalArgumentException ex) {
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        }
+        return "redirect:/documentacion";
     }
 
     private void cargarFormulario(Model model, DocumentoObraForm form, boolean modoEdicion) {

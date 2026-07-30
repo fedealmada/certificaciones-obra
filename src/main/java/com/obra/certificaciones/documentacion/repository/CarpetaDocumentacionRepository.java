@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CarpetaDocumentacionRepository extends JpaRepository<CarpetaDocumentacion, Long> {
-    @EntityGraph(attributePaths = {"obra", "proveedor"})
-    List<CarpetaDocumentacion> findByObraIdAndActivoTrueOrderByGeneralDescNombreAsc(Long obraId);
+    @EntityGraph(attributePaths = {"obra", "proveedor", "padre"})
+    List<CarpetaDocumentacion> findByObraIdAndActivoTrueOrderByOrdenAscGeneralDescNombreAsc(Long obraId);
 
     Optional<CarpetaDocumentacion> findByObraIdAndGeneralTrueAndActivoTrue(Long obraId);
 

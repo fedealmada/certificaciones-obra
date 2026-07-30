@@ -31,7 +31,17 @@ public class CarpetaDocumentacion {
     @ManyToOne(fetch = FetchType.LAZY)
     private Proveedor proveedor;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    private CarpetaDocumentacion padre;
+
     private String nombre;
+    private String apodo;
+    private String color = "#facc15";
+    private Integer orden = 0;
     private boolean general;
     private boolean activo = true;
+
+    public String nombreVisible() {
+        return apodo != null && !apodo.isBlank() ? apodo : nombre;
+    }
 }
