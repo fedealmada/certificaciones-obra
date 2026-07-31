@@ -36,7 +36,7 @@ public class CarpetaDocumentacion {
 
     private String nombre;
     private String apodo;
-    private String color = "#facc15";
+    private String color = "#3f6f8f";
     private Integer orden = 0;
     private boolean general;
     private boolean activo = true;

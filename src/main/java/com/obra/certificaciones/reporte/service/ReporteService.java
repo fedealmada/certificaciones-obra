@@ -175,9 +175,9 @@ public class ReporteService {
                 topOrdenes,
                 topMaterialesPendientes,
                 topProveedoresMateriales,
-                pieCss(estadosItems, List.of("#d34b42", "#ffd21a", "#5aa142")),
-                pieCss(importesPorTipo, List.of("#2f80ed", "#ffd21a", "#5b6470")),
-                pieCss(estadosEntregas, List.of("#d34b42", "#ffd21a", "#5aa142"))
+                pieCss(estadosItems, List.of("var(--chart-danger)", "var(--chart-warning)", "var(--chart-success)")),
+                pieCss(importesPorTipo, List.of("var(--chart-primary)", "var(--chart-warning)", "var(--chart-muted)")),
+                pieCss(estadosEntregas, List.of("var(--chart-danger)", "var(--chart-warning)", "var(--chart-success)"))
         );
     }
 

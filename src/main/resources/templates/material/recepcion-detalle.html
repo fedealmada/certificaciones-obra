@@ -1,20 +1,13 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Detalle Entrega</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script>
-    (() => {
-        const savedTheme = localStorage.getItem('obraControl.theme');
-        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const theme = savedTheme || (prefersDark ? 'dark' : 'light');
-        document.documentElement.dataset.theme = theme;
-        document.documentElement.dataset.bsTheme = theme;
-    })();
-    </script>
+    <script th:src="@{/js/design-system.js(v='20260731-progress-flow')}"></script>
     <link th:href="@{/css/app.css(v='20260730-dark2')}" rel="stylesheet">
-    <link th:href="@{/css/theme.css(v='20260730-theme10')}" rel="stylesheet">
+    <link th:href="@{/css/theme.css(v='20260731-night-reset')}" rel="stylesheet">
+    <link th:href="@{/css/design-system.css(v='20260731-oc-detail-flow')}" rel="stylesheet">
 </head>
 <body>
 <div th:replace="~{fragments/layout :: navbar}"></div>
@@ -30,7 +23,7 @@
             <i class="bi bi-check-lg"></i>
         </div>
         <div class="work-action-kicker">Entrega / viaje</div>
-        <h2 th:text="${accionTitulo ?: '¡Entrega agregada!'}">¡Entrega agregada!</h2>
+        <h2 th:text="${accionTitulo ?: 'Entrega agregada!'}">Entrega agregada!</h2>
         <p th:text="${accionMensaje ?: 'El envio quedo registrado correctamente.'}">El envio quedo registrado correctamente.</p>
         <a class="work-action-link" th:href="${desdeModuloEntregas ? ('/materiales/oc/' + orden.id + '?origen=entregas') : ('/oc/' + orden.id + '#entregas')}">Ver entregas de la OC</a>
     </div>
@@ -229,3 +222,4 @@ if (deliverySuccessOverlay) {
 </script>
 </body>
 </html>
+

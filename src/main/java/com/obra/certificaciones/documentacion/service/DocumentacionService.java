@@ -493,7 +493,7 @@ public class DocumentacionService {
             general.setObra(obra);
             general.setNombre("Simende (Obra)");
             general.setApodo("Obra");
-            general.setColor("#2563eb");
+            general.setColor("#3f6f8f");
             general.setOrden(0);
             general.setGeneral(true);
             carpetaRepository.save(general);
@@ -551,7 +551,7 @@ public class DocumentacionService {
                 carpeta.nombreVisible(),
                 carpeta.getNombre(),
                 carpeta.getApodo(),
-                StringUtils.hasText(carpeta.getColor()) ? carpeta.getColor() : "#facc15",
+                StringUtils.hasText(carpeta.getColor()) ? carpeta.getColor() : "#3f6f8f",
                 carpeta.getOrden() == null ? 0 : carpeta.getOrden(),
                 estadoGrupo,
                 documentos.size(),
@@ -575,7 +575,7 @@ public class DocumentacionService {
     }
 
     private String colorPorOrden(int orden) {
-        List<String> colores = List.of("#2563eb", "#16a34a", "#f59e0b", "#dc2626", "#7c3aed", "#0891b2", "#db2777");
+        List<String> colores = List.of("#3f6f8f", "#407761", "#9a6b43", "#9a5f5d", "#74678f", "#3e7f86", "#646f6a");
         return colores.get(Math.floorMod(orden, colores.size()));
     }
 
