@@ -51,6 +51,7 @@ public class InicioController {
                                 "modulo.dashboard",
                                 "modulo.itemizado",
                                 "modulo.controlRubros",
+                                "modulo.calendario",
                                 "modulo.items",
                                 "modulo.materiales",
                                 "modulo.asistencia"

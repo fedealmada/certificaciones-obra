@@ -4,10 +4,10 @@
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Sincronizacion GitHub</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script th:src="@{/js/design-system.js(v='20260801-doc-folder-page')}"></script>
+    <script th:src="@{/js/design-system.js(v='20260802-sync-actions')}"></script>
     <link th:href="@{/css/app.css(v='20260730-dark2')}" rel="stylesheet">
     <link th:href="@{/css/theme.css(v='20260731-night-reset')}" rel="stylesheet">
-    <link th:href="@{/css/design-system.css(v='20260801-doc-folder-page')}" rel="stylesheet">
+    <link th:href="@{/css/design-system.css(v='20260802-sync-actions')}" rel="stylesheet">
 </head>
 <body>
 <div th:replace="~{fragments/layout :: navbar}"></div>
@@ -22,24 +22,60 @@
         <div>
             <div class="document-kicker">Backup y GitHub</div>
             <h1>Sincronizacion del proyecto</h1>
-            <div class="text-muted">Genera backup de la base, guarda cambios y los sube al repositorio.</div>
+            <div class="text-muted">Elegis si queres guardar esta version en GitHub, traer la ultima version o restaurar la base desde el backup del repositorio.</div>
         </div>
     </div>
 
     <section class="sync-panel mb-3">
-        <div class="sync-action-card">
-            <div class="sync-action-icon"><i class="bi bi-cloud-arrow-up"></i></div>
-            <div>
-                <h2>Subir version actual</h2>
-                <p>Usalo cuando quieras dejar guardado el proyecto completo en GitHub, incluyendo el backup actualizado de MySQL.</p>
-            </div>
-            <form method="post" th:action="@{/sincronizacion/ejecutar}" class="sync-form">
-                <label class="form-label" for="mensaje">Mensaje del guardado</label>
-                <input class="form-control" id="mensaje" name="mensaje" value="Backup y sincronizacion" maxlength="120">
-                <button class="btn btn-primary btn-lg" type="submit">
-                    <i class="bi bi-cloud-check"></i> Generar backup y subir
-                </button>
-            </form>
+        <div class="sync-action-grid">
+            <article class="sync-action-card is-push">
+                <div class="sync-action-icon"><i class="bi bi-cloud-arrow-up"></i></div>
+                <div class="sync-action-content">
+                    <span class="sync-action-kicker">Guardar</span>
+                    <h2>Subir version actual</h2>
+                    <p>Genera el backup de MySQL, guarda los cambios y los sube a GitHub.</p>
+                </div>
+                <form method="post" th:action="@{/sincronizacion/ejecutar}" class="sync-form">
+                    <input type="hidden" name="accion" value="SUBIR">
+                    <label class="form-label" for="mensaje">Mensaje del guardado</label>
+                    <input class="form-control" id="mensaje" name="mensaje" value="Backup y sincronizacion" maxlength="120">
+                    <button class="btn btn-primary" type="submit">
+                        <i class="bi bi-cloud-check"></i> Generar backup y subir
+                    </button>
+                </form>
+            </article>
+
+            <article class="sync-action-card is-pull">
+                <div class="sync-action-icon"><i class="bi bi-cloud-arrow-down"></i></div>
+                <div class="sync-action-content">
+                    <span class="sync-action-kicker">Actualizar</span>
+                    <h2>Traer version de GitHub</h2>
+                    <p>Descarga la ultima version del repositorio sin modificar la base de datos local.</p>
+                </div>
+                <form method="post" th:action="@{/sincronizacion/ejecutar}" class="sync-form">
+                    <input type="hidden" name="accion" value="TRAER">
+                    <button class="btn btn-outline-primary" type="submit">
+                        <i class="bi bi-arrow-down-circle"></i> Actualizar archivos
+                    </button>
+                </form>
+            </article>
+
+            <article class="sync-action-card is-restore">
+                <div class="sync-action-icon"><i class="bi bi-database-down"></i></div>
+                <div class="sync-action-content">
+                    <span class="sync-action-kicker">Restaurar</span>
+                    <h2>Traer y restaurar base</h2>
+                    <p>Trae la version de GitHub y carga el backup SQL del repositorio en la base local.</p>
+                </div>
+                <form method="post" th:action="@{/sincronizacion/ejecutar}" class="sync-form"
+                      onsubmit="return confirm('Esto va a restaurar la base local usando el backup del repositorio. Queres continuar?');">
+                    <input type="hidden" name="accion" value="TRAER_RESTAURAR">
+                    <div class="sync-warning"><i class="bi bi-exclamation-triangle"></i> Reemplaza datos locales segun el backup disponible.</div>
+                    <button class="btn btn-outline-danger" type="submit">
+                        <i class="bi bi-database-check"></i> Traer y restaurar
+                    </button>
+                </form>
+            </article>
         </div>
     </section>
 
@@ -65,10 +101,19 @@
                 <i class="bi bi-github"></i>
                 <span>GitHub</span>
             </div>
+            <div class="sync-step" th:classappend="${resultado.pullRealizado()} ? ' is-ok' : ' is-pending'">
+                <i class="bi bi-cloud-arrow-down"></i>
+                <span>Pull GitHub</span>
+            </div>
+            <div class="sync-step" th:classappend="${resultado.baseRestaurada()} ? ' is-ok' : ' is-pending'">
+                <i class="bi bi-database-down"></i>
+                <span>Restaurar DB</span>
+            </div>
         </div>
         <div class="sync-detail-grid mt-3">
             <div><strong>Backup</strong><span th:text="${resultado.backupPath()}">backups</span></div>
-            <div><strong>Mensaje</strong><span th:text="${resultado.commitMensaje()}">mensaje</span></div>
+            <div><strong>Accion</strong><span th:text="${resultado.accion()}">accion</span></div>
+            <div th:if="${!#strings.isEmpty(resultado.commitMensaje())}"><strong>Mensaje</strong><span th:text="${resultado.commitMensaje()}">mensaje</span></div>
         </div>
         <details class="sync-log mt-3">
             <summary>Ver detalle del proceso</summary>

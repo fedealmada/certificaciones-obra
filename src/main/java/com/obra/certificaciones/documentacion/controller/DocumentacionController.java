@@ -5,6 +5,7 @@ import com.obra.certificaciones.documentacion.dto.DocumentoObraForm;
 import com.obra.certificaciones.documentacion.entity.SujetoDocumental;
 import com.obra.certificaciones.documentacion.entity.TipoDocumentoObra;
 import com.obra.certificaciones.documentacion.entity.TipoVinculoDocumental;
+import com.obra.certificaciones.documentacion.service.DocumentacionPdfService;
 import com.obra.certificaciones.documentacion.service.DocumentacionService;
 import com.obra.certificaciones.obra.service.ObraService;
 import com.obra.certificaciones.proveedor.service.ProveedorService;
@@ -37,6 +38,7 @@ public class DocumentacionController {
     private final ProveedorService proveedorService;
     private final DepositoService depositoService;
     private final ObraService obraService;
+    private final DocumentacionPdfService documentacionPdfService;
 
     @GetMapping
     public String index(Model model, HttpSession session) {
@@ -60,6 +62,15 @@ public class DocumentacionController {
         }
         cargarFormulario(model, form, false);
         return "documentacion/form";
+    }
+
+    @GetMapping("/resumen-pdf")
+    public ResponseEntity<byte[]> resumenPdf(HttpSession session) {
+        byte[] pdf = documentacionPdfService.generarResumenEstado(obraService.obraActiva(session));
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + documentacionPdfService.nombreArchivoResumen() + "\"")
+                .body(pdf);
     }
 
     @GetMapping("/carpetas/{id}")

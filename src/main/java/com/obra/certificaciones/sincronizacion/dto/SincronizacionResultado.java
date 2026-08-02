@@ -5,9 +5,12 @@ import java.util.List;
 
 public record SincronizacionResultado(
         boolean exitoso,
+        String accion,
         boolean backupGenerado,
         boolean commitCreado,
         boolean pushRealizado,
+        boolean pullRealizado,
+        boolean baseRestaurada,
         String mensaje,
         String backupPath,
         String commitMensaje,

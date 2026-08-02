@@ -22,9 +22,10 @@ public class SincronizacionGithubController {
     }
 
     @PostMapping("/sincronizacion/ejecutar")
-    public String ejecutar(@RequestParam(defaultValue = "Backup y sincronizacion") String mensaje,
+    public String ejecutar(@RequestParam(defaultValue = "SUBIR") String accion,
+                           @RequestParam(defaultValue = "Backup y sincronizacion") String mensaje,
                            RedirectAttributes redirectAttributes) {
-        SincronizacionResultado resultado = sincronizacionService.sincronizar(mensaje);
+        SincronizacionResultado resultado = sincronizacionService.ejecutar(accion, mensaje);
         redirectAttributes.addFlashAttribute("resultado", resultado);
         return "redirect:/sincronizacion";
     }

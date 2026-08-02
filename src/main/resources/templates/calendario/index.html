@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Calendario de obra</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script th:src="@{/js/design-system.js(v='20260802-calendario')}"></script>
+    <link th:href="@{/css/app.css(v='20260802-calendario')}" rel="stylesheet">
+    <link th:href="@{/css/theme.css(v='20260731-night-reset')}" rel="stylesheet">
+    <link th:href="@{/css/design-system.css(v='20260802-calendario')}" rel="stylesheet">
+</head>
+<body>
+<div th:replace="~{fragments/layout :: navbar}"></div>
+<main class="container">
+    <div class="page-navigation mb-3">
+        <a th:href="@{/}"><i class="bi bi-house"></i> Inicio</a>
+        <i class="bi bi-chevron-right"></i>
+        <span>Calendario</span>
+    </div>
+
+    <div class="document-header calendario-hero mb-4">
+        <div>
+            <div class="document-kicker"><i class="bi bi-calendar2-week"></i> Agenda operativa</div>
+            <h1>Calendario de obra</h1>
+            <div class="text-muted">Visitas, inspecciones, hormigonados, entregas y fechas importantes con horario e historial.</div>
+        </div>
+        <div class="document-actions">
+            <a class="btn btn-outline-secondary" th:href="@{/calendario}"><i class="bi bi-calendar-day"></i> Hoy</a>
+            <a class="btn btn-primary" href="#nuevo-evento"><i class="bi bi-plus-lg"></i> Nuevo evento</a>
+        </div>
+    </div>
+
+    <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
+    <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+
+    <section class="calendario-layout mb-3">
+        <article class="panel-section calendario-month-panel">
+            <div class="calendario-month-head">
+                <a class="btn btn-outline-secondary btn-sm" th:href="@{/calendario(fecha=${periodoAnterior}, vista=${vista})}" title="Periodo anterior"><i class="bi bi-chevron-left"></i></a>
+                <div>
+                    <h2 th:text="${vista == 'dia' ? #temporals.format(fecha, 'EEEE dd/MM/yyyy') : (vista == 'semana' ? 'Semana del ' + #temporals.format(diasSemana[0], 'dd/MM') + ' al ' + #temporals.format(diasSemana[6], 'dd/MM/yyyy') : #temporals.format(tituloMes, 'MMMM yyyy'))}">Agosto 2026</h2>
+                    <small th:text="${'Fecha activa: ' + #temporals.format(fecha, 'dd/MM/yyyy')}">Fecha activa</small>
+                </div>
+                <a class="btn btn-outline-secondary btn-sm" th:href="@{/calendario(fecha=${periodoSiguiente}, vista=${vista})}" title="Periodo siguiente"><i class="bi bi-chevron-right"></i></a>
+            </div>
+            <div class="calendario-view-tabs">
+                <a th:href="@{/calendario(fecha=${fecha}, vista='mes')}" th:classappend="${vista == 'mes'} ? ' is-active'"><i class="bi bi-calendar3"></i> Mes</a>
+                <a th:href="@{/calendario(fecha=${fecha}, vista='semana')}" th:classappend="${vista == 'semana'} ? ' is-active'"><i class="bi bi-calendar-week"></i> Semana</a>
+                <a th:href="@{/calendario(fecha=${fecha}, vista='dia')}" th:classappend="${vista == 'dia'} ? ' is-active'"><i class="bi bi-calendar-day"></i> Dia</a>
+            </div>
+            <div class="calendario-weekdays" th:if="${vista == 'mes'}">
+                <span>Lun</span><span>Mar</span><span>Mie</span><span>Jue</span><span>Vie</span><span>Sab</span><span>Dom</span>
+            </div>
+            <div class="calendario-month-grid" th:if="${vista == 'mes'}">
+                <span class="calendario-empty" th:each="espacio : ${espaciosInicioMes}"></span>
+                <a class="calendario-day"
+                   th:each="dia : ${diasMes}"
+                   th:href="@{/calendario(fecha=${dia.fecha()}, vista=${vista})}"
+                   th:with="eventos=${eventosPorDia.get(dia.fecha())}, feriado=${feriadosMes.get(dia.fecha())}"
+                   th:classappend="${(dia.sabado() ? ' is-saturday' : '') + (dia.domingo() ? ' is-sunday' : '') + (feriado != null ? ' is-holiday' : '') + (dia.seleccionado() ? ' is-selected' : '') + (dia.hoy() ? ' is-today' : '') + (eventos != null && !eventos.isEmpty() ? ' has-events' : '')}">
+                    <span class="calendario-day-number" th:text="${#temporals.format(dia.fecha(), 'dd')}">01</span>
+                    <span class="calendario-holiday-label" th:if="${feriado != null}" th:text="${feriado}">Feriado</span>
+                    <span class="calendario-day-events" th:if="${eventos != null && !eventos.isEmpty()}">
+                        <span class="calendario-dot" th:each="evento, iter : ${eventos}" th:if="${iter.index < 3}" th:classappend="${' ' + evento.tipo.cssClass}" th:title="${evento.titulo}"></span>
+                    </span>
+                    <small th:if="${eventos != null && eventos.size() > 3}" th:text="${'+' + (eventos.size() - 3)}">+1</small>
+                </a>
+            </div>
+            <div class="calendario-week-board" th:if="${vista == 'semana'}">
+                <div class="calendario-week-header">
+                    <span></span>
+                    <a th:each="dia : ${diasSemana}" th:href="@{/calendario(fecha=${dia}, vista='dia')}" th:with="feriado=${feriadosSemana.get(dia)}" th:classappend="${(dia.equals(fecha) ? ' is-selected' : '') + (feriado != null ? ' is-holiday' : '')}">
+                        <small th:text="${#temporals.format(dia, 'EEE')}">Lun</small>
+                        <strong th:text="${#temporals.format(dia, 'dd')}">01</strong>
+                        <em th:if="${feriado != null}" th:text="${feriado}">Feriado</em>
+                    </a>
+                </div>
+                <div class="calendario-time-row" th:each="bloque : ${bloquesSemana}">
+                    <span class="calendario-time-label" th:text="${#temporals.format(bloque.hora(), 'HH:mm')}">08:00</span>
+                    <div class="calendario-time-cell" th:each="dia : ${diasSemana}">
+                        <article class="calendario-time-event" th:each="eventoBloque : ${bloque.eventosPorDia().get(dia)}" th:classappend="${' ' + eventoBloque.evento().tipo.cssClass}">
+                            <strong th:text="${eventoBloque.evento().titulo}">Evento</strong>
+                            <small th:text="${eventoBloque.evento().lugar ?: eventoBloque.evento().tipo.descripcion}">Lugar</small>
+                        </article>
+                    </div>
+                </div>
+            </div>
+            <div class="calendario-day-board" th:if="${vista == 'dia'}">
+                <div class="calendario-day-holiday" th:if="${feriadoDia != null}">
+                    <i class="bi bi-flag"></i>
+                    <span><strong>Feriado nacional</strong><small th:text="${feriadoDia}">Feriado</small></span>
+                </div>
+                <div class="calendario-time-row is-day" th:each="bloque : ${bloquesDia}">
+                    <span class="calendario-time-label" th:text="${#temporals.format(bloque.hora(), 'HH:mm')}">08:00</span>
+                    <div class="calendario-time-cell">
+                        <article class="calendario-time-event is-large" th:each="eventoBloque : ${bloque.eventosPorDia().get(fecha)}" th:classappend="${' ' + eventoBloque.evento().tipo.cssClass}">
+                            <div>
+                                <strong th:text="${eventoBloque.evento().titulo}">Evento</strong>
+                                <small>
+                                    <span th:text="${eventoBloque.evento().tipo.descripcion}">Tipo</span>
+                                    <span th:if="${eventoBloque.evento().lugar != null}" th:text="${' / ' + eventoBloque.evento().lugar}"> / Lugar</span>
+                                    <span th:if="${eventoBloque.evento().horaFin != null}" th:text="${' / hasta ' + #temporals.format(eventoBloque.evento().horaFin, 'HH:mm')}"> / fin</span>
+                                </small>
+                            </div>
+                            <a th:href="@{/calendario/{id}/editar(id=${eventoBloque.evento().id}, vista='dia')}" title="Editar"><i class="bi bi-pencil-square"></i></a>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <aside class="calendario-side">
+            <section class="panel-section" id="nuevo-evento">
+                <div class="section-title-row">
+                    <h2 class="h5 mb-0"><i class="bi bi-pencil-square"></i> <span th:text="${modoEdicion ? 'Editar evento' : 'Agendar evento'}">Agendar evento</span></h2>
+                    <a class="section-total-pill" th:if="${modoEdicion}" th:href="@{/calendario(fecha=${fecha})}">Nuevo</a>
+                </div>
+                <form class="calendario-form" method="post" th:action="@{/calendario}" th:object="${form}">
+                    <input type="hidden" th:field="*{id}">
+                    <input type="hidden" th:field="*{fecha}">
+                    <div class="calendario-selected-date">
+                        <i class="bi bi-calendar-check"></i>
+                        <span>
+                            <small>Fecha seleccionada desde el calendario</small>
+                            <strong th:text="${#temporals.format(form.fecha, 'dd/MM/yyyy')}">02/08/2026</strong>
+                        </span>
+                    </div>
+                    <label>
+                        <span>Titulo</span>
+                        <input class="form-control" th:field="*{titulo}" placeholder="Ej: Visita ART / Hormigon piso 13 y 14">
+                    </label>
+                    <div class="calendario-form-grid">
+                        <label>
+                            <span>Tipo</span>
+                            <select class="form-select" th:field="*{tipo}">
+                                <option th:each="tipo : ${tipos}" th:value="${tipo}" th:text="${tipo.descripcion}">Tipo</option>
+                            </select>
+                        </label>
+                        <label>
+                            <span>Inicio</span>
+                            <input class="form-control" type="time" step="1800" th:field="*{horaInicio}">
+                        </label>
+                    </div>
+                    <div class="calendario-form-grid">
+                        <label>
+                            <span>Fin</span>
+                            <input class="form-control" type="time" step="1800" th:field="*{horaFin}">
+                        </label>
+                        <label>
+                            <span>Responsable</span>
+                            <input class="form-control" th:field="*{responsable}" placeholder="Persona o empresa">
+                        </label>
+                    </div>
+                    <label th:if="${modoEdicion}">
+                        <span>Estado</span>
+                        <select class="form-select" th:field="*{estado}">
+                            <option th:each="estado : ${estados}" th:value="${estado}" th:text="${estado.descripcion}">Estado</option>
+                        </select>
+                    </label>
+                    <label>
+                        <span>Lugar / sector</span>
+                        <input class="form-control" th:field="*{lugar}" placeholder="Ej: Piso 13, acceso obra, oficina tecnica">
+                    </label>
+                    <label>
+                        <span>Detalle</span>
+                        <textarea class="form-control" rows="3" th:field="*{descripcion}" placeholder="Notas importantes, requisitos, sectores afectados..."></textarea>
+                    </label>
+                    <label class="calendario-check">
+                        <input type="checkbox" th:field="*{importante}">
+                        <span>Marcar como importante</span>
+                    </label>
+                    <button class="btn btn-primary w-100" type="submit"><i class="bi bi-calendar-plus"></i> <span th:text="${modoEdicion ? 'Actualizar evento' : 'Guardar evento'}">Guardar evento</span></button>
+                </form>
+            </section>
+        </aside>
+    </section>
+
+    <section class="calendario-content-grid mb-3">
+        <article class="panel-section">
+            <div class="section-title-row">
+                <h2 class="h5 mb-0"><i class="bi bi-calendar-check"></i> Eventos del dia</h2>
+                <span class="section-total-pill" th:text="${eventosDia.size()} + ' eventos'">0 eventos</span>
+            </div>
+            <div class="calendario-event-list">
+                <article class="calendario-event-card" th:each="evento : ${eventosDia}" th:classappend="${' ' + evento.tipo.cssClass}">
+                    <span class="calendario-event-icon"><i class="bi" th:classappend="${evento.tipo.name() == 'HORMIGON' ? ' bi-cone-striped' : (evento.tipo.name() == 'ART' ? ' bi-shield-check' : (evento.tipo.name() == 'INMOBILIARIA' ? ' bi-building' : ' bi-calendar-event'))}"></i></span>
+                    <div>
+                        <div class="calendario-event-title">
+                            <strong th:text="${evento.titulo}">Evento</strong>
+                            <span class="doc-status-pill" th:classappend="${' ' + evento.estado.cssClass}" th:text="${evento.estado.descripcion}">Programado</span>
+                        </div>
+                        <small>
+                            <span th:text="${evento.horaInicio == null ? 'Sin horario' : #temporals.format(evento.horaInicio, 'HH:mm')}">09:00</span>
+                            <span th:if="${evento.horaFin != null}" th:text="${' - ' + #temporals.format(evento.horaFin, 'HH:mm')}"> - 10:00</span>
+                            <span th:if="${evento.lugar != null}" th:text="${' / ' + evento.lugar}"> / Lugar</span>
+                        </small>
+                        <p th:if="${evento.descripcion != null}" th:text="${evento.descripcion}">Detalle</p>
+                        <span class="calendario-event-meta">
+                            <b th:text="${evento.tipo.descripcion}">Tipo</b>
+                            <span th:if="${evento.responsable != null}" th:text="${evento.responsable}">Responsable</span>
+                        </span>
+                    </div>
+                    <div class="calendario-event-actions">
+                        <a class="btn btn-sm btn-outline-secondary" th:href="@{/calendario/{id}/editar(id=${evento.id})}" title="Editar"><i class="bi bi-pencil-square"></i></a>
+                        <form method="post" th:action="@{/calendario/{id}/estado(id=${evento.id})}" th:if="${evento.estado.name() == 'PROGRAMADO'}">
+                            <input type="hidden" name="estado" value="REALIZADO">
+                            <button class="btn btn-sm btn-outline-success" type="submit"><i class="bi bi-check2"></i></button>
+                        </form>
+                        <form method="post" th:action="@{/calendario/{id}/estado(id=${evento.id})}" th:if="${evento.estado.name() == 'PROGRAMADO'}">
+                            <input type="hidden" name="estado" value="CANCELADO">
+                            <button class="btn btn-sm btn-outline-warning" type="submit"><i class="bi bi-x-lg"></i></button>
+                        </form>
+                        <form method="post" th:action="@{/calendario/{id}/eliminar(id=${evento.id})}" onsubmit="return confirm('Eliminar este evento?');">
+                            <button class="btn btn-sm btn-outline-danger" type="submit"><i class="bi bi-trash"></i></button>
+                        </form>
+                    </div>
+                </article>
+                <div class="empty-state" th:if="${eventosDia.isEmpty()}">No hay eventos agendados para este dia.</div>
+            </div>
+        </article>
+
+        <article class="panel-section">
+            <div class="section-title-row">
+                <h2 class="h5 mb-0"><i class="bi bi-clock-history"></i> Proximos importantes</h2>
+                <span class="section-total-pill" th:text="${proximosEventos.size()} + ' proximos'">0 proximos</span>
+            </div>
+            <div class="calendario-mini-list">
+                <a th:each="evento : ${proximosEventos}" th:href="@{/calendario(fecha=${evento.fecha})}" th:classappend="${' ' + evento.tipo.cssClass}">
+                    <span>
+                        <strong th:text="${evento.titulo}">Evento</strong>
+                        <small th:text="${#temporals.format(evento.fecha, 'dd/MM/yyyy') + (evento.horaInicio == null ? '' : ' - ' + #temporals.format(evento.horaInicio, 'HH:mm'))}">Fecha</small>
+                    </span>
+                    <b th:text="${evento.tipo.descripcion}">Tipo</b>
+                </a>
+                <div class="empty-state" th:if="${proximosEventos.isEmpty()}">No hay eventos proximos programados.</div>
+            </div>
+        </article>
+    </section>
+
+    <section class="panel-section">
+        <div class="section-title-row">
+            <h2 class="h5 mb-0"><i class="bi bi-archive"></i> Historial de visitas y eventos</h2>
+            <span class="section-total-pill" th:text="${historialEventos.size()} + ' registros'">0 registros</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle document-table calendario-history-table">
+                <thead>
+                <tr><th>Fecha</th><th>Evento</th><th>Tipo</th><th>Horario</th><th>Lugar</th><th>Responsable</th><th>Estado</th><th class="text-end">Acciones</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="evento : ${historialEventos}">
+                    <td th:text="${#temporals.format(evento.fecha, 'dd/MM/yyyy')}">01/08/2026</td>
+                    <td><strong th:text="${evento.titulo}">Evento</strong><small th:if="${evento.descripcion != null}" th:text="${evento.descripcion}">Detalle</small></td>
+                    <td><span class="doc-tag" th:classappend="${' ' + evento.tipo.cssClass}" th:text="${evento.tipo.descripcion}">Tipo</span></td>
+                    <td th:text="${evento.horaInicio == null ? '-' : #temporals.format(evento.horaInicio, 'HH:mm') + (evento.horaFin == null ? '' : ' - ' + #temporals.format(evento.horaFin, 'HH:mm'))}">09:00</td>
+                    <td th:text="${evento.lugar ?: '-'}">Lugar</td>
+                    <td th:text="${evento.responsable ?: '-'}">Responsable</td>
+                    <td><span class="doc-status-pill" th:classappend="${' ' + evento.estado.cssClass}" th:text="${evento.estado.descripcion}">Estado</span></td>
+                    <td class="text-end"><a class="btn btn-sm btn-outline-secondary table-icon-action" th:href="@{/calendario/{id}/editar(id=${evento.id})}" title="Editar" aria-label="Editar"><i class="bi bi-pencil-square"></i></a></td>
+                </tr>
+                <tr th:if="${historialEventos.isEmpty()}"><td colspan="8" class="text-center text-muted py-4">Todavia no hay historial de eventos.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+</body>
+</html>

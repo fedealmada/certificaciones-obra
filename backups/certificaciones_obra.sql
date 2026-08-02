@@ -313,6 +313,46 @@ INSERT INTO `documento_obra` VALUES (1,'','2025-05-21','2025-05-25','2026-10-31
 UNLOCK TABLES;
 
 --
+-- Table structure for table `evento_obra`
+--
+
+DROP TABLE IF EXISTS `evento_obra`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `evento_obra` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `activo` bit(1) NOT NULL,
+  `descripcion` varchar(1200) DEFAULT NULL,
+  `estado` enum('CANCELADO','PROGRAMADO','REALIZADO') DEFAULT NULL,
+  `fecha` date DEFAULT NULL,
+  `fecha_creacion` datetime(6) DEFAULT NULL,
+  `fecha_ultima_actualizacion` datetime(6) DEFAULT NULL,
+  `hora_fin` time(6) DEFAULT NULL,
+  `hora_inicio` time(6) DEFAULT NULL,
+  `importante` bit(1) NOT NULL,
+  `lugar` varchar(300) DEFAULT NULL,
+  `responsable` varchar(180) DEFAULT NULL,
+  `tipo` enum('ART','ENTREGA','GENERAL','HORMIGON','INMOBILIARIA','INSPECCION','REUNION','SEGURIDAD_HIGIENE') DEFAULT NULL,
+  `titulo` varchar(220) NOT NULL,
+  `obra_id` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_evento_obra_fecha` (`obra_id`,`fecha`,`activo`),
+  KEY `idx_evento_obra_estado` (`obra_id`,`estado`,`activo`),
+  CONSTRAINT `FK9gsnwawredwje4hv9bu6na6a3` FOREIGN KEY (`obra_id`) REFERENCES `obra` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `evento_obra`
+--
+
+LOCK TABLES `evento_obra` WRITE;
+/*!40000 ALTER TABLE `evento_obra` DISABLE KEYS */;
+INSERT INTO `evento_obra` VALUES (1,'',NULL,'REALIZADO','2026-08-04','2026-08-02 03:45:04.000000','2026-08-02 03:45:14.000000','17:30:00.000000','07:30:00.000000','','Piso 5 y 6','Dacomat','GENERAL','Hormigón RDC',1);
+/*!40000 ALTER TABLE `evento_obra` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `item_certificacion`
 --
 
@@ -861,4 +901,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-08-02  3:19:28
+-- Dump completed on 2026-08-02  4:04:44

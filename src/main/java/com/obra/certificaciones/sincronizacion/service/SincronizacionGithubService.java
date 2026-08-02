@@ -33,6 +33,9 @@ public class SincronizacionGithubService {
     @Value("${app.sync.mysqldump:C:\\xampp\\mysql\\bin\\mysqldump.exe}")
     private String mysqldumpPath;
 
+    @Value("${app.sync.mysql:C:\\xampp\\mysql\\bin\\mysql.exe}")
+    private String mysqlPath;
+
     @Value("${app.sync.backup-path:backups\\certificaciones_obra.sql}")
     private String backupPath;
 
@@ -49,6 +52,18 @@ public class SincronizacionGithubService {
     }
 
     public SincronizacionResultado sincronizar(String mensajeUsuario) {
+        return subirAGithub(mensajeUsuario);
+    }
+
+    public SincronizacionResultado ejecutar(String accion, String mensajeUsuario) {
+        return switch (normalizarAccion(accion)) {
+            case "TRAER_RESTAURAR" -> traerDesdeGithub(true);
+            case "TRAER" -> traerDesdeGithub(false);
+            default -> subirAGithub(mensajeUsuario);
+        };
+    }
+
+    private SincronizacionResultado subirAGithub(String mensajeUsuario) {
         List<String> salida = new ArrayList<>();
         boolean backupGenerado = false;
         boolean commitCreado = false;
@@ -76,9 +91,12 @@ public class SincronizacionGithubService {
 
             return new SincronizacionResultado(
                     true,
+                    "SUBIR",
                     backupGenerado,
                     commitCreado,
                     pushRealizado,
+                    false,
+                    false,
                     "Sincronizacion completada. Backup actualizado y cambios subidos a GitHub.",
                     backup.toString(),
                     commitMensaje,
@@ -89,12 +107,69 @@ public class SincronizacionGithubService {
             salida.add("ERROR: " + e.getMessage());
             return new SincronizacionResultado(
                     false,
+                    "SUBIR",
                     backupGenerado,
                     commitCreado,
                     pushRealizado,
+                    false,
+                    false,
                     "No se pudo completar la sincronizacion. Revisa el detalle del proceso.",
                     backup.toString(),
                     commitMensaje,
+                    LocalDateTime.now(),
+                    salida
+            );
+        }
+    }
+
+    private SincronizacionResultado traerDesdeGithub(boolean restaurarBase) {
+        List<String> salida = new ArrayList<>();
+        boolean pullRealizado = false;
+        boolean baseRestaurada = false;
+        Path root = Path.of(projectRoot).toAbsolutePath().normalize();
+        Path backup = root.resolve(backupPath).normalize();
+        String accion = restaurarBase ? "TRAER_RESTAURAR" : "TRAER";
+
+        try {
+            String rama = ramaActual(salida);
+            ejecutarGitOk(salida, "fetch", "origin", rama);
+            ejecutarGitOk(salida, "pull", "--ff-only", "origin", rama);
+            pullRealizado = true;
+
+            if (restaurarBase) {
+                restaurarBackup(root, backup, salida);
+                baseRestaurada = true;
+            }
+
+            return new SincronizacionResultado(
+                    true,
+                    accion,
+                    false,
+                    false,
+                    false,
+                    pullRealizado,
+                    baseRestaurada,
+                    restaurarBase
+                            ? "Proyecto traido desde GitHub y base restaurada desde el backup del repositorio."
+                            : "Proyecto actualizado desde GitHub.",
+                    backup.toString(),
+                    "",
+                    LocalDateTime.now(),
+                    salida
+            );
+        } catch (Exception e) {
+            salida.add("ERROR: " + e.getMessage());
+            return new SincronizacionResultado(
+                    false,
+                    accion,
+                    false,
+                    false,
+                    false,
+                    pullRealizado,
+                    baseRestaurada,
+                    "No se pudo traer la version de GitHub. Revisa el detalle del proceso.",
+                    backup.toString(),
+                    "",
                     LocalDateTime.now(),
                     salida
             );
@@ -130,6 +205,36 @@ public class SincronizacionGithubService {
             throw new IOException("Fallo el backup de MySQL. Codigo: " + resultado.exitCode());
         }
         salida.add("Backup generado: " + backup);
+    }
+
+    private void restaurarBackup(Path root, Path backup, List<String> salida) throws IOException, InterruptedException, SQLException {
+        Path mysql = Path.of(mysqlPath).toAbsolutePath().normalize();
+        if (!Files.exists(mysql)) {
+            throw new IOException("No se encontro mysql en " + mysql);
+        }
+        if (!Files.exists(backup)) {
+            throw new IOException("No se encontro el backup SQL para restaurar: " + backup);
+        }
+
+        String databaseName = obtenerBaseDatos();
+        salida.add("Restaurando base de datos desde backup: " + backup);
+
+        List<String> comando = new ArrayList<>();
+        comando.add(mysql.toString());
+        comando.add("--default-character-set=utf8mb4");
+        comando.add("-u");
+        comando.add(dbUser);
+        if (dbPassword != null && !dbPassword.isBlank()) {
+            comando.add("-p" + dbPassword);
+        }
+        comando.add(databaseName);
+
+        ResultadoProceso resultado = ejecutar(root, comando, backup);
+        salida.addAll(resultado.salida());
+        if (resultado.exitCode() != 0) {
+            throw new IOException("Fallo la restauracion de MySQL. Codigo: " + resultado.exitCode());
+        }
+        salida.add("Base restaurada correctamente: " + databaseName);
     }
 
     private String obtenerBaseDatos() throws SQLException {
@@ -187,9 +292,16 @@ public class SincronizacionGithubService {
     }
 
     private ResultadoProceso ejecutar(Path directorio, List<String> comando) throws IOException, InterruptedException {
+        return ejecutar(directorio, comando, null);
+    }
+
+    private ResultadoProceso ejecutar(Path directorio, List<String> comando, Path entrada) throws IOException, InterruptedException {
         ProcessBuilder builder = new ProcessBuilder(comando);
         builder.directory(directorio.toFile());
         builder.redirectErrorStream(true);
+        if (entrada != null) {
+            builder.redirectInput(entrada.toFile());
+        }
         builder.environment().put("GIT_TERMINAL_PROMPT", "0");
         Process process = builder.start();
         List<String> salida = new ArrayList<>();
@@ -212,6 +324,13 @@ public class SincronizacionGithubService {
             return "Backup y sincronizacion";
         }
         return mensaje.replaceAll("[\\r\\n]+", " ").trim();
+    }
+
+    private String normalizarAccion(String accion) {
+        if (accion == null || accion.isBlank()) {
+            return "SUBIR";
+        }
+        return accion.trim().toUpperCase();
     }
 
     private record ResultadoProceso(int exitCode, List<String> salida) {
