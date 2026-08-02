@@ -26,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.net.MalformedURLException;
+import java.util.Comparator;
 import java.util.List;
 
 @Controller
@@ -59,6 +60,25 @@ public class DocumentacionController {
         }
         cargarFormulario(model, form, false);
         return "documentacion/form";
+    }
+
+    @GetMapping("/carpetas/{id}")
+    public String carpeta(@PathVariable Long id, Model model, HttpSession session) {
+        var grupo = documentacionService.obtenerGrupoCarpeta(id, obraService.obraActiva(session));
+        model.addAttribute("grupo", grupo);
+        model.addAttribute("proveedor", grupo.proveedorId() == null ? null : proveedorService.obtener(grupo.proveedorId()));
+        model.addAttribute("proveedores", proveedorService.listarActivos());
+        model.addAttribute("inicioLegajo", grupo.documentos().stream()
+                .map(documento -> documento.getFechaCreacion())
+                .filter(java.util.Objects::nonNull)
+                .min(Comparator.naturalOrder())
+                .orElse(null));
+        model.addAttribute("proximosVencimientos", grupo.documentos().stream()
+                .filter(documento -> documento.getFechaVencimiento() != null)
+                .sorted(Comparator.comparing(documento -> documento.getFechaVencimiento()))
+                .limit(4)
+                .toList());
+        return "documentacion/carpeta";
     }
 
     @GetMapping("/{id}")
@@ -98,9 +118,14 @@ public class DocumentacionController {
     }
 
     @PostMapping("/{id}/eliminar")
-    public String eliminar(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    public String eliminar(@PathVariable Long id,
+                           @RequestParam(required = false) String returnTo,
+                           RedirectAttributes redirectAttributes) {
         documentacionService.eliminar(id);
         redirectAttributes.addFlashAttribute("success", "Documento marcado como inactivo.");
+        if (returnTo != null && returnTo.startsWith("/documentacion")) {
+            return "redirect:" + returnTo;
+        }
         return "redirect:/documentacion";
     }
 
@@ -159,12 +184,16 @@ public class DocumentacionController {
                                       @RequestParam(required = false) String apodo,
                                       @RequestParam(required = false) String color,
                                       @RequestParam(required = false) Long proveedorId,
+                                      @RequestParam(required = false) String returnTo,
                                       RedirectAttributes redirectAttributes) {
         try {
             documentacionService.personalizarCarpeta(id, nombre, apodo, color, proveedorId);
             redirectAttributes.addFlashAttribute("success", "Carpeta personalizada correctamente.");
         } catch (IllegalArgumentException ex) {
             redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        }
+        if (returnTo != null && returnTo.startsWith("/documentacion")) {
+            return "redirect:" + returnTo;
         }
         return "redirect:/documentacion";
     }

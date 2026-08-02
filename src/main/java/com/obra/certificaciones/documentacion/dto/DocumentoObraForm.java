@@ -28,6 +28,8 @@ public class DocumentoObraForm {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate fechaVencimiento;
 
+    private boolean sinVencimiento;
+
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate fechaPresentacion = LocalDate.now();
 

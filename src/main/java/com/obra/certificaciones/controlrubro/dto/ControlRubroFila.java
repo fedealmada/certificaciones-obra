@@ -18,4 +18,15 @@ public record ControlRubroFila(
         String estado,
         String estadoTexto
 ) {
+    public BigDecimal manoObraPresupuestada() {
+        return manoObra;
+    }
+
+    public BigDecimal subtotalMaterialesIncidencia() {
+        return incidenciaMonto;
+    }
+
+    public BigDecimal presupuestoPendiente() {
+        return saldoTecho;
+    }
 }

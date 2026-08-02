@@ -106,6 +106,14 @@ public class DocumentacionService {
     }
 
     @Transactional
+    public GrupoDocumentacionContratista obtenerGrupoCarpeta(Long carpetaId, Obra obra) {
+        return agruparPorContratista(obra).stream()
+                .filter(grupo -> grupo.carpetaId() != null && grupo.carpetaId().equals(carpetaId))
+                .findFirst()
+                .orElseThrow(() -> new EntityNotFoundException("No existe la carpeta documental " + carpetaId));
+    }
+
+    @Transactional
     public CarpetaDocumentacion crearCarpetaContratista(Long proveedorId, Obra obra) {
         if (proveedorId == null) {
             throw new IllegalArgumentException("Debe seleccionar un contratista existente.");
@@ -300,9 +308,9 @@ public class DocumentacionService {
         documento.setVehiculoDominio(texto(form.getVehiculoDominio()));
         documento.setVehiculoDetalle(texto(form.getVehiculoDetalle()));
         documento.setFechaEmision(form.getFechaEmision());
-        documento.setFechaVencimiento(form.getFechaVencimiento());
+        documento.setFechaVencimiento(form.isSinVencimiento() ? null : form.getFechaVencimiento());
         documento.setFechaPresentacion(form.getFechaPresentacion());
-        documento.setFechaVencimientoFisico(form.getFechaVencimientoFisico());
+        documento.setFechaVencimientoFisico(form.isSinVencimiento() ? null : form.getFechaVencimientoFisico());
         documento.setFechaUltimaVerificacionFisica(form.getFechaUltimaVerificacionFisica());
         documento.setMensual(form.isMensual());
         documento.setObligatorioIngreso(form.isObligatorioIngreso());
@@ -377,6 +385,7 @@ public class DocumentacionService {
         form.setVehiculoDetalle(documento.getVehiculoDetalle());
         form.setFechaEmision(documento.getFechaEmision());
         form.setFechaVencimiento(documento.getFechaVencimiento());
+        form.setSinVencimiento(documento.sinVencimiento());
         form.setFechaPresentacion(documento.getFechaPresentacion());
         form.setFechaVencimientoFisico(documento.getFechaVencimientoFisico());
         form.setFechaUltimaVerificacionFisica(documento.getFechaUltimaVerificacionFisica());
@@ -401,7 +410,7 @@ public class DocumentacionService {
         LocalDate hoy = LocalDate.now();
         for (DocumentoObra documento : documentos) {
             EstadoDocumentoObra estado = documento.estado();
-            if (estado == EstadoDocumentoObra.APTO) aptos++;
+            if (estado == EstadoDocumentoObra.APTO || estado == EstadoDocumentoObra.SIN_VENCIMIENTO) aptos++;
             if (estado == EstadoDocumentoObra.POR_VENCER) porVencer++;
             if (estado == EstadoDocumentoObra.VENCIDO) vencidos++;
             if (estado == EstadoDocumentoObra.PENDIENTE) pendientes++;
@@ -533,7 +542,7 @@ public class DocumentacionService {
         long aptos = 0, porVencer = 0, vencidos = 0, pendientes = 0;
         for (DocumentoObra documento : documentos) {
             EstadoDocumentoObra estado = documento.estado();
-            if (estado == EstadoDocumentoObra.APTO) aptos++;
+            if (estado == EstadoDocumentoObra.APTO || estado == EstadoDocumentoObra.SIN_VENCIMIENTO) aptos++;
             if (estado == EstadoDocumentoObra.POR_VENCER) porVencer++;
             if (estado == EstadoDocumentoObra.VENCIDO) vencidos++;
             if (estado == EstadoDocumentoObra.PENDIENTE) pendientes++;

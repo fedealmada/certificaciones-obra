@@ -110,7 +110,7 @@ public class DocumentoObra {
             return EstadoDocumentoObra.PENDIENTE;
         }
         if (fechaVencimiento == null) {
-            return EstadoDocumentoObra.APTO;
+            return EstadoDocumentoObra.SIN_VENCIMIENTO;
         }
         LocalDate hoy = LocalDate.now();
         if (fechaVencimiento.isBefore(hoy)) {
@@ -124,9 +124,13 @@ public class DocumentoObra {
 
     public long diasAlVencimiento() {
         if (fechaVencimiento == null) {
-            return 99999;
+            return 0;
         }
         return ChronoUnit.DAYS.between(LocalDate.now(), fechaVencimiento);
+    }
+
+    public boolean sinVencimiento() {
+        return fechaVencimiento == null;
     }
 
     public boolean tienePdf() {

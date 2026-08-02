@@ -2,6 +2,7 @@ package com.obra.certificaciones.documentacion.entity;
 
 public enum EstadoDocumentoObra {
     APTO("Apto", "is-ok"),
+    SIN_VENCIMIENTO("Sin vencimiento", "is-info"),
     POR_VENCER("Por vencer", "is-warning"),
     VENCIDO("Vencido", "is-danger"),
     PENDIENTE("Pendiente", "is-pending"),

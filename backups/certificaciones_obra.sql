@@ -75,7 +75,7 @@ CREATE TABLE `carpeta_documentacion` (
   CONSTRAINT `FK3d1lg2ykqcn6isqw2mv56s4n1` FOREIGN KEY (`obra_id`) REFERENCES `obra` (`id`),
   CONSTRAINT `FK5wbfv2g57d8pucghhijf9m37j` FOREIGN KEY (`proveedor_id`) REFERENCES `proveedor` (`id`),
   CONSTRAINT `FKbdpiv3n0rrvp9f343m3kti1f8` FOREIGN KEY (`padre_id`) REFERENCES `carpeta_documentacion` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -84,7 +84,7 @@ CREATE TABLE `carpeta_documentacion` (
 
 LOCK TABLES `carpeta_documentacion` WRITE;
 /*!40000 ALTER TABLE `carpeta_documentacion` DISABLE KEYS */;
-INSERT INTO `carpeta_documentacion` VALUES (1,'','','Simende (Obra)',1,NULL,NULL,'#2563eb',0,NULL),(2,'','\0','Enercon',1,72,NULL,'#f59e0b',4,NULL),(3,'','\0','Miguel Muriel',1,2,NULL,'#7c3aed',1,NULL),(4,'','\0','Gloria Cristina Coronel',1,6,'Yesería Coronel','#dc2626',2,NULL),(5,'','\0','El Artesano (Gomez Eliana)',1,19,'El Artesano','#16a34a',3,NULL),(6,'\0','\0','Daniela Agustina Gomez',1,30,NULL,'#0891b2',5,NULL),(7,'\0','\0','God',1,NULL,NULL,'#facc15',5,NULL);
+INSERT INTO `carpeta_documentacion` VALUES (1,'','','Simende (Obra)',1,NULL,NULL,'#001eff',0,NULL),(2,'','\0','Enercon',1,72,NULL,'#f59e0b',4,NULL),(3,'','\0','Miguel Muriel',1,2,NULL,'#7c3aed',2,NULL),(4,'','\0','Gloria Cristina Coronel',1,6,'Yesería Coronel','#dc2626',1,NULL),(5,'','\0','El Artesano (Gomez Eliana)',1,19,'El Artesano','#16a34a',3,NULL),(6,'\0','\0','Daniela Agustina Gomez',1,30,NULL,'#0891b2',5,NULL),(7,'\0','\0','God',1,NULL,NULL,'#facc15',5,NULL),(8,'','\0','Inceobras',1,NULL,NULL,'#407761',5,NULL),(9,'','\0','Aguas Claras',1,NULL,NULL,'#3f6f8f',6,NULL);
 /*!40000 ALTER TABLE `carpeta_documentacion` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -299,7 +299,7 @@ CREATE TABLE `documento_obra` (
   CONSTRAINT `FKfnwump2hatdkei0a5o0ti7q7o` FOREIGN KEY (`obra_id`) REFERENCES `obra` (`id`),
   CONSTRAINT `FKhu4os8n1w365l3feclnvpyfls` FOREIGN KEY (`proveedor_id`) REFERENCES `proveedor` (`id`),
   CONSTRAINT `FKlmaeb03wgfn05md79824v09l5` FOREIGN KEY (`trabajador_id`) REFERENCES `deposito_trabajador` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -308,7 +308,7 @@ CREATE TABLE `documento_obra` (
 
 LOCK TABLES `documento_obra` WRITE;
 /*!40000 ALTER TABLE `documento_obra` DISABLE KEYS */;
-INSERT INTO `documento_obra` VALUES (1,'','2025-05-21','2025-05-22','2026-05-31','\0','Seguro de obra','',NULL,'',NULL,'OBRA','OTRO',NULL,NULL,'GENERAL',1,NULL,NULL,'\0',NULL,NULL,NULL,NULL,NULL),(2,'','2025-04-01','2025-03-21','2026-09-30','\0',NULL,'',NULL,'',NULL,'OBRA','AVISO_OBRA',NULL,NULL,'GENERAL',1,NULL,NULL,'\0',NULL,NULL,NULL,NULL,NULL),(3,'','2026-07-21','2026-07-21','2026-08-21','','Certificado de afiliación de ART','',NULL,'',NULL,'OBRA','ART',NULL,NULL,'GENERAL',1,NULL,NULL,'\0',NULL,NULL,NULL,NULL,NULL),(4,'','2025-10-18','2026-01-20','2026-06-30','\0','El Artesano','',NULL,'',NULL,'CONTRATISTA','ACCIDENTES_PERSONALES',NULL,NULL,'MONOTRIBUTISTA',1,19,NULL,'\0',NULL,NULL,NULL,NULL,NULL),(5,'','2025-10-20','2025-10-20','2026-10-20','\0','El Artesano','',NULL,'',NULL,'CONTRATISTA','ATS',NULL,NULL,'MONOTRIBUTISTA',1,19,NULL,'\0',NULL,NULL,NULL,NULL,NULL),(6,'','2019-11-01','2019-11-01','2026-10-31','\0',NULL,'',NULL,'',NULL,'CONTRATISTA','ART',NULL,NULL,'RELACION_DEPENDENCIA',1,72,NULL,'\0',NULL,NULL,NULL,NULL,NULL),(7,'','2026-07-02','2026-07-07','2026-07-31','',NULL,'',NULL,'',NULL,'CONTRATISTA','SVO',NULL,NULL,'RELACION_DEPENDENCIA',1,72,NULL,'\0',NULL,NULL,NULL,NULL,NULL);
+INSERT INTO `documento_obra` VALUES (1,'','2025-05-21','2025-05-25','2026-10-31','\0','Seguro de obra','',NULL,'',NULL,'OBRA','OTRO',NULL,NULL,'GENERAL',1,NULL,NULL,'\0',NULL,NULL,'2026-08-01 21:27:55.000000',NULL,NULL),(2,'','2025-04-01','2025-03-21','2026-09-30','\0',NULL,'',NULL,'',NULL,'OBRA','AVISO_OBRA',NULL,NULL,'GENERAL',1,NULL,NULL,'\0',NULL,NULL,NULL,NULL,NULL),(3,'\0','2026-07-21','2026-07-21','2026-08-21','','Certificado de afiliación de ART','',NULL,'',NULL,'OBRA','ART',NULL,NULL,'GENERAL',1,NULL,NULL,'\0',NULL,NULL,'2026-08-02 01:57:23.000000',NULL,NULL),(4,'','2025-10-18','2026-01-20','2026-06-30','\0','El Artesano','',NULL,'',NULL,'CONTRATISTA','ACCIDENTES_PERSONALES',NULL,NULL,'MONOTRIBUTISTA',1,19,NULL,'\0',NULL,NULL,NULL,NULL,NULL),(5,'','2025-10-20','2025-10-20','2026-10-20','\0','El Artesano','',NULL,'',NULL,'CONTRATISTA','ATS',NULL,NULL,'MONOTRIBUTISTA',1,19,NULL,'\0',NULL,NULL,NULL,NULL,NULL),(6,'','2019-11-01','2019-11-01','2026-10-31','\0',NULL,'',NULL,'',NULL,'CONTRATISTA','ART',NULL,NULL,'RELACION_DEPENDENCIA',1,72,NULL,'\0',NULL,NULL,NULL,NULL,NULL),(7,'','2026-07-02','2026-07-07','2026-07-31','',NULL,'',NULL,'',NULL,'CONTRATISTA','SVO',NULL,NULL,'RELACION_DEPENDENCIA',1,72,NULL,'\0',NULL,NULL,NULL,NULL,NULL),(8,'','2026-07-21','2026-07-21','2026-08-21','','Certificado de afiliación de ART','','a','',NULL,'OBRA','ART',NULL,NULL,'GENERAL',1,NULL,NULL,'\0',NULL,'2026-08-01 23:32:08.000000','2026-08-01 23:32:08.000000',NULL,NULL);
 /*!40000 ALTER TABLE `documento_obra` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -861,4 +861,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-07-31  0:34:16
+-- Dump completed on 2026-08-02  3:19:28

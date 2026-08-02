@@ -4,24 +4,24 @@
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Documento de obra</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script th:src="@{/js/design-system.js(v='20260731-progress-flow')}"></script>
+    <script th:src="@{/js/design-system.js(v='20260802-doc-search-dark')}"></script>
     <link th:href="@{/css/app.css(v='20260730-dark2')}" rel="stylesheet">
     <link th:href="@{/css/theme.css(v='20260731-night-reset')}" rel="stylesheet">
-    <link th:href="@{/css/design-system.css(v='20260731-oc-detail-flow')}" rel="stylesheet">
+    <link th:href="@{/css/design-system.css(v='20260802-doc-search-dark')}" rel="stylesheet">
 </head>
 <body>
 <div th:replace="~{fragments/layout :: navbar}"></div>
 <main class="container">
     <div class="page-navigation mb-3">
         <a th:href="@{/}"><i class="bi bi-house"></i> Inicio</a><i class="bi bi-chevron-right"></i>
-        <a th:href="@{/documentacion}">Documentacion</a><i class="bi bi-chevron-right"></i><span th:text="${modoEdicion ? 'Editar' : 'Nuevo'}">Nuevo</span>
+        <a th:href="@{/documentacion}">Documentos</a><i class="bi bi-chevron-right"></i><span th:text="${modoEdicion ? 'Editar' : 'Nuevo'}">Nuevo</span>
     </div>
 
     <div class="document-header mb-4">
         <div>
             <div class="document-kicker">Control documental</div>
             <h1 th:text="${modoEdicion ? 'Editar documento' : 'Nuevo documento'}">Nuevo documento</h1>
-            <div class="text-muted">Carga vencimientos, presentacion mensual y si el documento condiciona el ingreso a obra.</div>
+            <div class="text-muted">Carga la documentacion, su vigencia cuando corresponda y si condiciona el ingreso a obra.</div>
         </div>
         <div class="document-form-tip" th:if="${modoEdicion}">
             <i class="bi bi-clock-history"></i>
@@ -89,7 +89,8 @@
                 </div>
                 <div class="col-md-3">
                     <label class="form-label">Vigente hasta</label>
-                    <input class="form-control" type="date" th:field="*{fechaVencimiento}">
+                    <input class="form-control" type="date" th:field="*{fechaVencimiento}" id="fecha-vencimiento-input">
+                    <small class="text-muted" id="fecha-vencimiento-help">Dejalo vacio si el documento no vence.</small>
                 </div>
                 <div class="col-md-3">
                     <label class="form-label">Fecha presentacion</label>
@@ -119,6 +120,7 @@
                 <div class="col-md-12">
                     <div class="documentacion-check-grid">
                         <label><input type="checkbox" th:field="*{presentado}"> Presentado</label>
+                        <label><input type="checkbox" th:field="*{sinVencimiento}" id="sin-vencimiento-check"> No aplica vencimiento</label>
                         <label><input type="checkbox" th:field="*{impresoLegajo}"> Hay copia impresa en legajo</label>
                         <label><input type="checkbox" th:field="*{mensual}"> Control mensual</label>
                         <label><input type="checkbox" th:field="*{obligatorioIngreso}"> Condiciona ingreso a obra</label>
@@ -141,6 +143,9 @@
 const sujetoSelect = document.getElementById('sujeto-select');
 const vinculoSelect = document.getElementById('vinculo-select');
 const tipoDocumentoSelect = document.getElementById('tipo-documento-select');
+const sinVencimientoCheck = document.getElementById('sin-vencimiento-check');
+const fechaVencimientoInput = document.getElementById('fecha-vencimiento-input');
+const fechaVencimientoHelp = document.getElementById('fecha-vencimiento-help');
 const tipoDocumentoOptions = Array.from(tipoDocumentoSelect?.options || []).map(option => option.cloneNode(true));
 
 function updateDocFields() {
@@ -166,10 +171,27 @@ function updateTipoDocumentoOptions() {
     }
 }
 
+function updateVencimientoMode() {
+    if (!sinVencimientoCheck || !fechaVencimientoInput) return;
+    const sinVencimiento = sinVencimientoCheck.checked;
+    fechaVencimientoInput.disabled = sinVencimiento;
+    fechaVencimientoInput.classList.toggle('is-soft-disabled', sinVencimiento);
+    if (sinVencimiento) {
+        fechaVencimientoInput.value = '';
+    }
+    if (fechaVencimientoHelp) {
+        fechaVencimientoHelp.textContent = sinVencimiento
+            ? 'Este documento se controla como presentado, pero no genera alertas de vencimiento.'
+            : 'Dejalo vacio o marca "No aplica vencimiento" si el documento no vence.';
+    }
+}
+
 sujetoSelect?.addEventListener('change', updateDocFields);
 vinculoSelect?.addEventListener('change', updateTipoDocumentoOptions);
+sinVencimientoCheck?.addEventListener('change', updateVencimientoMode);
 updateDocFields();
 updateTipoDocumentoOptions();
+updateVencimientoMode();
 </script>
 </body>
 </html>

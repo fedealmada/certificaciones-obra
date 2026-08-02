@@ -2237,6 +2237,461 @@ html[data-theme] body .oc-detail-page .status-pill.status-progress {
     }
 }
 
+/* Final: breadcrumb y ancho absolutamente unificados */
+html[data-theme] body main.container,
+html[data-theme] body main.container-fluid,
+html[data-theme] body .dashboard-shell,
+html[data-theme] body .cert-detail-page,
+html[data-theme] body .contractor-folder-page,
+html[data-theme] body .note-list-shell,
+html[data-theme] body .note-form-shell,
+html[data-theme] body .note-detail-shell,
+html[data-theme] body .tablero-page {
+    width: min(1440px, calc(100vw - 8.25rem)) !important;
+    max-width: min(1440px, calc(100vw - 8.25rem)) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    padding-top: 2.15rem !important;
+}
+
+html[data-theme] body .page-navigation,
+html[data-theme] body .breadcrumb,
+html[data-theme] body .ds-breadcrumb,
+html[data-theme] body .contractor-folder-breadcrumb {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    width: 100% !important;
+    min-height: 2.35rem !important;
+    margin: 0 0 1rem !important;
+    padding: 0.5rem 0.75rem !important;
+    border: 1px solid var(--ds-border) !important;
+    border-radius: 10px !important;
+    background: var(--ds-surface) !important;
+    color: var(--ds-muted) !important;
+    box-shadow: none !important;
+    font-size: 0.78rem !important;
+    font-weight: 760 !important;
+    line-height: 1 !important;
+}
+
+html[data-theme] body .page-navigation a,
+html[data-theme] body .breadcrumb a,
+html[data-theme] body .ds-breadcrumb a,
+html[data-theme] body .contractor-folder-breadcrumb a {
+    color: var(--ds-primary) !important;
+    text-decoration: none !important;
+    font-weight: 820 !important;
+}
+
+html[data-theme] body .page-navigation span,
+html[data-theme] body .breadcrumb span,
+html[data-theme] body .ds-breadcrumb span,
+html[data-theme] body .contractor-folder-breadcrumb span {
+    color: var(--ds-text) !important;
+    font-weight: 820 !important;
+}
+
+html[data-theme] body .contractor-folder-actions .folder-premium-btn.is-primary,
+html[data-theme] body .contractor-folder-actions .folder-premium-btn.is-primary:visited {
+    border-color: #1d4ed8 !important;
+    background: #2563eb !important;
+    color: #ffffff !important;
+    text-shadow: none !important;
+}
+
+html[data-theme] body .contractor-folder-actions .folder-premium-btn.is-primary i {
+    color: #ffffff !important;
+}
+
+html[data-theme] body .contractor-folder-actions .folder-premium-btn.is-secondary,
+html[data-theme] body .contractor-folder-actions .folder-premium-btn.is-secondary:visited {
+    border-color: var(--ds-border) !important;
+    background: var(--ds-surface) !important;
+    color: var(--ds-text) !important;
+}
+
+html[data-theme] body .contractor-folder-actions .folder-premium-btn.is-secondary i {
+    color: var(--ds-text) !important;
+}
+
+html[data-theme="dark"] body .contractor-folder-actions .folder-premium-btn.is-primary,
+html[data-theme="dark"] body .contractor-folder-actions .folder-premium-btn.is-primary:visited {
+    border-color: #5b8dff !important;
+    background: #3b82f6 !important;
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] body .contractor-folder-actions .folder-premium-btn.is-secondary,
+html[data-theme="dark"] body .contractor-folder-actions .folder-premium-btn.is-secondary:visited {
+    border-color: #263652 !important;
+    background: #121c2d !important;
+    color: #edf4ff !important;
+}
+
+html[data-theme="dark"] body .contractor-folder-actions .folder-premium-btn.is-secondary i {
+    color: #edf4ff !important;
+}
+
+@media (max-width: 980px) {
+    html[data-theme] body main.container,
+    html[data-theme] body main.container-fluid,
+    html[data-theme] body .dashboard-shell,
+    html[data-theme] body .cert-detail-page,
+    html[data-theme] body .contractor-folder-page,
+    html[data-theme] body .note-list-shell,
+    html[data-theme] body .note-form-shell,
+    html[data-theme] body .note-detail-shell,
+    html[data-theme] body .tablero-page {
+        width: min(100%, calc(100vw - 1.25rem)) !important;
+        max-width: min(100%, calc(100vw - 1.25rem)) !important;
+        padding-top: 1rem !important;
+    }
+}
+
+/* Documentacion: busqueda, breadcrumb y modo oscuro consistentes */
+html[data-theme] body .document-folder-card.d-none,
+html[data-theme] body .document-folder.d-none,
+html[data-theme] body .document-branch.d-none,
+html[data-theme] body .contractor-document-row.d-none,
+html[data-theme] body .contractor-folder-empty.d-none,
+html[data-theme] body .contractor-sidebar-empty.d-none,
+html[data-theme] body [data-doc-filter-empty].d-none {
+    display: none !important;
+}
+
+html[data-theme] body .contractor-folder-toolbar label,
+html[data-theme] body .document-search-box {
+    background: var(--ds-surface) !important;
+    border-color: var(--ds-border) !important;
+    color: var(--ds-text) !important;
+}
+
+html[data-theme] body .contractor-folder-toolbar input,
+html[data-theme] body .document-search-box input,
+html[data-theme] body .contractor-folder-toolbar select,
+html[data-theme] body #documentacion-status-filter {
+    background: transparent !important;
+    color: var(--ds-text) !important;
+    border-color: var(--ds-border) !important;
+}
+
+html[data-theme] body .contractor-folder-toolbar input::placeholder,
+html[data-theme] body .document-search-box input::placeholder {
+    color: var(--ds-muted) !important;
+    opacity: 1 !important;
+}
+
+html[data-theme] body .contractor-folder-actions .folder-premium-btn {
+    min-height: 2.75rem !important;
+    border-radius: 12px !important;
+    font-weight: 850 !important;
+    letter-spacing: 0 !important;
+    transition: transform 200ms ease, box-shadow 200ms ease, background-color 200ms ease, border-color 200ms ease !important;
+}
+
+html[data-theme] body .contractor-folder-actions .folder-premium-btn.is-primary,
+html[data-theme] body .contractor-folder-actions .folder-premium-btn.is-primary:visited {
+    border-color: #1d4ed8 !important;
+    background: linear-gradient(180deg, #2f74ff 0%, #2563eb 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 14px 30px rgba(37, 99, 235, 0.22) !important;
+}
+
+html[data-theme] body .contractor-folder-actions .folder-premium-btn.is-primary i {
+    color: #ffffff !important;
+}
+
+html[data-theme] body .contractor-folder-actions .folder-premium-btn.is-primary:hover {
+    transform: translateY(-1px) !important;
+    background: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%) !important;
+    box-shadow: 0 18px 34px rgba(37, 99, 235, 0.28) !important;
+}
+
+html[data-theme="dark"] body .contractor-folder-page,
+html[data-theme="dark"] body main.container:has(.documentacion-hero) {
+    background: #0b1220 !important;
+    color: #edf4ff !important;
+}
+
+html[data-theme="dark"] body .documentacion-hero,
+html[data-theme="dark"] body .document-semaforo-kpi,
+html[data-theme="dark"] body .panel-section.document-explorer-section,
+html[data-theme="dark"] body .document-folder-card,
+html[data-theme="dark"] body .contractor-folder-hero,
+html[data-theme="dark"] body .contractor-folder-summary article,
+html[data-theme="dark"] body .contractor-folder-main,
+html[data-theme="dark"] body .contractor-folder-sidebar section,
+html[data-theme="dark"] body .contractor-document-row,
+html[data-theme="dark"] body .contractor-notes-box,
+html[data-theme="dark"] body .contractor-info-grid article,
+html[data-theme="dark"] body .contractor-timeline article {
+    background: #121c2d !important;
+    border-color: #263652 !important;
+    color: #edf4ff !important;
+    box-shadow: 0 18px 42px rgba(0, 0, 0, 0.22) !important;
+}
+
+html[data-theme="dark"] body .document-folder-card:hover,
+html[data-theme="dark"] body .contractor-document-row:hover {
+    background: #152238 !important;
+    border-color: #36537b !important;
+}
+
+html[data-theme="dark"] body .document-folder-card strong,
+html[data-theme="dark"] body .contractor-folder-title h1,
+html[data-theme="dark"] body .contractor-folder-panel-head h2,
+html[data-theme="dark"] body .contractor-document-main strong,
+html[data-theme="dark"] body .contractor-sidebar-head h3,
+html[data-theme="dark"] body .documentacion-hero h1,
+html[data-theme="dark"] body .document-semaforo-kpi strong {
+    color: #f8fbff !important;
+}
+
+html[data-theme="dark"] body .document-folder-card small,
+html[data-theme="dark"] body .document-folder-card-meta,
+html[data-theme="dark"] body .contractor-folder-panel-head p,
+html[data-theme="dark"] body .contractor-document-main small,
+html[data-theme="dark"] body .contractor-folder-meta,
+html[data-theme="dark"] body .contractor-sidebar-list dt,
+html[data-theme="dark"] body .contractor-sidebar-list dd,
+html[data-theme="dark"] body .contractor-sidebar-note,
+html[data-theme="dark"] body .text-muted {
+    color: #aebdd3 !important;
+}
+
+html[data-theme="dark"] body .contractor-folder-toolbar label,
+html[data-theme="dark"] body .document-search-box,
+html[data-theme="dark"] body .contractor-folder-toolbar select,
+html[data-theme="dark"] body #documentacion-status-filter,
+html[data-theme="dark"] body .document-control-bar .form-select,
+html[data-theme="dark"] body .contractor-document-actions button,
+html[data-theme="dark"] body .contractor-document-actions a {
+    background: #0f1828 !important;
+    border-color: #2e4264 !important;
+    color: #edf4ff !important;
+}
+
+html[data-theme="dark"] body .contractor-folder-toolbar input,
+html[data-theme="dark"] body .document-search-box input {
+    color: #f8fbff !important;
+}
+
+html[data-theme="dark"] body .contractor-folder-toolbar i,
+html[data-theme="dark"] body .document-search-box i,
+html[data-theme="dark"] body .contractor-document-actions i,
+html[data-theme="dark"] body .document-binder-image img {
+    color: #c7d7f2 !important;
+}
+
+html[data-theme="dark"] body .contractor-folder-actions .folder-premium-btn.is-primary,
+html[data-theme="dark"] body .contractor-folder-actions .folder-premium-btn.is-primary:visited {
+    border-color: #79a7ff !important;
+    background: linear-gradient(180deg, #77a7ff 0%, #3b82f6 100%) !important;
+    color: #061126 !important;
+    box-shadow: 0 18px 36px rgba(59, 130, 246, 0.28) !important;
+}
+
+html[data-theme="dark"] body .contractor-folder-actions .folder-premium-btn.is-primary i {
+    color: #061126 !important;
+}
+
+/* Documentacion: boton principal siempre visible dentro de carpeta */
+html[data-theme] body .contractor-folder-hero .contractor-folder-actions > a.folder-premium-btn.is-primary,
+html[data-theme] body .contractor-folder-hero .contractor-folder-actions > a.folder-premium-btn.is-primary:link,
+html[data-theme] body .contractor-folder-hero .contractor-folder-actions > a.folder-premium-btn.is-primary:visited,
+html[data-theme] body .contractor-folder-hero .contractor-folder-actions > a.folder-premium-btn.is-primary:focus {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.55rem !important;
+    min-width: 10.5rem !important;
+    min-height: 2.85rem !important;
+    padding: 0 1.15rem !important;
+    border: 1px solid #1d4ed8 !important;
+    border-radius: 12px !important;
+    background: #2563eb !important;
+    color: #ffffff !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    text-decoration: none !important;
+    text-shadow: none !important;
+    font-size: 0.9rem !important;
+    font-weight: 850 !important;
+    line-height: 1 !important;
+    box-shadow: 0 16px 32px rgba(37, 99, 235, 0.24) !important;
+}
+
+html[data-theme] body .contractor-folder-hero .contractor-folder-actions > a.folder-premium-btn.is-primary *,
+html[data-theme] body .contractor-folder-hero .contractor-folder-actions > a.folder-premium-btn.is-primary i {
+    color: #ffffff !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+html[data-theme] body .contractor-folder-hero .contractor-folder-actions > a.folder-premium-btn.is-primary:hover {
+    background: #1d4ed8 !important;
+    border-color: #1e40af !important;
+    color: #ffffff !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 20px 38px rgba(37, 99, 235, 0.3) !important;
+}
+
+html[data-theme="dark"] body .contractor-folder-hero .contractor-folder-actions > a.folder-premium-btn.is-primary,
+html[data-theme="dark"] body .contractor-folder-hero .contractor-folder-actions > a.folder-premium-btn.is-primary:link,
+html[data-theme="dark"] body .contractor-folder-hero .contractor-folder-actions > a.folder-premium-btn.is-primary:visited,
+html[data-theme="dark"] body .contractor-folder-hero .contractor-folder-actions > a.folder-premium-btn.is-primary:focus {
+    border-color: #82aaff !important;
+    background: #60a5fa !important;
+    color: #071426 !important;
+    box-shadow: 0 18px 36px rgba(96, 165, 250, 0.24) !important;
+}
+
+html[data-theme="dark"] body .contractor-folder-hero .contractor-folder-actions > a.folder-premium-btn.is-primary *,
+html[data-theme="dark"] body .contractor-folder-hero .contractor-folder-actions > a.folder-premium-btn.is-primary i {
+    color: #071426 !important;
+}
+
+html[data-theme="dark"] body .contractor-folder-hero .contractor-folder-actions > a.folder-premium-btn.is-primary:hover {
+    background: #93c5fd !important;
+    border-color: #bfdbfe !important;
+    color: #071426 !important;
+    box-shadow: 0 22px 42px rgba(147, 197, 253, 0.26) !important;
+}
+
+/* Global: posicion unica de paginas, ruta y acciones */
+html[data-theme] body main.container,
+html[data-theme] body main.container-fluid,
+html[data-theme] body .dashboard-shell,
+html[data-theme] body .cert-detail-page,
+html[data-theme] body .contractor-folder-page {
+    width: min(1440px, calc(100vw - 8.25rem)) !important;
+    max-width: min(1440px, calc(100vw - 8.25rem)) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    padding-top: 2.15rem !important;
+}
+
+html[data-theme] body .page-navigation,
+html[data-theme] body .breadcrumb,
+html[data-theme] body .ds-breadcrumb,
+html[data-theme] body .contractor-folder-breadcrumb {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    width: 100% !important;
+    min-height: 2.35rem !important;
+    margin: 0 0 1rem !important;
+    padding: 0.5rem 0.75rem !important;
+    border: 1px solid var(--ds-border) !important;
+    border-radius: 10px !important;
+    background: var(--ds-surface) !important;
+    color: var(--ds-muted) !important;
+    box-shadow: none !important;
+    font-size: 0.78rem !important;
+    font-weight: 760 !important;
+    line-height: 1 !important;
+}
+
+html[data-theme] body .page-navigation a,
+html[data-theme] body .breadcrumb a,
+html[data-theme] body .ds-breadcrumb a,
+html[data-theme] body .contractor-folder-breadcrumb a {
+    color: var(--ds-primary) !important;
+    text-decoration: none !important;
+    font-weight: 820 !important;
+}
+
+html[data-theme] body .page-navigation span,
+html[data-theme] body .breadcrumb span,
+html[data-theme] body .ds-breadcrumb span,
+html[data-theme] body .contractor-folder-breadcrumb span {
+    color: var(--ds-text) !important;
+    font-weight: 820 !important;
+}
+
+html[data-theme] body .page-navigation i,
+html[data-theme] body .breadcrumb i,
+html[data-theme] body .ds-breadcrumb i,
+html[data-theme] body .contractor-folder-breadcrumb i {
+    color: var(--ds-muted) !important;
+    font-size: 0.78rem !important;
+}
+
+html[data-theme] body .note-list-shell,
+html[data-theme] body .note-form-shell,
+html[data-theme] body .note-detail-shell,
+html[data-theme] body .tablero-page {
+    max-width: min(1440px, calc(100vw - 8.25rem)) !important;
+}
+
+html[data-theme] body .contractor-folder-actions .folder-premium-btn.is-primary,
+html[data-theme] body .contractor-folder-actions .folder-premium-btn.is-primary:visited {
+    border-color: #1d4ed8 !important;
+    background: #2563eb !important;
+    color: #ffffff !important;
+    text-shadow: none !important;
+    box-shadow: 0 14px 26px rgba(37, 99, 235, 0.22) !important;
+}
+
+html[data-theme] body .contractor-folder-actions .folder-premium-btn.is-primary i {
+    color: #ffffff !important;
+}
+
+html[data-theme] body .contractor-folder-actions .folder-premium-btn.is-secondary,
+html[data-theme] body .contractor-folder-actions .folder-premium-btn.is-secondary:visited {
+    border-color: var(--ds-border) !important;
+    background: var(--ds-surface) !important;
+    color: var(--ds-text) !important;
+}
+
+html[data-theme] body .contractor-folder-actions .folder-premium-btn.is-secondary i {
+    color: var(--ds-text) !important;
+}
+
+html[data-theme] body .contractor-folder-actions .folder-premium-btn:hover {
+    filter: none !important;
+}
+
+html[data-theme="dark"] body .contractor-folder-actions .folder-premium-btn.is-primary,
+html[data-theme="dark"] body .contractor-folder-actions .folder-premium-btn.is-primary:visited {
+    border-color: #5b8dff !important;
+    background: #3b82f6 !important;
+    color: #ffffff !important;
+    box-shadow: 0 16px 30px rgba(59, 130, 246, 0.24) !important;
+}
+
+html[data-theme="dark"] body .contractor-folder-actions .folder-premium-btn.is-secondary,
+html[data-theme="dark"] body .contractor-folder-actions .folder-premium-btn.is-secondary:visited {
+    border-color: #263652 !important;
+    background: #121c2d !important;
+    color: #edf4ff !important;
+}
+
+html[data-theme="dark"] body .contractor-folder-actions .folder-premium-btn.is-secondary i {
+    color: #edf4ff !important;
+}
+
+@media (max-width: 980px) {
+    html[data-theme] body main.container,
+    html[data-theme] body main.container-fluid,
+    html[data-theme] body .dashboard-shell,
+    html[data-theme] body .cert-detail-page,
+    html[data-theme] body .contractor-folder-page,
+    html[data-theme] body .note-list-shell,
+    html[data-theme] body .note-form-shell,
+    html[data-theme] body .note-detail-shell,
+    html[data-theme] body .tablero-page {
+        width: min(100%, calc(100vw - 1.25rem)) !important;
+        max-width: min(100%, calc(100vw - 1.25rem)) !important;
+        padding-top: 1rem !important;
+    }
+}
+
 html[data-theme="dark"] body .oc-detail-page .oc-detail-header,
 html[data-theme="dark"] body .oc-detail-card,
 html[data-theme="dark"] body .oc-detail-page .panel-section {
@@ -2321,4 +2776,3639 @@ html[data-theme="dark"] body .oc-detail-page .tracking-chip {
     background: rgba(56, 189, 248, 0.14) !important;
     border-color: rgba(56, 189, 248, 0.3) !important;
     color: #93d9ff !important;
+}
+
+/* Documentacion: iconografia visible y carpetas con identidad */
+html[data-theme] body .document-semaforo-kpis {
+    gap: 1rem !important;
+}
+
+html[data-theme] body .document-semaforo-kpi {
+    position: relative !important;
+    isolation: isolate !important;
+    min-height: 7rem !important;
+    padding: 1.15rem !important;
+    grid-template-columns: 3.6rem minmax(0, 1fr) !important;
+    border: 1px solid color-mix(in srgb, var(--doc-state-color) 20%, var(--ds-border)) !important;
+    border-left: 0 !important;
+    border-radius: 12px !important;
+    background:
+        radial-gradient(circle at 18% 18%, color-mix(in srgb, var(--doc-state-color) 15%, transparent), transparent 34%),
+        var(--ds-surface) !important;
+    box-shadow: 0 14px 34px rgba(20, 35, 64, 0.07) !important;
+    overflow: hidden !important;
+}
+
+html[data-theme] body .document-semaforo-kpi::before {
+    content: "" !important;
+    position: absolute !important;
+    inset: auto 1rem 0.85rem 1rem !important;
+    height: 3px !important;
+    border-radius: 999px !important;
+    background: var(--doc-state-color) !important;
+    opacity: 0.9 !important;
+}
+
+html[data-theme] body .document-semaforo-kpi::after {
+    content: "" !important;
+    position: absolute !important;
+    right: -1.5rem !important;
+    top: -1.5rem !important;
+    width: 5.7rem !important;
+    height: 5.7rem !important;
+    border-radius: 999px !important;
+    background: color-mix(in srgb, var(--doc-state-color) 12%, transparent) !important;
+    opacity: 1 !important;
+    pointer-events: none !important;
+}
+
+html[data-theme] body .document-semaforo-kpi .semaforo-light {
+    position: relative !important;
+    z-index: 1 !important;
+    width: 3.35rem !important;
+    height: 3.35rem !important;
+    flex: 0 0 3.35rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 15px !important;
+    background:
+        linear-gradient(145deg, color-mix(in srgb, var(--doc-state-color) 18%, #ffffff), color-mix(in srgb, var(--doc-state-color) 8%, #ffffff)) !important;
+    border: 1px solid color-mix(in srgb, var(--doc-state-color) 30%, #ffffff) !important;
+    color: var(--doc-state-color) !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.82),
+        0 14px 24px color-mix(in srgb, var(--doc-state-color) 22%, transparent) !important;
+}
+
+html[data-theme] body .document-semaforo-kpi .semaforo-light::before {
+    display: none !important;
+}
+
+html[data-theme] body .document-semaforo-kpi .semaforo-light i {
+    display: inline-flex !important;
+    font-size: 1.55rem !important;
+    line-height: 1 !important;
+}
+
+html[data-theme] body .document-semaforo-kpi span:not(.semaforo-light),
+html[data-theme] body .document-semaforo-kpi small {
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+html[data-theme] body .document-semaforo-kpi span:not(.semaforo-light) {
+    color: #52627c !important;
+    font-size: 0.78rem !important;
+    font-weight: 850 !important;
+    letter-spacing: 0 !important;
+    text-transform: none !important;
+}
+
+html[data-theme] body .document-semaforo-kpi strong {
+    position: relative !important;
+    z-index: 1 !important;
+    margin-top: 0.12rem !important;
+    font-size: 1.72rem !important;
+    font-weight: 900 !important;
+}
+
+html[data-theme] body .document-priority-card {
+    position: relative !important;
+    overflow: hidden !important;
+    border-radius: 12px !important;
+    border-color: color-mix(in srgb, var(--doc-state-color) 18%, var(--ds-border)) !important;
+    background:
+        linear-gradient(135deg, color-mix(in srgb, var(--doc-state-color) 6%, var(--ds-surface)) 0%, var(--ds-surface) 62%) !important;
+}
+
+html[data-theme] body .document-priority-card::after {
+    content: "" !important;
+    position: absolute !important;
+    inset: auto 0 0 0 !important;
+    height: 3px !important;
+    background: var(--doc-state-color) !important;
+    opacity: 0.75 !important;
+}
+
+html[data-theme] body .document-priority-card .priority-icon,
+html[data-theme] body .document-priority-card > .priority-icon {
+    width: 3rem !important;
+    height: 3rem !important;
+    flex: 0 0 3rem !important;
+    border-radius: 14px !important;
+    background:
+        linear-gradient(145deg, color-mix(in srgb, var(--doc-state-color) 17%, #ffffff), color-mix(in srgb, var(--doc-state-color) 7%, #ffffff)) !important;
+    border: 1px solid color-mix(in srgb, var(--doc-state-color) 28%, #ffffff) !important;
+    color: var(--doc-state-color) !important;
+    box-shadow: 0 12px 22px color-mix(in srgb, var(--doc-state-color) 18%, transparent) !important;
+}
+
+html[data-theme] body .document-priority-card .priority-icon i {
+    font-size: 1.35rem !important;
+}
+
+html[data-theme] body .document-folder {
+    border-left-width: 4px !important;
+    border-radius: 12px !important;
+    box-shadow: 0 12px 30px rgba(20, 35, 64, 0.055) !important;
+}
+
+html[data-theme] body .document-folder .documentacion-group-header {
+    min-height: 4.75rem !important;
+    background:
+        linear-gradient(90deg, color-mix(in srgb, var(--folder-color, var(--ds-primary)) 12%, var(--ds-surface)) 0%, var(--ds-surface) 56%) !important;
+}
+
+html[data-theme] body .document-folder-header:hover {
+    background:
+        linear-gradient(90deg, color-mix(in srgb, var(--folder-color, var(--ds-primary)) 18%, var(--ds-surface)) 0%, var(--ds-surface) 60%) !important;
+}
+
+html[data-theme] body .document-folder-icon,
+html[data-theme] body .folder-summary-icon,
+html[data-theme] body #folder-customize-icon {
+    position: relative !important;
+    width: 3.25rem !important;
+    height: 2.75rem !important;
+    flex: 0 0 3.25rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 10px !important;
+    background:
+        linear-gradient(180deg,
+            color-mix(in srgb, var(--folder-color, var(--ds-primary)) 72%, #ffffff) 0%,
+            color-mix(in srgb, var(--folder-color, var(--ds-primary)) 94%, #ffffff) 100%) !important;
+    border: 1px solid color-mix(in srgb, var(--folder-color, var(--ds-primary)) 58%, #ffffff) !important;
+    color: #ffffff !important;
+    box-shadow:
+        inset 0 -8px 14px rgba(15, 23, 42, 0.14),
+        0 12px 22px color-mix(in srgb, var(--folder-color, var(--ds-primary)) 22%, transparent) !important;
+}
+
+html[data-theme] body .document-folder-icon::before,
+html[data-theme] body .folder-summary-icon::before,
+html[data-theme] body #folder-customize-icon::before {
+    content: "" !important;
+    position: absolute !important;
+    top: -0.38rem !important;
+    left: 0.32rem !important;
+    width: 1.45rem !important;
+    height: 0.64rem !important;
+    border-radius: 8px 8px 0 0 !important;
+    background:
+        linear-gradient(180deg,
+            color-mix(in srgb, var(--folder-color, var(--ds-primary)) 48%, #ffffff),
+            color-mix(in srgb, var(--folder-color, var(--ds-primary)) 86%, #ffffff)) !important;
+    border: 1px solid color-mix(in srgb, var(--folder-color, var(--ds-primary)) 52%, #ffffff) !important;
+    border-bottom: 0 !important;
+}
+
+html[data-theme] body .document-folder-icon::after,
+html[data-theme] body .folder-summary-icon::after,
+html[data-theme] body #folder-customize-icon::after {
+    content: "" !important;
+    position: absolute !important;
+    inset: 0.55rem 0.28rem 0.28rem !important;
+    border-radius: 7px !important;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.06)) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.35) !important;
+}
+
+html[data-theme] body .document-folder-icon i,
+html[data-theme] body .folder-summary-icon i,
+html[data-theme] body #folder-customize-icon i {
+    position: relative !important;
+    z-index: 1 !important;
+    display: inline-flex !important;
+    font-size: 1.25rem !important;
+    filter: drop-shadow(0 1px 1px rgba(15, 23, 42, 0.18)) !important;
+}
+
+html[data-theme] body .document-leaf-icon,
+html[data-theme] body .document-empty-folder > i {
+    width: 2.35rem !important;
+    height: 2.35rem !important;
+    flex: 0 0 2.35rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 12px !important;
+    background:
+        linear-gradient(145deg, color-mix(in srgb, var(--folder-color, var(--ds-primary)) 14%, #ffffff), #ffffff) !important;
+    border: 1px solid color-mix(in srgb, var(--folder-color, var(--ds-primary)) 24%, var(--ds-border)) !important;
+    color: var(--folder-color, var(--ds-primary)) !important;
+    box-shadow: 0 8px 18px color-mix(in srgb, var(--folder-color, var(--ds-primary)) 12%, transparent) !important;
+}
+
+html[data-theme] body .document-leaf-icon .bi-file-earmark-pdf,
+html[data-theme] body .doc-tag.is-pdf i {
+    color: var(--ds-danger) !important;
+}
+
+html[data-theme] body .document-leaf:hover .document-leaf-icon {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 12px 24px color-mix(in srgb, var(--folder-color, var(--ds-primary)) 18%, transparent) !important;
+}
+
+html[data-theme] body .doc-mini-kpi,
+html[data-theme] body .doc-folder-type-pill,
+html[data-theme] body .doc-tag {
+    border-radius: 999px !important;
+}
+
+html[data-theme="dark"] body .document-semaforo-kpi {
+    background:
+        radial-gradient(circle at 18% 18%, color-mix(in srgb, var(--doc-state-color) 20%, transparent), transparent 36%),
+        #121a2a !important;
+    border-color: color-mix(in srgb, var(--doc-state-color) 28%, #26344d) !important;
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.24) !important;
+}
+
+html[data-theme="dark"] body .document-semaforo-kpi .semaforo-light,
+html[data-theme="dark"] body .document-priority-card .priority-icon {
+    background:
+        linear-gradient(145deg, color-mix(in srgb, var(--doc-state-color) 25%, #1a2538), color-mix(in srgb, var(--doc-state-color) 10%, #121a2a)) !important;
+    border-color: color-mix(in srgb, var(--doc-state-color) 34%, #2b3a55) !important;
+    color: color-mix(in srgb, var(--doc-state-color) 80%, #ffffff) !important;
+    box-shadow: 0 14px 24px color-mix(in srgb, var(--doc-state-color) 18%, transparent) !important;
+}
+
+html[data-theme="dark"] body .document-semaforo-kpi span:not(.semaforo-light) {
+    color: #b8c7dd !important;
+}
+
+html[data-theme="dark"] body .document-priority-card {
+    background:
+        linear-gradient(135deg, color-mix(in srgb, var(--doc-state-color) 10%, #121a2a) 0%, #121a2a 65%) !important;
+    border-color: color-mix(in srgb, var(--doc-state-color) 26%, #26344d) !important;
+}
+
+html[data-theme="dark"] body .document-folder .documentacion-group-header {
+    background:
+        linear-gradient(90deg, color-mix(in srgb, var(--folder-color, var(--ds-primary)) 18%, #121a2a) 0%, #121a2a 62%) !important;
+}
+
+html[data-theme="dark"] body .document-folder-header:hover {
+    background:
+        linear-gradient(90deg, color-mix(in srgb, var(--folder-color, var(--ds-primary)) 26%, #121a2a) 0%, #162238 64%) !important;
+}
+
+html[data-theme="dark"] body .document-folder-icon,
+html[data-theme="dark"] body .folder-summary-icon,
+html[data-theme="dark"] body #folder-customize-icon {
+    background:
+        linear-gradient(180deg,
+            color-mix(in srgb, var(--folder-color, var(--ds-primary)) 54%, #26344d) 0%,
+            color-mix(in srgb, var(--folder-color, var(--ds-primary)) 88%, #0f1726) 100%) !important;
+    border-color: color-mix(in srgb, var(--folder-color, var(--ds-primary)) 50%, #3a4a65) !important;
+    color: #ffffff !important;
+    box-shadow:
+        inset 0 -8px 16px rgba(0, 0, 0, 0.22),
+        0 14px 26px color-mix(in srgb, var(--folder-color, var(--ds-primary)) 22%, transparent) !important;
+}
+
+html[data-theme="dark"] body .document-folder-icon::before,
+html[data-theme="dark"] body .folder-summary-icon::before,
+html[data-theme="dark"] body #folder-customize-icon::before {
+    border-color: color-mix(in srgb, var(--folder-color, var(--ds-primary)) 48%, #3a4a65) !important;
+}
+
+html[data-theme="dark"] body .document-leaf-icon,
+html[data-theme="dark"] body .document-empty-folder > i {
+    background:
+        linear-gradient(145deg, color-mix(in srgb, var(--folder-color, var(--ds-primary)) 18%, #1a2538), #121a2a) !important;
+    border-color: color-mix(in srgb, var(--folder-color, var(--ds-primary)) 30%, #26344d) !important;
+    color: color-mix(in srgb, var(--folder-color, var(--ds-primary)) 74%, #ffffff) !important;
+}
+
+/* Documentacion: ajustes finos de semaforo, drag y clicks de carpeta */
+html[data-theme] body .document-semaforo-kpi {
+    background: var(--ds-surface) !important;
+}
+
+html[data-theme] body .document-semaforo-kpi::after {
+    display: none !important;
+}
+
+html[data-theme] body .document-semaforo-kpi .semaforo-light {
+    width: 3.35rem !important;
+    height: 3.35rem !important;
+    flex: 0 0 3.35rem !important;
+    border-radius: 999px !important;
+    background:
+        radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 1) 0 8%, rgba(255, 255, 255, 0.72) 9% 17%, transparent 18%),
+        radial-gradient(circle at 50% 48%, #ffffff 0 8%, color-mix(in srgb, var(--doc-state-color) 72%, #ffffff) 9% 25%, var(--doc-state-color) 26% 58%, color-mix(in srgb, var(--doc-state-color) 74%, #020617) 59% 100%) !important;
+    border: 1px solid color-mix(in srgb, var(--doc-state-color) 70%, #ffffff) !important;
+    color: #ffffff !important;
+    box-shadow:
+        inset 0 -11px 18px rgba(15, 23, 42, 0.34),
+        inset 0 2px 0 rgba(255, 255, 255, 0.86),
+        inset 0 0 18px rgba(255, 255, 255, 0.36),
+        0 0 0 5px color-mix(in srgb, var(--doc-state-color) 18%, transparent),
+        0 0 22px color-mix(in srgb, var(--doc-state-color) 58%, transparent),
+        0 16px 32px color-mix(in srgb, var(--doc-state-color) 32%, transparent) !important;
+}
+
+html[data-theme] body .document-semaforo-kpi .semaforo-light i {
+    position: relative !important;
+    z-index: 1 !important;
+    display: inline-flex !important;
+    color: #ffffff !important;
+    font-size: 1.28rem !important;
+    filter: drop-shadow(0 1px 2px rgba(15, 23, 42, 0.35)) !important;
+}
+
+html[data-theme] body .document-semaforo-kpi .semaforo-light::before {
+    content: "" !important;
+    position: absolute !important;
+    inset: -0.55rem !important;
+    display: block !important;
+    width: auto !important;
+    height: auto !important;
+    border: 1px solid color-mix(in srgb, var(--doc-state-color) 34%, transparent) !important;
+    border-radius: 999px !important;
+    background:
+        radial-gradient(circle, color-mix(in srgb, var(--doc-state-color) 22%, transparent) 0 42%, transparent 70%) !important;
+    box-shadow:
+        0 0 28px color-mix(in srgb, var(--doc-state-color) 42%, transparent),
+        inset 0 0 18px color-mix(in srgb, var(--doc-state-color) 18%, transparent) !important;
+}
+
+html[data-theme] body .document-semaforo-kpi .semaforo-light::after {
+    content: "" !important;
+    position: absolute !important;
+    inset: 0.34rem !important;
+    border-radius: 999px !important;
+    border: 1px solid rgba(255, 255, 255, 0.42) !important;
+    box-shadow:
+        inset 0 0 8px rgba(255, 255, 255, 0.44),
+        inset 0 -6px 10px rgba(15, 23, 42, 0.18) !important;
+    pointer-events: none !important;
+}
+
+html[data-theme] body .document-semaforo-kpi.is-danger .semaforo-light::before {
+    box-shadow:
+        0 0 32px color-mix(in srgb, var(--doc-state-color) 54%, transparent),
+        inset 0 0 18px color-mix(in srgb, var(--doc-state-color) 24%, transparent) !important;
+}
+
+html[data-theme] body .document-semaforo-kpi.is-warning .semaforo-light::before,
+html[data-theme] body .document-semaforo-kpi.is-pending .semaforo-light::before {
+    box-shadow:
+        0 0 32px color-mix(in srgb, var(--doc-state-color) 54%, transparent),
+        inset 0 0 18px color-mix(in srgb, var(--doc-state-color) 24%, transparent) !important;
+}
+
+html[data-theme] body .document-semaforo-kpi.is-ok .semaforo-light::before,
+html[data-theme] body .document-semaforo-kpi.is-total .semaforo-light::before {
+    box-shadow:
+        0 0 32px color-mix(in srgb, var(--doc-state-color) 52%, transparent),
+        inset 0 0 18px color-mix(in srgb, var(--doc-state-color) 22%, transparent) !important;
+}
+
+html[data-theme] body .document-folder-drop-marker {
+    display: grid !important;
+    grid-template-columns: 2.5rem auto !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    min-height: 3.4rem !important;
+    margin: 0.15rem 0 !important;
+    padding: 0.6rem 1rem !important;
+    border: 2px dashed color-mix(in srgb, var(--ds-primary) 54%, var(--ds-border)) !important;
+    border-radius: 12px !important;
+    background: color-mix(in srgb, var(--ds-primary) 9%, var(--ds-surface)) !important;
+    color: var(--ds-primary) !important;
+    font-size: 0.8rem !important;
+    font-weight: 850 !important;
+}
+
+html[data-theme] body .document-folder-drop-marker span {
+    width: 2.1rem !important;
+    height: 0.36rem !important;
+    border-radius: 999px !important;
+    background: var(--ds-primary) !important;
+    box-shadow: 0 0 0 5px color-mix(in srgb, var(--ds-primary) 12%, transparent) !important;
+}
+
+html[data-theme] body .document-folder.is-dragging {
+    opacity: 0.45 !important;
+    transform: scale(0.985) !important;
+}
+
+html[data-theme] body .document-folder.is-drop-target {
+    box-shadow:
+        0 -4px 0 var(--ds-primary),
+        0 12px 30px rgba(20, 35, 64, 0.075) !important;
+}
+
+html[data-theme] body .document-folder-name {
+    cursor: pointer !important;
+    padding: 0.18rem 0.32rem !important;
+    border-radius: 7px !important;
+}
+
+html[data-theme] body .document-folder-name:hover,
+html[data-theme] body .document-folder-name:focus-visible {
+    color: var(--folder-color, var(--ds-primary)) !important;
+    background: color-mix(in srgb, var(--folder-color, var(--ds-primary)) 10%, transparent) !important;
+    outline: 0 !important;
+}
+
+html[data-theme="dark"] body .document-semaforo-kpi {
+    background: #121a2a !important;
+}
+
+html[data-theme="dark"] body .document-semaforo-kpi .semaforo-light {
+    background:
+        radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.95) 0 8%, rgba(255, 255, 255, 0.55) 9% 17%, transparent 18%),
+        radial-gradient(circle at 50% 48%, #ffffff 0 7%, color-mix(in srgb, var(--doc-state-color) 78%, #ffffff) 8% 24%, var(--doc-state-color) 25% 58%, color-mix(in srgb, var(--doc-state-color) 60%, #020617) 59% 100%) !important;
+    border-color: color-mix(in srgb, var(--doc-state-color) 62%, #3a4a65) !important;
+    box-shadow:
+        inset 0 -12px 18px rgba(0, 0, 0, 0.42),
+        inset 0 1px 0 rgba(255, 255, 255, 0.58),
+        inset 0 0 18px rgba(255, 255, 255, 0.24),
+        0 0 0 6px color-mix(in srgb, var(--doc-state-color) 18%, transparent),
+        0 0 28px color-mix(in srgb, var(--doc-state-color) 48%, transparent),
+        0 18px 34px color-mix(in srgb, var(--doc-state-color) 28%, transparent) !important;
+}
+
+html[data-theme="dark"] body .document-folder-drop-marker {
+    background: color-mix(in srgb, var(--ds-primary) 12%, #121a2a) !important;
+    border-color: color-mix(in srgb, var(--ds-primary) 48%, #2b3a55) !important;
+}
+
+/* Documentacion: focos intensos y vista de archivadores */
+html[data-theme] body .document-semaforo-kpi.is-ok {
+    --doc-state-color: #00c853 !important;
+}
+
+html[data-theme] body .document-semaforo-kpi.is-warning,
+html[data-theme] body .document-semaforo-kpi.is-pending {
+    --doc-state-color: #ffb300 !important;
+}
+
+html[data-theme] body .document-semaforo-kpi.is-danger {
+    --doc-state-color: #ff1744 !important;
+}
+
+html[data-theme] body .document-semaforo-kpi.is-total {
+    --doc-state-color: #005dff !important;
+}
+
+html[data-theme] body .document-semaforo-kpi .semaforo-light {
+    background:
+        radial-gradient(circle at 31% 25%, #ffffff 0 7%, rgba(255, 255, 255, 0.82) 8% 14%, transparent 15%),
+        radial-gradient(circle at 52% 53%, #fff7d6 0 5%, var(--doc-state-color) 6% 63%, color-mix(in srgb, var(--doc-state-color) 72%, #020617) 64% 100%) !important;
+    box-shadow:
+        inset 0 -12px 20px rgba(0, 0, 0, 0.34),
+        inset 0 2px 0 rgba(255, 255, 255, 0.9),
+        inset 0 0 24px rgba(255, 255, 255, 0.36),
+        0 0 0 5px color-mix(in srgb, var(--doc-state-color) 28%, transparent),
+        0 0 38px color-mix(in srgb, var(--doc-state-color) 88%, transparent),
+        0 16px 34px color-mix(in srgb, var(--doc-state-color) 40%, transparent) !important;
+}
+
+html[data-theme] body .document-semaforo-kpi .semaforo-light::before {
+    background:
+        radial-gradient(circle, color-mix(in srgb, var(--doc-state-color) 36%, transparent) 0 42%, transparent 72%) !important;
+    box-shadow:
+        0 0 46px color-mix(in srgb, var(--doc-state-color) 72%, transparent),
+        inset 0 0 22px color-mix(in srgb, var(--doc-state-color) 34%, transparent) !important;
+}
+
+html[data-theme] body .document-view-toggle {
+    display: inline-flex !important;
+    gap: 0.35rem !important;
+    padding: 0.18rem !important;
+    border: 1px solid var(--ds-border) !important;
+    border-radius: 9px !important;
+    background: var(--ds-surface) !important;
+}
+
+html[data-theme] body .document-view-toggle .btn {
+    width: 2.25rem !important;
+    height: 2.1rem !important;
+    padding: 0 !important;
+    border-radius: 7px !important;
+}
+
+html[data-theme] body .document-view-toggle .btn.is-active {
+    background: #0d6efd !important;
+    border-color: #0d6efd !important;
+    color: #ffffff !important;
+}
+
+html[data-theme] body .document-folder-grid-view {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(10.5rem, 1fr)) !important;
+    gap: 1.55rem 1.35rem !important;
+    padding: 1.6rem 1.45rem 1.9rem !important;
+}
+
+html[data-theme] body .document-semaforo-kpis {
+    grid-template-columns: repeat(4, minmax(12rem, 1fr)) !important;
+}
+
+html[data-theme] body .document-explorer-section.is-tree-view .document-folder-grid-view,
+html[data-theme] body .document-explorer-section.is-folder-view .documentacion-group-list {
+    display: none !important;
+}
+
+html[data-theme] body .document-folder-card {
+    display: grid !important;
+    justify-items: center !important;
+    align-content: start !important;
+    gap: 0.45rem !important;
+    min-height: 15.5rem !important;
+    padding: 0.4rem 0.65rem 0.85rem !important;
+    border: 1px solid transparent !important;
+    border-radius: 14px !important;
+    background: transparent !important;
+    text-align: center !important;
+    cursor: pointer !important;
+    text-decoration: none !important;
+    transition: transform 180ms ease, background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease !important;
+}
+
+html[data-theme] body .document-folder-page-hero {
+    display: grid !important;
+    grid-template-columns: 5rem minmax(0, 1fr) auto !important;
+    align-items: center !important;
+    gap: 1rem !important;
+    min-height: 7rem !important;
+    padding: 1.15rem 1.35rem !important;
+    border: 1px solid color-mix(in srgb, var(--folder-color, var(--ds-primary)) 20%, var(--ds-border)) !important;
+    border-radius: 12px !important;
+    background:
+        linear-gradient(90deg, color-mix(in srgb, var(--folder-color, var(--ds-primary)) 10%, var(--ds-surface)) 0%, var(--ds-surface) 62%) !important;
+    box-shadow: 0 12px 30px rgba(20, 35, 64, 0.055) !important;
+}
+
+html[data-theme] body .document-folder-page-hero h1 {
+    margin: 0 !important;
+    color: var(--ds-text) !important;
+    font-size: clamp(1.55rem, 2vw, 2.1rem) !important;
+    font-weight: 900 !important;
+}
+
+html[data-theme] body .document-folder-page-hero p {
+    margin: 0.15rem 0 0 !important;
+    color: var(--ds-muted) !important;
+}
+
+html[data-theme] body .document-folder-page-actions {
+    display: inline-flex !important;
+    flex-wrap: wrap !important;
+    justify-content: flex-end !important;
+    gap: 0.65rem !important;
+}
+
+html[data-theme] body .document-folder-files-panel .table-responsive {
+    margin: 1rem !important;
+    overflow: hidden !important;
+    border-radius: 10px !important;
+}
+
+html[data-theme] body .document-file-cell {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.7rem !important;
+    min-width: 14rem !important;
+}
+
+html[data-theme] body .document-file-cell strong {
+    display: block !important;
+    color: var(--ds-text) !important;
+    font-weight: 900 !important;
+}
+
+html[data-theme] body .document-file-cell small {
+    color: var(--ds-muted) !important;
+}
+
+html[data-theme] body .document-days-pill {
+    display: inline-flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: 3.15rem !important;
+    padding: 0.28rem 0.45rem !important;
+    border: 1px solid var(--ds-border) !important;
+    border-radius: 8px !important;
+    background: var(--ds-surface-muted) !important;
+}
+
+html[data-theme] body .document-days-pill strong {
+    color: var(--ds-text) !important;
+    font-size: 0.88rem !important;
+    font-weight: 900 !important;
+    line-height: 1 !important;
+}
+
+html[data-theme] body .document-days-pill small {
+    color: var(--ds-muted) !important;
+    font-size: 0.62rem !important;
+    font-weight: 800 !important;
+}
+
+html[data-theme] body .document-days-pill.is-danger {
+    border-color: rgba(var(--ds-danger-rgb), 0.28) !important;
+    background: rgba(var(--ds-danger-rgb), 0.1) !important;
+}
+
+html[data-theme] body .document-days-pill.is-warning {
+    border-color: rgba(var(--ds-warning-rgb), 0.3) !important;
+    background: rgba(var(--ds-warning-rgb), 0.12) !important;
+}
+
+@media (max-width: 900px) {
+    html[data-theme] body .document-semaforo-kpis {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    html[data-theme] body .document-folder-page-hero {
+        grid-template-columns: 1fr !important;
+    }
+
+    html[data-theme] body .document-folder-page-actions {
+        justify-content: flex-start !important;
+    }
+}
+
+html[data-theme] body .document-folder-card:hover,
+html[data-theme] body .document-folder-card:focus-visible {
+    transform: translateY(-5px) !important;
+    background: color-mix(in srgb, var(--folder-color, #1f78d1) 6%, var(--ds-surface)) !important;
+    border-color: color-mix(in srgb, var(--folder-color, #1f78d1) 18%, var(--ds-border)) !important;
+    box-shadow: 0 18px 34px rgba(20, 35, 64, 0.08) !important;
+    outline: 0 !important;
+}
+
+html[data-theme] body .document-folder-card strong {
+    width: 100% !important;
+    color: var(--ds-text) !important;
+    font-size: 0.88rem !important;
+    font-weight: 850 !important;
+    line-height: 1.22 !important;
+}
+
+html[data-theme] body .document-folder-card small {
+    color: var(--ds-muted) !important;
+    font-size: 0.74rem !important;
+    font-weight: 750 !important;
+}
+
+html[data-theme] body .document-folder-card .doc-status-pill {
+    margin-top: 0.15rem !important;
+}
+
+html[data-theme] body .document-binder-icon {
+    position: relative !important;
+    width: 8.7rem !important;
+    height: 10.2rem !important;
+    display: block !important;
+    perspective: 620px !important;
+    filter: drop-shadow(0 19px 14px rgba(15, 23, 42, 0.2)) !important;
+}
+
+html[data-theme] body .document-binder-icon::after {
+    content: "" !important;
+    position: absolute !important;
+    left: 1.25rem !important;
+    right: 0.3rem !important;
+    bottom: 0.1rem !important;
+    height: 1.1rem !important;
+    border-radius: 999px !important;
+    background: radial-gradient(ellipse, rgba(15, 23, 42, 0.22), transparent 68%) !important;
+    filter: blur(2px) !important;
+}
+
+html[data-theme] body .document-binder-icon .binder-cover {
+    position: absolute !important;
+    right: 0.15rem !important;
+    top: 0.65rem !important;
+    width: 6.95rem !important;
+    height: 8.68rem !important;
+    border-radius: 0.24rem 0.5rem 0.5rem 0.18rem !important;
+    background:
+        linear-gradient(100deg, rgba(255,255,255,0.3) 0 10%, transparent 11% 34%, rgba(0,0,0,0.16) 100%),
+        linear-gradient(180deg, #3c9afb 0%, #1d76cc 52%, #0a4f99 100%) !important;
+    border: 1px solid #0b4d97 !important;
+    box-shadow:
+        inset 10px 0 16px rgba(255, 255, 255, 0.08),
+        inset -10px 0 18px rgba(0, 0, 0, 0.16) !important;
+    transform: rotateY(-8deg) skewY(-3deg) !important;
+}
+
+html[data-theme] body .document-binder-icon .binder-spine {
+    position: absolute !important;
+    left: 0.55rem !important;
+    top: 0.95rem !important;
+    width: 1.86rem !important;
+    height: 8.45rem !important;
+    border-radius: 0.38rem 0 0 0.38rem !important;
+    background:
+        linear-gradient(90deg, #0c3d7e 0%, #135cae 44%, #2b83dd 100%) !important;
+    border: 1px solid #083b7a !important;
+    box-shadow:
+        inset -8px 0 12px rgba(0, 0, 0, 0.18),
+        inset 3px 0 5px rgba(255, 255, 255, 0.18) !important;
+    transform: rotateY(-14deg) skewY(-3deg) !important;
+    z-index: 2 !important;
+}
+
+html[data-theme] body .document-binder-icon .binder-label {
+    position: absolute !important;
+    left: 0.46rem !important;
+    top: 1.65rem !important;
+    width: 0.92rem !important;
+    height: 3.3rem !important;
+    border-radius: 0.08rem !important;
+    background:
+        repeating-linear-gradient(180deg, #dbeafe 0 0.42rem, #ffffff 0.43rem 0.62rem) !important;
+    border: 1px solid rgba(15, 23, 42, 0.18) !important;
+}
+
+html[data-theme] body .document-binder-icon .binder-ring {
+    position: absolute !important;
+    left: 0.48rem !important;
+    bottom: 1.02rem !important;
+    width: 0.82rem !important;
+    height: 0.82rem !important;
+    border-radius: 999px !important;
+    background: #0f172a !important;
+    border: 2px solid #ffffff !important;
+    box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.36) !important;
+}
+
+html[data-theme] body .document-binder-icon .binder-pages {
+    position: absolute !important;
+    top: 0.35rem !important;
+    left: 1.42rem !important;
+    width: 5.8rem !important;
+    height: 0.58rem !important;
+    border-radius: 0.16rem 0.28rem 0 0 !important;
+    background:
+        linear-gradient(180deg, #f8fafc, #cbd5e1) !important;
+    border: 1px solid rgba(15, 23, 42, 0.12) !important;
+    transform: skewY(-3deg) !important;
+}
+
+html[data-theme] body .document-binder-icon.is-small {
+    width: 4.8rem !important;
+    height: 5.6rem !important;
+    transform: scale(0.62) !important;
+    transform-origin: left center !important;
+}
+
+
+
+html[data-theme="dark"] body .document-folder-card:hover,
+html[data-theme="dark"] body .document-folder-card:focus-visible {
+    background: color-mix(in srgb, var(--folder-color, #1f78d1) 10%, #121a2a) !important;
+    border-color: color-mix(in srgb, var(--folder-color, #1f78d1) 25%, #26344d) !important;
+    box-shadow: 0 20px 34px rgba(0, 0, 0, 0.26) !important;
+}
+
+/* Documentacion: indicadores sobrios y flujo de carpetas */
+html[data-theme] body .document-semaforo-kpis {
+    grid-template-columns: repeat(4, minmax(12rem, 1fr)) !important;
+    gap: 0.9rem !important;
+}
+
+html[data-theme] body .document-semaforo-kpi {
+    grid-template-columns: 3rem minmax(0, 1fr) !important;
+    align-items: center !important;
+    min-height: 5.8rem !important;
+    padding: 1rem 1.1rem !important;
+    border: 1px solid var(--ds-border) !important;
+    border-left: 3px solid var(--doc-state-color, var(--ds-primary)) !important;
+    border-radius: 10px !important;
+    background: var(--ds-surface) !important;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.055) !important;
+    overflow: hidden !important;
+}
+
+html[data-theme] body .document-semaforo-kpi::before,
+html[data-theme] body .document-semaforo-kpi::after {
+    display: none !important;
+}
+
+html[data-theme] body .document-semaforo-kpi .semaforo-light {
+    width: 2.55rem !important;
+    height: 2.55rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border: 1px solid color-mix(in srgb, var(--doc-state-color, var(--ds-primary)) 22%, var(--ds-border)) !important;
+    border-radius: 10px !important;
+    background: color-mix(in srgb, var(--doc-state-color, var(--ds-primary)) 12%, var(--ds-surface)) !important;
+    color: var(--doc-state-color, var(--ds-primary)) !important;
+    box-shadow: none !important;
+    filter: none !important;
+}
+
+html[data-theme] body .document-semaforo-kpi .semaforo-light::before,
+html[data-theme] body .document-semaforo-kpi .semaforo-light::after {
+    display: none !important;
+}
+
+html[data-theme] body .document-semaforo-kpi .semaforo-light i {
+    display: inline-flex !important;
+    color: currentColor !important;
+    font-size: 1.25rem !important;
+    filter: none !important;
+    text-shadow: none !important;
+}
+
+html[data-theme] body .document-semaforo-kpi span:not(.semaforo-light) {
+    color: var(--ds-muted) !important;
+    font-size: 0.76rem !important;
+    font-weight: 760 !important;
+    letter-spacing: 0 !important;
+    text-transform: none !important;
+}
+
+html[data-theme] body .document-semaforo-kpi strong {
+    margin: 0.08rem 0 !important;
+    color: var(--ds-text) !important;
+    font-size: 1.8rem !important;
+    font-weight: 880 !important;
+    line-height: 1 !important;
+}
+
+html[data-theme] body .document-semaforo-kpi small {
+    color: var(--ds-muted) !important;
+    font-size: 0.72rem !important;
+    font-weight: 650 !important;
+}
+
+html[data-theme="dark"] body .document-semaforo-kpi {
+    background: var(--ds-surface) !important;
+    box-shadow: 0 14px 26px rgba(0, 0, 0, 0.24) !important;
+}
+
+html[data-theme="dark"] body .document-semaforo-kpi .semaforo-light {
+    background: color-mix(in srgb, var(--doc-state-color, var(--ds-primary)) 18%, var(--ds-surface)) !important;
+    border-color: color-mix(in srgb, var(--doc-state-color, var(--ds-primary)) 35%, var(--ds-border)) !important;
+}
+
+html[data-theme] body .document-explorer-section.is-folder-view .document-control-actions [data-doc-expand] {
+    display: none !important;
+}
+
+html[data-theme] body .document-folder-card {
+    min-height: 18.5rem !important;
+    gap: 0.5rem !important;
+}
+
+html[data-theme] body .document-folder-card-meta {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    width: min(100%, 11.5rem) !important;
+    gap: 0.25rem !important;
+    margin-top: 0.1rem !important;
+}
+
+html[data-theme] body .document-folder-card-meta span {
+    display: inline-flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 2.15rem !important;
+    padding: 0.25rem 0.2rem !important;
+    border: 1px solid var(--ds-border) !important;
+    border-radius: 8px !important;
+    background: var(--ds-surface-muted) !important;
+    color: var(--ds-muted) !important;
+    font-size: 0.62rem !important;
+    font-weight: 760 !important;
+    line-height: 1.1 !important;
+}
+
+html[data-theme] body .document-folder-card-meta b {
+    color: var(--ds-text) !important;
+    font-size: 0.86rem !important;
+    font-weight: 900 !important;
+    line-height: 1 !important;
+}
+
+html[data-theme] body .document-folder-card-action {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.35rem !important;
+    width: min(100%, 11.5rem) !important;
+    min-height: 2.2rem !important;
+    margin-top: 0.15rem !important;
+    border: 1px solid color-mix(in srgb, var(--folder-color, var(--ds-primary)) 25%, var(--ds-border)) !important;
+    border-radius: 8px !important;
+    background: color-mix(in srgb, var(--folder-color, var(--ds-primary)) 10%, var(--ds-surface)) !important;
+    color: color-mix(in srgb, var(--folder-color, var(--ds-primary)) 72%, var(--ds-text)) !important;
+    font-size: 0.74rem !important;
+    font-weight: 850 !important;
+}
+
+html[data-theme] body .document-folder-card:hover .document-folder-card-action,
+html[data-theme] body .document-folder-card:focus-visible .document-folder-card-action {
+    background: color-mix(in srgb, var(--folder-color, var(--ds-primary)) 17%, var(--ds-surface)) !important;
+    border-color: color-mix(in srgb, var(--folder-color, var(--ds-primary)) 38%, var(--ds-border)) !important;
+}
+
+html[data-theme] body .document-folder-file-toolbar {
+    display: grid !important;
+    grid-template-columns: minmax(16rem, 1fr) minmax(12rem, 18rem) auto !important;
+    gap: 0.75rem !important;
+    align-items: end !important;
+    padding: 0 1rem 1rem !important;
+}
+
+html[data-theme] body .document-folder-file-toolbar .document-search-box,
+html[data-theme] body .document-folder-file-toolbar .form-select,
+html[data-theme] body .document-folder-file-toolbar .btn {
+    min-height: 2.65rem !important;
+}
+
+html[data-theme] body .document-folder-page .document-folder-detail-stats article {
+    border-left: 3px solid color-mix(in srgb, var(--folder-color, var(--ds-primary)) 45%, var(--ds-border)) !important;
+}
+
+html[data-theme] body .document-folder-profile-hero {
+    grid-template-columns: 5rem minmax(0, 1fr) auto !important;
+    background:
+        linear-gradient(90deg, color-mix(in srgb, var(--folder-color, var(--ds-primary)) 12%, var(--ds-surface)) 0%, var(--ds-surface) 64%) !important;
+}
+
+html[data-theme] body .document-folder-profile-copy {
+    display: grid !important;
+    gap: 0.35rem !important;
+}
+
+html[data-theme] body .document-folder-profile-meta {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 0.45rem !important;
+    margin-top: 0.25rem !important;
+}
+
+html[data-theme] body .document-folder-profile-meta span {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.35rem !important;
+    min-height: 2rem !important;
+    padding: 0.35rem 0.6rem !important;
+    border: 1px solid color-mix(in srgb, var(--folder-color, var(--ds-primary)) 18%, var(--ds-border)) !important;
+    border-radius: 999px !important;
+    background: color-mix(in srgb, var(--folder-color, var(--ds-primary)) 8%, var(--ds-surface)) !important;
+    color: var(--ds-muted) !important;
+    font-size: 0.76rem !important;
+    font-weight: 750 !important;
+}
+
+html[data-theme] body .document-folder-profile-meta i {
+    color: color-mix(in srgb, var(--folder-color, var(--ds-primary)) 78%, var(--ds-text)) !important;
+}
+
+html[data-theme] body .document-folder-profile-meta b {
+    color: var(--ds-text) !important;
+    font-weight: 850 !important;
+}
+
+html[data-theme] body .document-folder-profile-stats {
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+}
+
+html[data-theme] body .document-folder-profile-stats article {
+    position: relative !important;
+    display: grid !important;
+    grid-template-columns: 2.35rem minmax(0, 1fr) !important;
+    grid-template-areas:
+        "icon label"
+        "icon value" !important;
+    align-items: center !important;
+    column-gap: 0.65rem !important;
+    min-height: 4.9rem !important;
+    padding: 0.85rem 1rem !important;
+    border-left-width: 0 !important;
+    overflow: hidden !important;
+}
+
+html[data-theme] body .document-folder-profile-stats article::after {
+    content: "" !important;
+    position: absolute !important;
+    inset: auto 0 0 0 !important;
+    height: 3px !important;
+    background: var(--stat-color, var(--folder-color, var(--ds-primary))) !important;
+}
+
+html[data-theme] body .document-folder-profile-stats article i {
+    grid-area: icon !important;
+    width: 2.35rem !important;
+    height: 2.35rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border: 1px solid color-mix(in srgb, var(--stat-color, var(--folder-color, var(--ds-primary))) 22%, var(--ds-border)) !important;
+    border-radius: 10px !important;
+    background: color-mix(in srgb, var(--stat-color, var(--folder-color, var(--ds-primary))) 12%, var(--ds-surface)) !important;
+    color: var(--stat-color, var(--folder-color, var(--ds-primary))) !important;
+}
+
+html[data-theme] body .document-folder-profile-stats article span {
+    grid-area: label !important;
+}
+
+html[data-theme] body .document-folder-profile-stats article strong {
+    grid-area: value !important;
+}
+
+html[data-theme] body .document-folder-profile-stats .is-total {
+    --stat-color: var(--ds-primary);
+}
+
+html[data-theme] body .document-folder-profile-stats .is-ok {
+    --stat-color: var(--ds-success);
+}
+
+html[data-theme] body .document-folder-profile-stats .is-warning {
+    --stat-color: var(--ds-warning);
+}
+
+html[data-theme] body .document-folder-profile-stats .is-danger {
+    --stat-color: var(--ds-danger);
+}
+
+html[data-theme] body .document-folder-profile-stats .is-pending {
+    --stat-color: var(--ds-info);
+}
+
+html[data-theme] body .document-file-open {
+    width: 100% !important;
+    border: 0 !important;
+    background: transparent !important;
+    text-align: left !important;
+    color: inherit !important;
+    cursor: pointer !important;
+}
+
+html[data-theme] body .document-file-open:hover strong,
+html[data-theme] body .document-file-open:focus-visible strong {
+    color: var(--ds-primary) !important;
+}
+
+html[data-theme] body .document-file-open:focus-visible {
+    outline: 2px solid rgba(var(--ds-primary-rgb), 0.28) !important;
+    outline-offset: 3px !important;
+    border-radius: 8px !important;
+}
+
+@media (max-width: 900px) {
+    html[data-theme] body .document-folder-file-toolbar {
+        grid-template-columns: 1fr !important;
+    }
+
+    html[data-theme] body .document-folder-profile-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+}
+
+@media (max-width: 700px) {
+    html[data-theme] body .document-semaforo-kpis {
+        grid-template-columns: 1fr !important;
+    }
+
+    html[data-theme] body .document-folder-profile-stats {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* Documentacion: carpeta del contratista premium */
+html[data-theme] body .contractor-folder-page {
+    min-height: 100vh !important;
+    padding: 1.35rem clamp(1.2rem, 2.6vw, 2.4rem) 2.5rem !important;
+    background: #f7f9fc !important;
+    color: #0f1b3d !important;
+    font-family: Inter, var(--ds-font-family, system-ui), sans-serif !important;
+}
+
+html[data-theme] body .contractor-folder-breadcrumb {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.55rem !important;
+    margin: 0 0 1.2rem !important;
+    color: #6b7893 !important;
+    font-size: 0.82rem !important;
+    font-weight: 720 !important;
+}
+
+html[data-theme] body .contractor-folder-breadcrumb a {
+    color: #2563eb !important;
+    text-decoration: none !important;
+}
+
+html[data-theme] body .contractor-folder-hero {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    align-items: center !important;
+    gap: 1.4rem !important;
+    margin-bottom: 1.4rem !important;
+}
+
+html[data-theme] body .contractor-folder-hero-main {
+    display: flex !important;
+    align-items: center !important;
+    gap: 1.35rem !important;
+    min-width: 0 !important;
+}
+
+html[data-theme] body .contractor-folder-binder.document-binder-icon {
+    width: 6.4rem !important;
+    height: 7.4rem !important;
+    flex: 0 0 6.4rem !important;
+    filter: drop-shadow(0 18px 18px rgba(37, 99, 235, 0.18)) !important;
+}
+
+html[data-theme] body .contractor-folder-title {
+    min-width: 0 !important;
+}
+
+html[data-theme] body .contractor-folder-eyebrow {
+    margin-bottom: 0.35rem !important;
+    color: #64748b !important;
+    font-size: 0.82rem !important;
+    font-weight: 780 !important;
+}
+
+html[data-theme] body .contractor-folder-heading-row {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+}
+
+html[data-theme] body .contractor-folder-heading-row h1 {
+    margin: 0 !important;
+    color: #071436 !important;
+    font-size: clamp(2rem, 3vw, 3rem) !important;
+    font-weight: 850 !important;
+    letter-spacing: 0 !important;
+    line-height: 1.05 !important;
+}
+
+html[data-theme] body .contractor-folder-meta {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 0.8rem 1rem !important;
+    margin-top: 0.9rem !important;
+}
+
+html[data-theme] body .contractor-folder-meta span {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.45rem !important;
+    color: #53617a !important;
+    font-size: 0.87rem !important;
+    font-weight: 680 !important;
+}
+
+html[data-theme] body .contractor-folder-meta i {
+    color: #64748b !important;
+}
+
+html[data-theme] body .contractor-folder-meta b {
+    color: #17213b !important;
+    font-weight: 760 !important;
+}
+
+html[data-theme] body .contractor-folder-actions {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 0.75rem !important;
+}
+
+html[data-theme] body .folder-premium-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.55rem !important;
+    min-height: 2.75rem !important;
+    padding: 0 1rem !important;
+    border-radius: 12px !important;
+    font-size: 0.86rem !important;
+    font-weight: 820 !important;
+    text-decoration: none !important;
+    transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease, background-color 200ms ease !important;
+}
+
+html[data-theme] body .folder-premium-btn:hover {
+    transform: translateY(-1px) !important;
+}
+
+html[data-theme] body .folder-premium-btn.is-primary {
+    border: 1px solid #1d4ed8 !important;
+    background: #2563eb !important;
+    color: #ffffff !important;
+    box-shadow: 0 14px 24px rgba(37, 99, 235, 0.22) !important;
+}
+
+html[data-theme] body .folder-premium-btn.is-secondary {
+    border: 1px solid #d9e1ee !important;
+    background: #ffffff !important;
+    color: #17213b !important;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06) !important;
+}
+
+html[data-theme] body .contractor-folder-summary {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 1rem !important;
+    margin-bottom: 1.35rem !important;
+}
+
+html[data-theme] body .contractor-folder-summary article {
+    display: flex !important;
+    align-items: center !important;
+    gap: 1rem !important;
+    min-height: 7.2rem !important;
+    padding: 1.25rem !important;
+    border: 1px solid color-mix(in srgb, var(--summary-color, #2563eb) 16%, #dbe4f0) !important;
+    border-radius: 16px !important;
+    background: #ffffff !important;
+    box-shadow: 0 18px 38px rgba(15, 23, 42, 0.055) !important;
+    transition: transform 200ms ease, box-shadow 200ms ease !important;
+}
+
+html[data-theme] body .contractor-folder-summary article:hover {
+    transform: translateY(-3px) !important;
+    box-shadow: 0 24px 48px rgba(15, 23, 42, 0.085) !important;
+}
+
+html[data-theme] body .contractor-folder-summary article > span {
+    width: 3.9rem !important;
+    height: 3.9rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border: 1px solid color-mix(in srgb, var(--summary-color, #2563eb) 22%, #dbe4f0) !important;
+    border-radius: 14px !important;
+    background: color-mix(in srgb, var(--summary-color, #2563eb) 11%, #ffffff) !important;
+    color: var(--summary-color, #2563eb) !important;
+    font-size: 1.55rem !important;
+}
+
+html[data-theme] body .contractor-folder-summary strong {
+    display: block !important;
+    color: #071436 !important;
+    font-size: 2rem !important;
+    font-weight: 850 !important;
+    line-height: 1 !important;
+}
+
+html[data-theme] body .contractor-folder-summary p {
+    margin: 0.25rem 0 0 !important;
+    color: #17213b !important;
+    font-size: 0.88rem !important;
+    font-weight: 760 !important;
+}
+
+html[data-theme] body .contractor-folder-summary small {
+    color: #64748b !important;
+    font-size: 0.78rem !important;
+    font-weight: 650 !important;
+}
+
+html[data-theme] body .contractor-folder-summary .is-total { --summary-color: #2563eb; }
+html[data-theme] body .contractor-folder-summary .is-ok { --summary-color: #22c55e; }
+html[data-theme] body .contractor-folder-summary .is-warning { --summary-color: #f59e0b; }
+html[data-theme] body .contractor-folder-summary .is-danger { --summary-color: #ef4444; }
+
+html[data-theme] body .contractor-folder-tabs {
+    display: flex !important;
+    align-items: center !important;
+    gap: 1.15rem !important;
+    margin-bottom: 1.25rem !important;
+    border-bottom: 1px solid #dbe4f0 !important;
+}
+
+html[data-theme] body .contractor-folder-tabs button {
+    position: relative !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.45rem !important;
+    min-height: 3.1rem !important;
+    padding: 0 0.25rem !important;
+    border: 0 !important;
+    background: transparent !important;
+    color: #53617a !important;
+    font-size: 0.88rem !important;
+    font-weight: 760 !important;
+    transition: color 200ms ease !important;
+}
+
+html[data-theme] body .contractor-folder-tabs button::after {
+    content: "" !important;
+    position: absolute !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: -1px !important;
+    height: 2px !important;
+    border-radius: 999px !important;
+    background: #2563eb !important;
+    opacity: 0 !important;
+    transform: scaleX(0.5) !important;
+    transition: opacity 200ms ease, transform 200ms ease !important;
+}
+
+html[data-theme] body .contractor-folder-tabs button.is-active {
+    color: #2563eb !important;
+}
+
+html[data-theme] body .contractor-folder-tabs button.is-active::after {
+    opacity: 1 !important;
+    transform: scaleX(1) !important;
+}
+
+html[data-theme] body .contractor-folder-workspace {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(18rem, 25rem) !important;
+    gap: 1.45rem !important;
+    align-items: start !important;
+}
+
+html[data-theme] body .contractor-folder-main,
+html[data-theme] body .contractor-folder-sidebar section,
+html[data-theme] body .contractor-folder-panel {
+    border: 1px solid #dbe4f0 !important;
+    border-radius: 16px !important;
+    background: #ffffff !important;
+    box-shadow: 0 18px 42px rgba(15, 23, 42, 0.055) !important;
+}
+
+html[data-theme] body .contractor-folder-main {
+    min-width: 0 !important;
+}
+
+html[data-theme] body .contractor-folder-panel {
+    display: none !important;
+    padding: 1.25rem !important;
+    border: 0 !important;
+    box-shadow: none !important;
+}
+
+html[data-theme] body .contractor-folder-panel.is-active {
+    display: block !important;
+}
+
+html[data-theme] body .contractor-folder-panel-head {
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: space-between !important;
+    gap: 1rem !important;
+    margin-bottom: 1rem !important;
+}
+
+html[data-theme] body .contractor-folder-panel-head h2 {
+    margin: 0 !important;
+    color: #071436 !important;
+    font-size: 1rem !important;
+    font-weight: 820 !important;
+}
+
+html[data-theme] body .contractor-folder-panel-head p {
+    margin: 0.35rem 0 0 !important;
+    color: #64748b !important;
+    font-size: 0.82rem !important;
+}
+
+html[data-theme] body .contractor-folder-panel-head > span {
+    display: inline-flex !important;
+    align-items: center !important;
+    min-height: 2rem !important;
+    padding: 0 0.65rem !important;
+    border-radius: 999px !important;
+    background: #eef4ff !important;
+    color: #2563eb !important;
+    font-size: 0.75rem !important;
+    font-weight: 820 !important;
+}
+
+html[data-theme] body .contractor-folder-toolbar {
+    display: grid !important;
+    grid-template-columns: minmax(16rem, 1fr) minmax(12rem, 16rem) !important;
+    gap: 0.75rem !important;
+    margin-bottom: 1rem !important;
+}
+
+html[data-theme] body .contractor-folder-toolbar label {
+    position: relative !important;
+    margin: 0 !important;
+}
+
+html[data-theme] body .contractor-folder-toolbar label i {
+    position: absolute !important;
+    left: 0.9rem !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    color: #8a97ad !important;
+}
+
+html[data-theme] body .contractor-folder-toolbar input,
+html[data-theme] body .contractor-folder-toolbar select {
+    width: 100% !important;
+    min-height: 2.75rem !important;
+    border: 1px solid #dbe4f0 !important;
+    border-radius: 12px !important;
+    background: #ffffff !important;
+    color: #17213b !important;
+    font-size: 0.86rem !important;
+    font-weight: 650 !important;
+    outline: 0 !important;
+    transition: border-color 200ms ease, box-shadow 200ms ease !important;
+}
+
+html[data-theme] body .contractor-folder-toolbar input {
+    padding: 0 1rem 0 2.5rem !important;
+}
+
+html[data-theme] body .contractor-folder-toolbar select {
+    padding: 0 0.85rem !important;
+}
+
+html[data-theme] body .contractor-folder-toolbar input:focus,
+html[data-theme] body .contractor-folder-toolbar select:focus {
+    border-color: #93b4ff !important;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1) !important;
+}
+
+html[data-theme] body .contractor-document-list {
+    display: grid !important;
+    gap: 0.72rem !important;
+}
+
+html[data-theme] body .contractor-document-row {
+    display: grid !important;
+    grid-template-columns: minmax(17rem, 1fr) 9.5rem 8.5rem 7.2rem auto !important;
+    align-items: center !important;
+    gap: 0.8rem !important;
+    min-height: 5rem !important;
+    padding: 0.85rem 0.95rem !important;
+    border: 1px solid #e3eaf4 !important;
+    border-radius: 14px !important;
+    background: #ffffff !important;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.035) !important;
+    transition: transform 200ms ease, border-color 200ms ease, box-shadow 200ms ease, background-color 200ms ease !important;
+}
+
+html[data-theme] body .contractor-document-row:hover {
+    transform: translateY(-2px) !important;
+    border-color: #c8d8f5 !important;
+    box-shadow: 0 18px 34px rgba(15, 23, 42, 0.075) !important;
+    background: #fbfdff !important;
+}
+
+html[data-theme] body .contractor-document-main {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.85rem !important;
+    min-width: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+    padding: 0 !important;
+    text-align: left !important;
+}
+
+html[data-theme] body .contractor-document-main strong {
+    display: block !important;
+    color: #0f1b3d !important;
+    font-size: 0.92rem !important;
+    font-weight: 820 !important;
+    line-height: 1.22 !important;
+}
+
+html[data-theme] body .contractor-document-main small {
+    display: block !important;
+    margin-top: 0.18rem !important;
+    color: #64748b !important;
+    font-size: 0.78rem !important;
+    font-weight: 650 !important;
+}
+
+html[data-theme] body .contractor-document-icon {
+    width: 2.65rem !important;
+    height: 2.65rem !important;
+    flex: 0 0 2.65rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 12px !important;
+    border: 1px solid #dbe4f0 !important;
+    background: #f8fbff !important;
+    color: #2563eb !important;
+    font-size: 1.25rem !important;
+}
+
+html[data-theme] body .contractor-document-icon.is-pdf {
+    border-color: rgba(239, 68, 68, 0.2) !important;
+    background: rgba(239, 68, 68, 0.075) !important;
+    color: #ef4444 !important;
+}
+
+html[data-theme] body .contractor-document-category {
+    justify-self: start !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    min-height: 1.85rem !important;
+    padding: 0 0.6rem !important;
+    border: 1px solid #cbdcff !important;
+    border-radius: 999px !important;
+    background: #eef4ff !important;
+    color: #2563eb !important;
+    font-size: 0.75rem !important;
+    font-weight: 780 !important;
+}
+
+html[data-theme] body .contractor-document-date small,
+html[data-theme] body .contractor-document-date strong {
+    display: block !important;
+}
+
+html[data-theme] body .contractor-document-date small {
+    color: #8a97ad !important;
+    font-size: 0.68rem !important;
+    font-weight: 760 !important;
+}
+
+html[data-theme] body .contractor-document-date strong {
+    color: #17213b !important;
+    font-size: 0.82rem !important;
+    font-weight: 760 !important;
+}
+
+html[data-theme] body .contractor-document-actions {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 0.45rem !important;
+}
+
+html[data-theme] body .contractor-document-actions form {
+    display: inline-flex !important;
+    margin: 0 !important;
+}
+
+html[data-theme] body .contractor-document-actions button,
+html[data-theme] body .contractor-document-actions a {
+    width: 2.25rem !important;
+    height: 2.25rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border: 1px solid #dbe4f0 !important;
+    border-radius: 10px !important;
+    background: #ffffff !important;
+    color: #475569 !important;
+    text-decoration: none !important;
+    transition: transform 200ms ease, border-color 200ms ease, color 200ms ease, box-shadow 200ms ease !important;
+}
+
+html[data-theme] body .contractor-document-actions button:hover,
+html[data-theme] body .contractor-document-actions a:hover {
+    transform: translateY(-1px) !important;
+    border-color: #bcd0f5 !important;
+    color: #2563eb !important;
+    box-shadow: 0 8px 18px rgba(37, 99, 235, 0.12) !important;
+}
+
+html[data-theme] body .contractor-document-actions button.is-danger {
+    border-color: rgba(var(--ds-danger-rgb), 0.24) !important;
+    background: rgba(var(--ds-danger-rgb), 0.06) !important;
+    color: var(--ds-danger) !important;
+}
+
+html[data-theme] body .contractor-document-actions button.is-danger:hover {
+    border-color: rgba(var(--ds-danger-rgb), 0.42) !important;
+    background: rgba(var(--ds-danger-rgb), 0.1) !important;
+    color: var(--ds-danger) !important;
+    box-shadow: 0 8px 18px rgba(var(--ds-danger-rgb), 0.14) !important;
+}
+
+html[data-theme] body .contractor-folder-sidebar {
+    position: sticky !important;
+    top: 1rem !important;
+    display: grid !important;
+    gap: 1rem !important;
+}
+
+html[data-theme] body .contractor-folder-sidebar section {
+    padding: 1.1rem !important;
+}
+
+html[data-theme] body .contractor-sidebar-head {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 0.75rem !important;
+    margin-bottom: 1rem !important;
+}
+
+html[data-theme] body .contractor-sidebar-head h3 {
+    margin: 0 !important;
+    color: #0f1b3d !important;
+    font-size: 0.95rem !important;
+    font-weight: 820 !important;
+}
+
+html[data-theme] body .contractor-sidebar-head a {
+    min-height: 2rem !important;
+    padding: 0 0.65rem !important;
+    border: 1px solid #dbe4f0 !important;
+    border-radius: 10px !important;
+    color: #17213b !important;
+    font-size: 0.74rem !important;
+    font-weight: 780 !important;
+    text-decoration: none !important;
+}
+
+html[data-theme] body .contractor-sidebar-list {
+    display: grid !important;
+    gap: 0.8rem !important;
+    margin: 0 !important;
+}
+
+html[data-theme] body .contractor-sidebar-list div {
+    display: grid !important;
+    gap: 0.2rem !important;
+}
+
+html[data-theme] body .contractor-sidebar-list dt {
+    color: #7a879d !important;
+    font-size: 0.72rem !important;
+    font-weight: 780 !important;
+}
+
+html[data-theme] body .contractor-sidebar-list dd {
+    margin: 0 !important;
+    color: #24304a !important;
+    font-size: 0.86rem !important;
+    font-weight: 700 !important;
+}
+
+html[data-theme] body .contractor-due-list,
+html[data-theme] body .contractor-timeline {
+    display: grid !important;
+    gap: 0.65rem !important;
+}
+
+html[data-theme] body .contractor-due-list article,
+html[data-theme] body .contractor-timeline article {
+    display: grid !important;
+    grid-template-columns: 2rem minmax(0, 1fr) auto !important;
+    align-items: center !important;
+    gap: 0.7rem !important;
+    padding: 0.75rem 0 !important;
+    border-bottom: 1px solid #edf2f8 !important;
+}
+
+html[data-theme] body .contractor-due-list article:last-child,
+html[data-theme] body .contractor-timeline article:last-child {
+    border-bottom: 0 !important;
+}
+
+html[data-theme] body .contractor-due-list i,
+html[data-theme] body .contractor-timeline article > span {
+    width: 2rem !important;
+    height: 2rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 999px !important;
+    background: #fff7ed !important;
+    color: #f59e0b !important;
+}
+
+html[data-theme] body .contractor-due-list strong,
+html[data-theme] body .contractor-timeline strong {
+    display: block !important;
+    color: #17213b !important;
+    font-size: 0.82rem !important;
+    font-weight: 790 !important;
+}
+
+html[data-theme] body .contractor-due-list small,
+html[data-theme] body .contractor-timeline small {
+    color: #64748b !important;
+    font-size: 0.74rem !important;
+}
+
+html[data-theme] body .contractor-due-list span,
+html[data-theme] body .contractor-timeline b {
+    display: inline-flex !important;
+    align-items: center !important;
+    min-height: 1.7rem !important;
+    padding: 0 0.55rem !important;
+    border-radius: 999px !important;
+    background: #fff7ed !important;
+    color: #f59e0b !important;
+    font-size: 0.72rem !important;
+    font-weight: 820 !important;
+}
+
+html[data-theme] body .contractor-due-list .is-danger span,
+html[data-theme] body .contractor-timeline .is-danger b {
+    background: #fef2f2 !important;
+    color: #ef4444 !important;
+}
+
+html[data-theme] body .contractor-sidebar-note,
+html[data-theme] body .contractor-notes-box p {
+    margin: 0 !important;
+    color: #53617a !important;
+    font-size: 0.84rem !important;
+    line-height: 1.55 !important;
+}
+
+html[data-theme] body .contractor-info-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 0.8rem !important;
+}
+
+html[data-theme] body .contractor-info-grid article,
+html[data-theme] body .contractor-notes-box {
+    padding: 1rem !important;
+    border: 1px solid #e3eaf4 !important;
+    border-radius: 14px !important;
+    background: #fbfdff !important;
+}
+
+html[data-theme] body .contractor-info-grid span {
+    display: block !important;
+    color: #7a879d !important;
+    font-size: 0.75rem !important;
+    font-weight: 760 !important;
+}
+
+html[data-theme] body .contractor-info-grid strong {
+    display: block !important;
+    margin-top: 0.3rem !important;
+    color: #17213b !important;
+    font-size: 0.92rem !important;
+    font-weight: 800 !important;
+}
+
+html[data-theme] body .contractor-notes-box {
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 0.9rem !important;
+}
+
+html[data-theme] body .contractor-notes-box > i {
+    width: 2.5rem !important;
+    height: 2.5rem !important;
+    flex: 0 0 2.5rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 12px !important;
+    background: #eef4ff !important;
+    color: #2563eb !important;
+}
+
+html[data-theme] body .contractor-notes-box strong {
+    display: block !important;
+    margin-bottom: 0.25rem !important;
+    color: #17213b !important;
+}
+
+html[data-theme] body .contractor-folder-empty,
+html[data-theme] body .contractor-sidebar-empty {
+    display: grid !important;
+    justify-items: center !important;
+    gap: 0.45rem !important;
+    padding: 2.2rem 1rem !important;
+    color: #64748b !important;
+    text-align: center !important;
+}
+
+html[data-theme] body .contractor-folder-empty i {
+    color: #2563eb !important;
+    font-size: 2rem !important;
+}
+
+html[data-theme] body .contractor-folder-empty strong {
+    color: #17213b !important;
+    font-weight: 820 !important;
+}
+
+html[data-theme] body .contractor-folder-empty p {
+    margin: 0 !important;
+}
+
+html[data-theme="dark"] body .contractor-folder-page {
+    background: #0d1422 !important;
+    color: #e5edf8 !important;
+}
+
+html[data-theme="dark"] body .contractor-folder-heading-row h1,
+html[data-theme="dark"] body .contractor-folder-summary strong,
+html[data-theme="dark"] body .contractor-folder-summary p,
+html[data-theme="dark"] body .contractor-folder-panel-head h2,
+html[data-theme="dark"] body .contractor-sidebar-head h3,
+html[data-theme="dark"] body .contractor-document-main strong,
+html[data-theme="dark"] body .contractor-document-date strong,
+html[data-theme="dark"] body .contractor-sidebar-list dd,
+html[data-theme="dark"] body .contractor-due-list strong,
+html[data-theme="dark"] body .contractor-timeline strong,
+html[data-theme="dark"] body .contractor-info-grid strong,
+html[data-theme="dark"] body .contractor-notes-box strong {
+    color: #edf4ff !important;
+}
+
+html[data-theme="dark"] body .contractor-folder-main,
+html[data-theme="dark"] body .contractor-folder-sidebar section,
+html[data-theme="dark"] body .contractor-folder-panel,
+html[data-theme="dark"] body .contractor-folder-summary article,
+html[data-theme="dark"] body .contractor-document-row,
+html[data-theme="dark"] body .folder-premium-btn.is-secondary {
+    border-color: #223049 !important;
+    background: #121c2d !important;
+    box-shadow: 0 18px 42px rgba(0, 0, 0, 0.28) !important;
+}
+
+html[data-theme="dark"] body .contractor-folder-tabs {
+    border-bottom-color: #223049 !important;
+}
+
+html[data-theme="dark"] body .contractor-folder-meta span,
+html[data-theme="dark"] body .contractor-folder-eyebrow,
+html[data-theme="dark"] body .contractor-folder-panel-head p,
+html[data-theme="dark"] body .contractor-document-main small,
+html[data-theme="dark"] body .contractor-folder-summary small,
+html[data-theme="dark"] body .contractor-sidebar-list dt,
+html[data-theme="dark"] body .contractor-due-list small,
+html[data-theme="dark"] body .contractor-timeline small,
+html[data-theme="dark"] body .contractor-sidebar-note,
+html[data-theme="dark"] body .contractor-notes-box p {
+    color: #9fb0c8 !important;
+}
+
+html[data-theme="dark"] body .contractor-folder-toolbar input,
+html[data-theme="dark"] body .contractor-folder-toolbar select,
+html[data-theme="dark"] body .contractor-document-actions button,
+html[data-theme="dark"] body .contractor-document-actions a,
+html[data-theme="dark"] body .contractor-info-grid article,
+html[data-theme="dark"] body .contractor-notes-box {
+    border-color: #263652 !important;
+    background: #0f1828 !important;
+    color: #edf4ff !important;
+}
+
+@media (max-width: 1180px) {
+    html[data-theme] body .contractor-folder-workspace {
+        grid-template-columns: 1fr !important;
+    }
+
+    html[data-theme] body .contractor-folder-sidebar {
+        position: static !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+}
+
+@media (max-width: 980px) {
+    html[data-theme] body .contractor-folder-hero {
+        grid-template-columns: 1fr !important;
+    }
+
+    html[data-theme] body .contractor-folder-actions {
+        justify-content: flex-start !important;
+    }
+
+    html[data-theme] body .contractor-folder-summary {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    html[data-theme] body .contractor-document-row {
+        grid-template-columns: 1fr !important;
+    }
+
+    html[data-theme] body .contractor-document-actions {
+        justify-content: flex-start !important;
+    }
+}
+
+@media (max-width: 720px) {
+    html[data-theme] body .contractor-folder-page {
+        padding: 1rem !important;
+    }
+
+    html[data-theme] body .contractor-folder-hero-main {
+        align-items: flex-start !important;
+    }
+
+    html[data-theme] body .contractor-folder-binder.document-binder-icon {
+        width: 4.8rem !important;
+        height: 5.6rem !important;
+        flex-basis: 4.8rem !important;
+    }
+
+    html[data-theme] body .contractor-folder-summary,
+    html[data-theme] body .contractor-folder-sidebar,
+    html[data-theme] body .contractor-info-grid,
+    html[data-theme] body .contractor-folder-toolbar {
+        grid-template-columns: 1fr !important;
+    }
+
+    html[data-theme] body .contractor-folder-tabs {
+        overflow-x: auto !important;
+        gap: 0.9rem !important;
+    }
+}
+
+/* Documentacion: ajustes de consistencia, icono real y busquedas */
+html[data-theme] body .contractor-folder-page {
+    width: min(1680px, calc(100vw - 2rem)) !important;
+    max-width: min(1680px, calc(100vw - 2rem)) !important;
+    margin: 0 auto !important;
+    padding: 1.35rem 0 2.5rem !important;
+}
+
+html[data-theme] body .contractor-folder-breadcrumb {
+    min-height: 2.35rem !important;
+    margin: 0 0 1.05rem !important;
+    padding: 0 !important;
+}
+
+html[data-theme] body .documentacion-hero-title {
+    display: flex !important;
+    align-items: center !important;
+    gap: 1rem !important;
+    min-width: 0 !important;
+}
+
+html[data-theme] body .documentacion-hero-binder.document-binder-icon {
+    width: 4.8rem !important;
+    height: 5.2rem !important;
+    flex: 0 0 4.8rem !important;
+    margin: -0.25rem 0 !important;
+}
+
+html[data-theme] body .document-binder-image {
+    position: relative !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 0 0 auto !important;
+    overflow: hidden !important;
+    perspective: none !important;
+}
+
+html[data-theme] body .document-binder-image::after,
+html[data-theme] body .document-binder-image .binder-cover,
+html[data-theme] body .document-binder-image .binder-spine,
+html[data-theme] body .document-binder-image .binder-pages,
+html[data-theme] body .document-binder-image .binder-label,
+html[data-theme] body .document-binder-image .binder-ring {
+    display: none !important;
+}
+
+html[data-theme] body .document-binder-image img {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    object-fit: contain !important;
+    filter: drop-shadow(0 18px 16px rgba(37, 99, 235, 0.16)) !important;
+}
+
+html[data-theme] body .document-folder-grid-view {
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)) !important;
+    gap: 1.15rem !important;
+    padding: 1.1rem !important;
+}
+
+html[data-theme] body .document-folder-card {
+    min-height: 17.25rem !important;
+    padding: 0.75rem 0.85rem 0.95rem !important;
+}
+
+html[data-theme] body .document-folder-card .document-binder-image {
+    width: 8.8rem !important;
+    height: 9.2rem !important;
+    filter: none !important;
+}
+
+html[data-theme] body .contractor-folder-hero {
+    margin-bottom: 1.7rem !important;
+}
+
+html[data-theme] body .contractor-folder-binder.document-binder-icon {
+    width: 5.7rem !important;
+    height: 6.25rem !important;
+    flex: 0 0 5.7rem !important;
+    filter: none !important;
+}
+
+html[data-theme] body .contractor-folder-binder.document-binder-image img {
+    filter: drop-shadow(0 18px 18px rgba(37, 99, 235, 0.2)) !important;
+}
+
+html[data-theme] body .contractor-folder-empty.d-none,
+html[data-theme] body .contractor-sidebar-empty.d-none {
+    display: none !important;
+}
+
+html[data-theme] body .contractor-panel-link,
+html[data-theme] body .contractor-sidebar-edit {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.4rem !important;
+    min-height: 2.15rem !important;
+    padding: 0 0.7rem !important;
+    border: 1px solid #dbe4f0 !important;
+    border-radius: 10px !important;
+    background: #ffffff !important;
+    color: #2563eb !important;
+    font-size: 0.76rem !important;
+    font-weight: 800 !important;
+    text-decoration: none !important;
+}
+
+html[data-theme] body .contractor-sidebar-edit {
+    width: 100% !important;
+    margin-top: 0.9rem !important;
+}
+
+html[data-theme="dark"] body .contractor-panel-link,
+html[data-theme="dark"] body .contractor-sidebar-edit {
+    border-color: #263652 !important;
+    background: #0f1828 !important;
+    color: #93b4ff !important;
+}
+
+@media (max-width: 720px) {
+    html[data-theme] body .contractor-folder-page {
+        width: min(100%, calc(100vw - 1rem)) !important;
+        max-width: min(100%, calc(100vw - 1rem)) !important;
+    }
+
+    html[data-theme] body .documentacion-hero-title {
+        align-items: flex-start !important;
+    }
+
+    html[data-theme] body .documentacion-hero-binder.document-binder-icon {
+        width: 3.6rem !important;
+        height: 4rem !important;
+        flex-basis: 3.6rem !important;
+    }
+}
+
+/* Final absoluto: ancho, ruta y botones consistentes */
+html[data-theme] body main.container,
+html[data-theme] body main.container-fluid,
+html[data-theme] body .dashboard-shell,
+html[data-theme] body .cert-detail-page,
+html[data-theme] body .contractor-folder-page,
+html[data-theme] body .note-list-shell,
+html[data-theme] body .note-form-shell,
+html[data-theme] body .note-detail-shell,
+html[data-theme] body .tablero-page {
+    width: min(1440px, calc(100vw - 8.25rem)) !important;
+    max-width: min(1440px, calc(100vw - 8.25rem)) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    padding-top: 2.15rem !important;
+}
+
+html[data-theme] body .page-navigation,
+html[data-theme] body .breadcrumb,
+html[data-theme] body .ds-breadcrumb,
+html[data-theme] body .contractor-folder-breadcrumb {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    width: 100% !important;
+    min-height: 2.35rem !important;
+    margin: 0 0 1rem !important;
+    padding: 0.5rem 0.75rem !important;
+    border: 1px solid var(--ds-border) !important;
+    border-radius: 10px !important;
+    background: var(--ds-surface) !important;
+    color: var(--ds-muted) !important;
+    box-shadow: none !important;
+    font-size: 0.78rem !important;
+    font-weight: 760 !important;
+    line-height: 1 !important;
+}
+
+html[data-theme] body .page-navigation a,
+html[data-theme] body .breadcrumb a,
+html[data-theme] body .ds-breadcrumb a,
+html[data-theme] body .contractor-folder-breadcrumb a {
+    color: var(--ds-primary) !important;
+    text-decoration: none !important;
+    font-weight: 820 !important;
+}
+
+html[data-theme] body .page-navigation span,
+html[data-theme] body .breadcrumb span,
+html[data-theme] body .ds-breadcrumb span,
+html[data-theme] body .contractor-folder-breadcrumb span {
+    color: var(--ds-text) !important;
+    font-weight: 820 !important;
+}
+
+html[data-theme] body .contractor-folder-actions .folder-premium-btn.is-primary,
+html[data-theme] body .contractor-folder-actions .folder-premium-btn.is-primary:visited {
+    border-color: #1d4ed8 !important;
+    background: #2563eb !important;
+    color: #ffffff !important;
+    text-shadow: none !important;
+}
+
+html[data-theme] body .contractor-folder-actions .folder-premium-btn.is-primary i {
+    color: #ffffff !important;
+}
+
+html[data-theme] body .contractor-folder-actions .folder-premium-btn.is-secondary,
+html[data-theme] body .contractor-folder-actions .folder-premium-btn.is-secondary:visited {
+    border-color: var(--ds-border) !important;
+    background: var(--ds-surface) !important;
+    color: var(--ds-text) !important;
+}
+
+html[data-theme] body .contractor-folder-actions .folder-premium-btn.is-secondary i {
+    color: var(--ds-text) !important;
+}
+
+html[data-theme="dark"] body .contractor-folder-actions .folder-premium-btn.is-primary,
+html[data-theme="dark"] body .contractor-folder-actions .folder-premium-btn.is-primary:visited {
+    border-color: #5b8dff !important;
+    background: #3b82f6 !important;
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] body .contractor-folder-actions .folder-premium-btn.is-secondary,
+html[data-theme="dark"] body .contractor-folder-actions .folder-premium-btn.is-secondary:visited {
+    border-color: #263652 !important;
+    background: #121c2d !important;
+    color: #edf4ff !important;
+}
+
+html[data-theme="dark"] body .contractor-folder-actions .folder-premium-btn.is-secondary i {
+    color: #edf4ff !important;
+}
+
+@media (max-width: 980px) {
+    html[data-theme] body main.container,
+    html[data-theme] body main.container-fluid,
+    html[data-theme] body .dashboard-shell,
+    html[data-theme] body .cert-detail-page,
+    html[data-theme] body .contractor-folder-page,
+    html[data-theme] body .note-list-shell,
+    html[data-theme] body .note-form-shell,
+    html[data-theme] body .note-detail-shell,
+    html[data-theme] body .tablero-page {
+        width: min(100%, calc(100vw - 1.25rem)) !important;
+        max-width: min(100%, calc(100vw - 1.25rem)) !important;
+        padding-top: 1rem !important;
+    }
+}
+
+/* Capa final real de consistencia: normaliza componentes sin cambiar layout ni branding */
+html[data-theme] body {
+    --ds-font-h1: 1.55rem;
+    --ds-font-h2: 1.18rem;
+    --ds-font-h3: 1rem;
+    --ds-font-body: 0.875rem;
+    --ds-font-small: 0.78rem;
+    --ds-font-caption: 0.7rem;
+    --ds-line-tight: 1.18;
+    --ds-line-body: 1.5;
+    --ds-component-radius: 12px;
+    --ds-component-radius-sm: 10px;
+    --ds-component-padding: 1rem;
+    --ds-control-padding-x: 0.85rem;
+    --ds-control-icon-size: 1rem;
+    --ds-control-gap: 0.5rem;
+    --ds-table-cell-x: 0.85rem;
+    --ds-table-cell-y: 0.72rem;
+    --ds-card-shadow: var(--ds-shadow);
+    font-size: var(--ds-font-body) !important;
+    line-height: var(--ds-line-body) !important;
+}
+
+html[data-theme] body h1,
+html[data-theme] body .h1 {
+    font-size: var(--ds-font-h1) !important;
+    line-height: var(--ds-line-tight) !important;
+    font-weight: 760 !important;
+    letter-spacing: 0 !important;
+}
+
+html[data-theme] body h2,
+html[data-theme] body .h2 {
+    font-size: var(--ds-font-h2) !important;
+    line-height: var(--ds-line-tight) !important;
+    font-weight: 720 !important;
+    letter-spacing: 0 !important;
+}
+
+html[data-theme] body h3,
+html[data-theme] body .h3,
+html[data-theme] body h4,
+html[data-theme] body .h4,
+html[data-theme] body h5,
+html[data-theme] body .h5 {
+    font-size: var(--ds-font-h3) !important;
+    line-height: var(--ds-line-tight) !important;
+    font-weight: 700 !important;
+    letter-spacing: 0 !important;
+}
+
+html[data-theme] body small,
+html[data-theme] body .small,
+html[data-theme] body .text-muted {
+    font-size: var(--ds-font-small) !important;
+    line-height: 1.42 !important;
+}
+
+html[data-theme] body .document-kicker,
+html[data-theme] body .section-kicker,
+html[data-theme] body .ds-kicker,
+html[data-theme] body caption,
+html[data-theme] body .caption {
+    font-size: var(--ds-font-caption) !important;
+    line-height: 1.35 !important;
+    font-weight: 700 !important;
+    letter-spacing: 0 !important;
+}
+
+html[data-theme] body .card,
+html[data-theme] body .panel-section,
+html[data-theme] body .metric-card,
+html[data-theme] body .dashboard-card,
+html[data-theme] body .summary-card,
+html[data-theme] body .chart-panel,
+html[data-theme] body .document-header,
+html[data-theme] body .page-hero,
+html[data-theme] body .home-hero,
+html[data-theme] body .note-list-hero,
+html[data-theme] body .oc-detail-header,
+html[data-theme] body .cert-document-header,
+html[data-theme] body .oc-detail-card,
+html[data-theme] body .ticket-summary-card,
+html[data-theme] body .document-semaforo-kpi,
+html[data-theme] body .document-priority-card,
+html[data-theme] body .document-folder-card,
+html[data-theme] body .contractor-folder-hero,
+html[data-theme] body .contractor-folder-summary article,
+html[data-theme] body .contractor-folder-main,
+html[data-theme] body .contractor-folder-sidebar section,
+html[data-theme] body .contractor-info-grid article,
+html[data-theme] body .contractor-notes-box,
+html[data-theme] body .ds-card,
+html[data-theme] body .card-standard {
+    background-color: var(--ds-surface) !important;
+    border: 1px solid var(--ds-border) !important;
+    border-radius: var(--ds-component-radius) !important;
+    box-shadow: var(--ds-card-shadow) !important;
+    color: var(--ds-text) !important;
+}
+
+html[data-theme] body .card-body,
+html[data-theme] body .card-standard,
+html[data-theme] body .panel-section,
+html[data-theme] body .dashboard-card,
+html[data-theme] body .chart-panel,
+html[data-theme] body .oc-detail-card,
+html[data-theme] body .contractor-folder-main,
+html[data-theme] body .contractor-folder-sidebar section {
+    padding: var(--ds-component-padding) !important;
+}
+
+html[data-theme] body .metric-card,
+html[data-theme] body .summary-card,
+html[data-theme] body .document-semaforo-kpi,
+html[data-theme] body .contractor-folder-summary article,
+html[data-theme] body .ds-kpi {
+    min-height: 6rem !important;
+    padding: var(--ds-component-padding) !important;
+}
+
+html[data-theme] body .card-header,
+html[data-theme] body .section-title-row,
+html[data-theme] body .document-explorer-title,
+html[data-theme] body .contractor-folder-panel-head,
+html[data-theme] body .contractor-sidebar-head,
+html[data-theme] body .ds-card-header,
+html[data-theme] body .section-title {
+    gap: 0.75rem !important;
+    margin-bottom: 0.85rem !important;
+    padding-bottom: 0.75rem !important;
+    border-color: var(--ds-border) !important;
+}
+
+html[data-theme] body .card-header h1,
+html[data-theme] body .card-header h2,
+html[data-theme] body .section-title-row h1,
+html[data-theme] body .section-title-row h2,
+html[data-theme] body .contractor-folder-panel-head h2,
+html[data-theme] body .contractor-sidebar-head h3,
+html[data-theme] body .ds-card-title {
+    margin: 0 !important;
+    font-size: var(--ds-font-h3) !important;
+    line-height: var(--ds-line-tight) !important;
+    font-weight: 720 !important;
+}
+
+html[data-theme] body .btn,
+html[data-theme] body .btn-sm,
+html[data-theme] body .btn-lg,
+html[data-theme] body .ds-button,
+html[data-theme] body .btn-standard,
+html[data-theme] body .folder-premium-btn,
+html[data-theme] body .table-icon-action,
+html[data-theme] body .contractor-panel-link,
+html[data-theme] body .contractor-sidebar-edit,
+html[data-theme] body .document-folder-card-action {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: var(--ds-control-gap) !important;
+    min-height: var(--ds-control-height) !important;
+    padding: 0 var(--ds-control-padding-x) !important;
+    border-radius: var(--ds-component-radius-sm) !important;
+    font-family: var(--ds-font) !important;
+    font-size: 0.82rem !important;
+    font-weight: 750 !important;
+    line-height: 1 !important;
+    letter-spacing: 0 !important;
+    text-transform: none !important;
+    text-decoration: none !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease, box-shadow 180ms ease, transform 180ms ease !important;
+}
+
+html[data-theme] body .btn-sm,
+html[data-theme] body .table-icon-action {
+    min-height: var(--ds-control-height-sm) !important;
+    padding: 0 0.6rem !important;
+    font-size: 0.76rem !important;
+}
+
+html[data-theme] body .btn i,
+html[data-theme] body .ds-button i,
+html[data-theme] body .btn-standard i,
+html[data-theme] body .folder-premium-btn i,
+html[data-theme] body .table-icon-action i,
+html[data-theme] body .contractor-panel-link i,
+html[data-theme] body .contractor-sidebar-edit i {
+    width: var(--ds-control-icon-size) !important;
+    min-width: var(--ds-control-icon-size) !important;
+    height: var(--ds-control-icon-size) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: var(--ds-control-icon-size) !important;
+    line-height: 1 !important;
+}
+
+html[data-theme] body .btn:hover,
+html[data-theme] body .ds-button:hover,
+html[data-theme] body .btn-standard:hover,
+html[data-theme] body .folder-premium-btn:hover,
+html[data-theme] body .table-icon-action:hover,
+html[data-theme] body .contractor-panel-link:hover,
+html[data-theme] body .contractor-sidebar-edit:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: var(--ds-focus) !important;
+}
+
+html[data-theme] body .btn:active,
+html[data-theme] body .ds-button:active,
+html[data-theme] body .btn-standard:active,
+html[data-theme] body .folder-premium-btn:active,
+html[data-theme] body .table-icon-action:active {
+    transform: translateY(0) !important;
+    box-shadow: none !important;
+}
+
+html[data-theme] body .btn-primary,
+html[data-theme] body .btn-standard.is-primary,
+html[data-theme] body .folder-premium-btn.is-primary {
+    background: var(--ds-primary) !important;
+    border-color: var(--ds-primary) !important;
+    color: #ffffff !important;
+}
+
+html[data-theme] body .btn-primary *,
+html[data-theme] body .btn-standard.is-primary *,
+html[data-theme] body .folder-premium-btn.is-primary * {
+    color: #ffffff !important;
+}
+
+html[data-theme] body .btn-secondary,
+html[data-theme] body .btn-outline-secondary,
+html[data-theme] body .btn-light,
+html[data-theme] body .btn-standard.is-secondary,
+html[data-theme] body .folder-premium-btn.is-secondary {
+    background: var(--ds-surface) !important;
+    border-color: var(--ds-border-strong) !important;
+    color: var(--ds-text) !important;
+}
+
+html[data-theme] body .btn-outline-primary,
+html[data-theme] body .btn-standard.is-outline {
+    background: var(--ds-surface) !important;
+    border-color: color-mix(in srgb, var(--ds-primary) 38%, var(--ds-border)) !important;
+    color: var(--ds-primary) !important;
+}
+
+html[data-theme] body .form-control,
+html[data-theme] body .form-select,
+html[data-theme] body input[type="search"],
+html[data-theme] body input[type="date"],
+html[data-theme] body input[type="number"],
+html[data-theme] body textarea.form-control,
+html[data-theme] body .input-standard,
+html[data-theme] body .ds-input,
+html[data-theme] body .ds-select,
+html[data-theme] body .ds-textarea {
+    min-height: var(--ds-control-height) !important;
+    padding: 0.55rem var(--ds-control-padding-x) !important;
+    border: 1px solid var(--ds-border-strong) !important;
+    border-radius: var(--ds-component-radius-sm) !important;
+    background-color: var(--ds-surface) !important;
+    color: var(--ds-text) !important;
+    font-family: var(--ds-font) !important;
+    font-size: 0.84rem !important;
+    font-weight: 500 !important;
+    line-height: 1.35 !important;
+}
+
+html[data-theme] body textarea.form-control,
+html[data-theme] body .ds-textarea {
+    min-height: 7rem !important;
+    padding-top: 0.75rem !important;
+}
+
+html[data-theme] body .form-control::placeholder,
+html[data-theme] body input::placeholder,
+html[data-theme] body textarea::placeholder {
+    color: var(--ds-muted) !important;
+    opacity: 0.76 !important;
+}
+
+html[data-theme] body .form-label,
+html[data-theme] body label,
+html[data-theme] body .ds-label {
+    font-size: var(--ds-font-small) !important;
+    font-weight: 700 !important;
+    line-height: 1.25 !important;
+}
+
+html[data-theme] body .table-responsive,
+html[data-theme] body .ds-table-wrap {
+    border-radius: var(--ds-component-radius) !important;
+    border: 1px solid var(--ds-border) !important;
+    box-shadow: var(--ds-card-shadow) !important;
+}
+
+html[data-theme] body .table,
+html[data-theme] body table,
+html[data-theme] body .ds-table,
+html[data-theme] body .table-standard {
+    font-size: var(--ui-font-table, 0.82rem) !important;
+    line-height: 1.4 !important;
+}
+
+html[data-theme] body .table > :not(caption) > * > *,
+html[data-theme] body table > :not(caption) > * > *,
+html[data-theme] body .ds-table > :not(caption) > * > *,
+html[data-theme] body .table-standard > :not(caption) > * > * {
+    min-height: var(--ds-table-row-height) !important;
+    padding: var(--ds-table-cell-y) var(--ds-table-cell-x) !important;
+    vertical-align: middle !important;
+}
+
+html[data-theme] body .table thead th,
+html[data-theme] body table thead th,
+html[data-theme] body .ds-table thead th,
+html[data-theme] body .table-standard thead th {
+    font-size: var(--ds-font-caption) !important;
+    font-weight: 800 !important;
+    line-height: 1.2 !important;
+    letter-spacing: 0 !important;
+    text-transform: none !important;
+}
+
+html[data-theme] body td .btn,
+html[data-theme] body td .table-icon-action,
+html[data-theme] body .action-cell,
+html[data-theme] body .contractor-document-actions {
+    gap: 0.5rem !important;
+}
+
+html[data-theme] body .badge,
+html[data-theme] body .status-pill,
+html[data-theme] body .delivery-status-pill,
+html[data-theme] body .doc-status-pill,
+html[data-theme] body .note-status-pill,
+html[data-theme] body .section-total-pill,
+html[data-theme] body .filter-active-pill,
+html[data-theme] body .item-code-pill,
+html[data-theme] body .category-chip,
+html[data-theme] body .badge-standard,
+html[data-theme] body .ds-badge {
+    min-height: 1.5rem !important;
+    padding: 0.2rem 0.55rem !important;
+    border-radius: 999px !important;
+    font-size: var(--ds-font-caption) !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+    letter-spacing: 0 !important;
+    text-transform: none !important;
+}
+
+html[data-theme] body .modal-content,
+html[data-theme] body .document-quick-modal,
+html[data-theme] body .ds-dialog-panel,
+html[data-theme] body .modal-standard {
+    border-radius: var(--ds-component-radius) !important;
+    border: 1px solid var(--ds-border-strong) !important;
+    box-shadow: var(--ui-shadow) !important;
+}
+
+html[data-theme] body .modal-header,
+html[data-theme] body .modal-footer,
+html[data-theme] body .document-quick-header {
+    padding: 1rem !important;
+    border-color: var(--ds-border) !important;
+}
+
+html[data-theme] body .modal-body {
+    padding: 1rem !important;
+}
+
+html[data-theme] body .dropdown-menu,
+html[data-theme] body .popover,
+html[data-theme] body .toast,
+html[data-theme] body .alert,
+html[data-theme] body .empty-state,
+html[data-theme] body .tooltip-inner {
+    border-radius: var(--ds-component-radius-sm) !important;
+}
+
+/* Documentacion: escritorio de carpetas mas dinamico */
+html[data-theme] body .document-folder-grid-view {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 1.1rem !important;
+    align-items: stretch !important;
+}
+
+html[data-theme] body .document-folder-card {
+    min-height: 17.5rem !important;
+    cursor: pointer !important;
+    user-select: none !important;
+    transform: translateY(0) scale(1) !important;
+    transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease !important;
+}
+
+html[data-theme] body .document-folder-card:hover,
+html[data-theme] body .document-folder-card:focus-visible,
+html[data-theme] body .document-folder-card.is-context-active,
+html[data-theme] body .document-folder.is-context-active {
+    border-color: color-mix(in srgb, var(--folder-color, var(--ds-primary)) 42%, var(--ds-border)) !important;
+    box-shadow: 0 18px 38px rgba(var(--ds-primary-rgb), 0.16) !important;
+    transform: translateY(-2px) scale(1.01) !important;
+}
+
+html[data-theme] body .document-folder-card-action {
+    display: none !important;
+}
+
+html[data-theme] body .document-folder-menu {
+    min-width: 15.5rem !important;
+    padding: 0.45rem !important;
+    border-radius: 12px !important;
+    border: 1px solid var(--ds-border-strong) !important;
+    background: var(--ds-surface) !important;
+    box-shadow: var(--ui-shadow) !important;
+}
+
+html[data-theme] body .document-folder-menu button {
+    min-height: 2.25rem !important;
+    border-radius: 9px !important;
+    gap: 0.55rem !important;
+}
+
+html[data-theme] body .document-menu-title {
+    padding: 0.55rem 0.6rem 0.65rem !important;
+    margin-bottom: 0.25rem !important;
+    border-bottom: 1px solid var(--ds-border) !important;
+    color: var(--ds-text) !important;
+    font-weight: 850 !important;
+}
+
+html[data-theme] body main.contractor-folder-page .contractor-folder-hero .contractor-folder-actions > a.folder-premium-btn.is-primary,
+html[data-theme] body main.contractor-folder-page .contractor-folder-hero .contractor-folder-actions > a.folder-premium-btn.is-primary:link,
+html[data-theme] body main.contractor-folder-page .contractor-folder-hero .contractor-folder-actions > a.folder-premium-btn.is-primary:visited {
+    min-width: auto !important;
+    min-height: var(--ds-control-height) !important;
+    padding: 0 0.9rem !important;
+    border-radius: var(--ds-component-radius-sm) !important;
+    font-size: 0.82rem !important;
+    font-weight: 750 !important;
+    box-shadow: none !important;
+}
+
+@media (max-width: 1320px) {
+    html[data-theme] body .document-folder-grid-view {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+}
+
+@media (max-width: 980px) {
+    html[data-theme] body .document-folder-grid-view {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+}
+
+@media (max-width: 620px) {
+    html[data-theme] body .document-folder-grid-view {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* Documentacion: arrastre visible en mosaico y carpeta interna alineada al modulo */
+html[data-theme] body .document-folder-card[draggable="true"] {
+    cursor: grab !important;
+}
+
+html[data-theme] body .document-folder-card[draggable="true"]:active {
+    cursor: grabbing !important;
+}
+
+html[data-theme] body .document-folder-card.is-dragging {
+    opacity: 0.42 !important;
+    transform: scale(0.96) !important;
+    box-shadow: none !important;
+}
+
+html[data-theme] body .document-folder-card.is-drop-target {
+    outline: 2px solid color-mix(in srgb, var(--folder-color, var(--ds-primary)) 55%, transparent) !important;
+    outline-offset: 5px !important;
+}
+
+html[data-theme] body .document-folder-drop-marker.is-grid-marker {
+    min-height: 17.5rem !important;
+    display: grid !important;
+    place-items: center !important;
+    gap: 0.45rem !important;
+    padding: 1rem !important;
+    border: 2px dashed color-mix(in srgb, var(--ds-primary) 52%, var(--ds-border)) !important;
+    border-radius: var(--ds-component-radius) !important;
+    background:
+        linear-gradient(135deg, rgba(var(--ds-primary-rgb), 0.12), transparent 55%),
+        color-mix(in srgb, var(--ds-primary) 6%, var(--ds-surface)) !important;
+    color: var(--ds-primary) !important;
+    box-shadow: inset 0 0 0 1px rgba(var(--ds-primary-rgb), 0.12) !important;
+}
+
+html[data-theme] body .document-folder-drop-marker.is-grid-marker span {
+    width: 3rem !important;
+    height: 3rem !important;
+    border-radius: 14px !important;
+    background: rgba(var(--ds-primary-rgb), 0.12) !important;
+    border: 1px solid rgba(var(--ds-primary-rgb), 0.25) !important;
+}
+
+html[data-theme] body .document-folder-drop-marker.is-grid-marker strong {
+    color: var(--ds-primary) !important;
+    font-size: 0.82rem !important;
+    font-weight: 850 !important;
+}
+
+html[data-theme] body main.contractor-folder-page {
+    background: var(--ds-bg) !important;
+    color: var(--ds-text) !important;
+}
+
+html[data-theme] body main.contractor-folder-page .contractor-folder-hero {
+    padding: 1rem !important;
+    border-radius: var(--ds-component-radius) !important;
+    border: 1px solid var(--ds-border) !important;
+    background: var(--ds-surface) !important;
+    box-shadow: var(--ds-card-shadow) !important;
+    gap: 1rem !important;
+}
+
+html[data-theme] body main.contractor-folder-page .contractor-folder-hero-main {
+    gap: 0.9rem !important;
+}
+
+html[data-theme] body main.contractor-folder-page .contractor-folder-binder.document-binder-icon {
+    width: 4.8rem !important;
+    height: 5.2rem !important;
+    flex-basis: 4.8rem !important;
+}
+
+html[data-theme] body main.contractor-folder-page .contractor-folder-eyebrow {
+    margin-bottom: 0.25rem !important;
+    color: var(--ds-muted) !important;
+    font-size: var(--ds-font-caption) !important;
+}
+
+html[data-theme] body main.contractor-folder-page .contractor-folder-heading-row h1 {
+    color: var(--ds-text) !important;
+    font-size: var(--ds-font-h1) !important;
+    line-height: var(--ds-line-tight) !important;
+    font-weight: 760 !important;
+}
+
+html[data-theme] body main.contractor-folder-page .contractor-folder-meta {
+    margin-top: 0.65rem !important;
+    gap: 0.55rem 0.85rem !important;
+}
+
+html[data-theme] body main.contractor-folder-page .contractor-folder-meta span,
+html[data-theme] body main.contractor-folder-page .contractor-folder-meta b {
+    color: var(--ds-muted) !important;
+    font-size: var(--ds-font-small) !important;
+}
+
+html[data-theme] body main.contractor-folder-page .contractor-folder-summary {
+    gap: 1rem !important;
+    margin-bottom: 1rem !important;
+}
+
+html[data-theme] body main.contractor-folder-page .contractor-folder-summary article {
+    min-height: 6rem !important;
+    padding: 1rem !important;
+    border-radius: var(--ds-component-radius) !important;
+    background: var(--ds-surface) !important;
+    border-color: var(--ds-border) !important;
+    box-shadow: var(--ds-card-shadow) !important;
+}
+
+html[data-theme] body main.contractor-folder-page .contractor-folder-summary article > span {
+    width: 2.4rem !important;
+    height: 2.4rem !important;
+    border-radius: 12px !important;
+}
+
+html[data-theme] body main.contractor-folder-page .contractor-folder-summary strong {
+    font-size: 1.35rem !important;
+    color: var(--ds-text) !important;
+}
+
+html[data-theme] body main.contractor-folder-page .contractor-folder-summary p {
+    font-size: 0.82rem !important;
+    color: var(--ds-text) !important;
+}
+
+html[data-theme] body main.contractor-folder-page .contractor-folder-summary small {
+    font-size: var(--ds-font-caption) !important;
+    color: var(--ds-muted) !important;
+}
+
+html[data-theme] body main.contractor-folder-page .contractor-folder-tabs {
+    min-height: 2.55rem !important;
+    margin: 0 0 1rem !important;
+    padding: 0 0.25rem !important;
+    border-bottom: 1px solid var(--ds-border) !important;
+}
+
+html[data-theme] body main.contractor-folder-page .contractor-folder-tabs button {
+    min-height: 2.55rem !important;
+    padding: 0 0.75rem !important;
+    font-size: 0.82rem !important;
+    font-weight: 750 !important;
+}
+
+html[data-theme] body main.contractor-folder-page .contractor-folder-workspace {
+    grid-template-columns: minmax(0, 1fr) minmax(17rem, 21rem) !important;
+    gap: 1rem !important;
+}
+
+html[data-theme] body main.contractor-folder-page .contractor-folder-main,
+html[data-theme] body main.contractor-folder-page .contractor-folder-sidebar section {
+    border-radius: var(--ds-component-radius) !important;
+    background: var(--ds-surface) !important;
+    border: 1px solid var(--ds-border) !important;
+    box-shadow: var(--ds-card-shadow) !important;
+}
+
+html[data-theme] body main.contractor-folder-page .contractor-folder-panel-head {
+    margin-bottom: 0.85rem !important;
+}
+
+html[data-theme] body main.contractor-folder-page .contractor-document-row {
+    min-height: 4.25rem !important;
+    padding: 0.75rem 0.85rem !important;
+    border-radius: 10px !important;
+    background: var(--ds-surface) !important;
+    border-color: var(--ds-border) !important;
+    box-shadow: none !important;
+}
+
+html[data-theme] body main.contractor-folder-page .contractor-document-main strong,
+html[data-theme] body main.contractor-folder-page .contractor-sidebar-list dd,
+html[data-theme] body main.contractor-folder-page .contractor-due-list strong {
+    color: var(--ds-text) !important;
+}
+
+html[data-theme] body main.contractor-folder-page .contractor-document-main small,
+html[data-theme] body main.contractor-folder-page .contractor-sidebar-list dt,
+html[data-theme] body main.contractor-folder-page .contractor-sidebar-note {
+    color: var(--ds-muted) !important;
+}
+
+html[data-theme] body .folder-edit-modal {
+    width: min(34rem, calc(100vw - 2rem)) !important;
+}
+
+html[data-theme] body .folder-edit-icon {
+    background: color-mix(in srgb, var(--folder-color, var(--ds-primary)) 14%, var(--ds-surface)) !important;
+    border-color: color-mix(in srgb, var(--folder-color, var(--ds-primary)) 34%, var(--ds-border)) !important;
+    color: var(--folder-color, var(--ds-primary)) !important;
+}
+
+html[data-theme] body .folder-edit-form {
+    display: grid !important;
+    gap: 0.9rem !important;
+    padding: 1rem !important;
+}
+
+html[data-theme] body .folder-edit-form label {
+    display: grid !important;
+    gap: 0.35rem !important;
+}
+
+html[data-theme] body .folder-edit-form label > span {
+    color: var(--ds-muted) !important;
+    font-size: var(--ds-font-small) !important;
+    font-weight: 800 !important;
+}
+
+html[data-theme] body .folder-edit-color-row {
+    display: grid !important;
+    grid-template-columns: 3.25rem minmax(0, 1fr) !important;
+    gap: 0.55rem !important;
+}
+
+html[data-theme] body .folder-edit-color-row .form-control-color {
+    width: 3.25rem !important;
+    padding: 0.25rem !important;
+}
+
+/* Ordenes de compra: lectura amplia, encabezados centrados y barras fluidas */
+html[data-theme] body .oc-list-panel .table-responsive {
+    overflow-x: auto !important;
+    border-radius: var(--ds-component-radius) !important;
+}
+
+html[data-theme] body .oc-list-table {
+    width: 100% !important;
+    min-width: 1500px !important;
+    table-layout: auto !important;
+}
+
+html[data-theme] body .oc-list-table .oc-col-numero { width: 5.25rem !important; }
+html[data-theme] body .oc-list-table .oc-col-fecha { width: 7.6rem !important; }
+html[data-theme] body .oc-list-table .oc-col-proveedor { width: 14.5rem !important; }
+html[data-theme] body .oc-list-table .oc-col-categorias { width: 14rem !important; }
+html[data-theme] body .oc-list-table .oc-col-rubros { width: 23rem !important; }
+html[data-theme] body .oc-list-table .oc-col-items { width: 5rem !important; }
+html[data-theme] body .oc-list-table .oc-col-importe { width: 10.8rem !important; }
+html[data-theme] body .oc-list-table .oc-col-avance { width: 8.4rem !important; }
+html[data-theme] body .oc-list-table .oc-col-certificados { width: 11.5rem !important; }
+html[data-theme] body .oc-list-table .oc-col-acciones { width: 6.7rem !important; }
+
+html[data-theme] body .oc-list-table thead th {
+    padding: 0.75rem 0.9rem !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+    overflow-wrap: normal !important;
+    word-break: normal !important;
+    hyphens: none !important;
+    vertical-align: middle !important;
+}
+
+html[data-theme] body .oc-list-table thead th .table-sort-button,
+html[data-theme] body .oc-list-table thead th .table-sort-button.justify-content-end {
+    width: 100% !important;
+    min-width: max-content !important;
+    justify-content: center !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+    overflow-wrap: normal !important;
+    word-break: normal !important;
+    hyphens: none !important;
+}
+
+html[data-theme] body .oc-list-table thead th .table-sort-button *,
+html[data-theme] body .oc-list-table thead th > * {
+    white-space: nowrap !important;
+    overflow-wrap: normal !important;
+    word-break: normal !important;
+    hyphens: none !important;
+}
+
+html[data-theme] body .oc-list-table thead th:nth-child(1) { min-width: 5.2rem !important; }
+html[data-theme] body .oc-list-table thead th:nth-child(2) { min-width: 7.3rem !important; }
+html[data-theme] body .oc-list-table thead th:nth-child(3) { min-width: 10.6rem !important; }
+html[data-theme] body .oc-list-table thead th:nth-child(4) { min-width: 10.8rem !important; }
+html[data-theme] body .oc-list-table thead th:nth-child(5) { min-width: 18rem !important; }
+html[data-theme] body .oc-list-table thead th:nth-child(6) { min-width: 5.6rem !important; }
+html[data-theme] body .oc-list-table thead th:nth-child(7) { min-width: 8.6rem !important; }
+html[data-theme] body .oc-list-table thead th:nth-child(8) { min-width: 7.3rem !important; }
+html[data-theme] body .oc-list-table thead th:nth-child(9) { min-width: 8.4rem !important; }
+html[data-theme] body .oc-list-table thead th:nth-child(10) { min-width: 6.8rem !important; }
+
+html[data-theme] body .oc-list-table th,
+html[data-theme] body .oc-list-table td {
+    word-break: normal !important;
+}
+
+html[data-theme] body .oc-list-table tbody tr > * {
+    height: auto !important;
+    min-height: 4.6rem !important;
+    padding: 0.9rem 0.9rem !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    line-height: 1.28 !important;
+}
+
+html[data-theme] body .oc-list-table tbody td:nth-child(1),
+html[data-theme] body .oc-list-table tbody td:nth-child(2),
+html[data-theme] body .oc-list-table tbody td:nth-child(6),
+html[data-theme] body .oc-list-table tbody td:nth-child(7),
+html[data-theme] body .oc-list-table tbody td:nth-child(8),
+html[data-theme] body .oc-list-table tbody td:nth-child(9),
+html[data-theme] body .oc-list-table tbody td:nth-child(10) {
+    white-space: nowrap !important;
+}
+
+html[data-theme] body .oc-list-table tbody td:nth-child(2),
+html[data-theme] body .oc-list-table tbody td:nth-child(6),
+html[data-theme] body .oc-list-table tbody td:nth-child(7),
+html[data-theme] body .oc-list-table tbody td:nth-child(8),
+html[data-theme] body .oc-list-table tbody td:nth-child(9),
+html[data-theme] body .oc-list-table tbody td:nth-child(10) {
+    text-align: center !important;
+}
+
+html[data-theme] body .oc-list-table tbody td:nth-child(7) {
+    font-variant-numeric: tabular-nums !important;
+}
+
+html[data-theme] body .oc-list-table .category-chip {
+    max-width: 100% !important;
+    white-space: normal !important;
+}
+
+html[data-theme] body .oc-list-table .oc-list-rubros {
+    min-width: 21rem !important;
+    max-width: 27rem !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+}
+
+html[data-theme] body .oc-list-table .oc-progress-cell,
+html[data-theme] body .oc-list-table .oc-tracking-stack {
+    align-items: center !important;
+    margin-inline: auto !important;
+}
+
+html[data-theme] body .oc-list-table .action-cell {
+    display: table-cell !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+}
+
+html[data-theme] body .oc-list-table .action-cell form {
+    display: inline-flex !important;
+    margin: 0 0 0 0.35rem !important;
+    vertical-align: middle !important;
+}
+
+html[data-theme] body .oc-list-table .action-cell .table-icon-action {
+    vertical-align: middle !important;
+}
+
+html[data-theme] body .oc-progress .progress-bar,
+html[data-theme] body .oc-detail-page .oc-progress .progress-bar,
+html[data-theme] body .oc-detail-page .oc-total-progress-fill {
+    transform-origin: left center !important;
+    will-change: transform !important;
+}
+
+html[data-theme] body .oc-progress .progress-bar:not(.is-loaded),
+html[data-theme] body .oc-detail-page .oc-progress .progress-bar:not(.is-loaded),
+html[data-theme] body .oc-detail-page .oc-total-progress-fill:not(.is-loaded) {
+    transform: scaleX(0) !important;
+}
+
+html[data-theme] body .oc-detail-page .document-table,
+html[data-theme] body .oc-detail-page table {
+    table-layout: auto !important;
+}
+
+html[data-theme] body .oc-detail-page .table-responsive {
+    overflow-x: auto !important;
+}
+
+html[data-theme] body .oc-detail-page .oc-items-table {
+    min-width: 1460px !important;
+}
+
+html[data-theme] body .oc-detail-page .document-table thead th,
+html[data-theme] body .oc-detail-page table thead th {
+    text-align: center !important;
+    white-space: nowrap !important;
+    overflow-wrap: normal !important;
+    word-break: normal !important;
+    hyphens: none !important;
+    vertical-align: middle !important;
+}
+
+html[data-theme] body .oc-detail-page .document-table thead th .table-sort-button,
+html[data-theme] body .oc-detail-page .document-table thead th .table-sort-button.justify-content-end,
+html[data-theme] body .oc-detail-page table thead th .table-sort-button,
+html[data-theme] body .oc-detail-page table thead th .table-sort-button.justify-content-end {
+    width: 100% !important;
+    min-width: max-content !important;
+    justify-content: center !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+    overflow-wrap: normal !important;
+    word-break: normal !important;
+    hyphens: none !important;
+}
+
+html[data-theme] body .oc-detail-page .document-table thead th .table-sort-button *,
+html[data-theme] body .oc-detail-page table thead th .table-sort-button *,
+html[data-theme] body .oc-detail-page .document-table thead th > *,
+html[data-theme] body .oc-detail-page table thead th > * {
+    white-space: nowrap !important;
+    overflow-wrap: normal !important;
+    word-break: normal !important;
+    hyphens: none !important;
+}
+
+html[data-theme] body .oc-detail-page .document-table tbody tr > *,
+html[data-theme] body .oc-detail-page table tbody tr > * {
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    line-height: 1.28 !important;
+}
+
+html[data-theme] body .oc-detail-page .document-table tbody td.text-end,
+html[data-theme] body .oc-detail-page table tbody td.text-end {
+    text-align: center !important;
+    white-space: nowrap !important;
+    font-variant-numeric: tabular-nums !important;
+}
+
+html[data-theme] body .oc-detail-page .document-table tbody .action-cell,
+html[data-theme] body .oc-detail-page table tbody .action-cell {
+    text-align: center !important;
+    white-space: nowrap !important;
+}
+
+html[data-theme] body .oc-detail-page .document-table tbody .action-cell form,
+html[data-theme] body .oc-detail-page table tbody .action-cell form {
+    display: inline-flex !important;
+    margin: 0 0 0 0.35rem !important;
+}
+
+html[data-theme] body .oc-detail-page .item-detail-cell {
+    min-width: 18rem !important;
+    max-width: 30rem !important;
+    overflow-wrap: anywhere !important;
+}
+
+/* Itemizado: colores tipo planilla/PDF por jerarquia */
+html[data-theme] body .itemizado-excel .rubro-root > * {
+    background: #1d6b3a !important;
+    border-color: #15542d !important;
+    color: #ffffff !important;
+    font-weight: 850 !important;
+}
+
+html[data-theme] body .itemizado-excel .rubro-root .rubro-name,
+html[data-theme] body .itemizado-excel .rubro-root .total-cell,
+html[data-theme] body .itemizado-excel .rubro-root span,
+html[data-theme] body .itemizado-excel .rubro-root button,
+html[data-theme] body .itemizado-excel .rubro-root i {
+    color: #ffffff !important;
+}
+
+html[data-theme] body .itemizado-excel .rubro-middle > *,
+html[data-theme] body .itemizado-excel .rubro-leaf > * {
+    background: #fff7cc !important;
+    border-color: #eadf9b !important;
+    color: #2c260f !important;
+    font-weight: 780 !important;
+}
+
+html[data-theme] body .itemizado-excel .rubro-middle .rubro-name,
+html[data-theme] body .itemizado-excel .rubro-leaf .rubro-name,
+html[data-theme] body .itemizado-excel .rubro-middle .total-cell,
+html[data-theme] body .itemizado-excel .rubro-leaf .total-cell,
+html[data-theme] body .itemizado-excel .rubro-middle span,
+html[data-theme] body .itemizado-excel .rubro-leaf span,
+html[data-theme] body .itemizado-excel .rubro-middle button,
+html[data-theme] body .itemizado-excel .rubro-leaf button,
+html[data-theme] body .itemizado-excel .rubro-middle i,
+html[data-theme] body .itemizado-excel .rubro-leaf i {
+    color: #2c260f !important;
+}
+
+html[data-theme] body .itemizado-excel .item-row > *,
+html[data-theme] body .itemizado-excel .item-row:nth-child(even) > *,
+html[data-theme] body .itemizado-excel .itemizado-manual-row > * {
+    background: #ffffff !important;
+    border-color: #d8dee8 !important;
+    color: #111827 !important;
+}
+
+html[data-theme] body .itemizado-excel .item-row:hover > *,
+html[data-theme] body .itemizado-excel .itemizado-child-row:hover > * {
+    background: #f8fafc !important;
+}
+
+html[data-theme="dark"] body .itemizado-excel .rubro-root > * {
+    background: #1d6b3a !important;
+    border-color: #3f9b60 !important;
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] body .itemizado-excel .rubro-middle > *,
+html[data-theme="dark"] body .itemizado-excel .rubro-leaf > * {
+    background: #fff1a8 !important;
+    border-color: #d7c96e !important;
+    color: #211b08 !important;
+}
+
+html[data-theme="dark"] body .itemizado-excel .item-row > *,
+html[data-theme="dark"] body .itemizado-excel .item-row:nth-child(even) > *,
+html[data-theme="dark"] body .itemizado-excel .itemizado-manual-row > * {
+    background: #f8fafc !important;
+    border-color: #cfd8e6 !important;
+    color: #111827 !important;
+}
+
+/* Itemizado: seleccion/arrastre sin perder el color de jerarquia */
+html[data-theme] body .itemizado-excel .rubro-root:hover > *,
+html[data-theme] body .itemizado-excel .rubro-root.is-scroll-focus > *,
+html[data-theme] body .itemizado-excel .rubro-root.is-just-moved > *,
+html[data-theme] body .itemizado-excel .rubro-root.is-dragging > *,
+html[data-theme] body .itemizado-excel .rubro-root.is-drop-target > *,
+html[data-theme] body .itemizado-excel .rubro-root.is-drop-before > *,
+html[data-theme] body .itemizado-excel .rubro-root.is-drop-after > *,
+html[data-theme] body .itemizado-excel .rubro-root.is-drop-inside > * {
+    background: #218246 !important;
+    border-color: #145c31 !important;
+    color: #ffffff !important;
+    box-shadow:
+        inset 0 0 0 2px #38b66a,
+        inset 0 0 0 999px rgba(255, 255, 255, 0.035),
+        0 10px 22px rgba(29, 107, 58, 0.16) !important;
+}
+
+html[data-theme] body .itemizado-excel .rubro-middle:hover > *,
+html[data-theme] body .itemizado-excel .rubro-leaf:hover > *,
+html[data-theme] body .itemizado-excel .rubro-middle.is-scroll-focus > *,
+html[data-theme] body .itemizado-excel .rubro-leaf.is-scroll-focus > *,
+html[data-theme] body .itemizado-excel .rubro-middle.is-just-moved > *,
+html[data-theme] body .itemizado-excel .rubro-leaf.is-just-moved > *,
+html[data-theme] body .itemizado-excel .rubro-middle.is-dragging > *,
+html[data-theme] body .itemizado-excel .rubro-leaf.is-dragging > *,
+html[data-theme] body .itemizado-excel .rubro-middle.is-drop-target > *,
+html[data-theme] body .itemizado-excel .rubro-leaf.is-drop-target > *,
+html[data-theme] body .itemizado-excel .rubro-middle.is-drop-before > *,
+html[data-theme] body .itemizado-excel .rubro-leaf.is-drop-before > *,
+html[data-theme] body .itemizado-excel .rubro-middle.is-drop-after > *,
+html[data-theme] body .itemizado-excel .rubro-leaf.is-drop-after > *,
+html[data-theme] body .itemizado-excel .rubro-middle.is-drop-inside > *,
+html[data-theme] body .itemizado-excel .rubro-leaf.is-drop-inside > * {
+    background: #ffe173 !important;
+    border-color: #d3b74d !important;
+    color: #201703 !important;
+    box-shadow:
+        inset 0 0 0 2px #d99f00,
+        inset 0 0 0 999px rgba(255, 255, 255, 0.08),
+        0 10px 22px rgba(180, 130, 0, 0.12) !important;
+}
+
+html[data-theme] body .itemizado-excel .rubro-root.is-drop-before > * {
+    box-shadow: inset 0 4px 0 #8ef0a9, inset 0 0 0 2px #38b66a !important;
+}
+
+html[data-theme] body .itemizado-excel .rubro-root.is-drop-after > * {
+    box-shadow: inset 0 -4px 0 #8ef0a9, inset 0 0 0 2px #38b66a !important;
+}
+
+html[data-theme] body .itemizado-excel .rubro-middle.is-drop-before > *,
+html[data-theme] body .itemizado-excel .rubro-leaf.is-drop-before > * {
+    box-shadow: inset 0 4px 0 #9b6b00, inset 0 0 0 2px #d99f00 !important;
+}
+
+html[data-theme] body .itemizado-excel .rubro-middle.is-drop-after > *,
+html[data-theme] body .itemizado-excel .rubro-leaf.is-drop-after > * {
+    box-shadow: inset 0 -4px 0 #9b6b00, inset 0 0 0 2px #d99f00 !important;
+}
+
+html[data-theme] body .itemizado-excel .rubro-root.is-drop-invalid > *,
+html[data-theme] body .itemizado-excel .rubro-middle.is-drop-invalid > *,
+html[data-theme] body .itemizado-excel .rubro-leaf.is-drop-invalid > * {
+    background: #fee2e2 !important;
+    border-color: #ef4444 !important;
+    color: #7f1d1d !important;
+    box-shadow: inset 0 0 0 2px #ef4444 !important;
+}
+
+html[data-theme] body .itemizado-excel .rubro-root.is-scroll-focus > *,
+html[data-theme] body .itemizado-excel .rubro-middle.is-scroll-focus > *,
+html[data-theme] body .itemizado-excel .rubro-leaf.is-scroll-focus > *,
+html[data-theme] body .itemizado-excel .rubro-root.is-just-moved > *,
+html[data-theme] body .itemizado-excel .rubro-middle.is-just-moved > *,
+html[data-theme] body .itemizado-excel .rubro-leaf.is-just-moved > * {
+    animation: none !important;
+}
+
+html[data-theme="dark"] body .itemizado-excel .rubro-root:hover > *,
+html[data-theme="dark"] body .itemizado-excel .rubro-root.is-scroll-focus > *,
+html[data-theme="dark"] body .itemizado-excel .rubro-root.is-just-moved > *,
+html[data-theme="dark"] body .itemizado-excel .rubro-root.is-dragging > *,
+html[data-theme="dark"] body .itemizado-excel .rubro-root.is-drop-target > *,
+html[data-theme="dark"] body .itemizado-excel .rubro-root.is-drop-before > *,
+html[data-theme="dark"] body .itemizado-excel .rubro-root.is-drop-after > *,
+html[data-theme="dark"] body .itemizado-excel .rubro-root.is-drop-inside > * {
+    background: #2b8f50 !important;
+    border-color: #54d681 !important;
+    color: #ffffff !important;
+    box-shadow: inset 0 0 0 2px #86efac, 0 12px 28px rgba(34, 197, 94, 0.18) !important;
+}
+
+html[data-theme="dark"] body .itemizado-excel .rubro-middle:hover > *,
+html[data-theme="dark"] body .itemizado-excel .rubro-leaf:hover > *,
+html[data-theme="dark"] body .itemizado-excel .rubro-middle.is-scroll-focus > *,
+html[data-theme="dark"] body .itemizado-excel .rubro-leaf.is-scroll-focus > *,
+html[data-theme="dark"] body .itemizado-excel .rubro-middle.is-just-moved > *,
+html[data-theme="dark"] body .itemizado-excel .rubro-leaf.is-just-moved > *,
+html[data-theme="dark"] body .itemizado-excel .rubro-middle.is-dragging > *,
+html[data-theme="dark"] body .itemizado-excel .rubro-leaf.is-dragging > *,
+html[data-theme="dark"] body .itemizado-excel .rubro-middle.is-drop-target > *,
+html[data-theme="dark"] body .itemizado-excel .rubro-leaf.is-drop-target > *,
+html[data-theme="dark"] body .itemizado-excel .rubro-middle.is-drop-before > *,
+html[data-theme="dark"] body .itemizado-excel .rubro-leaf.is-drop-before > *,
+html[data-theme="dark"] body .itemizado-excel .rubro-middle.is-drop-after > *,
+html[data-theme="dark"] body .itemizado-excel .rubro-leaf.is-drop-after > *,
+html[data-theme="dark"] body .itemizado-excel .rubro-middle.is-drop-inside > *,
+html[data-theme="dark"] body .itemizado-excel .rubro-leaf.is-drop-inside > * {
+    background: #ffd84d !important;
+    border-color: #facc15 !important;
+    color: #161100 !important;
+    box-shadow: inset 0 0 0 2px #fff08a, 0 12px 28px rgba(250, 204, 21, 0.16) !important;
+}
+
+/* Control de rubros: planilla de lectura con identidad de itemizado */
+html[data-theme] body .control-rubro-planilla {
+    border: 1px solid var(--ds-border) !important;
+    border-radius: var(--ds-component-radius) !important;
+    background: var(--ds-surface) !important;
+    box-shadow: var(--ds-card-shadow) !important;
+}
+
+html[data-theme] body .control-rubro-toolbar {
+    background: var(--ds-surface) !important;
+    border-bottom: 1px solid var(--ds-border) !important;
+}
+
+html[data-theme] body .control-rubro-toolbar strong,
+html[data-theme] body .control-rubro-toolbar > span {
+    color: var(--ds-text) !important;
+}
+
+html[data-theme] body .control-rubro-toolbar > span {
+    background: var(--ds-surface-muted) !important;
+    border: 1px solid var(--ds-border) !important;
+}
+
+html[data-theme] body .control-rubro-excel {
+    min-width: 1380px !important;
+    border-collapse: collapse !important;
+    border-color: #b7c88d !important;
+}
+
+html[data-theme] body .control-rubro-excel thead th {
+    height: 3.1rem !important;
+    padding: 0.58rem 0.72rem !important;
+    background: #18202a !important;
+    border-color: #1f2933 !important;
+    color: #ffffff !important;
+    font-size: 0.68rem !important;
+    font-weight: 900 !important;
+    line-height: 1.15 !important;
+    text-align: center !important;
+    text-transform: uppercase !important;
+    white-space: normal !important;
+}
+
+html[data-theme] body .control-rubro-excel td {
+    padding: 0.6rem 0.72rem !important;
+    border-color: #d5ddc7 !important;
+    color: #111827 !important;
+    font-size: 0.76rem !important;
+    line-height: 1.24 !important;
+    vertical-align: middle !important;
+}
+
+html[data-theme] body .control-rubro-excel .control-col-item { width: 5.2rem !important; }
+html[data-theme] body .control-rubro-excel .control-col-actividad { width: 18rem !important; }
+html[data-theme] body .control-rubro-excel .control-col-money { width: 10.6rem !important; }
+html[data-theme] body .control-rubro-excel .control-col-percent { width: 8rem !important; }
+html[data-theme] body .control-rubro-excel .control-col-techo { width: 13rem !important; }
+
+html[data-theme] body .control-rubro-excel .control-rubro-root > * {
+    background: #1d6b3a !important;
+    border-color: #15542d !important;
+    color: #ffffff !important;
+    font-weight: 850 !important;
+}
+
+html[data-theme] body .control-rubro-excel .control-rubro-child > *,
+html[data-theme] body .control-rubro-excel .control-rubro-child:nth-child(even) > * {
+    background: #fff7cc !important;
+    border-color: #eadf9b !important;
+    color: #2c260f !important;
+    font-weight: 760 !important;
+}
+
+html[data-theme] body .control-rubro-excel .control-rubro-root .control-rubro-code {
+    background: rgba(255, 255, 255, 0.14) !important;
+    border-color: rgba(255, 255, 255, 0.44) !important;
+    color: #ffffff !important;
+}
+
+html[data-theme] body .control-rubro-excel .control-rubro-child .control-rubro-code {
+    background: #fffdf0 !important;
+    border-color: #d3b74d !important;
+    color: #2c260f !important;
+}
+
+html[data-theme] body .control-rubro-actividad {
+    text-transform: uppercase !important;
+    font-weight: 900 !important;
+}
+
+html[data-theme] body .control-rubro-total {
+    font-weight: 950 !important;
+}
+
+html[data-theme] body .control-rubro-edit-cell form {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 2rem !important;
+    gap: 0.3rem !important;
+    align-items: center !important;
+}
+
+html[data-theme] body .control-rubro-edit-cell .form-control {
+    min-width: 0 !important;
+    height: 2rem !important;
+    min-height: 2rem !important;
+    padding: 0.2rem 0.45rem !important;
+    border-color: rgba(17, 24, 39, 0.2) !important;
+    background: rgba(255, 255, 255, 0.72) !important;
+    color: #111827 !important;
+    font-size: 0.74rem !important;
+    font-weight: 850 !important;
+}
+
+html[data-theme] body .control-rubro-edit-cell .table-icon-action {
+    width: 2rem !important;
+    height: 2rem !important;
+    min-height: 2rem !important;
+    padding: 0 !important;
+    border-color: rgba(34, 102, 58, 0.35) !important;
+    background: rgba(255, 255, 255, 0.68) !important;
+    color: #1d6b3a !important;
+}
+
+html[data-theme] body .control-rubro-desvio.is-positive {
+    color: #14532d !important;
+    font-weight: 950 !important;
+}
+
+html[data-theme] body .control-rubro-desvio.is-negative {
+    color: #b91c1c !important;
+    font-weight: 950 !important;
+}
+
+html[data-theme] body .control-rubro-excel tfoot td {
+    background: #18202a !important;
+    border-color: #1f2933 !important;
+    color: #ffffff !important;
+    font-weight: 950 !important;
+}
+
+html[data-theme] body .control-rubro-excel .oc-progress {
+    margin-left: auto !important;
+    background: rgba(17, 24, 39, 0.16) !important;
+}
+
+html[data-theme="dark"] body .control-rubro-planilla,
+html[data-theme="dark"] body .control-rubro-toolbar {
+    background: var(--ds-surface) !important;
+    border-color: var(--ds-border) !important;
+}
+
+html[data-theme="dark"] body .control-rubro-excel thead th,
+html[data-theme="dark"] body .control-rubro-excel tfoot td {
+    background: #0b1220 !important;
+    border-color: #26344d !important;
+    color: #f8fbff !important;
+}
+
+html[data-theme="dark"] body .control-rubro-excel .control-rubro-root > * {
+    background: #2b8f50 !important;
+    border-color: #54d681 !important;
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] body .control-rubro-excel .control-rubro-child > *,
+html[data-theme="dark"] body .control-rubro-excel .control-rubro-child:nth-child(even) > * {
+    background: #ffd84d !important;
+    border-color: #facc15 !important;
+    color: #161100 !important;
+}
+
+html[data-theme="dark"] body .control-rubro-edit-cell .form-control {
+    background: rgba(255, 255, 255, 0.82) !important;
+    color: #111827 !important;
+}
+
+/* Itemizado y Control de Rubros: modo oscuro brillante y legible */
+html[data-theme="dark"] body .itemizado-planilla,
+html[data-theme="dark"] body .control-rubro-planilla,
+html[data-theme="dark"] body .itemizado-shell {
+    background: #0b1220 !important;
+    border-color: #26344d !important;
+    box-shadow: 0 18px 42px rgba(0, 0, 0, 0.28) !important;
+}
+
+html[data-theme="dark"] body .itemizado-toolbar,
+html[data-theme="dark"] body .control-rubro-toolbar {
+    background: #101a2e !important;
+    border-color: #26344d !important;
+    color: #edf4ff !important;
+}
+
+html[data-theme="dark"] body .itemizado-excel,
+html[data-theme="dark"] body .control-rubro-excel {
+    background: #0b1220 !important;
+    border-color: #26344d !important;
+    color: #edf4ff !important;
+}
+
+html[data-theme="dark"] body .itemizado-excel thead th,
+html[data-theme="dark"] body .control-rubro-excel thead th,
+html[data-theme="dark"] body .itemizado-excel tfoot td,
+html[data-theme="dark"] body .control-rubro-excel tfoot td {
+    background: #070d19 !important;
+    border-color: #2f4263 !important;
+    color: #f8fbff !important;
+    box-shadow: none !important;
+}
+
+html[data-theme="dark"] body .itemizado-excel .rubro-root > *,
+html[data-theme="dark"] body .control-rubro-excel .control-rubro-root > * {
+    background: #22c55e !important;
+    background-color: #22c55e !important;
+    border-color: #86efac !important;
+    color: #052e16 !important;
+    box-shadow: inset 0 0 0 1px rgba(240, 253, 244, 0.34) !important;
+}
+
+html[data-theme="dark"] body .itemizado-excel .rubro-root .rubro-name,
+html[data-theme="dark"] body .itemizado-excel .rubro-root .total-cell,
+html[data-theme="dark"] body .itemizado-excel .rubro-root span,
+html[data-theme="dark"] body .itemizado-excel .rubro-root button,
+html[data-theme="dark"] body .itemizado-excel .rubro-root i,
+html[data-theme="dark"] body .control-rubro-excel .control-rubro-root span,
+html[data-theme="dark"] body .control-rubro-excel .control-rubro-root button,
+html[data-theme="dark"] body .control-rubro-excel .control-rubro-root i,
+html[data-theme="dark"] body .control-rubro-excel .control-rubro-root .control-rubro-code {
+    color: #052e16 !important;
+}
+
+html[data-theme="dark"] body .itemizado-excel .rubro-middle > *,
+html[data-theme="dark"] body .itemizado-excel .rubro-leaf > *,
+html[data-theme="dark"] body .control-rubro-excel .control-rubro-child > *,
+html[data-theme="dark"] body .control-rubro-excel .control-rubro-child:nth-child(even) > * {
+    background: #facc15 !important;
+    background-color: #facc15 !important;
+    border-color: #fde68a !important;
+    color: #241a00 !important;
+    box-shadow: inset 0 0 0 1px rgba(254, 249, 195, 0.28) !important;
+}
+
+html[data-theme="dark"] body .itemizado-excel .rubro-middle .rubro-name,
+html[data-theme="dark"] body .itemizado-excel .rubro-leaf .rubro-name,
+html[data-theme="dark"] body .itemizado-excel .rubro-middle .total-cell,
+html[data-theme="dark"] body .itemizado-excel .rubro-leaf .total-cell,
+html[data-theme="dark"] body .itemizado-excel .rubro-middle span,
+html[data-theme="dark"] body .itemizado-excel .rubro-leaf span,
+html[data-theme="dark"] body .itemizado-excel .rubro-middle button,
+html[data-theme="dark"] body .itemizado-excel .rubro-leaf button,
+html[data-theme="dark"] body .itemizado-excel .rubro-middle i,
+html[data-theme="dark"] body .itemizado-excel .rubro-leaf i,
+html[data-theme="dark"] body .control-rubro-excel .control-rubro-child span,
+html[data-theme="dark"] body .control-rubro-excel .control-rubro-child button,
+html[data-theme="dark"] body .control-rubro-excel .control-rubro-child i,
+html[data-theme="dark"] body .control-rubro-excel .control-rubro-child .control-rubro-code {
+    color: #241a00 !important;
+}
+
+html[data-theme="dark"] body .itemizado-excel .item-row > *,
+html[data-theme="dark"] body .itemizado-excel .item-row:nth-child(even) > *,
+html[data-theme="dark"] body .itemizado-excel .itemizado-manual-row > * {
+    background: #101a2e !important;
+    background-color: #101a2e !important;
+    border-color: #26344d !important;
+    color: #edf4ff !important;
+}
+
+html[data-theme="dark"] body .itemizado-excel .item-row:nth-child(even) > * {
+    background: #132039 !important;
+    background-color: #132039 !important;
+}
+
+html[data-theme="dark"] body .itemizado-excel .item-row:hover > *,
+html[data-theme="dark"] body .itemizado-excel .itemizado-child-row:hover > * {
+    background: #1a2b49 !important;
+    background-color: #1a2b49 !important;
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] body .itemizado-rubro-drag-handle,
+html[data-theme="dark"] body .itemizado-toggle,
+html[data-theme="dark"] body .control-rubro-code {
+    background: rgba(255, 255, 255, 0.24) !important;
+    border-color: rgba(5, 46, 22, 0.32) !important;
+}
+
+html[data-theme="dark"] body .itemizado-excel .rubro-root:hover > *,
+html[data-theme="dark"] body .itemizado-excel .rubro-root.is-scroll-focus > *,
+html[data-theme="dark"] body .itemizado-excel .rubro-root.is-just-moved > *,
+html[data-theme="dark"] body .itemizado-excel .rubro-root.is-dragging > *,
+html[data-theme="dark"] body .itemizado-excel .rubro-root.is-drop-target > *,
+html[data-theme="dark"] body .itemizado-excel .rubro-root.is-drop-before > *,
+html[data-theme="dark"] body .itemizado-excel .rubro-root.is-drop-after > *,
+html[data-theme="dark"] body .itemizado-excel .rubro-root.is-drop-inside > * {
+    background: #4ade80 !important;
+    background-color: #4ade80 !important;
+    border-color: #bbf7d0 !important;
+    color: #052e16 !important;
+    box-shadow:
+        inset 0 0 0 2px #dcfce7,
+        0 0 22px rgba(34, 197, 94, 0.24) !important;
+}
+
+html[data-theme="dark"] body .itemizado-excel .rubro-middle:hover > *,
+html[data-theme="dark"] body .itemizado-excel .rubro-leaf:hover > *,
+html[data-theme="dark"] body .itemizado-excel .rubro-middle.is-scroll-focus > *,
+html[data-theme="dark"] body .itemizado-excel .rubro-leaf.is-scroll-focus > *,
+html[data-theme="dark"] body .itemizado-excel .rubro-middle.is-just-moved > *,
+html[data-theme="dark"] body .itemizado-excel .rubro-leaf.is-just-moved > *,
+html[data-theme="dark"] body .itemizado-excel .rubro-middle.is-dragging > *,
+html[data-theme="dark"] body .itemizado-excel .rubro-leaf.is-dragging > *,
+html[data-theme="dark"] body .itemizado-excel .rubro-middle.is-drop-target > *,
+html[data-theme="dark"] body .itemizado-excel .rubro-leaf.is-drop-target > *,
+html[data-theme="dark"] body .itemizado-excel .rubro-middle.is-drop-before > *,
+html[data-theme="dark"] body .itemizado-excel .rubro-leaf.is-drop-before > *,
+html[data-theme="dark"] body .itemizado-excel .rubro-middle.is-drop-after > *,
+html[data-theme="dark"] body .itemizado-excel .rubro-leaf.is-drop-after > *,
+html[data-theme="dark"] body .itemizado-excel .rubro-middle.is-drop-inside > *,
+html[data-theme="dark"] body .itemizado-excel .rubro-leaf.is-drop-inside > * {
+    background: #fde047 !important;
+    background-color: #fde047 !important;
+    border-color: #fef3c7 !important;
+    color: #241a00 !important;
+    box-shadow:
+        inset 0 0 0 2px #fff7ad,
+        0 0 22px rgba(250, 204, 21, 0.22) !important;
 }

@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${grupo.nombre()} + ' - Documentacion'">Carpeta documental</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script th:src="@{/js/design-system.js(v='20260802-doc-search-dark')}" defer></script>
+    <link th:href="@{/css/app.css(v='20260730-dark2')}" rel="stylesheet">
+    <link th:href="@{/css/theme.css(v='20260731-night-reset')}" rel="stylesheet">
+    <link th:href="@{/css/design-system.css(v='20260802-doc-search-dark')}" rel="stylesheet">
+</head>
+<body>
+<div th:replace="~{fragments/layout :: navbar}"></div>
+<main class="contractor-folder-page" th:style="${'--folder-color:' + grupo.color()}">
+    <nav class="page-navigation contractor-folder-breadcrumb" aria-label="Ruta">
+        <a th:href="@{/}">Inicio</a>
+        <i class="bi bi-chevron-right"></i>
+        <a th:href="@{/documentacion}">Documentos</a>
+        <i class="bi bi-chevron-right"></i>
+        <span th:text="${grupo.nombre()}">Carpeta</span>
+    </nav>
+
+    <section class="contractor-folder-hero">
+        <div class="contractor-folder-hero-main">
+            <span class="document-binder-icon document-binder-image contractor-folder-binder" aria-hidden="true">
+                <img th:src="@{/images/documentacion/binder-blue.png}" alt="" width="96" height="104" loading="eager" decoding="async">
+            </span>
+            <div class="contractor-folder-title">
+                <div class="contractor-folder-eyebrow">Carpeta fisica del contratista</div>
+                <div class="contractor-folder-heading-row">
+                    <h1 th:text="${grupo.nombre()}">Contratista</h1>
+                    <span class="doc-status-pill" th:classappend="${' ' + grupo.estado().cssClass}" th:text="${grupo.estado().descripcion}">Vigente</span>
+                </div>
+                <div class="contractor-folder-meta">
+                    <span><i class="bi bi-upc-scan"></i> CUIT <b th:text="${proveedor == null || proveedor.cuit == null || #strings.isEmpty(proveedor.cuit) ? '-' : proveedor.cuit}">-</b></span>
+                    <span><i class="bi bi-person"></i> Responsable <b th:text="${proveedor == null || proveedor.contacto == null || #strings.isEmpty(proveedor.contacto) ? '-' : proveedor.contacto}">-</b></span>
+                    <span><i class="bi bi-calendar2-check"></i> Creada <b th:text="${inicioLegajo == null ? '-' : #temporals.format(inicioLegajo, 'dd/MM/yyyy')}">-</b></span>
+                </div>
+            </div>
+        </div>
+        <div class="contractor-folder-actions">
+            <a class="folder-premium-btn is-secondary" th:href="@{/documentacion}"><i class="bi bi-arrow-left"></i> Volver</a>
+            <button class="folder-premium-btn is-secondary" type="button" data-folder-edit-open><i class="bi bi-pencil-square"></i> Editar carpeta</button>
+            <a class="folder-premium-btn is-primary" th:href="${grupo.proveedorId() == null ? '/documentacion/nuevo?sujeto=OBRA' : '/documentacion/nuevo?proveedorId=' + grupo.proveedorId()}"><i class="bi bi-plus-lg"></i> <span>Nuevo documento</span></a>
+        </div>
+    </section>
+
+    <section class="contractor-folder-summary" aria-label="Resumen documental">
+        <article class="is-total">
+            <span><i class="bi bi-file-earmark-text"></i></span>
+            <div><strong th:text="${grupo.total()}">0</strong><p>Documentos</p><small>archivos en carpeta</small></div>
+        </article>
+        <article class="is-ok">
+            <span><i class="bi bi-check2-circle"></i></span>
+            <div><strong th:text="${grupo.aptos()}">0</strong><p>Vigentes</p><small>al dia</small></div>
+        </article>
+        <article class="is-warning">
+            <span><i class="bi bi-clock-history"></i></span>
+            <div><strong th:text="${grupo.porVencer()}">0</strong><p>Por vencer</p><small>requieren seguimiento</small></div>
+        </article>
+        <article class="is-danger">
+            <span><i class="bi bi-exclamation-triangle"></i></span>
+            <div><strong th:text="${grupo.vencidos()}">0</strong><p>Vencidos</p><small>requieren atencion</small></div>
+        </article>
+    </section>
+
+    <nav class="contractor-folder-tabs" data-folder-tabs aria-label="Secciones de carpeta">
+        <button class="is-active" type="button" data-folder-tab="documentos"><i class="bi bi-file-earmark-text"></i> Documentos</button>
+        <button type="button" data-folder-tab="vencimientos"><i class="bi bi-clock"></i> Vencimientos</button>
+        <button type="button" data-folder-tab="historial"><i class="bi bi-arrow-counterclockwise"></i> Historial</button>
+        <button type="button" data-folder-tab="informacion"><i class="bi bi-info-circle"></i> Informacion</button>
+        <button type="button" data-folder-tab="observaciones"><i class="bi bi-card-text"></i> Observaciones</button>
+    </nav>
+
+    <section class="contractor-folder-workspace">
+        <div class="contractor-folder-main" data-folder-tab-panels>
+            <section class="contractor-folder-panel is-active" data-folder-panel="documentos" data-doc-filter-scope>
+                <div class="contractor-folder-panel-head">
+                    <div>
+                        <h2>Documentos de la carpeta</h2>
+                        <p>Gestiona vencimientos, soporte digital y estado del legajo fisico.</p>
+                    </div>
+                    <span th:text="${grupo.total()} + ' documentos'">0 documentos</span>
+                </div>
+                <div class="contractor-folder-toolbar" th:if="${!grupo.documentos().isEmpty()}">
+                    <label>
+                        <i class="bi bi-search"></i>
+                        <input type="search" placeholder="Buscar documento, categoria o responsable..." data-doc-filter-search>
+                    </label>
+                    <select data-doc-filter-status aria-label="Filtrar documentos por estado">
+                        <option value="">Todos los estados</option>
+                        <option value="is-ok">Vigentes</option>
+                        <option value="is-warning">Por vencer</option>
+                        <option value="is-danger">Vencidos</option>
+                        <option value="is-pending">Pendientes</option>
+                        <option value="is-info">Sin vencimiento</option>
+                    </select>
+                </div>
+                <div class="contractor-document-list">
+                    <article class="contractor-document-row" th:each="doc : ${grupo.documentos()}" data-doc-filter-row th:data-doc-id="${doc.id}" th:data-doc-name="${doc.nombreDocumento()}"
+                             th:attr="data-doc-search=${doc.nombreDocumento() + ' ' + doc.sujetoNombre() + ' ' + doc.vinculo.descripcion + ' ' + (doc.proveedor == null ? '' : doc.proveedor.nombre)},
+                                      data-doc-status=${doc.estado().descripcion},
+                                      data-doc-status-class=${doc.estado().cssClass},
+                                      data-doc-vinculo=${doc.vinculo.descripcion},
+                                      data-doc-sujeto=${doc.sujeto.descripcion},
+                                      data-doc-sujeto-nombre=${doc.sujetoNombre()},
+                                      data-doc-proveedor=${doc.proveedor == null ? '-' : doc.proveedor.nombre},
+                                      data-doc-presentacion=${doc.fechaPresentacion == null ? '-' : #temporals.format(doc.fechaPresentacion, 'dd/MM/yyyy')},
+                                      data-doc-vencimiento=${doc.fechaVencimiento == null ? 'No aplica vencimiento' : #temporals.format(doc.fechaVencimiento, 'dd/MM/yyyy')},
+                                      data-doc-dias=${doc.fechaVencimiento == null ? 'Sin alerta' : doc.diasAlVencimiento() + ' dias'},
+                                      data-doc-fisico=${doc.estadoCarpetaFisica().descripcion},
+                                      data-doc-fisico-class=${doc.estadoCarpetaFisica().cssClass},
+                                      data-doc-fisico-hasta=${doc.fechaVencimientoFisico == null ? '-' : #temporals.format(doc.fechaVencimientoFisico, 'dd/MM/yyyy')},
+                                      data-doc-fisico-verificado=${doc.fechaUltimaVerificacionFisica == null ? '-' : #temporals.format(doc.fechaUltimaVerificacionFisica, 'dd/MM/yyyy')},
+                                      data-doc-fisico-accion=${doc.accionCarpetaFisica()},
+                                      data-doc-creacion=${doc.fechaCreacion == null ? '-' : #temporals.format(doc.fechaCreacion, 'dd/MM/yyyy HH:mm')},
+                                      data-doc-actualizacion=${doc.fechaUltimaActualizacion == null ? '-' : #temporals.format(doc.fechaUltimaActualizacion, 'dd/MM/yyyy HH:mm')},
+                                      data-doc-mensual=${doc.mensual ? 'Si' : 'No'},
+                                      data-doc-ingreso=${doc.obligatorioIngreso ? 'Condiciona ingreso' : 'No condiciona'},
+                                      data-doc-pdf=${doc.tienePdf() ? 'Adjuntado' : 'Sin PDF'},
+                                      data-doc-print=${doc.estadoCarpetaFisica().descripcion},
+                                      data-doc-ubicacion=${doc.ubicacionFisica == null ? 'Sin ubicacion fisica cargada' : doc.ubicacionFisica},
+                                      data-doc-archivo=${doc.referenciaArchivo == null ? '' : doc.referenciaArchivo},
+                                      data-doc-observacion=${doc.observacion == null ? '' : doc.observacion},
+                                      data-doc-vehiculo=${doc.vehiculoDetalle == null ? '' : doc.vehiculoDetalle},
+                                      data-doc-url=@{/documentacion/{id}(id=${doc.id})},
+                                      data-doc-edit-url=@{/documentacion/{id}/editar(id=${doc.id})},
+                                      data-doc-duplicate-url=@{/documentacion/{id}/duplicar(id=${doc.id})},
+                                      data-doc-pdf-url=${doc.tienePdf() ? '/documentacion/' + doc.id + '/archivo' : ''}">
+                        <button class="contractor-document-main" type="button" data-doc-quick-trigger>
+                            <span class="contractor-document-icon" th:classappend="${doc.tienePdf() ? ' is-pdf' : ' is-file'}"><i th:class="${doc.tienePdf() ? 'bi bi-filetype-pdf' : 'bi bi-file-earmark-text'}"></i></span>
+                            <span>
+                                <strong th:text="${doc.nombreDocumento()}">Documento</strong>
+                                <small><span th:text="${doc.vinculo.descripcion}">Categoria</span> - <span th:text="${doc.sujetoNombre()}">Sujeto</span></small>
+                            </span>
+                        </button>
+                        <span class="contractor-document-category" th:text="${doc.vinculo.descripcion}">Categoria</span>
+                        <span class="contractor-document-date">
+                            <small>Vence</small>
+                            <strong th:text="${doc.fechaVencimiento == null ? 'No vence' : #temporals.format(doc.fechaVencimiento, 'dd/MM/yyyy')}">-</strong>
+                        </span>
+                        <span class="doc-status-pill" th:classappend="${' ' + doc.estado().cssClass}" th:text="${doc.estado().descripcion}">Estado</span>
+                        <span class="contractor-document-actions">
+                            <button type="button" data-doc-quick-trigger title="Vista rapida"><i class="bi bi-eye"></i></button>
+                            <a th:if="${doc.tienePdf()}" th:href="@{/documentacion/{id}/archivo(id=${doc.id})}" target="_blank" title="Abrir PDF"><i class="bi bi-download"></i></a>
+                            <a th:href="@{/documentacion/{id}/editar(id=${doc.id})}" title="Editar"><i class="bi bi-pencil-square"></i></a>
+                            <form method="post" th:action="@{/documentacion/{id}/eliminar(id=${doc.id})}" onsubmit="return confirm('Marcar este documento como inactivo?');">
+                                <input type="hidden" name="returnTo" th:value="@{/documentacion/carpetas/{id}(id=${grupo.carpetaId()})}">
+                                <button class="is-danger" type="submit" title="Eliminar" aria-label="Eliminar documento"><i class="bi bi-trash"></i></button>
+                            </form>
+                        </span>
+                    </article>
+                    <div class="contractor-folder-empty" th:if="${grupo.documentos().isEmpty()}">
+                        <i class="bi bi-folder2-open"></i>
+                        <strong>La carpeta todavia no tiene documentos</strong>
+                        <p>Agrega el primer documento para iniciar el legajo del contratista.</p>
+                    </div>
+                    <div class="contractor-folder-empty d-none" data-doc-filter-empty>
+                        <i class="bi bi-search"></i>
+                        <strong>No encontramos documentos</strong>
+                        <p>Proba con otro texto o cambia el filtro de estado.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="contractor-folder-panel" data-folder-panel="vencimientos">
+                <div class="contractor-folder-panel-head">
+                    <div><h2>Vencimientos</h2><p>Documentos ordenados por fecha para anticipar renovaciones.</p></div>
+                </div>
+                <div class="contractor-timeline">
+                    <article th:each="doc : ${proximosVencimientos}" th:classappend="${' ' + doc.estado().cssClass}">
+                        <span><i class="bi bi-clock-history"></i></span>
+                        <div>
+                            <strong th:text="${doc.nombreDocumento()}">Documento</strong>
+                            <small th:text="${doc.fechaVencimiento == null ? 'Sin vencimiento' : 'Vence el ' + #temporals.format(doc.fechaVencimiento, 'dd/MM/yyyy')}">Vence</small>
+                        </div>
+                        <b th:text="${doc.fechaVencimiento == null ? '-' : doc.diasAlVencimiento() + ' dias'}">0 dias</b>
+                    </article>
+                    <div class="contractor-folder-empty" th:if="${proximosVencimientos.isEmpty()}">
+                        <i class="bi bi-check2-circle"></i>
+                        <strong>Sin vencimientos cargados</strong>
+                        <p>Los documentos de esta carpeta no tienen fecha de vencimiento.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="contractor-folder-panel" data-folder-panel="historial">
+                <div class="contractor-folder-panel-head">
+                    <div><h2>Historial</h2><p>Ultimos movimientos registrados en el legajo documental.</p></div>
+                </div>
+                <div class="contractor-timeline">
+                    <article th:each="doc : ${grupo.documentos()}">
+                        <span><i class="bi bi-arrow-repeat"></i></span>
+                        <div>
+                            <strong th:text="${doc.nombreDocumento()}">Documento</strong>
+                            <small th:text="${doc.fechaUltimaActualizacion == null ? 'Sin actualizacion registrada' : 'Actualizado el ' + #temporals.format(doc.fechaUltimaActualizacion, 'dd/MM/yyyy HH:mm')}">Actualizado</small>
+                        </div>
+                        <b th:text="${doc.estado().descripcion}">Estado</b>
+                    </article>
+                </div>
+            </section>
+
+            <section class="contractor-folder-panel" data-folder-panel="informacion">
+                <div class="contractor-folder-panel-head">
+                    <div><h2>Informacion del contratista</h2><p>Datos principales asociados a esta carpeta.</p></div>
+                </div>
+                <div class="contractor-info-grid">
+                    <article><span>Empresa</span><strong th:text="${grupo.nombreContratista()}">Empresa</strong></article>
+                    <article><span>CUIT</span><strong th:text="${proveedor == null || proveedor.cuit == null || #strings.isEmpty(proveedor.cuit) ? '-' : proveedor.cuit}">-</strong></article>
+                    <article><span>Responsable</span><strong th:text="${proveedor == null || proveedor.contacto == null || #strings.isEmpty(proveedor.contacto) ? '-' : proveedor.contacto}">-</strong></article>
+                    <article><span>Telefono</span><strong th:text="${proveedor == null || proveedor.telefono == null || #strings.isEmpty(proveedor.telefono) ? '-' : proveedor.telefono}">-</strong></article>
+                    <article><span>Email</span><strong th:text="${proveedor == null || proveedor.email == null || #strings.isEmpty(proveedor.email) ? '-' : proveedor.email}">-</strong></article>
+                    <article><span>Estado</span><strong th:text="${grupo.estado().descripcion}">Estado</strong></article>
+                </div>
+            </section>
+
+            <section class="contractor-folder-panel" data-folder-panel="observaciones">
+                <div class="contractor-folder-panel-head">
+                    <div><h2>Observaciones del contratista</h2><p>Estas notas vienen de la ficha del proveedor y sirven como referencia administrativa del legajo.</p></div>
+                    <a class="contractor-panel-link" th:if="${proveedor != null}" th:href="@{/proveedores/{id}/editar(id=${proveedor.id})}"><i class="bi bi-pencil-square"></i> Editar proveedor</a>
+                </div>
+                <div class="contractor-notes-box">
+                    <i class="bi bi-card-text"></i>
+                    <div>
+                        <strong>Notas guardadas en Proveedores</strong>
+                        <p th:text="${proveedor == null || proveedor.observacion == null || #strings.isEmpty(proveedor.observacion) ? 'Sin observaciones cargadas para este contratista.' : proveedor.observacion}">Sin observaciones</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <aside class="contractor-folder-sidebar">
+            <section>
+                <div class="contractor-sidebar-head">
+                    <h3>Informacion de la carpeta</h3>
+                    <i class="bi bi-three-dots"></i>
+                </div>
+                <dl class="contractor-sidebar-list">
+                    <div><dt>Empresa</dt><dd th:text="${grupo.nombreContratista()}">Empresa</dd></div>
+                    <div><dt>CUIT</dt><dd th:text="${proveedor == null || proveedor.cuit == null || #strings.isEmpty(proveedor.cuit) ? '-' : proveedor.cuit}">-</dd></div>
+                    <div><dt>Responsable</dt><dd th:text="${proveedor == null || proveedor.contacto == null || #strings.isEmpty(proveedor.contacto) ? '-' : proveedor.contacto}">-</dd></div>
+                    <div><dt>Telefono</dt><dd th:text="${proveedor == null || proveedor.telefono == null || #strings.isEmpty(proveedor.telefono) ? '-' : proveedor.telefono}">-</dd></div>
+                    <div><dt>Email</dt><dd th:text="${proveedor == null || proveedor.email == null || #strings.isEmpty(proveedor.email) ? '-' : proveedor.email}">-</dd></div>
+                    <div><dt>Estado general</dt><dd><span class="doc-status-pill" th:classappend="${' ' + grupo.estado().cssClass}" th:text="${grupo.estado().descripcion}">Estado</span></dd></div>
+                </dl>
+            </section>
+
+            <section>
+                <div class="contractor-sidebar-head">
+                    <h3>Proximos vencimientos</h3>
+                    <a th:href="@{/documentacion}">Ver calendario</a>
+                </div>
+                <div class="contractor-due-list">
+                    <article th:each="doc : ${proximosVencimientos}" th:classappend="${' ' + doc.estado().cssClass}">
+                        <i class="bi bi-clock"></i>
+                        <div>
+                            <strong th:text="${doc.nombreDocumento()}">Documento</strong>
+                            <small th:text="${doc.fechaVencimiento == null ? 'Sin fecha' : 'Vence el ' + #temporals.format(doc.fechaVencimiento, 'dd/MM/yyyy')}">Vence</small>
+                        </div>
+                        <span th:text="${doc.fechaVencimiento == null ? '-' : doc.diasAlVencimiento() + ' dias'}">0 dias</span>
+                    </article>
+                    <div class="contractor-sidebar-empty" th:if="${proximosVencimientos.isEmpty()}">Sin vencimientos proximos.</div>
+                </div>
+            </section>
+
+            <section>
+                <div class="contractor-sidebar-head">
+                    <h3>Observaciones</h3>
+                </div>
+                <p class="contractor-sidebar-note" th:text="${proveedor == null || proveedor.observacion == null || #strings.isEmpty(proveedor.observacion) ? 'Sin notas cargadas.' : proveedor.observacion}">Sin notas.</p>
+                <a class="contractor-sidebar-edit" th:if="${proveedor != null}" th:href="@{/proveedores/{id}/editar(id=${proveedor.id})}"><i class="bi bi-pencil-square"></i> Editar observaciones</a>
+            </section>
+        </aside>
+    </section>
+
+    <div class="document-quick-view d-none" id="folder-edit-view" aria-hidden="true">
+        <div class="document-quick-backdrop" data-folder-edit-close></div>
+        <section class="document-quick-modal folder-edit-modal" role="dialog" aria-modal="true" aria-labelledby="folder-edit-title" tabindex="-1">
+            <button class="document-quick-close" type="button" data-folder-edit-close aria-label="Cerrar edicion"><i class="bi bi-x-lg"></i></button>
+            <header class="document-quick-header">
+                <span class="document-quick-icon folder-edit-icon" th:style="${'--folder-color:' + grupo.color()}"><i class="bi bi-folder2-open"></i></span>
+                <div>
+                    <div class="document-kicker">Ajustes de carpeta</div>
+                    <h2 id="folder-edit-title" th:text="${grupo.nombre()}">Carpeta</h2>
+                    <p>Modifica nombre, apodo, color y contratista vinculado.</p>
+                </div>
+            </header>
+            <form class="folder-edit-form" method="post" th:action="@{/documentacion/carpetas/{id}/personalizar(id=${grupo.carpetaId()})}">
+                <input type="hidden" name="returnTo" th:value="@{/documentacion/carpetas/{id}(id=${grupo.carpetaId()})}">
+                <label>
+                    <span>Nombre de carpeta</span>
+                    <input class="form-control" name="nombre" th:value="${grupo.nombreContratista()}" placeholder="Nombre de carpeta">
+                </label>
+                <label>
+                    <span>Apodo visible</span>
+                    <input class="form-control" name="apodo" th:value="${grupo.apodo()}" placeholder="Ej: Simende, Muriel, Legajo obra">
+                </label>
+                <label>
+                    <span>Color</span>
+                    <span class="folder-edit-color-row">
+                        <input class="form-control form-control-color" type="color" name="color" th:value="${grupo.color()}" data-folder-edit-color>
+                        <input class="form-control" type="text" th:value="${grupo.color()}" data-folder-edit-color-text maxlength="7" pattern="#[0-9a-fA-F]{6}">
+                    </span>
+                </label>
+                <label>
+                    <span>Contratista vinculado</span>
+                    <select class="form-select" name="proveedorId" th:disabled="${grupo.general()}">
+                        <option value="">Sin contratista vinculado</option>
+                        <option th:each="item : ${proveedores}" th:value="${item.id}" th:selected="${grupo.proveedorId() != null && grupo.proveedorId().equals(item.id)}" th:text="${item.nombre}">Proveedor</option>
+                    </select>
+                    <small th:text="${grupo.general() ? 'La carpeta general de obra no se vincula a un contratista.' : 'Opcional. Si se vincula, esta carpeta muestra la documentacion de ese contratista.'}">Opcional</small>
+                </label>
+                <footer class="document-quick-actions">
+                    <button class="btn btn-primary" type="submit"><i class="bi bi-save"></i> Guardar cambios</button>
+                    <button class="btn btn-outline-secondary" type="button" data-folder-edit-close><i class="bi bi-x-lg"></i> Cancelar</button>
+                </footer>
+            </form>
+        </section>
+    </div>
+
+    <div class="document-quick-view d-none" id="document-quick-view" aria-hidden="true">
+        <div class="document-quick-backdrop" data-doc-modal-close></div>
+        <section class="document-quick-modal" role="dialog" aria-modal="true" aria-labelledby="document-quick-title" tabindex="-1">
+            <button class="document-quick-close" type="button" data-doc-modal-close aria-label="Cerrar ficha"><i class="bi bi-x-lg"></i></button>
+            <header class="document-quick-header">
+                <span class="document-quick-icon"><i class="bi bi-file-earmark-check"></i></span>
+                <div>
+                    <div class="document-kicker" id="document-quick-kicker">Vinculo</div>
+                    <h2 id="document-quick-title">Documento</h2>
+                    <p id="document-quick-subtitle">Sujeto</p>
+                </div>
+                <span class="doc-status-pill" id="document-quick-status">Apto</span>
+            </header>
+            <div class="document-quick-print-alert" id="document-quick-print-alert">
+                <i class="bi bi-folder-check"></i>
+                <div><strong>Legajo fisico</strong><small>Ubicacion</small></div>
+            </div>
+            <div class="document-quick-grid">
+                <article><span>Contratista</span><strong data-doc-field="proveedor">-</strong></article>
+                <article><span>Corresponde a</span><strong data-doc-field="sujeto">-</strong></article>
+                <article><span>Presentacion</span><strong data-doc-field="presentacion">-</strong></article>
+                <article><span>Vencimiento</span><strong data-doc-field="vencimiento">-</strong><small data-doc-field="dias">-</small></article>
+                <article><span>Control mensual</span><strong data-doc-field="mensual">No</strong></article>
+                <article><span>Ingreso a obra</span><strong data-doc-field="ingreso">-</strong></article>
+                <article><span>PDF digital</span><strong data-doc-field="pdf">Sin PDF</strong></article>
+                <article><span>Legajo fisico</span><strong data-doc-field="print">-</strong></article>
+                <article><span>Version fisica hasta</span><strong data-doc-field="fisicoHasta">-</strong></article>
+                <article><span>Ultima verificacion fisica</span><strong data-doc-field="fisicoVerificado">-</strong></article>
+                <article><span>Creado</span><strong data-doc-field="creacion">-</strong></article>
+                <article><span>Ultima actualizacion</span><strong data-doc-field="actualizacion">-</strong></article>
+            </div>
+            <div class="document-quick-notes d-none" id="document-quick-notes">
+                <h3><i class="bi bi-card-text"></i> Resumen</h3>
+                <p data-doc-note="archivo"></p>
+                <p data-doc-note="vehiculo"></p>
+                <p data-doc-note="observacion"></p>
+            </div>
+            <footer class="document-quick-actions">
+                <a class="btn btn-outline-primary" id="document-quick-pdf" href="#" target="_blank"><i class="bi bi-filetype-pdf"></i> Abrir PDF</a>
+                <a class="btn btn-primary" id="document-quick-edit" href="#"><i class="bi bi-pencil-square"></i> Editar</a>
+                <a class="btn btn-outline-secondary" id="document-quick-duplicate" href="#"><i class="bi bi-copy"></i> Cargar similar</a>
+                <a class="btn btn-outline-secondary" id="document-quick-full" href="#"><i class="bi bi-box-arrow-up-right"></i> Ver ficha completa</a>
+            </footer>
+        </section>
+    </div>
+</main>
+<script>
+const folderEditView = document.getElementById('folder-edit-view');
+const folderEditModal = folderEditView?.querySelector('.folder-edit-modal');
+const folderEditColor = folderEditView?.querySelector('[data-folder-edit-color]');
+const folderEditColorText = folderEditView?.querySelector('[data-folder-edit-color-text]');
+
+function openFolderEdit() {
+    if (!folderEditView) return;
+    folderEditView.classList.remove('d-none', 'is-closing');
+    folderEditView.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('document-modal-open');
+    requestAnimationFrame(() => folderEditView.classList.add('is-open'));
+    setTimeout(() => folderEditModal?.focus?.(), 80);
+}
+
+function closeFolderEdit() {
+    if (!folderEditView || folderEditView.classList.contains('d-none')) return;
+    folderEditView.classList.add('is-closing');
+    folderEditView.classList.remove('is-open');
+    folderEditView.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('document-modal-open');
+    setTimeout(() => {
+        folderEditView.classList.add('d-none');
+        folderEditView.classList.remove('is-closing');
+    }, 180);
+}
+
+function syncFolderEditColor(value) {
+    const color = /^#[0-9a-fA-F]{6}$/.test(value || '') ? value : '#3f6f8f';
+    if (folderEditColor) folderEditColor.value = color;
+    if (folderEditColorText) folderEditColorText.value = color;
+    folderEditView?.querySelector('.folder-edit-icon')?.style.setProperty('--folder-color', color);
+}
+
+document.querySelector('[data-folder-edit-open]')?.addEventListener('click', openFolderEdit);
+folderEditView?.querySelectorAll('[data-folder-edit-close]').forEach(element => element.addEventListener('click', closeFolderEdit));
+folderEditColor?.addEventListener('input', event => syncFolderEditColor(event.target.value));
+folderEditColorText?.addEventListener('input', event => syncFolderEditColor(event.target.value));
+document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') closeFolderEdit();
+});
+</script>
+</body>
+</html>

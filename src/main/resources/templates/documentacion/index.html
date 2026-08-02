@@ -4,23 +4,28 @@
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Documentacion</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script th:src="@{/js/design-system.js(v='20260731-progress-flow')}"></script>
+    <script th:src="@{/js/design-system.js(v='20260802-doc-search-dark')}"></script>
     <link th:href="@{/css/app.css(v='20260730-dark2')}" rel="stylesheet">
     <link th:href="@{/css/theme.css(v='20260731-night-reset')}" rel="stylesheet">
-    <link th:href="@{/css/design-system.css(v='20260731-oc-detail-flow')}" rel="stylesheet">
+    <link th:href="@{/css/design-system.css(v='20260802-doc-search-dark')}" rel="stylesheet">
 </head>
 <body>
 <div th:replace="~{fragments/layout :: navbar}"></div>
 <main class="container">
     <div class="page-navigation mb-3">
-        <a th:href="@{/}"><i class="bi bi-house"></i> Inicio</a><i class="bi bi-chevron-right"></i><span>Documentacion</span>
+        <a th:href="@{/}"><i class="bi bi-house"></i> Inicio</a><i class="bi bi-chevron-right"></i><span>Documentos</span>
     </div>
 
     <div class="document-header documentacion-hero mb-4">
-        <div>
-            <div class="document-kicker"><i class="bi bi-shield-check"></i> Control documental de contratistas</div>
-            <h1>Documentacion de obra</h1>
-            <div class="text-muted">Vencimientos, pendientes mensuales, personas, contratistas y vehiculos habilitados.</div>
+        <div class="documentacion-hero-title">
+            <span class="document-binder-icon document-binder-image documentacion-hero-binder" aria-hidden="true">
+                <img th:src="@{/images/documentacion/binder-blue.png}" alt="" width="96" height="104" loading="eager" decoding="async">
+            </span>
+            <div>
+                <div class="document-kicker"><i class="bi bi-shield-check"></i> Control documental de contratistas</div>
+                <h1>Documentacion de obra</h1>
+                <div class="text-muted">Vencimientos, pendientes mensuales, personas, contratistas y vehiculos habilitados.</div>
+            </div>
         </div>
         <div class="document-actions">
             <button class="btn btn-outline-primary" type="button" data-create-document-folder><i class="bi bi-folder-plus"></i> Nueva carpeta documental</button>
@@ -32,83 +37,25 @@
     <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
 
     <div class="document-semaforo-kpis mb-3">
+        <article class="document-semaforo-kpi is-total">
+            <span class="semaforo-light"><i class="bi bi-folder2-open"></i></span>
+            <div><span>Total carpetas</span><strong th:text="${gruposDocumentacion.size()}">0</strong><small>Carpetas documentales</small></div>
+        </article>
         <article class="document-semaforo-kpi is-ok">
-            <span class="semaforo-light"></span>
-            <div><span>Vigentes</span><strong th:text="${resumen.aptos()}">0</strong><small>Documentos al dia</small></div>
+            <span class="semaforo-light"><i class="bi bi-check2-circle"></i></span>
+            <div><span>Al dia</span><strong th:text="${resumen.aptos()}">0</strong><small>Documentos vigentes</small></div>
         </article>
         <article class="document-semaforo-kpi is-warning">
-            <span class="semaforo-light"></span>
-            <div><span>Por vencer</span><strong th:text="${resumen.porVencer()}">0</strong><small>Vencen en <= 15 dias</small></div>
+            <span class="semaforo-light"><i class="bi bi-clock-history"></i></span>
+            <div><span>Proximos a vencer</span><strong th:text="${resumen.porVencer()}">0</strong><small>Requieren seguimiento</small></div>
         </article>
         <article class="document-semaforo-kpi is-danger">
-            <span class="semaforo-light"></span>
+            <span class="semaforo-light"><i class="bi bi-exclamation-triangle"></i></span>
             <div><span>Vencidos</span><strong th:text="${resumen.vencidos()}">0</strong><small>Documentos vencidos</small></div>
-        </article>
-        <article class="document-semaforo-kpi is-pending">
-            <span class="semaforo-light"></span>
-            <div><span>Sin cargar</span><strong th:text="${resumen.pendientes()}">0</strong><small>Falta documentacion</small></div>
-        </article>
-        <article class="document-semaforo-kpi is-total">
-            <span class="semaforo-light"><i class="bi bi-file-earmark-text"></i></span>
-            <div><span>Total</span><strong th:text="${resumen.total()}">0</strong><small>Documentos controlados</small></div>
         </article>
     </div>
 
-    <section class="panel-section document-priority-panel mb-3">
-        <div class="section-title-row document-priority-title">
-            <div>
-                <h2 class="h5 mb-0"><i class="bi bi-stars"></i> Prioridades documentales</h2>
-                <small>Una vista limpia para decidir que revisar primero.</small>
-            </div>
-            <span class="section-total-pill">Control rapido</span>
-        </div>
-        <div class="document-priority-grid">
-            <article class="document-priority-card is-danger" th:if="${resumen.vencidos() > 0}">
-                <span class="priority-icon"><i class="bi bi-exclamation-octagon"></i></span>
-                <div>
-                    <strong th:text="${resumen.vencidos()} + ' vencidos'">0 vencidos</strong>
-                    <small>Revisar antes de autorizar ingreso o continuidad.</small>
-                </div>
-            </article>
-            <article class="document-priority-card is-warning" th:if="${resumen.porVencer() > 0}">
-                <span class="priority-icon"><i class="bi bi-calendar-event"></i></span>
-                <div>
-                    <strong th:text="${resumen.porVencer()} + ' por vencer'">0 por vencer</strong>
-                    <small>Conviene pedir renovacion antes de que bloquee la carpeta.</small>
-                </div>
-            </article>
-            <article class="document-priority-card is-pending" th:if="${resumen.pendientes() > 0}">
-                <span class="priority-icon"><i class="bi bi-folder-x"></i></span>
-                <div>
-                    <strong th:text="${resumen.pendientes()} + ' sin cargar'">0 sin cargar</strong>
-                    <small>Documentacion requerida que todavia no fue presentada.</small>
-                </div>
-            </article>
-            <article class="document-priority-card is-info" th:if="${resumen.mensualesPendientes() > 0}">
-                <span class="priority-icon"><i class="bi bi-arrow-repeat"></i></span>
-                <div>
-                    <strong th:text="${resumen.mensualesPendientes()} + ' mensuales a actualizar'">0 mensuales</strong>
-                    <small>Control administrativo de vencimientos periodicos.</small>
-                </div>
-            </article>
-            <article class="document-priority-card is-warning" th:if="${resumen.carpetaFisicaPendiente() > 0}">
-                <span class="priority-icon"><i class="bi bi-printer"></i></span>
-                <div>
-                    <strong th:text="${resumen.carpetaFisicaPendiente()} + ' carpetas fisicas pendientes'">0 carpetas</strong>
-                    <small>Documentos vigentes que requieren imprimir, actualizar o revisar legajo.</small>
-                </div>
-            </article>
-            <article class="document-priority-card is-ok" th:if="${resumen.vencidos() == 0 && resumen.porVencer() == 0 && resumen.pendientes() == 0 && resumen.mensualesPendientes() == 0 && resumen.carpetaFisicaPendiente() == 0}">
-                <span class="priority-icon"><i class="bi bi-check2-circle"></i></span>
-                <div>
-                    <strong>Sin urgencias documentales</strong>
-                    <small>Las carpetas no tienen vencimientos ni faltantes criticos.</small>
-                </div>
-            </article>
-        </div>
-    </section>
-
-    <section class="panel-section document-explorer-section">
+    <section class="panel-section document-explorer-section is-folder-view" data-document-explorer>
         <div class="section-title-row document-explorer-title">
             <div>
                 <h2 class="h5 mb-0"><i class="bi bi-folder-check"></i> Carpetas documentales</h2>
@@ -129,12 +76,33 @@
                 <option value="is-danger">Vencidos</option>
                 <option value="is-warning">Por vencer</option>
                 <option value="is-pending">Sin cargar</option>
+                <option value="is-info">Sin vencimiento</option>
                 <option value="is-ok">Vigentes</option>
             </select>
             <div class="document-control-actions">
+                <div class="document-view-toggle" role="group" aria-label="Cambiar vista">
+                    <button class="btn btn-outline-secondary btn-sm is-active" type="button" data-doc-view="folders" title="Vista carpetas"><i class="bi bi-grid-3x3-gap-fill"></i></button>
+                    <button class="btn btn-outline-secondary btn-sm" type="button" data-doc-view="tree" title="Vista ramificada"><i class="bi bi-list-ul"></i></button>
+                </div>
                 <button class="btn btn-outline-secondary btn-sm" type="button" data-doc-expand="all"><i class="bi bi-arrows-expand"></i> Abrir</button>
                 <button class="btn btn-outline-secondary btn-sm" type="button" data-doc-expand="none"><i class="bi bi-arrows-collapse"></i> Cerrar</button>
             </div>
+        </div>
+        <div class="document-folder-grid-view" id="document-folder-grid">
+            <a class="document-folder-card" draggable="true" th:each="grupo : ${gruposDocumentacion}" th:classappend="${' ' + grupo.estado().cssClass}" th:style="${'--folder-color:' + grupo.color()}" th:href="@{/documentacion/carpetas/{id}(id=${grupo.carpetaId()})}" th:data-carpeta-id="${grupo.carpetaId()}" th:data-proveedor-id="${grupo.proveedorId()}" th:data-folder-name="${grupo.nombre()}" th:data-folder-real-name="${grupo.nombreContratista()}" th:data-folder-apodo="${grupo.apodo()}" th:data-folder-color="${grupo.color()}" th:data-folder-general="${grupo.general()}" th:data-folder-total="${grupo.total()}" th:data-folder-vigentes="${grupo.aptos()}" th:data-folder-por-vencer="${grupo.porVencer()}" th:data-folder-vencidos="${grupo.vencidos()}" th:data-folder-pendientes="${grupo.pendientes()}" th:data-folder-tipo="${grupo.tipoDescripcion()}" th:data-folder-estado="${grupo.estado().descripcion}" th:data-folder-estado-class="${grupo.estado().cssClass}" title="Click para abrir. Click derecho para ajustes.">
+                <span class="document-binder-icon document-binder-image" aria-hidden="true">
+                    <img th:src="@{/images/documentacion/binder-blue.png}" alt="" width="176" height="184" loading="lazy" decoding="async">
+                </span>
+                <strong th:text="${grupo.nombre()}">Carpeta</strong>
+                <small th:text="${grupo.total()} + ' documentos'">0 documentos</small>
+                <span class="document-folder-card-meta">
+                    <span><b th:text="${grupo.aptos()}">0</b> vigentes</span>
+                    <span><b th:text="${grupo.porVencer()}">0</b> por vencer</span>
+                    <span><b th:text="${grupo.vencidos()}">0</b> vencidos</span>
+                </span>
+                <span class="doc-status-pill" th:classappend="${' ' + grupo.estado().cssClass}" th:text="${grupo.estado().descripcion}">Estado</span>
+            </a>
+            <div class="empty-state" th:if="${gruposDocumentacion.isEmpty()}">No hay carpetas documentales.</div>
         </div>
         <div class="documentacion-group-list" id="document-folder-list">
             <article class="documentacion-group document-folder" draggable="true" th:each="grupo : ${gruposDocumentacion}" th:classappend="${' ' + grupo.tipoCss()}" th:style="${'--folder-color:' + grupo.color()}" th:data-carpeta-id="${grupo.carpetaId()}" th:data-folder-parent-id="${grupo.carpetaPadreId()}" th:data-proveedor-id="${grupo.proveedorId()}" th:data-folder-name="${grupo.nombre()}" th:data-folder-real-name="${grupo.nombreContratista()}" th:data-folder-apodo="${grupo.apodo()}" th:data-folder-color="${grupo.color()}" th:data-folder-general="${grupo.general()}" th:data-folder-total="${grupo.total()}" th:data-folder-vigentes="${grupo.aptos()}" th:data-folder-por-vencer="${grupo.porVencer()}" th:data-folder-vencidos="${grupo.vencidos()}" th:data-folder-pendientes="${grupo.pendientes()}" th:data-folder-tipo="${grupo.tipoDescripcion()}" th:data-folder-estado="${grupo.estado().descripcion}" th:data-folder-estado-class="${grupo.estado().cssClass}">
@@ -175,8 +143,8 @@
                                           data-doc-sujeto-nombre=${doc.sujetoNombre()},
                                           data-doc-proveedor=${doc.proveedor == null ? '-' : doc.proveedor.nombre},
                                           data-doc-presentacion=${doc.fechaPresentacion == null ? '-' : #temporals.format(doc.fechaPresentacion, 'dd/MM/yyyy')},
-                                          data-doc-vencimiento=${doc.fechaVencimiento == null ? 'Sin vencimiento' : #temporals.format(doc.fechaVencimiento, 'dd/MM/yyyy')},
-                                          data-doc-dias=${doc.fechaVencimiento == null ? '-' : doc.diasAlVencimiento() + ' dias'},
+                                          data-doc-vencimiento=${doc.fechaVencimiento == null ? 'No aplica vencimiento' : #temporals.format(doc.fechaVencimiento, 'dd/MM/yyyy')},
+                                          data-doc-dias=${doc.fechaVencimiento == null ? 'Sin alerta' : doc.diasAlVencimiento() + ' dias'},
                                           data-doc-fisico=${doc.estadoCarpetaFisica().descripcion},
                                           data-doc-fisico-class=${doc.estadoCarpetaFisica().cssClass},
                                           data-doc-fisico-hasta=${doc.fechaVencimientoFisico == null ? '-' : #temporals.format(doc.fechaVencimientoFisico, 'dd/MM/yyyy')},
@@ -211,12 +179,12 @@
                                     </span>
                                 </span>
                                 <span class="document-leaf-meta">
-                                    <strong th:text="${doc.fechaVencimiento == null ? 'Sin vencimiento' : #temporals.format(doc.fechaVencimiento, 'dd/MM/yyyy')}">-</strong>
+                                    <strong th:text="${doc.fechaVencimiento == null ? 'No aplica vencimiento' : #temporals.format(doc.fechaVencimiento, 'dd/MM/yyyy')}">-</strong>
                                     <small th:if="${doc.fechaPresentacion != null}" th:text="${'Presentado ' + #temporals.format(doc.fechaPresentacion, 'dd/MM/yyyy')}">Presentado</small>
                                 </span>
                                 <span class="document-leaf-days" th:classappend="${doc.estado().cssClass}">
-                                    <strong th:text="${doc.fechaVencimiento == null ? '-' : doc.diasAlVencimiento()}">0</strong>
-                                    <small th:text="${doc.fechaVencimiento == null ? 'sin fecha' : 'dias'}">dias</small>
+                                    <strong th:text="${doc.fechaVencimiento == null ? 'N/A' : doc.diasAlVencimiento()}">0</strong>
+                                    <small th:text="${doc.fechaVencimiento == null ? 'no vence' : 'dias'}">dias</small>
                                 </span>
                                 <span class="document-leaf-state">
                                     <span class="doc-status-pill" th:classappend="${' ' + doc.estado().cssClass}" th:text="${doc.estado().descripcion}">Apto</span>
@@ -432,6 +400,8 @@ const quickFull = document.getElementById('document-quick-full');
 const folderQuickNewDoc = document.getElementById('folder-quick-new-doc');
 const documentacionSearch = document.getElementById('documentacion-search');
 const documentacionStatusFilter = document.getElementById('documentacion-status-filter');
+const documentExplorer = document.querySelector('[data-document-explorer]');
+const documentViewButtons = document.querySelectorAll('[data-doc-view]');
 
 function setQuickText(selector, value) {
     const element = quickView?.querySelector(selector);
@@ -450,6 +420,19 @@ function setFolderQuickText(selector, value) {
 function setFolderQuickField(name, value) {
     setFolderQuickText(`[data-folder-field="${name}"]`, value);
 }
+
+function setDocumentView(view) {
+    const selected = view === 'tree' ? 'tree' : 'folders';
+    documentExplorer?.classList.toggle('is-tree-view', selected === 'tree');
+    documentExplorer?.classList.toggle('is-folder-view', selected === 'folders');
+    documentViewButtons.forEach(button => {
+        const active = button.dataset.docView === selected;
+        button.classList.toggle('is-active', active);
+        button.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
+    localStorage.setItem('obraControl.documentacion.view', selected);
+}
+
 
 function folderNewDocUrl(folder) {
     const proveedorId = folder?.dataset.proveedorId;
@@ -677,12 +660,14 @@ function openDocumentFolderMenu(folder, event) {
     documentacionFolderTarget = folder;
     const isGeneral = folder?.dataset.folderGeneral === 'true';
     const title = document.getElementById('document-folder-menu-title');
-    if (title) title.textContent = isGeneral ? 'Carpeta general' : 'Carpeta';
+    if (title) title.textContent = folder?.dataset.folderName || (isGeneral ? 'Carpeta general' : 'Carpeta');
     const renameButton = folderMenu.querySelector('[data-action="rename-folder"]');
     renameButton?.classList.toggle('d-none', isGeneral);
     const deleteButton = folderMenu.querySelector('[data-action="delete-folder"]');
     deleteButton?.classList.toggle('d-none', isGeneral);
     docMenu?.classList.add('d-none');
+    document.querySelectorAll('.document-folder-card.is-context-active, .document-folder.is-context-active').forEach(element => element.classList.remove('is-context-active'));
+    folder?.classList.add('is-context-active');
     folderMenu.classList.remove('d-none');
     folderMenu.style.left = `${Math.min(event.clientX, window.innerWidth - 230)}px`;
     folderMenu.style.top = `${Math.min(event.clientY, window.innerHeight - 300)}px`;
@@ -700,12 +685,20 @@ function openDocumentFileMenu(branch, event) {
 document.querySelectorAll('.document-folder-header').forEach(header => {
     header.addEventListener('click', event => {
         if (event.target.closest('a, button, form, input, select, textarea')) return;
-        openFolderQuickView(header.closest('.document-folder'));
+        if (event.target.closest('.document-folder-name')) {
+            openFolderQuickView(header.closest('.document-folder'));
+            return;
+        }
+        header.closest('.document-folder')?.classList.toggle('is-collapsed');
     });
     header.addEventListener('keydown', event => {
         if ((event.key === 'Enter' || event.key === ' ') && !event.target.closest('a, button, form, input, select, textarea')) {
             event.preventDefault();
-            openFolderQuickView(header.closest('.document-folder'));
+            if (event.target.closest('.document-folder-name')) {
+                openFolderQuickView(header.closest('.document-folder'));
+                return;
+            }
+            header.closest('.document-folder')?.classList.toggle('is-collapsed');
         }
     });
     header.addEventListener('contextmenu', event => {
@@ -716,6 +709,19 @@ document.querySelectorAll('.document-folder-header').forEach(header => {
 });
 
 document.querySelectorAll('.document-folder-name').forEach(name => {
+    name.setAttribute('tabindex', '0');
+    name.setAttribute('role', 'button');
+    name.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        openFolderQuickView(name.closest('.document-folder'));
+    });
+    name.addEventListener('keydown', event => {
+        if (event.key !== 'Enter' && event.key !== ' ') return;
+        event.preventDefault();
+        event.stopPropagation();
+        openFolderQuickView(name.closest('.document-folder'));
+    });
     name.addEventListener('contextmenu', event => {
         event.preventDefault();
         event.stopPropagation();
@@ -724,6 +730,22 @@ document.querySelectorAll('.document-folder-name').forEach(name => {
 });
 
 let draggedFolder = null;
+let suppressFolderOpen = false;
+let folderDropMarker = null;
+
+function getFolderDropMarker() {
+    if (!folderDropMarker) {
+        folderDropMarker = document.createElement('div');
+        folderDropMarker.className = 'document-folder-drop-marker';
+        folderDropMarker.innerHTML = '<span></span><strong>Soltar carpeta aca</strong>';
+    }
+    return folderDropMarker;
+}
+
+function clearFolderDropMarker() {
+    folderDropMarker?.remove();
+    document.querySelectorAll('.document-folder.is-drop-target, .document-folder-card.is-drop-target').forEach(item => item.classList.remove('is-drop-target'));
+}
 
 function folderAfterDrag(container, y) {
     const folders = [...container.querySelectorAll('.document-folder:not(.is-dragging):not(.d-none)')];
@@ -737,8 +759,30 @@ function folderAfterDrag(container, y) {
     }, { offset: Number.NEGATIVE_INFINITY, element: null }).element;
 }
 
-function submitFolderOrder() {
-    const folders = [...document.querySelectorAll('#document-folder-list .document-folder[data-carpeta-id]')];
+function folderAfterGridDrag(container, x, y) {
+    const folders = [...container.querySelectorAll('.document-folder-card:not(.is-dragging):not(.d-none)')];
+    return folders.find(folder => {
+        const box = folder.getBoundingClientRect();
+        const centerY = box.top + box.height / 2;
+        const centerX = box.left + box.width / 2;
+        return y < centerY || (Math.abs(y - centerY) < box.height / 2 && x < centerX);
+    }) || null;
+}
+
+function syncFolderListOrderFromGrid() {
+    const list = document.getElementById('document-folder-list');
+    const gridCards = [...document.querySelectorAll('#document-folder-grid .document-folder-card[data-carpeta-id]')];
+    if (!list || gridCards.length === 0) return;
+    gridCards.forEach(card => {
+        const listFolder = list.querySelector(`.document-folder[data-carpeta-id="${card.dataset.carpetaId}"]`);
+        if (listFolder) list.appendChild(listFolder);
+    });
+}
+
+function submitFolderOrder(source = 'list') {
+    if (source === 'grid') syncFolderListOrderFromGrid();
+    const selector = source === 'grid' ? '#document-folder-grid .document-folder-card[data-carpeta-id]' : '#document-folder-list .document-folder[data-carpeta-id]';
+    const folders = [...document.querySelectorAll(selector)];
     if (folders.length === 0) return;
     const form = document.createElement('form');
     form.method = 'post';
@@ -765,24 +809,88 @@ document.querySelectorAll('.document-folder[draggable="true"]').forEach(folder =
         event.dataTransfer.effectAllowed = 'move';
     });
     folder.addEventListener('dragend', () => {
+        if (draggedFolder && folderDropMarker?.parentElement) {
+            folderDropMarker.parentElement.insertBefore(draggedFolder, folderDropMarker);
+        }
         folder.classList.remove('is-dragging');
         draggedFolder = null;
-        document.querySelectorAll('.document-folder.is-drop-target').forEach(item => item.classList.remove('is-drop-target'));
-        submitFolderOrder();
+        clearFolderDropMarker();
+        submitFolderOrder('list');
+    });
+});
+
+document.querySelectorAll('.document-folder-card').forEach(card => {
+    card.setAttribute('aria-label', `${card.dataset.folderName || 'Carpeta'}: abrir carpeta. Click derecho para acciones.`);
+    card.addEventListener('click', event => {
+        if (!suppressFolderOpen) return;
+        event.preventDefault();
+        event.stopPropagation();
+    });
+    card.addEventListener('dragstart', event => {
+        draggedFolder = card;
+        suppressFolderOpen = true;
+        card.classList.add('is-dragging');
+        event.dataTransfer.effectAllowed = 'move';
+        event.dataTransfer.setData('text/plain', card.dataset.carpetaId || '');
+    });
+    card.addEventListener('dragend', () => {
+        if (draggedFolder === card && folderDropMarker?.parentElement) {
+            folderDropMarker.parentElement.insertBefore(card, folderDropMarker);
+            submitFolderOrder('grid');
+        }
+        card.classList.remove('is-dragging');
+        draggedFolder = null;
+        clearFolderDropMarker();
+        window.setTimeout(() => {
+            suppressFolderOpen = false;
+        }, 80);
+    });
+    card.addEventListener('contextmenu', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        openDocumentFolderMenu(card, event);
+    });
+    card.addEventListener('keydown', event => {
+        if (event.key !== 'ContextMenu' && !(event.shiftKey && event.key === 'F10')) return;
+        event.preventDefault();
+        const rect = card.getBoundingClientRect();
+        openDocumentFolderMenu(card, {
+            clientX: rect.left + rect.width * 0.55,
+            clientY: rect.top + rect.height * 0.45
+        });
     });
 });
 
 const folderList = document.getElementById('document-folder-list');
-folderList?.addEventListener('dragover', event => {
+const folderGrid = document.getElementById('document-folder-grid');
+
+folderGrid?.addEventListener('dragover', event => {
     event.preventDefault();
-    if (!draggedFolder) return;
-    const afterElement = folderAfterDrag(folderList, event.clientY);
-    document.querySelectorAll('.document-folder.is-drop-target').forEach(item => item.classList.remove('is-drop-target'));
+    if (!draggedFolder?.classList.contains('document-folder-card')) return;
+    const afterElement = folderAfterGridDrag(folderGrid, event.clientX, event.clientY);
+    const marker = getFolderDropMarker();
+    marker.classList.add('is-grid-marker');
+    document.querySelectorAll('.document-folder-card.is-drop-target').forEach(item => item.classList.remove('is-drop-target'));
     if (afterElement == null) {
-        folderList.appendChild(draggedFolder);
+        folderGrid.appendChild(marker);
     } else {
         afterElement.classList.add('is-drop-target');
-        folderList.insertBefore(draggedFolder, afterElement);
+        folderGrid.insertBefore(marker, afterElement);
+    }
+});
+
+folderList?.addEventListener('dragover', event => {
+    event.preventDefault();
+    if (!draggedFolder?.classList.contains('document-folder')) return;
+    const afterElement = folderAfterDrag(folderList, event.clientY);
+    const marker = getFolderDropMarker();
+    marker.classList.remove('is-grid-marker');
+    document.querySelectorAll('.document-folder.is-drop-target').forEach(item => item.classList.remove('is-drop-target'));
+    if (afterElement == null) {
+        folderList.appendChild(marker);
+    } else {
+        afterElement.classList.add('is-drop-target');
+        folderList.insertBefore(marker, afterElement);
     }
 });
 
@@ -806,14 +914,38 @@ document.querySelectorAll('[data-create-document-folder]').forEach(button => {
     button.addEventListener('click', createDocumentFolder);
 });
 
+documentViewButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        setDocumentView(button.dataset.docView);
+    });
+});
+
+function normalizeDocumentacionText(value) {
+    return (value || '').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+
 function filterDocumentacion() {
-    const search = (documentacionSearch?.value || '').trim().toLowerCase();
+    const search = normalizeDocumentacionText(documentacionSearch?.value).trim();
     const status = documentacionStatusFilter?.value || '';
     document.querySelectorAll('.document-folder').forEach(folder => {
         let visibleDocs = 0;
-        const folderText = [folder.dataset.folderName || '', folder.dataset.folderRealName || '', folder.textContent || ''].join(' ').toLowerCase();
+        const folderText = normalizeDocumentacionText([
+            folder.dataset.folderName || '',
+            folder.dataset.folderRealName || '',
+            folder.dataset.folderApodo || '',
+            folder.dataset.folderTipo || '',
+            folder.dataset.folderEstado || '',
+            folder.textContent || ''
+        ].join(' '));
+        const folderMatchesStatus = !status || folder.dataset.folderEstadoClass === status;
         folder.querySelectorAll('.document-branch').forEach(branch => {
-            const branchText = [branch.dataset.docName || '', branch.dataset.docSujetoNombre || '', branch.dataset.docProveedor || '', branch.dataset.docStatus || '', branch.dataset.docVinculo || ''].join(' ').toLowerCase();
+            const branchText = normalizeDocumentacionText([
+                branch.dataset.docName || '',
+                branch.dataset.docSujetoNombre || '',
+                branch.dataset.docProveedor || '',
+                branch.dataset.docStatus || '',
+                branch.dataset.docVinculo || ''
+            ].join(' '));
             const matchesSearch = !search || folderText.includes(search) || branchText.includes(search);
             const matchesStatus = !status || branch.dataset.docStatusClass === status;
             const visible = matchesSearch && matchesStatus;
@@ -822,8 +954,22 @@ function filterDocumentacion() {
         });
         const hasDocs = folder.querySelectorAll('.document-branch').length > 0;
         const folderMatches = !search || folderText.includes(search);
-        const shouldShowFolder = hasDocs ? visibleDocs > 0 || (folderMatches && !status) : folderMatches && !status;
+        const shouldShowFolder = hasDocs ? visibleDocs > 0 || (folderMatches && folderMatchesStatus) : folderMatches && folderMatchesStatus;
         folder.classList.toggle('d-none', !shouldShowFolder);
+        const gridCard = document.querySelector(`.document-folder-card[data-carpeta-id="${folder.dataset.carpetaId}"]`);
+        if (gridCard) {
+            const gridText = normalizeDocumentacionText([
+                gridCard.dataset.folderName || '',
+                gridCard.dataset.folderRealName || '',
+                gridCard.dataset.folderApodo || '',
+                gridCard.dataset.folderTipo || '',
+                gridCard.dataset.folderEstado || '',
+                gridCard.textContent || ''
+            ].join(' '));
+            const gridMatchesSearch = !search || gridText.includes(search) || folderText.includes(search);
+            const gridMatchesStatus = !status || gridCard.dataset.folderEstadoClass === status || visibleDocs > 0;
+            gridCard.classList.toggle('d-none', !(gridMatchesSearch && gridMatchesStatus));
+        }
         if ((search || status) && shouldShowFolder) {
             folder.classList.remove('is-collapsed');
         }
@@ -832,6 +978,7 @@ function filterDocumentacion() {
 
 documentacionSearch?.addEventListener('input', filterDocumentacion);
 documentacionStatusFilter?.addEventListener('change', filterDocumentacion);
+setDocumentView(localStorage.getItem('obraControl.documentacion.view') || 'folders');
 
 document.querySelectorAll('[data-doc-expand]').forEach(button => {
     button.addEventListener('click', () => {
@@ -898,6 +1045,7 @@ document.addEventListener('click', event => {
     if (!event.target.closest('#document-folder-menu') && !event.target.closest('#document-file-menu')) {
         folderMenu?.classList.add('d-none');
         docMenu?.classList.add('d-none');
+        document.querySelectorAll('.document-folder-card.is-context-active, .document-folder.is-context-active').forEach(element => element.classList.remove('is-context-active'));
     }
 });
 </script>
