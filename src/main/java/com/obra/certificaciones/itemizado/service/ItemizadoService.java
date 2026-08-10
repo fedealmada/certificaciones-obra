@@ -129,6 +129,35 @@ public class ItemizadoService {
         return itemizadoManualItemRepository.save(manual);
     }
 
+
+    @Transactional
+    public ItemizadoManualItem actualizarManual(Long id, Long rubroId, String item, String detalle, String unidad, BigDecimal cantidad, BigDecimal precioUnitario) {
+        ItemizadoManualItem manual = itemizadoManualItemRepository.findById(id)
+                .filter(ItemizadoManualItem::isActivo)
+                .filter(itemManual -> itemManual.getTipo() == TipoItemizadoManual.MANO_OBRA)
+                .orElseThrow(() -> new EntityNotFoundException("No existe el item manual " + id));
+        Rubro rubro = rubroRepository.findById(rubroId)
+                .orElseThrow(() -> new EntityNotFoundException("No existe el rubro " + rubroId));
+        if (!StringUtils.hasText(detalle)) {
+            throw new IllegalArgumentException("El detalle del item es obligatorio.");
+        }
+        Long rubroAnteriorId = manual.getRubro() == null ? null : manual.getRubro().getId();
+        manual.setRubro(rubro);
+        manual.setItem(StringUtils.hasText(item) ? item.trim() : null);
+        manual.setDetalle(detalle.trim());
+        manual.setUnidad(StringUtils.hasText(unidad) ? unidad.trim() : null);
+        manual.setCantidad(cantidad == null ? BigDecimal.ZERO : cantidad);
+        manual.setPrecioUnitario(precioUnitario == null ? BigDecimal.ZERO : precioUnitario);
+        if (!Objects.equals(rubroAnteriorId, rubroId)) {
+            manual.setOrden(siguienteOrdenManual(rubroId));
+        }
+        manual.calcularImporte();
+        itemizadoManualItemRepository.findByActivoTrueOrderByOrdenAscIdAsc().stream()
+                .filter(material -> material.getItemPadre() != null)
+                .filter(material -> Objects.equals(material.getItemPadre().getId(), id))
+                .forEach(material -> material.setRubro(rubro));
+        return itemizadoManualItemRepository.save(manual);
+    }
     @Transactional
     public ItemizadoManualItem crearMaterialManual(Long itemPadreId, String detalle, String unidad, BigDecimal cantidad, BigDecimal precioUnitario) {
         ItemizadoManualItem padre = itemizadoManualItemRepository.findById(itemPadreId)

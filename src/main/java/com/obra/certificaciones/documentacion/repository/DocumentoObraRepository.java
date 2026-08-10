@@ -11,15 +11,16 @@ import java.util.Optional;
 
 public interface DocumentoObraRepository extends JpaRepository<DocumentoObra, Long> {
     @Override
-    @EntityGraph(attributePaths = {"obra", "proveedor", "trabajador"})
+    @EntityGraph(attributePaths = {"obra", "proveedor", "trabajador", "carpeta"})
     Optional<DocumentoObra> findById(Long id);
 
-    @EntityGraph(attributePaths = {"obra", "proveedor", "trabajador"})
+    @EntityGraph(attributePaths = {"obra", "proveedor", "trabajador", "carpeta"})
     List<DocumentoObra> findByObraIdAndActivoTrueOrderByFechaVencimientoAscIdDesc(Long obraId);
 
-    @EntityGraph(attributePaths = {"obra", "proveedor", "trabajador"})
+    @EntityGraph(attributePaths = {"obra", "proveedor", "trabajador", "carpeta"})
     Page<DocumentoObra> findByObraIdAndActivoTrueOrderByFechaVencimientoAscIdDesc(Long obraId, Pageable pageable);
 
-    @EntityGraph(attributePaths = {"obra", "proveedor", "trabajador"})
+    @EntityGraph(attributePaths = {"obra", "proveedor", "trabajador", "carpeta"})
     List<DocumentoObra> findByObraIdOrderByActivoDescFechaVencimientoAscIdDesc(Long obraId);
 }
+

@@ -1,10 +1,10 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Itemizado de Obra</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script th:src="@{/js/design-system.js(v='20260802-rubros-dark-bright')}"></script>
+    <script th:src="@{/js/design-system.js(v='20260802-rubros-dark-bright')}" defer></script>
     <link th:href="@{/css/app.css(v='20260730-dark2')}" rel="stylesheet">
     <link th:href="@{/css/theme.css(v='20260731-night-reset')}" rel="stylesheet">
     <link th:href="@{/css/design-system.css(v='20260802-rubros-dark-bright')}" rel="stylesheet">
@@ -133,21 +133,15 @@
                         <td class="text-end total-cell" th:text="${#numbers.formatDecimal(nodo.totalGeneral, 1, 'POINT', 2, 'COMMA')}"></td>
                         <td></td>
                     </tr>
-                    <tr th:each="item : ${nodo.items}" class="item-row itemizado-child-row" th:classappend="${item.esManual()} ? ' itemizado-manual-row' : ' itemizado-draggable-row'" th:attr="draggable=${!item.esManual()}" th:data-level="${nodo.nivel + 1}" th:data-item-id="${item.idVista()}" th:data-current-rubro-id="${nodo.rubro.id}">
+                    <tr th:each="item : ${nodo.items}" class="item-row itemizado-child-row" th:classappend="${item.esManual()} ? ' itemizado-manual-row itemizado-context-manual' : ' itemizado-draggable-row'" th:attr="draggable=${!item.esManual()}" th:data-level="${nodo.nivel + 1}" th:data-item-id="${item.idVista()}" th:data-current-rubro-id="${nodo.rubro.id}" th:data-manual-id="${item.esManual() ? item.idVista() : null}" th:data-manual-rubro-id="${item.esManual() ? nodo.rubro.id : null}" th:data-manual-item="${item.esManual() ? item.item() : null}" th:data-manual-detalle="${item.esManual() ? item.detalle() : null}" th:data-manual-unidad="${item.esManual() ? item.unidad() : null}" th:data-manual-cantidad="${item.esManual() ? item.cantidad() : null}" th:data-manual-precio="${item.esManual() ? item.precioUnitario() : null}">
                         <td><span class="itemizado-drag-handle" th:if="${!item.esManual()}" title="Mover item"><i class="bi bi-grip-vertical"></i></span><span th:text="${item.codigoItemizado}"></span></td>
                         <td><span th:text="${item.item() ?: '-'}"></span><span class="manual-chip" th:if="${item.esManual()}">Manual</span></td>
                         <td th:style="'padding-left:' + ${(nodo.nivel + 1) * 18 + 8} + 'px'">
                             <span th:text="${item.detalle()}"></span>
                             <small class="itemizado-materiales-vinculados" th:if="${item.tieneMateriales()}" th:text="${'Materiales: ' + item.materialesDescripcion()}"></small>
-                            <form class="itemizado-material-form" th:if="${item.esManual()}" method="post" th:action="@{/itemizado/manuales/{id}/materiales(id=${item.idVista()})}">
-                                <input name="detalle" required placeholder="Material asociado">
-                                <input name="unidad" placeholder="Und">
-                                <input type="number" step="0.01" name="cantidad" value="1" aria-label="Cantidad material">
-                                <input type="number" step="0.01" name="precioUnitario" value="0" aria-label="Precio material">
-                                <button type="submit" title="Agregar material"><i class="bi bi-plus-lg"></i></button>
-                            </form>
+                            <small class="itemizado-materiales-vinculados" th:if="${item.esManual() && !item.tieneMateriales()}">Click derecho para editar o asociar materiales</small>
                         </td>
-                        <td><a th:if="${!item.esManual()}" th:href="@{/oc/{id}(id=${item.ocId()})}" th:text="${item.ocNumero()}">OC</a><span th:if="${item.esManual()}" class="manual-chip">Manual</span></td>
+                        <td><a th:if="${!item.esManual()}" th:href="@{/oc/{id}(id=${item.ocId()})}" th:text="${item.ocNumero()}">OC</a><span th:if="${item.esManual()}" class="manual-chip">Sin OC</span></td>
                         <td th:text="${item.unidad()}"></td>
                         <td class="text-end" th:text="${item.cantidad()}"></td>
                         <td class="text-end" th:text="${#numbers.formatDecimal(item.precioUnitario(), 1, 'POINT', 2, 'COMMA')}"></td>
@@ -183,6 +177,12 @@
             <button type="button" data-action="root"><i class="bi bi-plus-lg"></i> Nuevo rubro raiz</button>
         </div>
 
+        <div class="itemizado-context-menu d-none" id="itemizado-manual-menu" role="menu">
+            <button type="button" data-action="edit-manual"><i class="bi bi-pencil-square"></i> Editar item</button>
+            <button type="button" data-action="material-manual"><i class="bi bi-box-seam"></i> Agregar material</button>
+            <button type="button" data-action="delete-manual"><i class="bi bi-trash"></i> Eliminar item</button>
+        </div>
+
         <div class="itemizado-editor-backdrop d-none" id="itemizado-rubro-editor">
             <form class="itemizado-editor-panel">
                 <div>
@@ -205,8 +205,9 @@
             <form class="itemizado-editor-panel itemizado-manual-editor-panel">
                 <div>
                     <div class="document-kicker" id="itemizado-manual-kicker">Item sin OC</div>
-                    <h2>Nuevo item manual</h2>
+                    <h2 id="itemizado-manual-title">Nuevo item manual</h2>
                 </div>
+                <input type="hidden" id="itemizado-manual-id">
                 <input type="hidden" id="itemizado-manual-rubro-id">
                 <label class="form-label" for="itemizado-manual-rubro-select">Rubro</label>
                 <select class="form-select" id="itemizado-manual-rubro-select" required>
@@ -235,11 +236,39 @@
                 <textarea class="form-control" id="itemizado-manual-detalle" rows="3" required placeholder="Tarea fuera de orden de compra"></textarea>
                 <div class="itemizado-editor-actions">
                     <button class="btn btn-outline-secondary" type="button" id="itemizado-manual-cancel">Cancelar</button>
-                    <button class="btn btn-primary" type="submit">Agregar item</button>
+                    <button class="btn btn-primary" type="submit" id="itemizado-manual-submit">Agregar item</button>
                 </div>
             </form>
         </div>
-    </section>
+        <div class="itemizado-editor-backdrop d-none" id="itemizado-material-editor">
+            <form class="itemizado-editor-panel itemizado-manual-editor-panel">
+                <div>
+                    <div class="document-kicker" id="itemizado-material-kicker">Material asociado</div>
+                    <h2>Nuevo material para item sin OC</h2>
+                </div>
+                <input type="hidden" id="itemizado-material-manual-id">
+                <label class="form-label" for="itemizado-material-detalle">Detalle</label>
+                <textarea class="form-control" id="itemizado-material-detalle" rows="3" required placeholder="Material asociado al item"></textarea>
+                <div class="itemizado-manual-editor-grid">
+                    <div>
+                        <label class="form-label" for="itemizado-material-unidad">Und</label>
+                        <input class="form-control" id="itemizado-material-unidad" placeholder="UN">
+                    </div>
+                    <div>
+                        <label class="form-label" for="itemizado-material-cantidad">Cant.</label>
+                        <input class="form-control" id="itemizado-material-cantidad" type="number" step="0.01" value="1">
+                    </div>
+                    <div>
+                        <label class="form-label" for="itemizado-material-precio">Precio</label>
+                        <input class="form-control" id="itemizado-material-precio" type="number" step="0.01" value="0">
+                    </div>
+                </div>
+                <div class="itemizado-editor-actions">
+                    <button class="btn btn-outline-secondary" type="button" id="itemizado-material-cancel">Cancelar</button>
+                    <button class="btn btn-primary" type="submit">Agregar material</button>
+                </div>
+            </form>
+        </div>    </section>
 </main>
 <script>
 function toggleItemizadoRubro(button) {
@@ -277,6 +306,7 @@ let draggedRubroRow = null;
 let itemizadoUndoStack = [];
 let itemizadoRedoStack = [];
 let itemizadoContextRow = null;
+let itemizadoManualContextRow = null;
 
 function setItemizadoStatus(message, type = '') {
     if (!itemizadoStatus) return;
@@ -373,8 +403,8 @@ function guardarRubroArbol({ mode, rubroId, padreId, nombre }) {
     });
 }
 
-function guardarItemManualItemizado({ rubroId, item, detalle, unidad, cantidad, precioUnitario }) {
-    return itemizadoFormPost('/itemizado/manuales', {
+function guardarItemManualItemizado({ id, rubroId, item, detalle, unidad, cantidad, precioUnitario }) {
+    return itemizadoFormPost(id ? `/itemizado/manuales/${id}` : '/itemizado/manuales', {
         rubroId,
         item,
         detalle,
@@ -382,6 +412,19 @@ function guardarItemManualItemizado({ rubroId, item, detalle, unidad, cantidad, 
         cantidad,
         precioUnitario
     });
+}
+
+function guardarMaterialManualItemizado({ manualId, detalle, unidad, cantidad, precioUnitario }) {
+    return itemizadoFormPost(`/itemizado/manuales/${manualId}/materiales`, {
+        detalle,
+        unidad,
+        cantidad,
+        precioUnitario
+    });
+}
+
+function eliminarItemManualItemizado(id) {
+    return itemizadoFormPost(`/itemizado/manuales/${id}/eliminar`, {});
 }
 
 function moverRubroArbol(rubroId, padreId) {
@@ -501,21 +544,37 @@ function marcarDropRubro(row, event) {
     return position;
 }
 
+function posicionarMenuItemizado(menu, event, menuWidth = 230, menuHeight = 260) {
+    const left = Math.min(event.clientX, window.innerWidth - menuWidth - 12);
+    const top = Math.min(event.clientY, window.innerHeight - menuHeight - 12);
+    menu.style.left = `${Math.max(12, left)}px`;
+    menu.style.top = `${Math.max(12, top)}px`;
+}
+
 function cerrarMenuRubro() {
     document.querySelector('#itemizado-rubro-menu')?.classList.add('d-none');
+}
+
+function cerrarMenuManual() {
+    document.querySelector('#itemizado-manual-menu')?.classList.add('d-none');
 }
 
 function abrirMenuRubro(row, event) {
     const menu = document.querySelector('#itemizado-rubro-menu');
     if (!menu) return;
+    cerrarMenuManual();
     itemizadoContextRow = row;
     menu.classList.remove('d-none');
-    const menuWidth = 210;
-    const menuHeight = 260;
-    const left = Math.min(event.clientX, window.innerWidth - menuWidth - 12);
-    const top = Math.min(event.clientY, window.innerHeight - menuHeight - 12);
-    menu.style.left = `${Math.max(12, left)}px`;
-    menu.style.top = `${Math.max(12, top)}px`;
+    posicionarMenuItemizado(menu, event, 210, 260);
+}
+
+function abrirMenuManual(row, event) {
+    const menu = document.querySelector('#itemizado-manual-menu');
+    if (!menu) return;
+    cerrarMenuRubro();
+    itemizadoManualContextRow = row;
+    menu.classList.remove('d-none');
+    posicionarMenuItemizado(menu, event, 230, 180);
 }
 
 function cerrarEditorRubro() {
@@ -524,6 +583,10 @@ function cerrarEditorRubro() {
 
 function cerrarEditorManual() {
     document.querySelector('#itemizado-manual-editor')?.classList.add('d-none');
+}
+
+function cerrarEditorMaterialManual() {
+    document.querySelector('#itemizado-material-editor')?.classList.add('d-none');
 }
 
 function abrirEditorRubro(mode, row = null) {
@@ -550,26 +613,47 @@ function abrirEditorRubro(mode, row = null) {
 function abrirEditorManual(row = null) {
     const editor = document.querySelector('#itemizado-manual-editor');
     if (!editor) return;
+    const manualIdInput = document.querySelector('#itemizado-manual-id');
     const rubroSelect = document.querySelector('#itemizado-manual-rubro-select');
     const rubroInput = document.querySelector('#itemizado-manual-rubro-id');
     const kicker = document.querySelector('#itemizado-manual-kicker');
+    const title = document.querySelector('#itemizado-manual-title');
+    const submit = document.querySelector('#itemizado-manual-submit');
     const itemInput = document.querySelector('#itemizado-manual-item');
     const detalleInput = document.querySelector('#itemizado-manual-detalle');
     const unidadInput = document.querySelector('#itemizado-manual-unidad');
     const cantidadInput = document.querySelector('#itemizado-manual-cantidad');
     const precioInput = document.querySelector('#itemizado-manual-precio');
-    const rubroId = row?.dataset.rubroId || '';
+    const isEdit = row?.dataset.manualId;
+    const rubroId = row?.dataset.manualRubroId || row?.dataset.rubroId || '';
 
+    manualIdInput.value = isEdit ? row.dataset.manualId : '';
     rubroInput.value = rubroId;
     rubroSelect.value = rubroId;
-    kicker.textContent = row?.dataset.rubroFullName || 'Item sin OC';
-    itemInput.value = '';
-    detalleInput.value = '';
-    unidadInput.value = 'GL';
-    cantidadInput.value = '1';
-    precioInput.value = '0';
+    kicker.textContent = isEdit ? 'Editando item sin OC' : (row?.dataset.rubroFullName || 'Item sin OC');
+    title.textContent = isEdit ? 'Editar item manual' : 'Nuevo item manual';
+    submit.textContent = isEdit ? 'Guardar cambios' : 'Agregar item';
+    itemInput.value = isEdit ? (row.dataset.manualItem || '') : '';
+    detalleInput.value = isEdit ? (row.dataset.manualDetalle || '') : '';
+    unidadInput.value = isEdit ? (row.dataset.manualUnidad || '') : 'GL';
+    cantidadInput.value = isEdit ? (row.dataset.manualCantidad || '1') : '1';
+    precioInput.value = isEdit ? (row.dataset.manualPrecio || '0') : '0';
     editor.classList.remove('d-none');
     setTimeout(() => (rubroId ? detalleInput : rubroSelect).focus(), 40);
+}
+
+function abrirEditorMaterialManual(row) {
+    if (!row?.dataset.manualId) return;
+    const editor = document.querySelector('#itemizado-material-editor');
+    if (!editor) return;
+    document.querySelector('#itemizado-material-manual-id').value = row.dataset.manualId;
+    document.querySelector('#itemizado-material-kicker').textContent = row.dataset.manualDetalle || 'Material asociado';
+    document.querySelector('#itemizado-material-detalle').value = '';
+    document.querySelector('#itemizado-material-unidad').value = 'UN';
+    document.querySelector('#itemizado-material-cantidad').value = '1';
+    document.querySelector('#itemizado-material-precio').value = '0';
+    editor.classList.remove('d-none');
+    setTimeout(() => document.querySelector('#itemizado-material-detalle')?.focus(), 40);
 }
 
 async function guardarEditorRubro(event) {
@@ -602,6 +686,7 @@ async function guardarEditorRubro(event) {
 
 async function guardarEditorManual(event) {
     event.preventDefault();
+    const manualId = document.querySelector('#itemizado-manual-id').value;
     const rubroSelect = document.querySelector('#itemizado-manual-rubro-select');
     const rubroId = rubroSelect.value || document.querySelector('#itemizado-manual-rubro-id').value;
     const item = document.querySelector('#itemizado-manual-item').value.trim();
@@ -613,19 +698,68 @@ async function guardarEditorManual(event) {
         setItemizadoStatus('El rubro y el detalle son obligatorios.', 'is-error');
         return;
     }
-    setItemizadoStatus('Agregando item sin OC...', 'is-saving');
+    setItemizadoStatus(manualId ? 'Actualizando item sin OC...' : 'Agregando item sin OC...', 'is-saving');
     try {
-        const response = await guardarItemManualItemizado({ rubroId, item, detalle, unidad, cantidad, precioUnitario });
+        const response = await guardarItemManualItemizado({ id: manualId, rubroId, item, detalle, unidad, cantidad, precioUnitario });
         if (!response.ok) {
-            throw new Error('No se pudo crear el item manual.');
+            throw new Error('No se pudo guardar el item manual.');
         }
         cerrarEditorManual();
         await refrescarItemizado({ rubroId });
-        setItemizadoStatus('Item manual agregado.', 'is-saved');
-        mostrarAvisoItemizado('Item agregado', 'El item sin OC se sumo al itemizado.');
+        setItemizadoStatus(manualId ? 'Item manual actualizado.' : 'Item manual agregado.', 'is-saved');
+        mostrarAvisoItemizado(manualId ? 'Item actualizado' : 'Item agregado', manualId ? 'Los cambios quedaron guardados en el itemizado.' : 'El item sin OC se sumo al itemizado.');
     } catch (error) {
-        setItemizadoStatus('No se pudo agregar el item manual.', 'is-error');
+        setItemizadoStatus('No se pudo guardar el item manual.', 'is-error');
+        mostrarAvisoItemizado('No se pudo guardar', 'Revisa los datos e intenta nuevamente.', 'error');
+    }
+}
+
+async function guardarEditorMaterialManual(event) {
+    event.preventDefault();
+    const manualId = document.querySelector('#itemizado-material-manual-id').value;
+    const detalle = document.querySelector('#itemizado-material-detalle').value.trim();
+    const unidad = document.querySelector('#itemizado-material-unidad').value.trim();
+    const cantidad = document.querySelector('#itemizado-material-cantidad').value || '1';
+    const precioUnitario = document.querySelector('#itemizado-material-precio').value || '0';
+    if (!manualId || !detalle) {
+        setItemizadoStatus('El detalle del material es obligatorio.', 'is-error');
+        return;
+    }
+    setItemizadoStatus('Agregando material asociado...', 'is-saving');
+    try {
+        const response = await guardarMaterialManualItemizado({ manualId, detalle, unidad, cantidad, precioUnitario });
+        if (!response.ok) {
+            throw new Error('No se pudo guardar el material.');
+        }
+        const row = document.querySelector(`.itemizado-context-manual[data-manual-id="${manualId}"]`);
+        const rubroId = row?.dataset.manualRubroId || row?.dataset.currentRubroId;
+        cerrarEditorMaterialManual();
+        await refrescarItemizado(rubroId ? { rubroId } : null);
+        setItemizadoStatus('Material asociado agregado.', 'is-saved');
+        mostrarAvisoItemizado('Material agregado', 'El material quedo asociado al item sin OC.');
+    } catch (error) {
+        setItemizadoStatus('No se pudo agregar el material.', 'is-error');
         mostrarAvisoItemizado('No se pudo agregar', 'Revisa los datos e intenta nuevamente.', 'error');
+    }
+}
+
+async function eliminarManualDesdeItemizado(row) {
+    if (!row?.dataset.manualId) return;
+    if (!confirm('Eliminar este item manual y sus materiales asociados?')) {
+        return;
+    }
+    setItemizadoStatus('Eliminando item sin OC...', 'is-saving');
+    try {
+        const response = await eliminarItemManualItemizado(row.dataset.manualId);
+        if (!response.ok) {
+            throw new Error('No se pudo eliminar el item manual.');
+        }
+        await refrescarItemizado({ rubroId: row.dataset.manualRubroId || row.dataset.currentRubroId });
+        setItemizadoStatus('Item manual eliminado.', 'is-saved');
+        mostrarAvisoItemizado('Item eliminado', 'El item sin OC se quito del itemizado.');
+    } catch (error) {
+        setItemizadoStatus('No se pudo eliminar el item manual.', 'is-error');
+        mostrarAvisoItemizado('No se pudo eliminar', 'Intenta nuevamente.', 'error');
     }
 }
 
@@ -834,6 +968,13 @@ function inicializarItemizadoDrag() {
             cerrarEditorManual();
         }
     });
+    document.querySelector('#itemizado-material-cancel')?.addEventListener('click', cerrarEditorMaterialManual);
+    document.querySelector('#itemizado-material-editor form')?.addEventListener('submit', guardarEditorMaterialManual);
+    document.querySelector('#itemizado-material-editor')?.addEventListener('click', event => {
+        if (event.target.id === 'itemizado-material-editor') {
+            cerrarEditorMaterialManual();
+        }
+    });
     document.querySelector('#itemizado-rubro-menu')?.addEventListener('click', event => {
         const button = event.target.closest('button[data-action]');
         if (!button) return;
@@ -849,8 +990,28 @@ function inicializarItemizadoDrag() {
             abrirEditorRubro(action === 'root' ? 'root' : action, itemizadoContextRow);
         }
     });
+    document.querySelector('#itemizado-manual-menu')?.addEventListener('click', event => {
+        const button = event.target.closest('button[data-action]');
+        if (!button) return;
+        const action = button.dataset.action;
+        const row = itemizadoManualContextRow;
+        cerrarMenuManual();
+        if (action === 'edit-manual') {
+            abrirEditorManual(row);
+        } else if (action === 'material-manual') {
+            abrirEditorMaterialManual(row);
+        } else if (action === 'delete-manual') {
+            eliminarManualDesdeItemizado(row);
+        }
+    });
     updateItemizadoHistoryButtons();
 
+    document.querySelectorAll('.itemizado-context-manual').forEach(row => {
+        row.addEventListener('contextmenu', event => {
+            event.preventDefault();
+            abrirMenuManual(row, event);
+        });
+    });
     document.querySelectorAll('.itemizado-context-rubro').forEach(row => {
         row.addEventListener('contextmenu', event => {
             event.preventDefault();
@@ -970,6 +1131,9 @@ document.addEventListener('click', event => {
     if (!event.target.closest('#itemizado-rubro-menu')) {
         cerrarMenuRubro();
     }
+    if (!event.target.closest('#itemizado-manual-menu')) {
+        cerrarMenuManual();
+    }
 });
 
 document.addEventListener('keydown', event => {
@@ -977,6 +1141,7 @@ document.addEventListener('keydown', event => {
         cerrarMenuRubro();
         cerrarEditorRubro();
         cerrarEditorManual();
+        cerrarEditorMaterialManual();
     }
 });
 

@@ -30,6 +30,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,6 +62,7 @@ public class MaterialController {
         model.addAttribute("recibidoPorOrden", totalesPorOrden(resumenesPorOrden, "recibido"));
         model.addAttribute("pendientePorOrden", totalesPorOrden(resumenesPorOrden, "pendiente"));
         model.addAttribute("avancePorOrden", avancesPorOrden(resumenesPorOrden));
+        model.addAttribute("itemPreviewLines", itemPreviewLines(ordenes));
         model.addAttribute("cero", BigDecimal.ZERO);
         return "material/lista";
     }
@@ -217,6 +219,37 @@ public class MaterialController {
         }
     }
 
+
+    private Map<Long, String> itemPreviewLines(List<OrdenCompra> ordenes) {
+        Map<Long, String> previews = new HashMap<>();
+        for (OrdenCompra orden : ordenes) {
+            List<String> lineas = new ArrayList<>();
+            for (var item : orden.getItems()) {
+                if (item.getCategoria() == com.obra.certificaciones.oc.entity.CategoriaItem.MANO_OBRA) {
+                    continue;
+                }
+                lineas.add(textoPreview(item.getItem()) + "||"
+                        + textoPreview(item.getDetalle()) + "||"
+                        + textoPreview(item.getUnidad()) + "||"
+                        + numeroPreview(item.getCantidad()) + "||"
+                        + numeroPreview(item.getPrecioUnitario()) + "||"
+                        + numeroPreview(item.getImporte()));
+                if (lineas.size() >= 12) {
+                    break;
+                }
+            }
+            previews.put(orden.getId(), String.join("~~", lineas));
+        }
+        return previews;
+    }
+
+    private String textoPreview(String valor) {
+        return valor == null ? "" : valor.replace("||", " ").replace("~~", " ").trim();
+    }
+
+    private String numeroPreview(BigDecimal valor) {
+        return valor == null ? "0" : valor.toPlainString();
+    }
     private void cargarFormulario(Long ordenCompraId, Long recepcionId, RecepcionMaterialForm form, boolean modoEdicion, String origen, Model model) {
         OrdenCompra orden = ordenCompraService.obtener(ordenCompraId);
         var itemsResumen = modoEdicion

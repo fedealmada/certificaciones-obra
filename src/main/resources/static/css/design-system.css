@@ -6412,3 +6412,611 @@ html[data-theme="dark"] body .itemizado-excel .rubro-leaf.is-drop-inside > * {
         inset 0 0 0 2px #fff7ad,
         0 0 22px rgba(250, 204, 21, 0.22) !important;
 }
+
+.document-folder-selected-note {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    margin-bottom: 16px;
+    border: 1px solid color-mix(in srgb, var(--accent-500, #3b82f6) 28%, var(--border-color, #d6dfef));
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--accent-500, #3b82f6) 10%, var(--surface-card, #ffffff));
+    color: var(--text-primary, #0f172a);
+}
+
+.document-folder-selected-note i {
+    width: 38px;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--accent-500, #3b82f6) 18%, transparent);
+    color: var(--accent-600, #2563eb);
+    font-size: 1.2rem;
+}
+
+.document-folder-selected-note strong,
+.document-folder-selected-note small {
+    display: block;
+}
+
+.document-folder-selected-note small {
+    color: var(--text-muted, #64748b);
+}
+/* Tareas cotidianas */
+.tareas-notion-page {
+    --task-paper: #ffffff;
+    --task-paper-soft: #f8fafc;
+    --task-ink: #1f2937;
+    --task-muted: #667085;
+    --task-line: #e4eaf2;
+    --task-band: #eaf6fb;
+    --task-shadow: 0 12px 26px rgba(31, 41, 55, .08);
+    max-width: 1480px;
+}
+
+.tareas-notion-hero {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: end;
+    gap: 18px;
+    padding: 26px 4px 18px;
+}
+
+.tareas-notion-icon {
+    display: grid;
+    place-items: center;
+    width: 74px;
+    height: 74px;
+    border: 2px solid var(--task-ink);
+    border-radius: 18px;
+    color: var(--task-ink);
+    background: #fff;
+    box-shadow: 6px 6px 0 rgba(15, 23, 42, .08);
+    font-size: 2rem;
+    transform: rotate(-2deg);
+}
+
+.tareas-notion-title h1 {
+    margin: 4px 0 12px;
+    color: var(--task-ink);
+    font-size: clamp(2.1rem, 4vw, 4rem);
+    font-weight: 850;
+    line-height: 1.02;
+}
+
+.tareas-notion-title p {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    margin: 0;
+    padding: 7px 11px;
+    border-left: 4px solid var(--task-ink);
+    border-radius: 4px;
+    color: #35657c;
+    background: #eef7fb;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: .95rem;
+    font-weight: 700;
+}
+
+.tareas-note-editor {
+    padding: 18px;
+    border: 1px solid var(--task-line);
+    border-radius: 14px;
+    background: linear-gradient(180deg, #ffffff, #fbfdff);
+    box-shadow: var(--task-shadow);
+}
+
+.tareas-note-editor-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.tareas-note-editor h2 {
+    margin: 0;
+    color: var(--task-ink);
+    font-size: 1.15rem;
+    font-weight: 800;
+}
+
+.tareas-note-editor p {
+    margin: 4px 0 0;
+    color: var(--task-muted);
+    font-size: .92rem;
+}
+
+.tareas-note-form {
+    display: grid;
+    grid-template-columns: minmax(260px, 1.15fr) minmax(320px, 1.6fr);
+    gap: 14px;
+    align-items: start;
+}
+
+.tareas-note-title-field,
+.tareas-note-textarea {
+    min-width: 0;
+}
+
+.tareas-note-title-field .form-control,
+.tareas-note-textarea .form-control {
+    border-color: #dbe4ef;
+    background: #fff;
+    font-size: .98rem;
+}
+
+.tareas-note-title-field .form-control {
+    min-height: 48px;
+    font-weight: 700;
+}
+
+.tareas-note-textarea textarea {
+    min-height: 130px;
+    resize: vertical;
+    line-height: 1.45;
+}
+
+.tareas-note-fields {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(140px, 1fr));
+    gap: 10px;
+}
+
+.tareas-note-fields .form-label,
+.tareas-note-form .form-label {
+    margin-bottom: 4px;
+    color: #475569;
+    font-size: .78rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .02em;
+}
+
+.tareas-note-submit {
+    grid-column: 1 / -1;
+    justify-self: end;
+    min-width: 170px;
+}
+
+.tareas-notion-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 270px;
+    gap: 22px;
+    align-items: start;
+}
+
+.tareas-main-board,
+.tareas-side-panel {
+    min-width: 0;
+}
+
+.tareas-section-band {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 64px;
+    padding: 14px 18px;
+    border-radius: 6px;
+    color: #1f2937;
+    background: var(--task-band);
+    font-size: 1.55rem;
+    font-weight: 850;
+}
+
+.tareas-view-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    padding: 14px 4px 10px;
+    border-bottom: 1px solid var(--task-line);
+    color: var(--task-muted);
+}
+
+.tareas-view-tabs span {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 0 0 9px;
+    border-bottom: 2px solid transparent;
+    font-size: .94rem;
+    font-weight: 650;
+}
+
+.tareas-view-tabs .is-active {
+    color: var(--task-ink);
+    border-color: var(--task-ink);
+}
+
+.tareas-kanban {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    padding-top: 16px;
+}
+
+.tareas-lane {
+    min-width: 0;
+    min-height: 360px;
+    padding: 10px;
+    border: 1px solid color-mix(in srgb, var(--task-line) 72%, transparent);
+    border-radius: 12px;
+    background: #f8faf8;
+}
+
+.tareas-lane.is-progress { background: #f4faff; }
+.tareas-lane.is-done { background: #f3fbf5; }
+
+.tareas-lane > header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 10px;
+    color: var(--task-ink);
+    font-size: .96rem;
+    font-weight: 800;
+}
+
+.tareas-lane > header span,
+.tareas-lane > header b {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 26px;
+    padding: 4px 9px;
+    border-radius: 999px;
+    background: color-mix(in srgb, #d8dee8 68%, transparent);
+}
+
+.tareas-lane.is-progress > header span { background: #d8edf8; }
+.tareas-lane.is-done > header span { background: #dcefe2; }
+
+.tarea-note-card {
+    position: relative;
+    display: grid;
+    gap: 10px;
+    margin-bottom: 10px;
+    padding: 14px;
+    border: 1px solid #dfe6ee;
+    border-radius: 12px;
+    background: var(--task-paper);
+    box-shadow: 0 3px 0 rgba(15, 23, 42, .04), 0 10px 22px rgba(15, 23, 42, .06);
+}
+
+.tarea-note-card::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 4px;
+    border-radius: 12px 12px 0 0;
+    background: #64748b;
+}
+
+.tarea-note-card.is-low::before { background: #22c55e; }
+.tarea-note-card.is-medium::before { background: #3b82f6; }
+.tarea-note-card.is-high::before { background: #f59e0b; }
+.tarea-note-card.is-urgent::before,
+.tarea-note-card.is-overdue::before { background: #ef4444; }
+
+.tarea-note-topline,
+.tarea-actions,
+.tarea-check-add,
+.tarea-progress > div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.tarea-note-card h3 {
+    margin: 2px 0 0;
+    color: var(--task-ink);
+    font-size: 1rem;
+    font-weight: 780;
+    line-height: 1.32;
+}
+
+.tarea-note-card p {
+    margin: 0;
+    color: #566579;
+    font-size: .9rem;
+    line-height: 1.5;
+    white-space: pre-line;
+}
+
+.tarea-priority,
+.tarea-state {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    font-size: .75rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.tarea-priority.is-low { color: #166534; background: #dcfce7; border-color: #86efac; }
+.tarea-priority.is-medium { color: #1d4ed8; background: #dbeafe; border-color: #93c5fd; }
+.tarea-priority.is-high { color: #92400e; background: #fef3c7; border-color: #fcd34d; }
+.tarea-priority.is-urgent { color: #991b1b; background: #fee2e2; border-color: #fca5a5; }
+
+.tarea-state.is-pending { color: #334155; background: #f1f5f9; border-color: #cbd5e1; }
+.tarea-state.is-progress { color: #075985; background: #e0f2fe; border-color: #7dd3fc; }
+.tarea-state.is-paused { color: #854d0e; background: #fef9c3; border-color: #fde047; }
+.tarea-state.is-done { color: #166534; background: #dcfce7; border-color: #86efac; }
+
+.tarea-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.tarea-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    max-width: 100%;
+    padding: 4px 7px;
+    border-radius: 7px;
+    color: #5b677a;
+    background: #f1f5f9;
+    font-size: .75rem;
+}
+
+.tarea-meta b {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.tarea-meta .is-danger { color: #b91c1c; background: #fee2e2; }
+.tarea-meta .is-warning { color: #92400e; background: #fef3c7; }
+
+.tarea-progress {
+    display: grid;
+    gap: 5px;
+}
+
+.tarea-progress strong {
+    color: var(--task-ink);
+    font-size: .88rem;
+}
+
+.tarea-progress span {
+    color: var(--task-muted);
+    font-size: .78rem;
+}
+
+.tarea-progress > span:last-child {
+    display: block;
+    height: 7px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: #e5e7eb;
+}
+
+.tarea-progress > span:last-child i {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #3b82f6, #22c55e);
+}
+
+.tarea-checklist {
+    display: grid;
+    gap: 5px;
+}
+
+.tarea-check-item {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 7px;
+    border-radius: 8px;
+    background: #f8fafc;
+    font-size: .84rem;
+}
+
+.tarea-check-item button {
+    border: 0;
+    background: transparent;
+    color: #2563eb;
+    line-height: 1;
+}
+
+.tarea-check-item span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.tarea-check-item.is-done span {
+    color: var(--task-muted);
+    text-decoration: line-through;
+}
+
+.tarea-check-add {
+    align-items: stretch;
+}
+
+.tarea-check-add input {
+    min-width: 0;
+    font-size: .82rem;
+}
+
+.tarea-actions {
+    justify-content: flex-end;
+    flex-wrap: wrap;
+}
+
+.tarea-actions form {
+    display: inline-flex;
+}
+
+.tareas-empty-lane {
+    padding: 22px 10px;
+    border: 1px dashed #cbd5e1;
+    border-radius: 12px;
+    color: var(--task-muted);
+    text-align: center;
+    font-size: .9rem;
+}
+
+.tareas-gallery-card {
+    margin-top: 16px;
+    padding: 18px;
+    border: 1px solid var(--task-line);
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: var(--task-shadow);
+}
+
+.tareas-gallery-card h3 {
+    margin: 0 0 14px;
+    color: var(--task-ink);
+    font-size: 1rem;
+    font-weight: 750;
+}
+
+.tareas-side-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 11px;
+    color: var(--task-ink);
+    font-size: .9rem;
+}
+
+.tareas-side-row span {
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: #f1f5f9;
+}
+
+.tareas-side-bar {
+    height: 6px;
+    margin-top: 6px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: #e5e7eb;
+}
+
+.tareas-side-bar i {
+    display: block;
+    height: 100%;
+    background: #4f8a62;
+}
+
+.tareas-side-bar.is-warn i { background: #ef4444; }
+.tareas-side-bar.is-done i { background: #22c55e; }
+
+.tareas-history-panel {
+    border-radius: 12px;
+}
+
+html[data-theme="dark"] .tareas-notion-page {
+    --task-paper: #101a2e;
+    --task-paper-soft: #0b1324;
+    --task-ink: #edf4ff;
+    --task-muted: #9fb0c8;
+    --task-line: #26344d;
+    --task-band: #10263a;
+    --task-shadow: 0 18px 40px rgba(0, 0, 0, .28);
+}
+
+html[data-theme="dark"] .tareas-notion-icon,
+html[data-theme="dark"] .tareas-note-editor,
+html[data-theme="dark"] .tareas-gallery-card {
+    background: #101a2e;
+    border-color: #2d3c56;
+}
+
+html[data-theme="dark"] .tareas-notion-title p {
+    color: #aad8ee;
+    background: #10263a;
+    border-color: #8fd3ff;
+}
+
+html[data-theme="dark"] .tareas-note-editor {
+    background: linear-gradient(180deg, #101a2e, #0d1728);
+}
+
+html[data-theme="dark"] .tareas-note-title-field .form-control,
+html[data-theme="dark"] .tareas-note-textarea .form-control {
+    color: #edf4ff;
+    background: #0b1324;
+    border-color: #2d3c56;
+}
+
+html[data-theme="dark"] .tareas-note-fields .form-label,
+html[data-theme="dark"] .tareas-note-form .form-label {
+    color: #b8c7dc;
+}
+
+html[data-theme="dark"] .tareas-lane,
+html[data-theme="dark"] .tareas-lane.is-progress,
+html[data-theme="dark"] .tareas-lane.is-done {
+    background: #0b1324;
+    border-color: #26344d;
+}
+
+html[data-theme="dark"] .tarea-note-card {
+    background: #101a2e;
+    border-color: #2d3c56;
+    box-shadow: 0 14px 34px rgba(0, 0, 0, .28);
+}
+
+html[data-theme="dark"] .tarea-note-card p,
+html[data-theme="dark"] .tarea-meta span,
+html[data-theme="dark"] .tarea-progress span {
+    color: #b8c7dc;
+}
+
+html[data-theme="dark"] .tarea-meta span,
+html[data-theme="dark"] .tarea-check-item,
+html[data-theme="dark"] .tareas-side-row span {
+    background: #18243a;
+}
+
+html[data-theme="dark"] .tareas-empty-lane {
+    border-color: #2d3c56;
+}
+
+html[data-theme="dark"] .tarea-state.is-pending { color: #d6e2f3; background: #1c2940; border-color: #33435f; }
+html[data-theme="dark"] .tarea-progress > span:last-child,
+html[data-theme="dark"] .tareas-side-bar { background: #26344d; }
+
+@media (max-width: 1200px) {
+    .tareas-notion-layout { grid-template-columns: 1fr; }
+    .tareas-side-panel { order: -1; }
+    .tareas-gallery-card { max-width: none; }
+}
+
+@media (max-width: 980px) {
+    .tareas-note-form,
+    .tareas-kanban { grid-template-columns: 1fr; }
+    .tareas-note-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .tareas-notion-hero { grid-template-columns: auto minmax(0, 1fr); }
+    .tareas-notion-hero > .btn { grid-column: 1 / -1; justify-self: start; }
+}
+
+@media (max-width: 620px) {
+    .tareas-notion-hero { grid-template-columns: 1fr; padding-top: 12px; }
+    .tareas-notion-icon { width: 58px; height: 58px; font-size: 1.55rem; }
+    .tareas-note-fields { grid-template-columns: 1fr; }
+    .tareas-section-band { min-height: 54px; font-size: 1.25rem; }
+    .tareas-view-tabs { gap: 10px; }
+    .tarea-actions { justify-content: stretch; }
+    .tarea-actions .btn,
+    .tarea-actions form { flex: 1 1 auto; }
+}

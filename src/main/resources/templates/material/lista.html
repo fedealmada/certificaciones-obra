@@ -1,10 +1,10 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Entregas y viajes</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script th:src="@{/js/design-system.js(v='20260801-doc-folder-page')}"></script>
+    <script th:src="@{/js/design-system.js(v='20260801-doc-folder-page')}" defer></script>
     <link th:href="@{/css/app.css(v='20260730-dark2')}" rel="stylesheet">
     <link th:href="@{/css/theme.css(v='20260731-night-reset')}" rel="stylesheet">
     <link th:href="@{/css/design-system.css(v='20260801-doc-folder-page')}" rel="stylesheet">
@@ -75,7 +75,7 @@
             th:data-avance="${avancePorOrden.getOrDefault(orden.id, cero)}"
             th:data-estado="${estadosPorOrden.get(orden.id) != null ? estadosPorOrden.get(orden.id).name() : 'PENDIENTE'}"
             th:data-estado-texto="${estadosPorOrden.get(orden.id) != null && estadosPorOrden.get(orden.id).name() == 'COMPLETO' ? 'ENTREGA COMPLETA' : (estadosPorOrden.get(orden.id) != null && estadosPorOrden.get(orden.id).name() == 'PARCIAL' ? 'ENTREGA PARCIAL' : 'ENTREGA PENDIENTE')}"
-            th:data-item-lines="${#strings.listJoin(orden.items.![item + '||' + detalle + '||' + unidad + '||' + cantidad + '||' + precioUnitario + '||' + importe], '~~')}"
+            th:data-item-lines="${itemPreviewLines.get(orden.id)}"
             tabindex="0"
             role="link">
             <td><a class="cert-row-link" th:href="@{/materiales/oc/{id}(id=${orden.id}, origen='entregas')}" th:text="${orden.numero}">OC</a></td>

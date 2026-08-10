@@ -60,6 +60,26 @@ public class ItemizadoController {
         return "redirect:/itemizado";
     }
 
+
+    @PostMapping("/manuales/{id}")
+    public String actualizarManual(@PathVariable Long id,
+                                   @RequestParam Long rubroId,
+                                   @RequestParam(required = false) String item,
+                                   @RequestParam String detalle,
+                                   @RequestParam(required = false) String unidad,
+                                   @RequestParam(required = false) BigDecimal cantidad,
+                                   @RequestParam(required = false) BigDecimal precioUnitario,
+                                   RedirectAttributes redirectAttributes) {
+        try {
+            itemizadoService.actualizarManual(id, rubroId, item, detalle, unidad, cantidad, precioUnitario);
+            redirectAttributes.addFlashAttribute("accionCompletada", true);
+            redirectAttributes.addFlashAttribute("accionTitulo", "Item actualizado");
+            redirectAttributes.addFlashAttribute("accionMensaje", "El item manual se actualizo correctamente.");
+        } catch (IllegalArgumentException ex) {
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        }
+        return "redirect:/itemizado";
+    }
     @PostMapping("/manuales/{id}/materiales")
     public String crearMaterialManual(@PathVariable Long id,
                                       @RequestParam String detalle,

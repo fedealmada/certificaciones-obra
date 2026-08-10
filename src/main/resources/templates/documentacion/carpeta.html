@@ -41,7 +41,7 @@
         <div class="contractor-folder-actions">
             <a class="folder-premium-btn is-secondary" th:href="@{/documentacion}"><i class="bi bi-arrow-left"></i> Volver</a>
             <button class="folder-premium-btn is-secondary" type="button" data-folder-edit-open><i class="bi bi-pencil-square"></i> Editar carpeta</button>
-            <a class="folder-premium-btn is-primary" th:href="${grupo.proveedorId() == null ? '/documentacion/nuevo?sujeto=OBRA' : '/documentacion/nuevo?proveedorId=' + grupo.proveedorId()}"><i class="bi bi-plus-lg"></i> <span>Nuevo documento</span></a>
+            <button class="folder-premium-btn is-primary" type="button" data-folder-doc-open><i class="bi bi-plus-lg"></i> <span>Nuevo documento</span></button>
         </div>
     </section>
 
@@ -273,6 +273,83 @@
         </aside>
     </section>
 
+
+    <div class="document-quick-view d-none" id="folder-document-create-view" aria-hidden="true">
+        <div class="document-quick-backdrop" data-folder-doc-close></div>
+        <section class="document-quick-modal folder-document-create-modal" role="dialog" aria-modal="true" aria-labelledby="folder-doc-create-title" tabindex="-1">
+            <button class="document-quick-close" type="button" data-folder-doc-close aria-label="Cerrar carga"><i class="bi bi-x-lg"></i></button>
+            <header class="document-quick-header">
+                <span class="document-quick-icon folder-edit-icon" th:style="${'--folder-color:' + grupo.color()}"><i class="bi bi-file-earmark-plus"></i></span>
+                <div>
+                    <div class="document-kicker">Nuevo documento</div>
+                    <h2 id="folder-doc-create-title" th:text="${grupo.nombre()}">Carpeta</h2>
+                    <p>La carpeta, el contratista y la fecha de verificacion fisica se completan automaticamente.</p>
+                </div>
+            </header>
+            <form class="folder-edit-form" method="post" th:action="@{/documentacion}">
+                <input type="hidden" name="carpetaId" th:value="${grupo.carpetaId()}">
+                <input type="hidden" name="proveedorId" th:value="${grupo.proveedorId()}">
+                <input type="hidden" name="sujeto" th:value="${grupo.proveedorId() == null ? 'OBRA' : 'CONTRATISTA'}">
+                <input type="hidden" name="presentado" value="true">
+                <input type="hidden" name="obligatorioIngreso" value="true">
+                <input type="hidden" name="activo" value="true">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Tipo de vinculo</label>
+                        <select class="form-select" name="vinculo" id="folder-doc-vinculo">
+                            <option th:each="vinculo : ${vinculos}" th:value="${vinculo}" th:text="${vinculo.descripcion}">Vinculo</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Tipo de documento</label>
+                        <select class="form-select" name="tipo" id="folder-doc-tipo">
+                            <option th:each="tipo : ${tipos}" th:value="${tipo}" th:text="${tipo.descripcion}" th:data-vinculos="${tipo.vinculosCsv}">Documento</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Nombre personalizado</label>
+                        <input class="form-control" name="nombrePersonalizado" placeholder="Solo si corresponde">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Vigente desde</label>
+                        <input class="form-control" type="date" name="fechaEmision" th:value="${hoy}">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Vigente hasta</label>
+                        <input class="form-control" type="date" name="fechaVencimiento">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Presentacion</label>
+                        <input class="form-control" type="date" name="fechaPresentacion" th:value="${hoy}">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Version fisica hasta</label>
+                        <input class="form-control" type="date" name="fechaVencimientoFisico">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Verificacion fisica</label>
+                        <input class="form-control" type="date" name="fechaUltimaVerificacionFisica" th:value="${hoy}">
+                    </div>
+                    <div class="col-md-12">
+                        <div class="documentacion-check-grid">
+                            <label><input type="checkbox" name="sinVencimiento"> No aplica vencimiento</label>
+                            <label><input type="checkbox" name="impresoLegajo"> Hay copia impresa en legajo</label>
+                            <label><input type="checkbox" name="mensual"> Control mensual</label>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <label class="form-label">Observacion</label>
+                        <input class="form-control" name="observacion" placeholder="Aclaraciones, fuente, ubicacion o responsable">
+                    </div>
+                </div>
+                <footer class="document-quick-actions">
+                    <button class="btn btn-primary" type="submit"><i class="bi bi-save"></i> Guardar documento</button>
+                    <a class="btn btn-outline-secondary" th:href="@{/documentacion/nuevo(carpetaId=${grupo.carpetaId()})}"><i class="bi bi-sliders"></i> Formulario completo</a>
+                    <button class="btn btn-outline-secondary" type="button" data-folder-doc-close><i class="bi bi-x-lg"></i> Cancelar</button>
+                </footer>
+            </form>
+        </section>
+    </div>
     <div class="document-quick-view d-none" id="folder-edit-view" aria-hidden="true">
         <div class="document-quick-backdrop" data-folder-edit-close></div>
         <section class="document-quick-modal folder-edit-modal" role="dialog" aria-modal="true" aria-labelledby="folder-edit-title" tabindex="-1">
@@ -365,6 +442,46 @@
     </div>
 </main>
 <script>
+const folderDocCreateView = document.getElementById('folder-document-create-view');
+const folderDocCreateModal = folderDocCreateView?.querySelector('.folder-document-create-modal');
+const folderDocVinculo = document.getElementById('folder-doc-vinculo');
+const folderDocTipo = document.getElementById('folder-doc-tipo');
+const folderDocTipoOptions = Array.from(folderDocTipo?.options || []).map(option => option.cloneNode(true));
+
+function updateFolderDocTipoOptions() {
+    if (!folderDocVinculo || !folderDocTipo) return;
+    const selectedValue = folderDocTipo.value;
+    const vinculo = folderDocVinculo.value || 'GENERAL';
+    folderDocTipo.innerHTML = '';
+    folderDocTipoOptions
+        .filter(option => vinculo === 'GENERAL' || (option.dataset.vinculos || '').split(',').includes(vinculo))
+        .forEach(option => folderDocTipo.appendChild(option.cloneNode(true)));
+    if (Array.from(folderDocTipo.options).some(option => option.value === selectedValue)) {
+        folderDocTipo.value = selectedValue;
+    }
+}
+
+function openFolderDocCreate() {
+    if (!folderDocCreateView) return;
+    updateFolderDocTipoOptions();
+    folderDocCreateView.classList.remove('d-none', 'is-closing');
+    folderDocCreateView.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('document-modal-open');
+    requestAnimationFrame(() => folderDocCreateView.classList.add('is-open'));
+    setTimeout(() => folderDocCreateModal?.focus?.(), 80);
+}
+
+function closeFolderDocCreate() {
+    if (!folderDocCreateView || folderDocCreateView.classList.contains('d-none')) return;
+    folderDocCreateView.classList.add('is-closing');
+    folderDocCreateView.classList.remove('is-open');
+    folderDocCreateView.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('document-modal-open');
+    setTimeout(() => {
+        folderDocCreateView.classList.add('d-none');
+        folderDocCreateView.classList.remove('is-closing');
+    }, 180);
+}
 const folderEditView = document.getElementById('folder-edit-view');
 const folderEditModal = folderEditView?.querySelector('.folder-edit-modal');
 const folderEditColor = folderEditView?.querySelector('[data-folder-edit-color]');
@@ -399,11 +516,14 @@ function syncFolderEditColor(value) {
 }
 
 document.querySelector('[data-folder-edit-open]')?.addEventListener('click', openFolderEdit);
+document.querySelector('[data-folder-doc-open]')?.addEventListener('click', openFolderDocCreate);
+folderDocCreateView?.querySelectorAll('[data-folder-doc-close]').forEach(element => element.addEventListener('click', closeFolderDocCreate));
+folderDocVinculo?.addEventListener('change', updateFolderDocTipoOptions);
 folderEditView?.querySelectorAll('[data-folder-edit-close]').forEach(element => element.addEventListener('click', closeFolderEdit));
 folderEditColor?.addEventListener('input', event => syncFolderEditColor(event.target.value));
 folderEditColorText?.addEventListener('input', event => syncFolderEditColor(event.target.value));
 document.addEventListener('keydown', event => {
-    if (event.key === 'Escape') closeFolderEdit();
+    if (event.key === 'Escape') { closeFolderEdit(); closeFolderDocCreate(); }
 });
 </script>
 </body>

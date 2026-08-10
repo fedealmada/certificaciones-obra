@@ -14,6 +14,7 @@ import java.time.LocalDate;
 public class DocumentoObraForm {
     private Long id;
     private Long proveedorId;
+    private Long carpetaId;
     private Long trabajadorId;
     private SujetoDocumental sujeto = SujetoDocumental.CONTRATISTA;
     private TipoVinculoDocumental vinculo = TipoVinculoDocumental.GENERAL;
@@ -37,7 +38,7 @@ public class DocumentoObraForm {
     private LocalDate fechaVencimientoFisico;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    private LocalDate fechaUltimaVerificacionFisica;
+    private LocalDate fechaUltimaVerificacionFisica = LocalDate.now();
 
     private boolean mensual;
     private boolean obligatorioIngreso = true;

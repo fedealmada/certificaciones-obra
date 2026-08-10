@@ -43,6 +43,9 @@ public class DocumentoObra {
     private Proveedor proveedor;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    private CarpetaDocumentacion carpeta;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     private DepositoTrabajador trabajador;
 
     @Enumerated(EnumType.STRING)

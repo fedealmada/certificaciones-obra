@@ -35,6 +35,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -86,6 +87,7 @@ public class OrdenCompraController {
                 .filter(entry -> Boolean.TRUE.equals(entry.getValue()))
                 .map(Map.Entry::getKey)
                 .toList()));
+        model.addAttribute("itemPreviewLines", itemPreviewLines(ordenes, false));
         model.addAttribute("categorias", categoriaOrdenService.listarActivas());
         model.addAttribute("proveedor", proveedor);
         model.addAttribute("categoriaSeleccionada", categoriaId);
@@ -94,24 +96,24 @@ public class OrdenCompraController {
     }
 
     @GetMapping("/nueva")
-    public String nueva(Model model) {
+    public String nueva(Model model, HttpSession session) {
         model.addAttribute("form", ordenCompraService.crearForm(null));
         model.addAttribute("categorias", categoriaOrdenService.listarActivas());
         model.addAttribute("proveedores", proveedorService.listarTodos());
         model.addAttribute("rubros", rubroService.listarActivos());
-        model.addAttribute("itemsManoObra", itemOrdenCompraRepository.findByCategoriaOrderByOrdenCompraNumeroAscIdAsc(CategoriaItem.MANO_OBRA));
+        model.addAttribute("itemsManoObra", itemsManoObraObraActiva(session));
         model.addAttribute("catalogoMateriales", materialCatalogoService.listarActivos());
         model.addAttribute("modosSeguimiento", ModoSeguimientoOrden.values());
         return "oc/form";
     }
 
     @GetMapping("/{id}/editar")
-    public String editar(@PathVariable Long id, Model model) {
+    public String editar(@PathVariable Long id, Model model, HttpSession session) {
         model.addAttribute("form", ordenCompraService.crearForm(id));
         model.addAttribute("categorias", categoriaOrdenService.listarActivas());
         model.addAttribute("proveedores", proveedorService.listarTodos());
         model.addAttribute("rubros", rubroService.listarActivos());
-        model.addAttribute("itemsManoObra", itemOrdenCompraRepository.findByCategoriaOrderByOrdenCompraNumeroAscIdAsc(CategoriaItem.MANO_OBRA));
+        model.addAttribute("itemsManoObra", itemsManoObraObraActiva(session));
         model.addAttribute("catalogoMateriales", materialCatalogoService.listarActivos());
         model.addAttribute("modosSeguimiento", ModoSeguimientoOrden.values());
         return "oc/form";
@@ -130,10 +132,10 @@ public class OrdenCompraController {
             return "redirect:/oc/" + ordenCompra.getId();
         } catch (IllegalArgumentException ex) {
             model.addAttribute("form", form);
-            model.addAttribute("categorias", categoriaOrdenService.listarActivas());
+        model.addAttribute("categorias", categoriaOrdenService.listarActivas());
             model.addAttribute("proveedores", proveedorService.listarTodos());
             model.addAttribute("rubros", rubroService.listarActivos());
-            model.addAttribute("itemsManoObra", itemOrdenCompraRepository.findByCategoriaOrderByOrdenCompraNumeroAscIdAsc(CategoriaItem.MANO_OBRA));
+            model.addAttribute("itemsManoObra", itemsManoObraObraActiva(session));
             model.addAttribute("catalogoMateriales", materialCatalogoService.listarActivos());
             model.addAttribute("modosSeguimiento", ModoSeguimientoOrden.values());
             model.addAttribute("error", ex.getMessage());
@@ -240,6 +242,43 @@ public class OrdenCompraController {
         return "oc/item-detalle";
     }
 
+
+    private List<ItemOrdenCompra> itemsManoObraObraActiva(HttpSession session) {
+        return itemOrdenCompraRepository.findByOrdenCompraObraIdAndCategoriaOrderByOrdenCompraNumeroAscIdAsc(
+                obraService.obraActiva(session).getId(),
+                CategoriaItem.MANO_OBRA);
+    }
+
+    private Map<Long, String> itemPreviewLines(List<OrdenCompra> ordenes, boolean soloRecepcionables) {
+        Map<Long, String> previews = new HashMap<>();
+        for (OrdenCompra orden : ordenes) {
+            List<String> lineas = new ArrayList<>();
+            for (ItemOrdenCompra item : orden.getItems()) {
+                if (soloRecepcionables && item.getCategoria() == CategoriaItem.MANO_OBRA) {
+                    continue;
+                }
+                lineas.add(textoPreview(item.getItem()) + "||"
+                        + textoPreview(item.getDetalle()) + "||"
+                        + textoPreview(item.getUnidad()) + "||"
+                        + numeroPreview(item.getCantidad()) + "||"
+                        + numeroPreview(item.getPrecioUnitario()) + "||"
+                        + numeroPreview(item.getImporte()));
+                if (lineas.size() >= 12) {
+                    break;
+                }
+            }
+            previews.put(orden.getId(), String.join("~~", lineas));
+        }
+        return previews;
+    }
+
+    private String textoPreview(String valor) {
+        return valor == null ? "" : valor.replace("||", " ").replace("~~", " ").trim();
+    }
+
+    private String numeroPreview(BigDecimal valor) {
+        return valor == null ? "0" : valor.toPlainString();
+    }
     private BigDecimal totalPorCategoria(OrdenCompra ordenCompra, CategoriaItem categoria) {
         return ordenCompra.getItems().stream()
                 .filter(item -> item.getCategoria() == categoria)

@@ -27,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.net.MalformedURLException;
+import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 
@@ -46,19 +47,33 @@ public class DocumentacionController {
         var grupos = documentacionService.agruparPorContratista(obra);
         model.addAttribute("gruposDocumentacion", grupos);
         model.addAttribute("totalDocumentos", grupos.stream().mapToLong(grupo -> grupo.total()).sum());
-        model.addAttribute("resumen", documentacionService.resumen(obra));
+        model.addAttribute("resumen", documentacionService.resumenDesdeGrupos(grupos));
         model.addAttribute("proveedores", proveedorService.listarActivos());
         return "documentacion/index";
     }
 
     @GetMapping("/nuevo")
     public String nuevo(@RequestParam(required = false) Long proveedorId,
+                        @RequestParam(required = false) Long carpetaId,
                         @RequestParam(required = false) SujetoDocumental sujeto,
-                        Model model) {
+                        Model model,
+                        HttpSession session) {
         DocumentoObraForm form = new DocumentoObraForm();
         form.setProveedorId(proveedorId);
+        form.setCarpetaId(carpetaId);
+        form.setFechaUltimaVerificacionFisica(LocalDate.now());
         if (sujeto != null) {
             form.setSujeto(sujeto);
+        }
+        if (carpetaId != null) {
+            var carpeta = documentacionService.obtenerCarpeta(carpetaId, obraService.obraActiva(session));
+            if (carpeta.getProveedor() != null) {
+                form.setProveedorId(carpeta.getProveedor().getId());
+                form.setSujeto(SujetoDocumental.CONTRATISTA);
+            } else if (carpeta.getProveedor() == null) {
+                form.setSujeto(SujetoDocumental.OBRA);
+            }
+            model.addAttribute("carpetaSeleccionada", carpeta);
         }
         cargarFormulario(model, form, false);
         return "documentacion/form";
@@ -79,6 +94,9 @@ public class DocumentacionController {
         model.addAttribute("grupo", grupo);
         model.addAttribute("proveedor", grupo.proveedorId() == null ? null : proveedorService.obtener(grupo.proveedorId()));
         model.addAttribute("proveedores", proveedorService.listarActivos());
+        model.addAttribute("vinculos", TipoVinculoDocumental.values());
+        model.addAttribute("tipos", TipoDocumentoObra.values());
+        model.addAttribute("hoy", LocalDate.now());
         model.addAttribute("inicioLegajo", grupo.documentos().stream()
                 .map(documento -> documento.getFechaCreacion())
                 .filter(java.util.Objects::nonNull)
@@ -120,6 +138,9 @@ public class DocumentacionController {
         try {
             documentacionService.guardar(form, obraService.obraActiva(session));
             redirectAttributes.addFlashAttribute("success", "Documento guardado correctamente.");
+            if (form.getCarpetaId() != null) {
+                return "redirect:/documentacion/carpetas/" + form.getCarpetaId();
+            }
             return "redirect:/documentacion";
         } catch (IllegalArgumentException ex) {
             model.addAttribute("error", ex.getMessage());
@@ -288,3 +309,4 @@ public class DocumentacionController {
         model.addAttribute("tipos", TipoDocumentoObra.values());
     }
 }
+
