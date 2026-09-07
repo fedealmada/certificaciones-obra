@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="tareaCard(tarea)">
+    <div class="tarea-note-topline">
+        <span class="tarea-priority" th:classappend="${' ' + tarea.prioridad.cssClass}" th:text="${tarea.prioridad.etiqueta}">Media</span>
+        <span class="tarea-state" th:classappend="${' ' + tarea.estado.cssClass}" th:text="${tarea.estado.etiqueta}">Pendiente</span>
+    </div>
+    <h3 th:text="${tarea.titulo}">Tarea</h3>
+    <p th:if="${tarea.descripcion}" th:text="${tarea.descripcion}">Nota</p>
+    <div class="tarea-meta">
+        <span th:if="${tarea.fechaVencimiento}"><i class="bi bi-calendar-event"></i> <b th:text="${#temporals.format(tarea.fechaVencimiento, 'dd/MM/yyyy')}">Fecha</b></span>
+        <span th:if="${tarea.responsable}"><i class="bi bi-person"></i> <b th:text="${tarea.responsable}">Responsable</b></span>
+        <span th:if="${tarea.etiqueta}"><i class="bi bi-tag"></i> <b th:text="${tarea.etiqueta}">Etiqueta</b></span>
+        <span th:if="${tarea.vencida()}" class="is-danger"><i class="bi bi-exclamation-triangle"></i> Vencida</span>
+        <span th:if="${tarea.venceHoy()}" class="is-warning"><i class="bi bi-alarm"></i> Vence hoy</span>
+    </div>
+    <div class="tarea-progress">
+        <div><strong th:text="${tarea.avanceChecklist()} + '%'">0%</strong><span th:text="|${tarea.checklistCompletado()}/${tarea.totalChecklist()} checklist|">0/0 checklist</span></div>
+        <span><i th:style="'width:' + ${tarea.avanceChecklist()} + '%'"></i></span>
+    </div>
+    <div class="tarea-checklist" th:if="${!tarea.checklistOrdenado().isEmpty()}">
+        <div class="tarea-check-item" th:each="item : ${tarea.checklistOrdenado()}" th:classappend="${item.completado ? ' is-done' : ''}">
+            <form method="post" th:action="@{/tareas/checklist/{id}/toggle(id=${item.id})}">
+                <input type="hidden" name="tareaId" th:value="${tarea.id}">
+                <button type="submit" th:title="${item.completado ? 'Marcar pendiente' : 'Marcar hecho'}"><i class="bi" th:classappend="${item.completado ? ' bi-check-square-fill' : ' bi-square'}"></i></button>
+            </form>
+            <span th:text="${item.descripcion}">Checklist</span>
+            <form method="post" th:action="@{/tareas/checklist/{id}/eliminar(id=${item.id})}">
+                <input type="hidden" name="tareaId" th:value="${tarea.id}">
+                <button type="submit" title="Eliminar punto"><i class="bi bi-x-lg"></i></button>
+            </form>
+        </div>
+    </div>
+    <form class="tarea-check-add" method="post" th:action="@{/tareas/{id}/checklist(id=${tarea.id})}">
+        <input class="form-control form-control-sm" name="descripcion" placeholder="Agregar punto al checklist">
+        <button class="btn btn-sm btn-outline-primary" type="submit"><i class="bi bi-plus-lg"></i></button>
+    </form>
+    <div class="tarea-actions">
+        <a class="btn btn-sm btn-outline-primary" th:href="@{/tareas/{id}/editar(id=${tarea.id})}" title="Editar"><i class="bi bi-pencil-square"></i></a>
+        <form method="post" th:action="@{/tareas/{id}/estado(id=${tarea.id})}">
+            <input type="hidden" name="estado" value="EN_CURSO">
+            <button class="btn btn-sm btn-outline-secondary" type="submit" title="Mover a en curso"><i class="bi bi-hourglass-split"></i></button>
+        </form>
+        <form method="post" th:action="@{/tareas/{id}/estado(id=${tarea.id})}">
+            <input type="hidden" name="estado" value="COMPLETADA">
+            <button class="btn btn-sm btn-success" type="submit"><i class="bi bi-check2"></i> Cerrar</button>
+        </form>
+        <form method="post" th:action="@{/tareas/{id}/eliminar(id=${tarea.id})}" onsubmit="return confirm('Eliminar esta tarea?');">
+            <button class="btn btn-sm btn-outline-danger" type="submit" title="Eliminar"><i class="bi bi-trash"></i></button>
+        </form>
+    </div>
+</div>
+</body>
+</html>

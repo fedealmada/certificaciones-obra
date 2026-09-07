@@ -13,6 +13,5 @@ public interface TareaPendienteRepository extends JpaRepository<TareaPendiente, 
     @EntityGraph(attributePaths = "checklist")
     List<TareaPendiente> findByObraAndActivoTrueAndEstadoInOrderByFechaVencimientoAscPrioridadDescIdDesc(Obra obra, Collection<EstadoTarea> estados);
 
-    @EntityGraph(attributePaths = "checklist")
     List<TareaPendiente> findTop30ByObraAndActivoTrueAndEstadoOrderByFechaCierreDescIdDesc(Obra obra, EstadoTarea estado);
 }

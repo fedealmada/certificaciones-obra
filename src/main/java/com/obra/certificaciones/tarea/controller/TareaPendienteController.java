@@ -97,11 +97,19 @@ public class TareaPendienteController {
         var obra = obraService.obraActiva(session);
         var pendientes = tareaService.pendientes(obra);
         var historial = tareaService.historial(obra);
+        var pendientesPorHacer = pendientes.stream()
+                .filter(tarea -> tarea.getEstado() == EstadoTarea.PENDIENTE || tarea.getEstado() == EstadoTarea.PAUSADA)
+                .toList();
+        var tareasEnCurso = pendientes.stream()
+                .filter(tarea -> tarea.getEstado() == EstadoTarea.EN_CURSO)
+                .toList();
         model.addAttribute("form", form);
         model.addAttribute("modoEdicion", modoEdicion);
         model.addAttribute("prioridades", PrioridadTarea.values());
         model.addAttribute("estados", EstadoTarea.values());
         model.addAttribute("pendientes", pendientes);
+        model.addAttribute("pendientesPorHacer", pendientesPorHacer);
+        model.addAttribute("tareasEnCurso", tareasEnCurso);
         model.addAttribute("historial", historial);
         model.addAttribute("totalPendientes", pendientes.size());
         model.addAttribute("totalUrgentes", pendientes.stream().filter(t -> t.getPrioridad() == PrioridadTarea.URGENTE).count());
