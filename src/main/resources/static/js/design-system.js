@@ -428,6 +428,25 @@
         setActiveTab(buttons.find(button => button.classList.contains('is-active'))?.dataset.folderTab || buttons[0]?.dataset.folderTab || 'documentos');
     }
 
+    function initMobileTables() {
+        document.querySelectorAll('table.table').forEach(table => {
+            if (table.closest('form') || table.matches('.itemizado-excel, .control-rubro-excel') ||
+                table.querySelector('input, select, textarea') || table.tHead?.rows.length !== 1) return;
+            const headers = Array.from(table.tHead.rows[0].cells);
+            if (headers.some(cell => cell.colSpan !== 1 || cell.rowSpan !== 1)) return;
+            const labels = headers.map(cell => cell.textContent.trim());
+            for (const body of table.tBodies) {
+                for (const row of body.rows) {
+                    if (row.cells.length !== labels.length) continue;
+                    Array.from(row.cells).forEach((cell, index) => {
+                        cell.dataset.mobileLabel = labels[index];
+                    });
+                }
+            }
+            table.classList.add('mobile-record-table');
+        });
+    }
+
     function init() {
         initTheme();
         initSidebar();
@@ -435,6 +454,7 @@
         initBootstrapHelpers();
         initSharedDialogs();
         initDesignTables();
+        initMobileTables();
         initProgressBars();
         initDocumentQuickView();
         initDocumentFolderFilters();

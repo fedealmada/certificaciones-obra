@@ -210,3 +210,42 @@ html[data-theme] body .cg-page .cg-edit-link { font-size:13px; padding:7px 10px;
  .cg-print-head { padding-bottom:12px; }
  .cg-print-meta { margin:14px 0; }
 }
+/* Cost editor stays above the current certificate without discarding advances. */
+.cg-cost-dialog {
+  --cg-bg: var(--ds-surface);
+  --cg-soft: var(--ds-surface-muted);
+  --cg-line: var(--ds-border);
+  --cg-text: var(--ds-text);
+  --cg-muted: var(--ds-muted);
+  --cg-accent: var(--ds-primary);
+  --cg-tint: var(--ds-surface-muted);
+  width: min(960px, calc(100vw - 24px));
+  max-height: calc(100dvh - 32px);
+  padding: 0;
+  border: 1px solid var(--ds-border);
+  border-radius: 8px;
+  background: var(--ds-surface);
+  color: var(--ds-text);
+  box-shadow: 0 20px 64px #0005;
+  overflow-y: auto;
+}
+.cg-cost-dialog::backdrop { background: #0009; }
+.cg-cost-dialog[open] { animation: cg-cost-open 160ms ease-out; }
+.cg-cost-dialog-header {
+  position: sticky; top: 0; z-index: 1; display: flex;
+  align-items: center; justify-content: space-between; gap: 12px;
+  padding: 16px 20px; background: var(--ds-surface);
+  border-bottom: 1px solid var(--ds-border);
+}
+.cg-cost-dialog-header h2 { margin: 0; font-size: 1.1rem; }
+.cg-cost-dialog-body { padding: 16px; }
+.cg-cost-dialog-body .cg-panel { margin: 0; }
+.cg-cost-dialog-status { padding: 0 20px 16px; margin: 0; }
+.cg-cost-dialog-status:empty { display: none; }
+@keyframes cg-cost-open { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width: 640px) {
+  .cg-cost-dialog .cg-fields, .cg-cost-dialog .cg-cost-summary { grid-template-columns: minmax(0, 1fr); }
+  .cg-cost-dialog .cg-wide { grid-column: auto; }
+  .cg-cost-dialog-header, .cg-cost-dialog-body { padding: 12px; }
+}
+@media (prefers-reduced-motion: reduce) { .cg-cost-dialog[open] { animation: none; } }
