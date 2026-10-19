@@ -9,5 +9,7 @@ import java.math.BigDecimal;
 @Setter
 public class ItemNuevaCertificacionForm {
     private Long itemOrdenCompraId;
+    private BigDecimal porcentajeCalculado;
+    private BigDecimal cantidadActual = BigDecimal.ZERO;
     private BigDecimal porcentajeActual = BigDecimal.ZERO;
 }

@@ -64,7 +64,8 @@
         <div class="cert-table-title-row">
             <div>
                 <div class="document-kicker">Carga de avance</div>
-                <h2>Items certificables</h2>
+                <h2 th:text="${form.porCantidad ? 'Cantidades ejecutadas' : 'Porcentajes de avance'}">Items certificables</h2>
+                <p class="text-muted" th:if="${form.porCantidad}">Ingresá la cantidad de este certificado. El importe se calcula con el precio unitario de la OC.</p>
             </div>
             <span th:text="${#lists.size(itemsCertificables)} + ' items'">0 items</span>
         </div>
@@ -75,26 +76,27 @@
                 <th>Item</th>
                 <th>Detalle</th>
                 <th class="text-end">Importe</th>
-                <th class="text-end">% anterior</th>
-                <th class="text-end">% actual</th>
-                <th class="text-end">% acumulado</th>
+                <th class="text-end">Anterior</th>
+                <th class="text-end">Actual</th>
+                <th class="text-end">Acumulado</th>
                 <th class="text-end">Monto actual</th>
             </tr>
             </thead>
             <tbody>
             <tr th:each="vista, st : ${itemsCertificables}"
-                th:attr="data-importe=${vista.itemOrdenCompra.importe},data-anterior=${vista.porcentajeAnterior},data-pendiente=${vista.porcentajePendiente}">
+                th:attr="data-cantidad=${form.porCantidad},data-unidad=${vista.itemOrdenCompra.unidad},data-precio=${vista.itemOrdenCompra.precioUnitario},data-importe=${vista.itemOrdenCompra.importe},data-anterior=${vista.porcentajeAnterior},data-pendiente=${vista.porcentajePendiente}">
                 <td th:text="${vista.itemOrdenCompra.item}"></td>
                 <td>
                     <div th:text="${vista.itemOrdenCompra.detalle}"></div>
+                    <small class="d-block text-muted" th:if="${form.porCantidad}" th:text="${'Contratado: ' + vista.itemOrdenCompra.cantidad + ' ' + vista.itemOrdenCompra.unidad + ' · $ ' + #numbers.formatDecimal(vista.itemOrdenCompra.precioUnitario,1,'POINT',2,'COMMA') + ' por unidad'}"></small>
                     <small class="text-muted" th:if="${vista.porcentajePendiente == 0}">Sin margen para certificar</small>
-                    <small class="text-muted" th:if="${vista.porcentajePendiente > 0}" th:text="'Maximo editable: ' + ${vista.porcentajePendiente} + ' %'"></small>
+                    <small class="text-muted" th:if="${vista.porcentajePendiente > 0}" th:text="'Máximo editable: ' + ${#numbers.formatDecimal(vista.porcentajePendiente,1,'POINT',2,'COMMA')} + ${form.porCantidad ? ' ' + vista.itemOrdenCompra.unidad : ' %'}"></small>
                 </td>
                 <td class="text-end" th:text="${#numbers.formatDecimal(vista.itemOrdenCompra.importe, 1, 'POINT', 2, 'COMMA')}"></td>
-                <td class="text-end" th:text="${vista.porcentajeAnterior} + ' %'"></td>
+                <td class="text-end" th:text="${#numbers.formatDecimal(vista.porcentajeAnterior,1,'POINT',2,'COMMA')} + ${form.porCantidad ? ' ' + vista.itemOrdenCompra.unidad : ' %'}"></td>
                 <td class="w-25">
                     <input type="hidden" th:field="*{items[__${st.index}__].itemOrdenCompraId}">
-                    <input class="form-control text-end porcentaje-input" type="number" step="0.01" min="0"
+                    <input class="form-control text-end porcentaje-input" type="number" th:step="${form.porCantidad ? '0.000001' : '0.01'}" min="0"
                            th:max="${vista.porcentajePendiente}"
                            th:readonly="${vista.porcentajePendiente == 0}"
                            th:field="*{items[__${st.index}__].porcentajeActual}">
@@ -142,8 +144,9 @@ function recalcularCertificado() {
         }
 
         const acumulado = anterior + actual;
-        const montoActual = importe * actual / 100;
-        row.querySelector('.acumulado-estimado').textContent = `${moneyFormatter.format(acumulado)} %`;
+        const porCantidad = row.dataset.cantidad === 'true';
+        const montoActual = porCantidad ? actual * toNumber(row.dataset.precio) : importe * actual / 100;
+        row.querySelector('.acumulado-estimado').textContent = `${moneyFormatter.format(acumulado)} ${porCantidad ? row.dataset.unidad : '%'}`;
         row.querySelector('.monto-estimado').textContent = moneyFormatter.format(montoActual);
 
         totalActual += montoActual;

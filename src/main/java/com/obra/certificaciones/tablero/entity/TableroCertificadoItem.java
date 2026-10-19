@@ -29,6 +29,17 @@ public class TableroCertificadoItem {
     @ManyToOne(fetch = FetchType.LAZY)
     private ItemOrdenCompra itemOrdenCompra;
 
+    private String claveContinuidad;
+    private boolean recurrente;
+    @Column(precision = 19, scale = 2)
+    private BigDecimal totalTareaInformado;
+    @Column(precision = 19, scale = 2)
+    private BigDecimal montoActualInformado;
+    @Column(precision = 19, scale = 2)
+    private BigDecimal montoAcumuladoInformado;
+
+    @Column(precision = 19, scale = 2)
+    private BigDecimal montoAnteriorFijo;
     private boolean grupo;
     private String grupoNombre;
     private Integer ordenFila;
@@ -59,7 +70,7 @@ public class TableroCertificadoItem {
 
     @Transient
     public BigDecimal costoSubtotal() {
-        if (grupo && subtotalManual != null) {
+        if (subtotalManual != null) {
             return escalar(subtotalManual);
         }
         return escalar(valor(costoManoObra)
@@ -85,27 +96,33 @@ public class TableroCertificadoItem {
 
     @Transient
     public BigDecimal totalTarea() {
-        return escalar(costoSubtotal().add(estructuraMasBeneficio()));
+        return totalTareaInformado != null ? escalar(totalTareaInformado) : escalar(costoSubtotal().add(estructuraMasBeneficio()));
     }
 
     @Transient
     public BigDecimal montoCertificado() {
-        return escalar(porcentaje(totalTarea(), avanceCertificadoPorcentaje).add(valor(materialesAdicionalesEtapa)));
+        return montoActualInformado != null ? escalar(montoActualInformado) : escalar(porcentaje(totalTarea(), avanceCertificadoPorcentaje).add(valor(materialesAdicionalesEtapa)));
     }
 
     @Transient
     public BigDecimal avanceAcumuladoPorcentaje() {
-        return valor(avanceAnteriorPorcentaje).add(valor(avanceCertificadoPorcentaje));
+        return recurrente ? valor(avanceCertificadoPorcentaje) : valor(avanceAnteriorPorcentaje).add(valor(avanceCertificadoPorcentaje));
     }
 
     @Transient
     public BigDecimal montoAnterior() {
-        return porcentaje(totalTarea(), avanceAnteriorPorcentaje);
+        return montoAnteriorFijo != null ? escalar(montoAnteriorFijo) : porcentaje(totalTarea(), avanceAnteriorPorcentaje);
     }
 
     @Transient
     public BigDecimal montoAcumulado() {
-        return escalar(porcentaje(totalTarea(), avanceAcumuladoPorcentaje()).add(valor(materialesAdicionalesEtapa)));
+        return montoAcumuladoInformado != null ? escalar(montoAcumuladoInformado) : escalar(montoAnterior().add(montoCertificado()));
+    }
+
+    public BigDecimal porcentajeDisponible() { return recurrente ? BigDecimal.valueOf(100) : BigDecimal.valueOf(100).subtract(valor(avanceAnteriorPorcentaje)).max(BigDecimal.ZERO); }
+    public String claveHistorial() {
+        if (claveContinuidad != null) return claveContinuidad;
+        return "legacy-fila:" + id;
     }
 
     public void recalcularManoObra() {

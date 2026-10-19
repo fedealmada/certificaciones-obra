@@ -101,6 +101,7 @@ public class OrdenCompraService {
         ordenCompra.setNumero(form.getNumero());
         ordenCompra.setFecha(form.getFecha());
         ordenCompra.setFechaVigencia(form.getFechaVigencia());
+        ordenCompra.setCertificacionPorCantidad(Boolean.TRUE.equals(form.getCertificacionPorCantidad()));
         ordenCompra.setModoSeguimiento(form.getModoSeguimiento() == null ? ModoSeguimientoOrden.CERTIFICACION : form.getModoSeguimiento());
         aplicarProveedor(ordenCompra, form);
         ordenCompra.setObservacion(form.getObservacion());
@@ -143,6 +144,7 @@ public class OrdenCompraService {
         form.setFecha(ordenCompra.getFecha());
         form.setFechaVigencia(ordenCompra.getFechaVigencia());
         form.setModoSeguimiento(ordenCompra.getModoSeguimientoEfectivo());
+        form.setCertificacionPorCantidad(ordenCompra.isPorCantidad());
         form.setProveedorId(ordenCompra.getProveedorEntidad() == null ? null : ordenCompra.getProveedorEntidad().getId());
         form.setObservacion(ordenCompra.getObservacion());
         ordenCompra.getItems().forEach(item -> {
@@ -206,6 +208,9 @@ public class OrdenCompraService {
             }
             if (item.getCategoriaId() == null && item.getCategoriaEntidad() == null) {
                 throw new IllegalArgumentException("Todos los items deben tener categoria.");
+            }
+            if (Boolean.TRUE.equals(form.getCertificacionPorCantidad()) && (item.getCantidad() == null || item.getCantidad().signum() <= 0)) {
+                throw new IllegalArgumentException("Para certificar por cantidad, todos los items deben tener cantidad contratada mayor a cero.");
             }
             if (esNegativo(item.getCantidad())) {
                 throw new IllegalArgumentException("La cantidad no puede ser negativa.");

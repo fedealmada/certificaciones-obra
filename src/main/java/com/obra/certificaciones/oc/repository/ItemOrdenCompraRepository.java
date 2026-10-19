@@ -14,6 +14,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ItemOrdenCompraRepository extends JpaRepository<ItemOrdenCompra, Long> {
+    @EntityGraph(attributePaths = {"ordenCompra", "ordenCompra.proveedorEntidad", "ordenCompra.obra", "rubroEntidad", "categoriaEntidad"})
+    List<ItemOrdenCompra> findByOrdenCompraObraIdOrderByIdAsc(Long obraId);
+
     @Override
     @EntityGraph(attributePaths = {"ordenCompra", "rubroEntidad"})
     Optional<ItemOrdenCompra> findById(Long id);

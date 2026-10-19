@@ -1,0 +1,12 @@
+<!doctype html><html lang="es" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="resumen" class="panel-section mb-3">
+    <div class="section-title-row"><h2 class="h5 mb-0">Liquidación del certificado</h2><strong th:text="${liquidacion.estadoCac}"></strong></div>
+    <div class="row g-3">
+        <div class="col-md-3"><small class="text-muted">Trabajos certificados · Bruto</small><div class="h4 mt-2" th:text="${'$ ' + #numbers.formatDecimal(liquidacion.bruto, 1, 'POINT', 2, 'COMMA')}"></div></div>
+        <div class="col-md-3"><small class="text-muted" th:text="${'Fondo de reparo · ' + #numbers.formatDecimal(liquidacion.porcentajeFondo, 1, 'POINT', 2, 'COMMA') + ' %'}"></small><div class="h4 mt-2" th:text="${'− $ ' + #numbers.formatDecimal(liquidacion.retencion, 1, 'POINT', 2, 'COMMA')}"></div></div>
+        <div class="col-md-3"><small class="text-muted">Ajuste CAC</small><div class="h4 mt-2" th:text="${'$ ' + #numbers.formatDecimal(liquidacion.cac, 1, 'POINT', 2, 'COMMA')}"></div><small class="text-muted" th:text="${#numbers.formatDecimal(liquidacion.porcentajeCac, 1, 'POINT', 4, 'COMMA') + ' %'}"></small></div>
+        <div class="col-md-3"><small class="text-muted" th:text="${liquidacion.pendiente ? 'Neto provisional · CAC pendiente' : 'Neto a pagar'}"></small><div class="h4 mt-2" th:text="${'$ ' + #numbers.formatDecimal(liquidacion.neto, 1, 'POINT', 2, 'COMMA')}"></div></div>
+    </div>
+    <p class="small text-muted mb-0 mt-2">El fondo de reparo se descuenta solo de los trabajos. Neto = bruto − fondo de reparo + CAC.</p>
+</section>
+</body></html>

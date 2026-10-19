@@ -8,8 +8,9 @@
     <link th:href="@{/css/app.css(v='20260730-dark2')}" rel="stylesheet">
     <link th:href="@{/css/theme.css(v='20260731-night-reset')}" rel="stylesheet">
     <link th:href="@{/css/design-system.css(v='20260802-oc-table-readable-flow')}" rel="stylesheet">
+    <link th:href="@{/css/oc-labels.css(v='20261018')}" rel="stylesheet">
 </head>
-<body>
+<body class="oc-labels">
 <div th:replace="~{fragments/layout :: navbar}"></div>
 <main class="container">
     <div class="page-navigation mb-3">
@@ -48,7 +49,7 @@
                 <input class="form-control live-filter" id="oc-rubro-filter" name="rubro" data-filter="rubro" th:value="${rubro}" placeholder="Buscar rubro">
             </div>
             <div class="col-md-2 d-flex gap-2">
-                <button class="btn btn-outline-secondary w-100" type="button" onclick="window.location.href='/oc'"><i class="bi bi-x-lg"></i> Limpiar</button>
+                <button class="btn btn-outline-secondary w-100" type="button" onclick="clearOcFilters()"><i class="bi bi-x-lg"></i> Limpiar</button>
             </div>
         </form>
     </section>
@@ -112,11 +113,16 @@
                     <td th:text="${#temporals.format(orden.fecha, 'dd/MM/yyyy')}"></td>
                     <td th:text="${orden.proveedorEntidad?.nombre ?: '-'}"></td>
                     <td>
-                        <span class="category-chip"
-                              th:classappend="${ordenesMateriales.getOrDefault(orden.id, false) ? ' is-material' : (ordenesCertificables.getOrDefault(orden.id, false) ? ' is-labor' : ' is-service')}">
-                            <i th:class="${ordenesMateriales.getOrDefault(orden.id, false) ? 'bi bi-box-seam' : (ordenesCertificables.getOrDefault(orden.id, false) ? 'bi bi-people' : 'bi bi-tools')}"></i>
-                            <span th:text="${orden.items.isEmpty() ? '-' : #strings.listJoin(#sets.toSet(orden.items.![categoriaEntidad != null ? categoriaEntidad.nombre : categoria.descripcion]), ', ')}"></span>
-                        </span>
+                        <div class="oc-category-labels">
+                            <span class="category-chip" th:each="item, st : ${orden.items}"
+                                  th:if="${st.first or !#lists.contains(orden.items.subList(0, st.index).![categoriaEntidad != null ? categoriaEntidad.nombre : categoria.descripcion], item.categoriaEntidad != null ? item.categoriaEntidad.nombre : item.categoria.descripcion)}"
+                                  th:with="tipo=${item.categoriaEntidad != null ? item.categoriaEntidad.tipo : item.categoria}"
+                                  th:classappend="${tipo.name() == 'MATERIAL' ? ' is-material' : (tipo.name() == 'MANO_OBRA' ? ' is-labor' : ' is-service')}">
+                                <i th:class="${tipo.name() == 'MATERIAL' ? 'bi bi-box-seam' : (tipo.name() == 'MANO_OBRA' ? 'bi bi-people' : 'bi bi-tools')}" aria-hidden="true"></i>
+                                <span th:text="${item.categoriaEntidad != null ? item.categoriaEntidad.nombre : (tipo.name() == 'OTRO' ? 'Servicio' : tipo.descripcion)}"></span>
+                            </span>
+                            <span th:if="${orden.items.isEmpty()}" class="text-muted">—</span>
+                        </div>
                     </td>
                     <td class="oc-list-rubros" th:text="${orden.items.isEmpty() ? '-' : #strings.listJoin(#sets.toSet(orden.items.![rubroEntidad != null ? rubroEntidad.nombreCompleto : '']), ', ')}"></td>
                     <td class="text-end" th:text="${orden.items.size()}"></td>
@@ -133,19 +139,19 @@
                     <td class="text-end">
                         <div class="oc-tracking-stack">
                         <span th:if="${ordenesSoloRegistro.getOrDefault(orden.id, false)}"
-                              class="delivery-status-pill is-record-only">SOLO REGISTRO</span>
-                        <small th:if="${ordenesSoloRegistro.getOrDefault(orden.id, false)}" class="delivery-trip-count tracking-chip is-none">sin seguimiento</small>
+                              class="delivery-status-pill is-record-only">Solo registro</span>
+
                         <a th:if="${ordenesMateriales.getOrDefault(orden.id, false)}"
                            class="delivery-status-pill"
                            th:classappend="${estadosEntregaPorOrden.get(orden.id).name() == 'COMPLETO' ? ' is-complete' : (estadosEntregaPorOrden.get(orden.id).name() == 'PARCIAL' ? ' is-partial' : ' is-pending')}"
                            th:href="@{/materiales/oc/{id}(id=${orden.id})}"
-                           th:text="${estadosEntregaPorOrden.get(orden.id).name() == 'COMPLETO' ? 'ENTREGA COMPLETA' : (estadosEntregaPorOrden.get(orden.id).name() == 'PARCIAL' ? 'ENTREGA PARCIAL' : 'ENTREGA PENDIENTE')}">ENTREGA PENDIENTE</a>
+                           th:text="${estadosEntregaPorOrden.get(orden.id).name() == 'COMPLETO' ? 'Entrega completa' : (estadosEntregaPorOrden.get(orden.id).name() == 'PARCIAL' ? 'Entrega parcial' : 'Entrega pendiente')}">Entrega pendiente</a>
                         <small th:if="${ordenesMateriales.getOrDefault(orden.id, false)}" class="delivery-trip-count tracking-chip is-delivery" th:text="${viajesPorOrden.getOrDefault(orden.id, 0) == 1 ? '1 viaje' : viajesPorOrden.getOrDefault(orden.id, 0) + ' viajes'}">0 viajes</small>
                         <a th:if="${ordenesCertificables.getOrDefault(orden.id, false)}"
                            class="delivery-status-pill"
                            th:classappend="${ordenesCerradas.getOrDefault(orden.id, false) ? ' is-work-closed' : ' is-work-open'}"
                            th:href="@{/oc/{id}(id=${orden.id})} + '#certificados'"
-                           th:text="${ordenesCerradas.getOrDefault(orden.id, false) ? 'CERRADA' : 'ABIERTA'}">ABIERTA</a>
+                           th:text="${ordenesCerradas.getOrDefault(orden.id, false) ? 'Cerrada' : 'Abierta'}">Abierta</a>
                         <small th:if="${ordenesCertificables.getOrDefault(orden.id, false)}" class="delivery-trip-count tracking-chip is-cert" th:text="${certificadosPorOrden.getOrDefault(orden.id, 0) == 1 ? '1 certificado' : certificadosPorOrden.getOrDefault(orden.id, 0) + ' certificados'}">0 certificados</small>
                         </div>
                     </td>
@@ -379,7 +385,54 @@ function saveOcFilters() {
 
 function restoreOcFilters() { }
 
-function clearOcFilters() { window.location.href = '/oc'; }
+const ocFilterForm = document.querySelector('#oc-filter-form');
+const ocFilterStorageKey = 'obraControl.oc.filters.v1';
+const ocFilterNames = ['proveedor', 'categoriaId', 'rubro'];
+
+function saveOcFilters() {
+    const filters = Object.fromEntries(ocFilterNames.map(name => [name, ocFilterForm.elements[name].value]));
+    try { localStorage.setItem(ocFilterStorageKey, JSON.stringify(filters)); } catch (_) { /* El filtrado funciona sin almacenamiento. */ }
+}
+
+function restoreOcFilters() {
+    const params = new URLSearchParams(window.location.search);
+    // Los enlaces con filtros explicitos tienen prioridad sobre la ultima seleccion.
+    if (ocFilterNames.some(name => params.has(name))) {
+        saveOcFilters();
+        return;
+    }
+    try {
+        const saved = JSON.parse(localStorage.getItem(ocFilterStorageKey) || 'null');
+        if (!saved || typeof saved !== 'object') return;
+        let active = false;
+        ocFilterNames.forEach(name => {
+            if (typeof saved[name] !== 'string') return;
+            const field = ocFilterForm.elements[name];
+            field.value = saved[name];
+            if (field.value) {
+                params.set(name, field.value);
+                active = true;
+            }
+        });
+        if (active) {
+            params.delete('page');
+            window.location.replace(ocFilterForm.action + '?' + params.toString());
+        }
+    } catch (_) { /* Ignorar preferencias no disponibles o invalidas. */ }
+}
+
+function clearOcFilters() {
+    window.clearTimeout(ocSubmitTimer);
+    ocFilterNames.forEach(name => { ocFilterForm.elements[name].value = ''; });
+    try { localStorage.removeItem(ocFilterStorageKey); } catch (_) { }
+    window.location.href = ocFilterForm.action;
+}
+
+restoreOcFilters();
+ocFilterForm.addEventListener('submit', () => {
+    window.clearTimeout(ocSubmitTimer);
+    saveOcFilters();
+});
 
 function applySort(key, type, toggleDirection) {
     const direction = toggleDirection ? (currentSort.key === key && currentSort.direction === 'asc' ? 'desc' : 'asc') : currentSort.direction;
@@ -408,10 +461,10 @@ function applySort(key, type, toggleDirection) {
 document.querySelectorAll('.live-filter').forEach(field => {
     const submitFilters = () => {
         window.clearTimeout(ocSubmitTimer);
-        ocSubmitTimer = window.setTimeout(() => document.querySelector('#oc-filter-form').submit(), 280);
+        saveOcFilters();
+        ocSubmitTimer = window.setTimeout(() => ocFilterForm.requestSubmit(), field.tagName === 'SELECT' ? 0 : 1200);
     };
-    field.addEventListener('input', submitFilters);
-    field.addEventListener('change', submitFilters);
+    field.addEventListener(field.tagName === 'SELECT' ? 'change' : 'input', submitFilters);
 });
 
 document.querySelectorAll('.table-sort-button').forEach(button => {

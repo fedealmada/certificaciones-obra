@@ -1,0 +1,62 @@
+.quincenal-page { padding-bottom: 32px; }
+.q-period-heading { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin: 26px 0 18px; flex-wrap: wrap; }
+.q-month { text-transform: capitalize; margin: 4px 0 0; font-size: 1.65rem; font-weight: 700; }
+.q-history { width: auto; max-width: 230px; }
+.q-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-bottom: 20px; }
+.q-card { position: relative; padding: 22px; overflow: hidden; }
+.q-card-label { font-size: .87rem; font-weight: 600; margin: 15px 0 8px; }
+.q-card-label span { color: var(--bs-secondary-color); margin-left: 6px; font-weight: 400; }
+.q-card-icon { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 10px; color: #6478df; background: rgba(100,120,223,.12); font-size: 1.15rem; }
+.q-card-icon-second { color: #249a85; background: rgba(36,154,133,.12); }
+.q-card-total { border-top: 3px solid #6478df; }
+.q-money { display: block; font-size: clamp(1.15rem, 2.2vw, 1.9rem); letter-spacing: -.04em; margin-bottom: 9px; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.q-card small { display: block; font-size: .78rem; }
+.q-rule { display: flex; gap: 12px; padding: 14px 18px; border: 1px solid rgba(100,120,223,.22); background: rgba(100,120,223,.06); border-radius: 12px; font-size: .82rem; line-height: 1.6; }
+.q-rule > i { color: #6478df; font-size: 1.1rem; }
+.q-summary th, .q-summary td { padding: 14px 12px; }
+.q-summary tfoot { border-top: 2px solid rgba(128,128,128,.25); }
+.q-provider-link { color: inherit; font-weight: 600; text-decoration: none; }
+.q-provider-link:hover { color: #6478df; text-decoration: underline; }
+.q-numeric { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.q-certificate { border: 1px solid rgba(128,128,128,.2); border-radius: 12px; margin-top: 10px; overflow: hidden; }
+.q-certificate summary { list-style: none; display: flex; align-items: center; gap: 18px; padding: 17px; cursor: pointer; }
+.q-certificate summary::-webkit-details-marker { display: none; }
+.q-certificate summary:focus-visible { outline: 2px solid #6478df; outline-offset: -3px; }
+.q-certificate summary:hover { background: rgba(100,120,223,.05); }
+.q-disclosure { font-size: .75rem; transition: transform .15s ease; }
+.q-certificate[open] .q-disclosure { transform: rotate(90deg); }
+.q-cert-main { flex: 1; min-width: 120px; }
+.q-cert-main strong, .q-cert-main small { display: block; overflow-wrap: anywhere; }
+.q-cert-main small { margin-top: 4px; font-size: .76rem; }
+.q-contractor-heading { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; }
+.q-adjustment-badge { display: inline-flex; align-items: center; border: 1px solid; border-radius: 6px; padding: 2px 7px; font-size: .67rem; font-weight: 750; line-height: 1.5; letter-spacing: .025em; white-space: nowrap; }
+.q-badge-fr { color: #1857aa; background: #e7f0ff; border-color: #b8d2fb; }
+.q-badge-cac { color: #096348; background: #def6e9; border-color: #9ddcbd; }
+.q-badge-cac-pending { color: #825308; background: #fff0c7; border-color: #eacb79; }
+.q-badge-cac-expired { color: #526074; background: #edf0f4; border-color: #cbd1da; }
+.q-half { border-radius: 30px; padding: 5px 10px; font-size: .72rem; font-weight: 600; background: rgba(100,120,223,.13); white-space: nowrap; }
+.q-half-second { background: rgba(36,154,133,.13); }
+.q-cert-date { display: flex; flex-direction: column; font-size: .8rem; min-width: 82px; }
+.q-cert-date small { font-size: .68rem; }
+.q-cert-amount { min-width: 130px; text-align: right; }
+.q-cert-content { border-top: 1px solid rgba(128,128,128,.2); padding: 16px 20px; }
+.q-task-description { min-width: 200px; white-space: normal; overflow-wrap: anywhere; }
+.q-footnote { line-height: 1.7; }
+@media (max-width: 900px) { .q-cards { grid-template-columns: 1fr; gap: 10px; } .q-card { padding: 16px 20px; } .q-card-icon { float: right; } .q-card-label { margin-top: 0; } .q-money { font-size: 1.7rem; } }
+@media (max-width: 600px) { .q-certificate summary { flex-wrap: wrap; gap: 10px; } .q-cert-main { flex-basis: 75%; } .q-cert-amount { margin-left: auto; } .q-cert-date { margin-left: 10px; } .q-summary { min-width: 680px; } }
+@media print {
+    @page { size: A4 landscape; margin: 12mm; }
+    .app-sidebar, .app-topbar, .no-print { display: none !important; }
+    body, main.container { margin: 0 !important; padding: 0 !important; max-width: none !important; width: 100% !important; background: white !important; color: #111 !important; }
+    .quincenal-page * { color: #111 !important; box-shadow: none !important; }
+    .panel-section, .q-certificate { background: white !important; border: 1px solid #ccc !important; }
+    .q-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .q-card, .q-certificate { break-inside: avoid; }
+    .q-card-icon { display: none; }
+    .table-responsive { overflow: visible !important; }
+    .table { --bs-table-bg: white; --bs-table-color: #111; }
+    .q-money { font-size: 1.5rem; }
+    .q-summary { min-width: 0; }
+    .q-rule { background: white; }
+    .q-task-description { min-width: 0; }
+}

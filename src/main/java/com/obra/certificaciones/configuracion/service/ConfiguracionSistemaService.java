@@ -28,6 +28,7 @@ public class ConfiguracionSistemaService {
                 new ModuloSistema("modulo.items", "Items", "Buscador general de items de OC.", "/items", "bi-list-task", "green"),
                 new ModuloSistema("modulo.importarCertificados", "Importar certificados", "Pegar planillas y cargar avances automaticamente.", "/certificaciones/importar", "bi-clipboard-check", "blue"),
                 new ModuloSistema("modulo.tableroCertificados", "Tablero certificados", "Certificacion general, costos y avance financiero.", "/tablero-certificados", "bi-table", "blue"),
+                new ModuloSistema("modulo.certificadosQuincenales", "Certificados quincenales", "Mano de obra y servicios certificables por contratista, quincena y mes.", "/certificados-quincenales", "bi-calendar2-range", "green"),
                 new ModuloSistema("modulo.itemizado", "Itemizado", "Arbol de rubros e itemizado general.", "/itemizado", "bi-diagram-3", "green"),
                 new ModuloSistema("modulo.controlRubros", "Control rubros", "Techos, incidencias y avance economico por rubro.", "/control-rubros", "bi-clipboard-data", "yellow"),
                 new ModuloSistema("modulo.calendario", "Calendario de obra", "Visitas, hormigonados, inspecciones y agenda operativa.", "/calendario", "bi-calendar2-week", "blue"),

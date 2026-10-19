@@ -10,6 +10,14 @@ public record ResumenCertificacion(
         BigDecimal saldoPendiente,
         int cantidadItemsCertificados
 ) {
+    public BigDecimal totalAnterior() {
+        return totalAcumulado.subtract(totalActual);
+    }
+
+    public BigDecimal porcentajeAnterior() {
+        return porcentaje(totalAnterior());
+    }
+
     public BigDecimal porcentajeActual() {
         return porcentaje(totalActual);
     }

@@ -2,6 +2,7 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <body>
 <nav th:fragment="navbar" class="app-topbar app-sidebar" aria-label="Navegacion principal">
+    <script th:src="@{/js/quincenas-navigation.js(v='20261018-1')}" defer></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <div class="app-nav-container">
         <a class="app-brand" th:href="@{/}" title="Inicio">
@@ -16,6 +17,7 @@
             <a class="nav-link" th:if="${configuracion.activo('modulo.notasPedido')}" th:href="@{/notas-pedido}" title="Notas de pedido"><i class="bi bi-journal-check"></i><span>Notas pedido</span></a>
             <a class="nav-link" th:if="${configuracion.activo('modulo.importarOc')}" th:href="@{/oc/importar}" title="Importar OC"><i class="bi bi-file-earmark-arrow-up"></i><span>Importar OC</span></a>
             <a class="nav-link" th:if="${configuracion.activo('modulo.importarCertificados')}" th:href="@{/certificaciones/importar}" title="Certificados"><i class="bi bi-clipboard-check"></i><span>Certificados</span></a>
+            <a class="nav-link" th:if="${configuracion.activo('modulo.certificadosQuincenales')}" th:href="@{/certificados-quincenales}" title="Certificados quincenales"><i class="bi bi-calendar2-range"></i><span>Quincenales</span></a>
             <a class="nav-link" th:if="${configuracion.activo('modulo.tableroCertificados')}" th:href="@{/tablero-certificados}" title="Tablero certificados"><i class="bi bi-table"></i><span>Tablero cert.</span></a>
             <a class="nav-link" th:if="${configuracion.activo('modulo.proveedores')}" th:href="@{/proveedores}" title="Proveedores"><i class="bi bi-people"></i><span>Proveedores</span></a>
             <a class="nav-link" th:if="${configuracion.activo('modulo.documentacion')}" th:href="@{/documentacion}" title="Documentacion"><i class="bi bi-shield-check"></i><span>Documentacion</span></a>

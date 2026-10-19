@@ -8,8 +8,19 @@ public record ItemCertificacionCalculado(
         BigDecimal porcentajeAnterior,
         BigDecimal porcentajeActual,
         BigDecimal porcentajeAcumulado,
-        BigDecimal montoActual
+        BigDecimal montoActual,
+        BigDecimal importeAnterior,
+        BigDecimal importeAcumulado
 ) {
+    public ItemCertificacionCalculado(ItemOrdenCompra item, BigDecimal anterior, BigDecimal actual, BigDecimal acumulado, BigDecimal monto) {
+        this(item, anterior, actual, acumulado, monto, null, null);
+    }
+    public BigDecimal cantidadAnterior() { return cantidad(porcentajeAnterior); }
+    public BigDecimal cantidadActual() { return cantidad(porcentajeActual); }
+    public BigDecimal cantidadAcumulada() { return cantidad(porcentajeAcumulado); }
+    private BigDecimal cantidad(BigDecimal porcentaje) {
+        return itemOrdenCompra.getCantidad().multiply(porcentaje).divide(new BigDecimal("100"), 6, java.math.RoundingMode.HALF_UP);
+    }
     public boolean isTerminado() {
         return porcentajeAcumuladoSeguro().compareTo(BigDecimal.valueOf(100)) >= 0;
     }
@@ -19,15 +30,15 @@ public record ItemCertificacionCalculado(
     }
 
     public BigDecimal montoAnterior() {
-        return calcularMonto(porcentajeAnterior);
+        return importeAnterior != null ? importeAnterior : calcularMonto(porcentajeAnterior);
     }
 
     public BigDecimal montoAcumulado() {
-        return calcularMonto(porcentajeAcumulado);
+        return importeAcumulado != null ? importeAcumulado : calcularMonto(porcentajeAcumulado);
     }
 
     private BigDecimal porcentajeAcumuladoSeguro() {
-        return porcentajeAcumulado == null ? BigDecimal.ZERO : porcentajeAcumulado;
+        return porcentajeAcumulado == null ? BigDecimal.ZERO : porcentajeAcumulado.setScale(10, java.math.RoundingMode.HALF_UP);
     }
 
     private BigDecimal calcularMonto(BigDecimal porcentaje) {

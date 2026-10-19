@@ -34,6 +34,7 @@ public class CertificacionController {
     private final CertificacionCalculoService calculoService;
     private final OrdenCompraService ordenCompraService;
     private final CertificacionExportService exportService;
+    private final com.obra.certificaciones.certificacion.service.AjustesCertificacionService ajustesService;
 
     @GetMapping("/nueva")
     public String nueva(@PathVariable Long ordenCompraId, Model model) {
@@ -76,6 +77,7 @@ public class CertificacionController {
 
     private void cargarModeloFormulario(Long ordenCompraId, Long certificacionId, NuevaCertificacionForm form, Model model) {
         OrdenCompra orden = ordenCompraService.obtener(ordenCompraId);
+        form.setPorCantidad(certificacionId == null ? orden.isPorCantidad() : certificacionService.obtener(certificacionId).isPorCantidad());
         Map<Long, BigDecimal> porcentajesActualesForm = form.getItems().stream()
                 .collect(java.util.stream.Collectors.toMap(
                         item -> item.getItemOrdenCompraId(),
@@ -95,6 +97,10 @@ public class CertificacionController {
                     BigDecimal anterior = anteriores.getOrDefault(item.getId(), BigDecimal.ZERO);
                     BigDecimal posterior = posteriores.getOrDefault(item.getId(), BigDecimal.ZERO);
                     BigDecimal maximoActual = BigDecimal.valueOf(100).subtract(anterior).subtract(posterior).max(BigDecimal.ZERO);
+                    if (form.isPorCantidad()) {
+                        anterior = anterior.multiply(item.getCantidad()).divide(new BigDecimal("100"), 6, java.math.RoundingMode.HALF_UP);
+                        maximoActual = maximoActual.multiply(item.getCantidad()).divide(new BigDecimal("100"), 6, java.math.RoundingMode.HALF_UP);
+                    }
                     return new ItemNuevaCertificacionVista(item, anterior, maximoActual, actual);
                 })
                 .toList();
@@ -114,7 +120,8 @@ public class CertificacionController {
         model.addAttribute("certificacion", certificacion);
         model.addAttribute("certificacionesOrden", certificacionService.listarPorOrdenCompra(ordenCompraId));
         model.addAttribute("itemsCalculados", itemsCalculados);
-        model.addAttribute("resumen", calculoService.calcularResumen(ordenCompraId, orden.getItems(), itemsCalculados));
+        model.addAttribute("liquidacion", ajustesService.liquidar(certificacion));
+        model.addAttribute("resumen", calculoService.calcularResumenHasta(certificacion, orden.getItems(), itemsCalculados));
         return "certificacion/detalle";
     }
 

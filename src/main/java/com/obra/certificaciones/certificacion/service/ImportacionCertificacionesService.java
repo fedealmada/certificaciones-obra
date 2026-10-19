@@ -85,6 +85,7 @@ public class ImportacionCertificacionesService {
                 certificacion.setNumero(certificadoParseado.numero());
                 certificacion.setFecha(certificadoParseado.fecha());
                 certificacion.setObservacion("Importado desde planilla pegada");
+                certificacion.setPorCantidad(ordenParseada.porCantidad());
 
                 for (ItemParseado itemParseado : ordenParseada.items()) {
                     BigDecimal porcentaje = itemParseado.avancesPorCertificado().getOrDefault(certificadoParseado.numero(), BigDecimal.ZERO);
@@ -95,6 +96,10 @@ public class ImportacionCertificacionesService {
                     ItemCertificacion itemCertificacion = new ItemCertificacion();
                     itemCertificacion.setItemOrdenCompra(item);
                     itemCertificacion.setPorcentajeActual(porcentaje);
+                    if (ordenParseada.porCantidad()) {
+                        itemCertificacion.setCantidadActual(porcentaje);
+                        itemCertificacion.setPorcentajeActual(itemCertificacion.getPorcentajeActual());
+                    }
                     certificacion.agregarItem(itemCertificacion);
                 }
 
@@ -153,6 +158,9 @@ public class ImportacionCertificacionesService {
                 }
             }
 
+            if (ordenParseada.porCantidad() && !ordenCompra.isPorCantidad())
+                errores.add("La planilla certifica cantidades. Configure la OC para certificar por cantidad antes de importar.");
+            if (ordenParseada.porCantidad()) avisos.add("Planilla por cantidades: avance actual × precio unitario. Se conservan las unidades originales.");
             validarItemsYAcumulados(ordenParseada, ordenCompra, items, errores, avisos);
         }
 
@@ -188,11 +196,17 @@ public class ImportacionCertificacionesService {
                 errores.add("No se encontro el item " + itemParseado.codigo() + " en la OC.");
                 continue;
             }
+            if (ordenParseada.porCantidad() && (item.getCantidad() == null || item.getCantidad().signum() <= 0)) {
+                errores.add("El item " + item.getItem() + " necesita una cantidad contratada mayor a cero."); continue;
+            }
             BigDecimal acumulado = calculoService.porcentajeAcumuladoItem(ordenCompra.getId(), item.getId());
             acumulados.put(item.getId(), acumulado);
             for (CertificadoParseado certificado : ordenParseada.certificados()) {
-                acumulado = acumulado.add(itemParseado.avancesPorCertificado().getOrDefault(certificado.numero(), BigDecimal.ZERO));
-                if (acumulado.compareTo(BigDecimal.valueOf(100)) > 0) {
+                BigDecimal avance = itemParseado.avancesPorCertificado().getOrDefault(certificado.numero(), BigDecimal.ZERO);
+                if (avance.signum() < 0 || (ordenParseada.porCantidad() && avance.stripTrailingZeros().scale() > 6))
+                    errores.add("Avance invalido en item " + item.getItem() + ": use cantidades positivas con hasta seis decimales.");
+                acumulado = acumulado.add(porcentajeAvance(ordenParseada, item, avance));
+                if (acumulado.setScale(10, RoundingMode.HALF_UP).compareTo(BigDecimal.valueOf(100)) > 0) {
                     errores.add("El item " + itemParseado.codigo() + " supera el 100% acumulado.");
                     break;
                 }
@@ -238,7 +252,7 @@ public class ImportacionCertificacionesService {
                 }
                 ItemOrdenCompra item = items.get(itemParseado.codigo());
                 if (item != null) {
-                    importeActual = importeActual.add(calculoService.calcularMonto(item.getImporte(), porcentaje));
+                    importeActual = importeActual.add(ordenParseada.porCantidad() ? porcentaje.multiply(item.getPrecioUnitario()).setScale(2, RoundingMode.HALF_UP) : calculoService.calcularMonto(item.getImporte(), porcentaje));
                 }
             }
             totalAcumulado = totalAcumulado.add(importeActual);
@@ -272,10 +286,11 @@ public class ImportacionCertificacionesService {
                                         OrdenParseada ordenParseada,
                                         boolean despuesDeImportar) {
         BigDecimal total = BigDecimal.ZERO;
-        for (ItemOrdenCompra item : items.values()) {
+        for (var entrada : items.entrySet()) {
+            ItemOrdenCompra item = entrada.getValue();
             BigDecimal acumulado = calculoService.porcentajeAcumuladoItem(ordenCompra.getId(), item.getId());
             if (despuesDeImportar) {
-                acumulado = acumulado.subtract(porcentajeParseadoTotal(ordenParseada, item.getItem())).max(BigDecimal.ZERO);
+                acumulado = acumulado.subtract(porcentajeAvance(ordenParseada, item, porcentajeParseadoTotal(ordenParseada, entrada.getKey()))).max(BigDecimal.ZERO);
             }
             total = total.add(calculoService.calcularMonto(item.getImporte(), acumulado));
         }
@@ -287,6 +302,12 @@ public class ImportacionCertificacionesService {
                 .filter(item -> item.codigo().equals(itemCodigo))
                 .flatMap(item -> item.avancesPorCertificado().values().stream())
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    private BigDecimal porcentajeAvance(OrdenParseada orden, ItemOrdenCompra item, BigDecimal avance) {
+        if (!orden.porCantidad()) return avance;
+        if (item.getCantidad() == null || item.getCantidad().signum() <= 0) return BigDecimal.ZERO;
+        return avance.multiply(new BigDecimal("100")).divide(item.getCantidad(), 16, RoundingMode.HALF_UP);
     }
 
     private BigDecimal porcentaje(BigDecimal valor, BigDecimal total) {
@@ -320,7 +341,7 @@ public class ImportacionCertificacionesService {
         Map<String, ItemOrdenCompra> items = new LinkedHashMap<>();
         ordenCompra.getItems().stream()
                 .filter(calculoService::esItemCertificable)
-                .forEach(item -> items.put(item.getItem(), item));
+                .forEach(item -> items.put(item.getItem().contains(".") ? item.getItem() : ordenCompra.getNumero() + "." + item.getItem(), item));
         return items;
     }
 
@@ -356,7 +377,7 @@ public class ImportacionCertificacionesService {
         String tarea = extraer(TAREA_PATTERN, bloque);
         List<CertificadoParseado> certificados = parsearCertificados(bloque);
         List<ItemParseado> items = parsearItems(bloque, numeroOc, certificados);
-        return new OrdenParseada(numeroOc, contratista, tarea, certificados, items);
+        return new OrdenParseada(numeroOc, contratista, tarea, certificados, items, normalizar(bloque).contains("avance cant"));
     }
 
     private List<CertificadoParseado> parsearCertificados(String bloque) {
@@ -464,7 +485,7 @@ public class ImportacionCertificacionesService {
         return true;
     }
 
-    private record OrdenParseada(String numeroOc, String contratista, String tarea, List<CertificadoParseado> certificados, List<ItemParseado> items) {
+    private record OrdenParseada(String numeroOc, String contratista, String tarea, List<CertificadoParseado> certificados, List<ItemParseado> items, boolean porCantidad) {
     }
 
     private record CertificadoParseado(int numero, LocalDate fecha) {

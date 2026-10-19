@@ -1,0 +1,82 @@
+/* Semántica visual común al listado y detalle de órdenes. */
+html[data-theme] body.oc-labels :is(.oc-list-table, .oc-detail-page) .oc-category-labels {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 5px;
+}
+html[data-theme] body.oc-labels :is(.oc-list-table, .oc-detail-page) .category-chip,
+html[data-theme] body.oc-labels :is(.oc-list-table, .oc-detail-page) .delivery-status-pill,
+html[data-theme] body.oc-labels :is(.oc-list-table, .oc-detail-page) .tracking-chip {
+    display: inline-flex !important; align-items: center !important; justify-content: center !important;
+    gap: 6px !important; width: fit-content !important; min-width: 0 !important;
+    min-height: 24px !important; padding: 4px 9px !important; margin: 0 !important;
+    border: 1px solid var(--label-border, #dce2ea) !important; border-radius: 7px !important;
+    background: var(--label-bg, #f1f5f9) !important; color: var(--label-text, #526173) !important;
+    box-shadow: none !important; font-size: 11px !important; font-weight: 650 !important;
+    line-height: 1.25 !important; letter-spacing: 0 !important; text-transform: none !important;
+    text-decoration: none !important; white-space: nowrap !important;
+}
+html[data-theme] body.oc-labels :is(.oc-list-table, .oc-detail-page) .category-chip.is-labor,
+html[data-theme] body.oc-labels :is(.oc-list-table, .oc-detail-page) .tracking-chip.is-cert {
+    --label-bg: #f1eafe; --label-text: #7041b5; --label-border: #e1d2f8;
+}
+html[data-theme] body.oc-labels :is(.oc-list-table, .oc-detail-page) .category-chip.is-material {
+    --label-bg: #fff0df; --label-text: #a85c0b; --label-border: #f7d9b3;
+}
+html[data-theme] body.oc-labels :is(.oc-list-table, .oc-detail-page) .category-chip.is-service {
+    --label-bg: #e3f5f3; --label-text: #087b72; --label-border: #bfe7e2;
+}
+html[data-theme] body.oc-labels :is(.oc-list-table, .oc-detail-page) .delivery-status-pill.is-work-open,
+html[data-theme] body.oc-labels :is(.oc-list-table, .oc-detail-page) .tracking-chip.is-delivery {
+    --label-bg: #eaf2ff; --label-text: #2b63b8; --label-border: #cddffc;
+}
+html[data-theme] body.oc-labels :is(.oc-list-table, .oc-detail-page) .delivery-status-pill.is-work-closed,
+html[data-theme] body.oc-labels :is(.oc-list-table, .oc-detail-page) .delivery-status-pill.is-complete {
+    --label-bg: #e5f5ec; --label-text: #247549; --label-border: #c5e7d3;
+}
+html[data-theme] body.oc-labels :is(.oc-list-table, .oc-detail-page) .delivery-status-pill.is-partial {
+    --label-bg: #fff4d7; --label-text: #956408; --label-border: #efdda5;
+}
+html[data-theme] body.oc-labels :is(.oc-list-table, .oc-detail-page) .delivery-status-pill.is-pending,
+html[data-theme] body.oc-labels :is(.oc-list-table, .oc-detail-page) .delivery-status-pill.is-record-only,
+html[data-theme] body.oc-labels :is(.oc-list-table, .oc-detail-page) .tracking-chip.is-none {
+    --label-bg: #f0f3f7; --label-text: #627084; --label-border: #dce3ec;
+}
+html[data-theme] body.oc-labels :is(.oc-list-table, .oc-detail-page) .delivery-status-pill::before {
+    content: ''; width: 6px; height: 6px; flex-shrink: 0; border-radius: 50%; background: currentColor;
+}
+html[data-theme] body.oc-labels :is(.oc-list-table, .oc-detail-page) .tracking-chip::before,
+html[data-theme] body.oc-labels :is(.oc-list-table, .oc-detail-page) .tracking-chip::after { content: none !important; }
+html[data-theme] body.oc-labels :is(.oc-list-table, .oc-detail-page) .category-chip i { font-size: 12px !important; color: inherit !important; }
+html[data-theme] body.oc-labels :is(.oc-list-table, .oc-detail-page) .oc-tracking-stack { gap: 5px !important; min-width: 0 !important; }
+html[data-theme] body.oc-labels :is(.oc-list-table, .oc-detail-page) a.delivery-status-pill:hover { filter: brightness(.96); }
+html[data-theme] body.oc-labels :is(.oc-list-table, .oc-detail-page) a.delivery-status-pill:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+html[data-theme="dark"] body.oc-labels :is(.oc-list-table, .oc-detail-page) .category-chip.is-labor,
+html[data-theme="dark"] body.oc-labels :is(.oc-list-table, .oc-detail-page) .tracking-chip.is-cert { --label-bg: #302543; --label-text: #d5b5ff; --label-border: #51406d; }
+html[data-theme="dark"] body.oc-labels :is(.oc-list-table, .oc-detail-page) .category-chip.is-material { --label-bg: #3c2e20; --label-text: #f2bf7f; --label-border: #62482b; }
+html[data-theme="dark"] body.oc-labels :is(.oc-list-table, .oc-detail-page) .category-chip.is-service { --label-bg: #183936; --label-text: #89dcd0; --label-border: #2b5b55; }
+html[data-theme="dark"] body.oc-labels :is(.oc-list-table, .oc-detail-page) .delivery-status-pill.is-work-open,
+html[data-theme="dark"] body.oc-labels :is(.oc-list-table, .oc-detail-page) .tracking-chip.is-delivery { --label-bg: #21334f; --label-text: #a8c9ff; --label-border: #38527b; }
+html[data-theme="dark"] body.oc-labels :is(.oc-list-table, .oc-detail-page) .delivery-status-pill.is-work-closed,
+html[data-theme="dark"] body.oc-labels :is(.oc-list-table, .oc-detail-page) .delivery-status-pill.is-complete { --label-bg: #203b2d; --label-text: #a0dfb8; --label-border: #365d47; }
+html[data-theme="dark"] body.oc-labels :is(.oc-list-table, .oc-detail-page) .delivery-status-pill.is-partial { --label-bg: #3d3420; --label-text: #f1d18d; --label-border: #665431; }
+html[data-theme="dark"] body.oc-labels :is(.oc-list-table, .oc-detail-page) .delivery-status-pill.is-pending,
+html[data-theme="dark"] body.oc-labels :is(.oc-list-table, .oc-detail-page) .delivery-status-pill.is-record-only,
+html[data-theme="dark"] body.oc-labels :is(.oc-list-table, .oc-detail-page) .tracking-chip.is-none { --label-bg: #2a3240; --label-text: #bac6d7; --label-border: #424e61; }
+/* Mantener el seguimiento a la vista en pantallas de escritorio. */
+html[data-theme] body.oc-labels .oc-list-table { min-width: 1080px !important; table-layout: fixed !important; }
+html[data-theme] body.oc-labels .oc-list-table .oc-col-numero { width: 5% !important; }
+html[data-theme] body.oc-labels .oc-list-table .oc-col-fecha { width: 8% !important; }
+html[data-theme] body.oc-labels .oc-list-table .oc-col-proveedor { width: 15% !important; }
+html[data-theme] body.oc-labels .oc-list-table .oc-col-categorias { width: 12% !important; }
+html[data-theme] body.oc-labels .oc-list-table .oc-col-rubros { width: 15% !important; }
+html[data-theme] body.oc-labels .oc-list-table .oc-col-items { width: 4% !important; }
+html[data-theme] body.oc-labels .oc-list-table .oc-col-importe { width: 12% !important; }
+html[data-theme] body.oc-labels .oc-list-table .oc-col-avance { width: 7% !important; }
+html[data-theme] body.oc-labels .oc-list-table .oc-col-certificados { width: 14% !important; }
+html[data-theme] body.oc-labels .oc-list-table .oc-col-acciones { width: 8% !important; }
+html[data-theme] body.oc-labels .oc-list-table thead th,
+html[data-theme] body.oc-labels .oc-list-table tbody tr > * { min-width: 0 !important; padding: 12px 6px !important; }
+html[data-theme] body.oc-labels .oc-list-table .oc-list-rubros { min-width: 0 !important; max-width: none !important; }
+html[data-theme] body.oc-labels .oc-list-table .oc-progress-cell { min-width: 0 !important; width: 100% !important; }
+html[data-theme] body.oc-labels :is(.oc-list-table, .oc-detail-page) a.delivery-status-pill[class][href] {
+    color: var(--label-text, #526173) !important;
+}

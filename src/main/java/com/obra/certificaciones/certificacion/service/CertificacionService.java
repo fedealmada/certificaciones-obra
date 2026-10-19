@@ -56,6 +56,7 @@ public class CertificacionService {
         NuevaCertificacionForm form = new NuevaCertificacionForm();
         form.setNumero((int) certificacionRepository.countByOrdenCompraId(ordenCompraId) + 1);
         form.setFecha(fechaOrden(ordenCompra));
+        form.setPorCantidad(ordenCompra.isPorCantidad());
         itemsCertificables(ordenCompra).forEach(item -> {
             ItemNuevaCertificacionForm itemForm = new ItemNuevaCertificacionForm();
             itemForm.setItemOrdenCompraId(item.getId());
@@ -73,10 +74,11 @@ public class CertificacionService {
 
         Map<Long, BigDecimal> porcentajesActuales = new HashMap<>();
         certificacion.getItems().forEach(item ->
-                porcentajesActuales.put(item.getItemOrdenCompra().getId(), item.getPorcentajeActual()));
+                porcentajesActuales.put(item.getItemOrdenCompra().getId(), certificacion.isPorCantidad() ? cantidadEquivalente(item) : item.getPorcentajeActual()));
 
         NuevaCertificacionForm form = new NuevaCertificacionForm();
         form.setId(certificacion.getId());
+        form.setPorCantidad(certificacion.isPorCantidad());
         form.setNumero(certificacion.getNumero());
         form.setFecha(certificacion.getFecha());
         form.setObservacion(certificacion.getObservacion());
@@ -95,7 +97,9 @@ public class CertificacionService {
         validarOrdenCertificable(ordenCompra);
         Map<Long, ItemOrdenCompra> itemsPorId = itemsCertificablesPorId(ordenCompra);
         Map<Long, BigDecimal> acumuladosPorItem = calculoService.porcentajesAcumuladosPorItem(ordenCompraId);
+        normalizarCantidades(form, ordenCompra, ordenCompra.isPorCantidad(), null);
         Certificacion certificacion = new Certificacion();
+        certificacion.setPorCantidad(ordenCompra.isPorCantidad());
         certificacion.setOrdenCompra(ordenCompra);
         certificacion.setNumero(form.getNumero());
         certificacion.setFecha(form.getFecha());
@@ -114,10 +118,11 @@ public class CertificacionService {
             ItemCertificacion itemCertificacion = new ItemCertificacion();
             itemCertificacion.setItemOrdenCompra(itemOrdenCompra);
             itemCertificacion.setPorcentajeActual(porcentajeActual);
+            itemCertificacion.setCantidadActual(form.isPorCantidad() ? itemForm.getCantidadActual() : null);
             certificacion.agregarItem(itemCertificacion);
         }
         if (certificacion.getItems().isEmpty()) {
-            throw new IllegalArgumentException("Debe cargar al menos un porcentaje mayor a 0.");
+            throw new IllegalArgumentException("Debe cargar al menos un avance mayor a 0.");
         }
         return certificacionRepository.save(certificacion);
     }
@@ -130,6 +135,7 @@ public class CertificacionService {
         validarOrdenCertificable(ordenCompra);
         Map<Long, ItemOrdenCompra> itemsPorId = itemsCertificablesPorId(ordenCompra);
 
+        normalizarCantidades(form, ordenCompra, certificacion.isPorCantidad(), certificacionId);
         Map<Long, BigDecimal> porcentajesEditados = new HashMap<>();
         for (ItemNuevaCertificacionForm itemForm : form.getItems()) {
             ItemOrdenCompra itemOrdenCompra = obtenerItemFormulario(itemsPorId, itemForm);
@@ -152,10 +158,11 @@ public class CertificacionService {
             ItemCertificacion itemCertificacion = new ItemCertificacion();
             itemCertificacion.setItemOrdenCompra(itemOrdenCompra);
             itemCertificacion.setPorcentajeActual(porcentajeActual);
+            itemCertificacion.setCantidadActual(form.isPorCantidad() ? itemForm.getCantidadActual() : null);
             certificacion.agregarItem(itemCertificacion);
         }
         if (certificacion.getItems().isEmpty()) {
-            throw new IllegalArgumentException("Debe cargar al menos un porcentaje mayor a 0.");
+            throw new IllegalArgumentException("Debe cargar al menos un avance mayor a 0.");
         }
         return certificacionRepository.save(certificacion);
     }
@@ -171,7 +178,7 @@ public class CertificacionService {
 
     private void validarAcumulado(ItemOrdenCompra itemOrdenCompra, ItemNuevaCertificacionForm itemForm, BigDecimal acumuladoAnterior) {
         BigDecimal acumuladoNuevo = acumuladoAnterior.add(porcentajeSeguro(itemForm));
-        if (acumuladoNuevo.compareTo(BigDecimal.valueOf(100)) > 0) {
+        if (acumuladoNuevo.setScale(10, java.math.RoundingMode.HALF_UP).compareTo(BigDecimal.valueOf(100)) > 0) {
             throw new IllegalArgumentException("El item " + itemOrdenCompra.getItem() + " supera el 100% acumulado.");
         }
     }
@@ -201,7 +208,7 @@ public class CertificacionService {
             BigDecimal actualEditado = porcentajesEditados.getOrDefault(item.getId(), BigDecimal.ZERO);
             BigDecimal posterior = posteriores.getOrDefault(item.getId(), BigDecimal.ZERO);
             BigDecimal acumuladoFinal = anterior.add(actualEditado).add(posterior);
-            if (acumuladoFinal.compareTo(BigDecimal.valueOf(100)) > 0) {
+            if (acumuladoFinal.setScale(10, java.math.RoundingMode.HALF_UP).compareTo(BigDecimal.valueOf(100)) > 0) {
                 throw new IllegalArgumentException("La correccion hace que el item " + item.getItem() + " supere el 100% en el historial.");
             }
         }
@@ -219,7 +226,40 @@ public class CertificacionService {
         }
     }
 
+    private BigDecimal cantidadEquivalente(ItemCertificacion item) {
+        return item.getCantidadActual() != null ? item.getCantidadActual()
+                : item.getItemOrdenCompra().getCantidad().multiply(item.getPorcentajeActual())
+                    .divide(new BigDecimal("100"), 12, java.math.RoundingMode.HALF_UP);
+    }
+
+    private void normalizarCantidades(NuevaCertificacionForm form, OrdenCompra oc, boolean porCantidad, Long excluir) {
+        form.setPorCantidad(porCantidad);
+        form.getItems().forEach(i -> { i.setPorcentajeCalculado(null); i.setCantidadActual(null); });
+        if (!porCantidad) return;
+        var items = itemsCertificablesPorId(oc);
+        var usados = new HashMap<Long, BigDecimal>();
+        for (var historico : calculoService.historialOrden(oc.getId())) {
+            if (excluir != null && excluir.equals(historico.getCertificacion().getId())) continue;
+            usados.merge(historico.getItemOrdenCompra().getId(), cantidadEquivalente(historico), BigDecimal::add);
+        }
+        var vistos = new java.util.HashSet<Long>();
+        for (var fila : form.getItems()) {
+            var item = obtenerItemFormulario(items, fila);
+            if (!vistos.add(item.getId())) throw new IllegalArgumentException("Item repetido en el certificado.");
+            var cantidad = fila.getPorcentajeActual() == null ? BigDecimal.ZERO : fila.getPorcentajeActual();
+            if (item.getCantidad() == null || item.getCantidad().signum() <= 0)
+                throw new IllegalArgumentException("La cantidad contratada del item " + item.getItem() + " debe ser mayor a cero.");
+            if (cantidad.signum() < 0 || cantidad.stripTrailingZeros().scale() > 6)
+                throw new IllegalArgumentException("Ingrese una cantidad positiva con hasta seis decimales.");
+            if (cantidad.add(usados.getOrDefault(item.getId(), BigDecimal.ZERO)).compareTo(item.getCantidad()) > 0)
+                throw new IllegalArgumentException("El item " + item.getItem() + " supera la cantidad contratada, incluyendo los otros certificados.");
+            fila.setCantidadActual(cantidad);
+            fila.setPorcentajeCalculado(cantidad.multiply(new BigDecimal("100")).divide(item.getCantidad(), 16, java.math.RoundingMode.HALF_UP));
+        }
+    }
+
     private BigDecimal porcentajeSeguro(ItemNuevaCertificacionForm itemForm) {
+        if (itemForm.getPorcentajeCalculado() != null) return itemForm.getPorcentajeCalculado();
         return itemForm.getPorcentajeActual() == null ? BigDecimal.ZERO : itemForm.getPorcentajeActual();
     }
 

@@ -14,6 +14,7 @@ public interface CertificacionRepository extends JpaRepository<Certificacion, Lo
     @EntityGraph(attributePaths = {"ordenCompra", "items", "items.itemOrdenCompra"})
     Optional<Certificacion> findById(Long id);
 
+    @EntityGraph(attributePaths = {"ordenCompra", "items", "items.itemOrdenCompra"})
     List<Certificacion> findByOrdenCompraIdOrderByFechaAscIdAsc(Long ordenCompraId);
     long countByOrdenCompraId(Long ordenCompraId);
     long countByOrdenCompraObraId(Long obraId);

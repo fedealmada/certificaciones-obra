@@ -55,6 +55,7 @@ public class OrdenCompraController {
     private final CategoriaOrdenService categoriaOrdenService;
     private final AlertaSistemaService alertaSistemaService;
     private final ObraService obraService;
+    private final com.obra.certificaciones.certificacion.service.AjustesCertificacionService ajustesService;
 
     @GetMapping
     public String listar(@RequestParam(required = false) String proveedor,
@@ -159,12 +160,17 @@ public class OrdenCompraController {
                     var detalleCertificacion = calculoService.calcularDetalle(certificacion);
                     return new com.obra.certificaciones.certificacion.dto.CertificacionResumenVista(
                             certificacion,
-                            calculoService.calcularResumen(ordenCompra.getItems(), detalleCertificacion, acumuladosPorItem));
+                            calculoService.calcularResumenHasta(certificacion, ordenCompra.getItems(), detalleCertificacion));
                 })
                 .toList();
         model.addAttribute("orden", ordenCompra);
         model.addAttribute("itemsResumen", itemsResumen);
         model.addAttribute("certificaciones", certificadosResumen);
+        var finanzas = ajustesService.acumulado(id);
+        model.addAttribute("finanzasOc", finanzas.totales());
+        model.addAttribute("liquidaciones", finanzas.certificados().stream().collect(java.util.stream.Collectors.toMap(
+                com.obra.certificaciones.certificacion.dto.LiquidacionCertificado.Fila::id,
+                com.obra.certificaciones.certificacion.dto.LiquidacionCertificado.Fila::liquidacion)));
         model.addAttribute("totalManoObra", totalPorCategoria(ordenCompra, CategoriaItem.MANO_OBRA));
         model.addAttribute("totalCertificable", totalCertificable(ordenCompra));
         model.addAttribute("totalMateriales", totalPorCategoria(ordenCompra, CategoriaItem.MATERIAL));

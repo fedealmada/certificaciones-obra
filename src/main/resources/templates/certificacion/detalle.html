@@ -8,6 +8,7 @@
     <link th:href="@{/css/app.css(v='20260730-dark2')}" rel="stylesheet">
     <link th:href="@{/css/theme.css(v='20260731-night-reset')}" rel="stylesheet">
     <link th:href="@{/css/design-system.css(v='20260801-doc-folder-page')}" rel="stylesheet">
+    <link th:href="@{/css/certificados-amplios.css(v='20261019-compacto')}" rel="stylesheet">
 </head>
 <body>
 <div th:replace="~{fragments/layout :: navbar}"></div>
@@ -33,6 +34,7 @@
             </div>
         </div>
         <div class="document-actions">
+            <a class="btn btn-outline-primary" th:href="@{/oc/{oc}/certificaciones/{id}/ajustes(oc=${orden.id},id=${certificacion.id})}"><i class="bi bi-calculator"></i> Fondo de reparo y CAC</a>
             <a class="btn btn-outline-primary" th:href="@{/oc/{ocId}/certificaciones/{certId}/editar(ocId=${orden.id}, certId=${certificacion.id})}"><i class="bi bi-pencil-square"></i> Editar</a>
             <a class="btn btn-outline-success" th:href="@{/oc/{ocId}/certificaciones/{certId}/exportar(ocId=${orden.id}, certId=${certificacion.id})}"><i class="bi bi-file-earmark-spreadsheet"></i> Exportar Excel</a>
             <form method="post" th:action="@{/oc/{ocId}/certificaciones/{certId}/eliminar(ocId=${orden.id}, certId=${certificacion.id})}" onsubmit="return confirm('Eliminar este certificado? Los acumulados se recalcularan.');">
@@ -81,18 +83,22 @@
         </div>
     </section>
 
+    <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
+    <div th:replace="~{fragments/liquidacion :: resumen}"></div>
+    <p class="small text-muted mb-3" th:if="${certificacion.brutoInformado != null}">La liquidación utiliza el bruto original informado; los porcentajes de avance se conservan. Podés revisarlo en «Fondo de reparo y CAC».</p>
     <section class="cert-detail-summary mb-4">
         <div class="cert-detail-summary-main">
-            <span>Avance acumulado OC</span>
+            <span>Acumulado a este certificado</span>
             <strong th:text="${#numbers.formatDecimal(resumen.porcentajeAcumulado, 1, 'POINT', 2, 'COMMA')} + ' %'">0,00 %</strong>
             <div class="cert-detail-progress-track">
                 <div class="cert-detail-progress-fill" th:style="'width: ' + ${resumen.porcentajeAcumulado > 100 ? 100 : resumen.porcentajeAcumulado} + '%'"></div>
             </div>
+            <small th:text="${'Anterior + actual · Certificado ' + certificacion.numero}"></small>
         </div>
-        <div><span>Total contratado</span><strong th:text="${#numbers.formatDecimal(resumen.totalContratado, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
-        <div><span>Certificado actual</span><strong th:text="${#numbers.formatDecimal(resumen.totalActual, 1, 'POINT', 2, 'COMMA')}">0,00</strong><small th:text="${#numbers.formatDecimal(resumen.porcentajeActual, 1, 'POINT', 2, 'COMMA')} + ' %'">0,00 %</small></div>
-        <div><span>Acumulado</span><strong th:text="${#numbers.formatDecimal(resumen.totalAcumulado, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
-        <div><span>Saldo pendiente</span><strong th:text="${#numbers.formatDecimal(resumen.saldoPendiente, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
+        <div><span>Anterior</span><strong th:text="${#numbers.formatDecimal(resumen.totalAnterior, 1, 'POINT', 2, 'COMMA')}">0,00</strong><small th:text="${#numbers.formatDecimal(resumen.porcentajeAnterior, 1, 'POINT', 2, 'COMMA') + ' %'}"></small></div>
+        <div><span>Este certificado</span><strong th:text="${#numbers.formatDecimal(resumen.totalActual, 1, 'POINT', 2, 'COMMA')}">0,00</strong><small th:text="${#numbers.formatDecimal(resumen.porcentajeActual, 1, 'POINT', 2, 'COMMA')} + ' %'">0,00 %</small></div>
+        <div><span>Acumulado al certificado</span><strong th:text="${#numbers.formatDecimal(resumen.totalAcumulado, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
+        <div><span>Saldo a esa fecha</span><strong th:text="${#numbers.formatDecimal(resumen.saldoPendiente, 1, 'POINT', 2, 'COMMA')}">0,00</strong></div>
     </section>
 
     <div class="cert-table-title-row">
@@ -108,7 +114,7 @@
             <div>Item</div>
             <div>Detalle</div>
             <div>Contratado</div>
-            <div>Avance %</div>
+            <div th:text="${certificacion.porCantidad ? 'Avance en cantidades' : 'Avance %'}">Avance</div>
             <div>Avance $</div>
         </div>
 
@@ -140,15 +146,15 @@
                 <div class="cert-value-stack cert-progress-stack">
                     <div>
                         <span>Anterior</span>
-                        <strong th:text="${item.porcentajeAnterior} + ' %'">0 %</strong>
+                        <strong th:text="${certificacion.porCantidad ? #numbers.formatDecimal(item.cantidadAnterior,1,'POINT',2,'COMMA') + ' ' + item.itemOrdenCompra.unidad : #numbers.formatDecimal(item.porcentajeAnterior,1,'POINT',2,'COMMA') + ' %'}">0 %</strong>
                     </div>
                     <div class="is-current">
                         <span>Actual</span>
-                        <strong th:text="${item.porcentajeActual} + ' %'">0 %</strong>
+                        <strong th:text="${certificacion.porCantidad ? #numbers.formatDecimal(item.cantidadActual,1,'POINT',2,'COMMA') + ' ' + item.itemOrdenCompra.unidad : #numbers.formatDecimal(item.porcentajeActual,1,'POINT',2,'COMMA') + ' %'}">0 %</strong>
                     </div>
                     <div class="is-total">
                         <span>Acumulado</span>
-                        <strong th:text="${item.porcentajeAcumulado} + ' %'">0 %</strong>
+                        <strong th:text="${certificacion.porCantidad ? #numbers.formatDecimal(item.cantidadAcumulada,1,'POINT',2,'COMMA') + ' ' + item.itemOrdenCompra.unidad : #numbers.formatDecimal(item.porcentajeAcumulado,1,'POINT',2,'COMMA') + ' %'}">0 %</strong>
                     </div>
                 </div>
             </div>

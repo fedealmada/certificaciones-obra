@@ -9,6 +9,12 @@ import java.util.Optional;
 import java.time.LocalDate;
 
 public interface TableroCertificadoRepository extends JpaRepository<TableroCertificado, Long> {
+    @org.springframework.data.jpa.repository.Lock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
+    @org.springframework.data.jpa.repository.Query("select t from TableroCertificado t where t.id = :id")
+    Optional<TableroCertificado> bloquear(@org.springframework.data.repository.query.Param("id") Long id);
+
+    boolean existsByAnteriorId(Long anteriorId);
+
     @EntityGraph(attributePaths = {"obra", "items", "items.itemOrdenCompra"})
     List<TableroCertificado> findByObraIdOrderByFechaHastaDescIdDesc(Long obraId);
 

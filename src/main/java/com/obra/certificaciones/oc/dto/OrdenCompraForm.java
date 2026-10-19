@@ -22,5 +22,9 @@ public class OrdenCompraForm {
     private Long proveedorId;
     private String observacion;
     private ModoSeguimientoOrden modoSeguimiento = ModoSeguimientoOrden.CERTIFICACION;
+
+    private Boolean certificacionPorCantidad = false;
+
+    public boolean isPorCantidad() { return Boolean.TRUE.equals(certificacionPorCantidad); }
     private List<ItemOrdenCompra> items = new ArrayList<>();
 }

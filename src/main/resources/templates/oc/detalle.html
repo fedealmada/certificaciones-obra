@@ -8,8 +8,9 @@
     <link th:href="@{/css/app.css(v='20260730-dark2')}" rel="stylesheet">
     <link th:href="@{/css/theme.css(v='20260731-night-reset')}" rel="stylesheet">
     <link th:href="@{/css/design-system.css(v='20260802-oc-table-readable-flow')}" rel="stylesheet">
+    <link th:href="@{/css/oc-labels.css(v='20261018')}" rel="stylesheet">
 </head>
-<body>
+<body class="oc-labels">
 <div th:replace="~{fragments/layout :: navbar}"></div>
 <div class="work-action-overlay work-action-success"
      id="oc-success-overlay"
@@ -42,6 +43,7 @@
             <div class="document-kicker">Orden de compra</div>
             <div class="oc-title-status-row">
                 <h1 th:text="'OC ' + ${orden.numero}">OC</h1>
+                <span class="badge text-bg-info" th:if="${ordenCertificable}" th:text="${orden.porCantidad ? 'Por cantidad' : 'Por porcentaje'}"></span>
                 <span th:if="${ordenMaterial}"
                       class="delivery-status-pill"
                       th:classappend="${estadoEntregaOrden.name() == 'COMPLETO' ? ' is-complete' : (estadoEntregaOrden.name() == 'PARCIAL' ? ' is-partial' : ' is-pending')}"
@@ -62,6 +64,7 @@
             </div>
         </div>
         <div class="document-actions">
+            <a class="btn btn-outline-primary" th:if="${ordenCertificable}" th:href="@{/oc/{id}/ajustes(id=${orden.id})}"><i class="bi bi-calculator"></i> Fondo de reparo y CAC</a>
             <a class="btn btn-primary" th:if="${ordenMaterial}" th:href="@{/materiales/oc/{id}/recepciones/nueva(id=${orden.id})}"><i class="bi bi-truck"></i> Nueva entrega</a>
             <a class="btn btn-outline-primary" th:if="${ordenMaterial}" th:href="@{/materiales/oc/{id}(id=${orden.id})}"><i class="bi bi-box-seam"></i> Ver entregas</a>
             <a class="btn btn-primary" th:if="${ordenCertificable}" th:href="@{/oc/{id}/certificaciones/nueva(id=${orden.id})}"><i class="bi bi-plus-lg"></i> Nuevo Certificado</a>
@@ -105,7 +108,7 @@
                 <span class="ticket-info-icon"><i class="bi bi-patch-check"></i></span>
                 <div>
                     <span>Seguimiento</span>
-                    <strong><span class="tracking-chip is-cert" th:text="${orden.modoSeguimientoEfectivo.descripcion}">Certificable</span></strong>
+                    <strong><span class="tracking-chip" th:classappend="${ordenMaterial ? ' is-delivery' : (ordenCertificable ? ' is-cert' : ' is-none')}" th:text="${orden.modoSeguimientoEfectivo.descripcion}">Certificable</span></strong>
                 </div>
             </div>
         </div>
@@ -196,8 +199,8 @@
                     </td>
                     <td th:attr="data-sort-value=${catName}">
                         <span class="category-chip"
-                              th:classappend="${#strings.contains(#strings.toLowerCase(catName), 'material') ? ' is-material' : (#strings.contains(#strings.toLowerCase(catName), 'servicio') ? ' is-service' : ' is-labor')}">
-                            <i th:class="${#strings.contains(#strings.toLowerCase(catName), 'material') ? 'bi bi-box-seam' : (#strings.contains(#strings.toLowerCase(catName), 'servicio') ? 'bi bi-tools' : 'bi bi-people')}"></i>
+                              th:classappend="${(resumen.itemOrdenCompra.categoriaEntidad != null ? resumen.itemOrdenCompra.categoriaEntidad.tipo.name() : resumen.itemOrdenCompra.categoria.name()) == 'MATERIAL' ? ' is-material' : ((resumen.itemOrdenCompra.categoriaEntidad != null ? resumen.itemOrdenCompra.categoriaEntidad.tipo.name() : resumen.itemOrdenCompra.categoria.name()) == 'OTRO' ? ' is-service' : ' is-labor')}">
+                            <i th:class="${(resumen.itemOrdenCompra.categoriaEntidad != null ? resumen.itemOrdenCompra.categoriaEntidad.tipo.name() : resumen.itemOrdenCompra.categoria.name()) == 'MATERIAL' ? 'bi bi-box-seam' : ((resumen.itemOrdenCompra.categoriaEntidad != null ? resumen.itemOrdenCompra.categoriaEntidad.tipo.name() : resumen.itemOrdenCompra.categoria.name()) == 'OTRO' ? 'bi bi-tools' : 'bi bi-people')}"></i>
                             <span th:text="${catName}">Categoria</span>
                         </span>
                     </td>
@@ -261,6 +264,7 @@
         </div>
     </section>
 
+    <section class="panel-section mb-3" th:if="${ordenCertificable}"><div class="section-title-row"><h2 class="h5 mb-0">Acumulados de fondo de reparo y CAC</h2><a th:href="@{/oc/{id}/ajustes(id=${orden.id})}">Configurar y ver historial</a></div><div class="row g-3"><div class="col-md-4"><small class="text-muted">Fondo de reparo retenido</small><div class="h4 mt-1" th:text="${'$ ' + #numbers.formatDecimal(finanzasOc.retencion, 1, 'POINT', 2, 'COMMA')}"></div></div><div class="col-md-4"><small class="text-muted">CAC acumulado</small><div class="h4 mt-1" th:text="${'$ ' + #numbers.formatDecimal(finanzasOc.cac, 1, 'POINT', 2, 'COMMA')}"></div></div><div class="col-md-4"><small class="text-muted">Neto acumulado de certificados</small><div class="h4 mt-1" th:text="${'$ ' + #numbers.formatDecimal(finanzasOc.neto, 1, 'POINT', 2, 'COMMA')}"></div></div></div><p class="small text-muted mb-0" th:if="${finanzasOc.pendientes > 0}" th:text="${finanzasOc.pendientes + ' certificados tienen CAC pendiente; el neto acumulado es provisional.'}"></p></section>
     <section class="panel-section" id="certificados" th:if="${ordenCertificable}">
         <div class="section-title-row">
             <h2 class="h5 mb-0"><i class="bi bi-check2-square"></i> Certificados realizados</h2>
@@ -268,7 +272,7 @@
         </div>
         <div class="table-responsive">
             <table class="table table-hover align-middle document-table" data-ds-table>
-                <thead><tr><th>Numero</th><th>Fecha</th><th>Observacion</th><th class="text-end">Avance actual</th><th class="text-end">Acumulado OC</th><th class="text-end">Acciones</th></tr></thead>
+                <thead><tr><th>Numero</th><th>Fecha</th><th>Observacion</th><th class="text-end">Avance actual</th><th class="text-end">Acum. a ese cert.</th><th class="text-end">Fondo de reparo</th><th class="text-end">CAC</th><th class="text-end">Neto a pagar</th><th class="text-end">Acciones</th></tr></thead>
                 <tbody>
                 <tr class="cert-click-row" th:each="cert : ${certificaciones}" th:data-href="@{/oc/{ocId}/certificaciones/{certId}(ocId=${orden.id}, certId=${cert.certificacion.id})}" tabindex="0" role="link">
                     <td><a class="cert-row-link" th:href="@{/oc/{ocId}/certificaciones/{certId}(ocId=${orden.id}, certId=${cert.certificacion.id})}" th:text="${cert.certificacion.numero}">1</a></td>
@@ -276,9 +280,12 @@
                     <td th:text="${cert.certificacion.observacion}"></td>
                     <td class="text-end" th:text="${#numbers.formatDecimal(cert.resumen.porcentajeActual, 1, 'POINT', 2, 'COMMA')} + ' %'"></td>
                     <td class="text-end fw-semibold" th:text="${#numbers.formatDecimal(cert.resumen.porcentajeAcumulado, 1, 'POINT', 2, 'COMMA')} + ' %'">0,00 %</td>
+                    <td class="text-end" th:text="${'− ' + #numbers.formatDecimal(liquidaciones[cert.certificacion.id].retencion, 1, 'POINT', 2, 'COMMA')}"></td>
+                    <td class="text-end" th:text="${#numbers.formatDecimal(liquidaciones[cert.certificacion.id].cac, 1, 'POINT', 2, 'COMMA')}"></td>
+                    <td class="text-end"><strong th:text="${#numbers.formatDecimal(liquidaciones[cert.certificacion.id].neto, 1, 'POINT', 2, 'COMMA')}"></strong><small class="d-block" th:if="${liquidaciones[cert.certificacion.id].pendiente}">Provisional</small></td>
                     <td class="text-end action-cell"><a class="btn btn-sm btn-outline-secondary table-icon-action" th:href="@{/oc/{ocId}/certificaciones/{certId}/editar(ocId=${orden.id}, certId=${cert.certificacion.id})}" title="Editar certificado" aria-label="Editar certificado"><i class="bi bi-pencil-square"></i></a><form method="post" th:action="@{/oc/{ocId}/certificaciones/{certId}/eliminar(ocId=${orden.id}, certId=${cert.certificacion.id})}" onsubmit="return confirm('Eliminar este certificado? Los acumulados se recalcularan.');"><button class="btn btn-sm btn-outline-danger table-icon-action" type="submit" title="Eliminar certificado" aria-label="Eliminar certificado"><i class="bi bi-trash"></i></button></form></td>
                 </tr>
-                <tr th:if="${certificaciones.isEmpty()}"><td colspan="6" class="text-center text-muted py-4">Todavia no hay certificados.</td></tr>
+                <tr th:if="${certificaciones.isEmpty()}"><td colspan="9" class="text-center text-muted py-4">Todavia no hay certificados.</td></tr>
                 </tbody>
             </table>
         </div>

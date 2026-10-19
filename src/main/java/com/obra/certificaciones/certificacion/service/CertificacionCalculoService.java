@@ -111,6 +111,7 @@ public class CertificacionCalculoService {
         List<ItemCertificacion> historial = historialOrden(certificacion.getOrdenCompra().getId());
         Map<Long, BigDecimal> acumulados = new HashMap<>();
         List<ItemCertificacionCalculado> resultado = new ArrayList<>();
+        Map<Long, BigDecimal> montos = new HashMap<>();
 
         for (ItemCertificacion itemHistorial : historial) {
             ItemOrdenCompra itemOrdenCompra = itemHistorial.getItemOrdenCompra();
@@ -119,12 +120,23 @@ public class CertificacionCalculoService {
             BigDecimal actual = porcentajeSeguro(itemHistorial);
             BigDecimal acumulado = anterior.add(actual);
             acumulados.put(itemId, acumulado);
+            BigDecimal montoAnterior = montos.getOrDefault(itemId, BigDecimal.ZERO);
+            BigDecimal montoAcumulado = montoAnterior.add(itemHistorial.getMontoActual());
+            montos.put(itemId, montoAcumulado);
 
             if (itemHistorial.getCertificacion().getId().equals(certificacion.getId())) {
-                resultado.add(new ItemCertificacionCalculado(itemOrdenCompra, anterior, actual, acumulado, calcularMonto(itemOrdenCompra.getImporte(), actual)));
+                resultado.add(new ItemCertificacionCalculado(itemOrdenCompra, anterior, actual, acumulado, itemHistorial.getMontoActual(), montoAnterior, montoAcumulado));
             }
         }
         return resultado;
+    }
+
+    public BigDecimal calcularMontoAcumulado(ItemOrdenCompra item, BigDecimal porcentaje) {
+        if (item.getOrdenCompra() != null && item.getOrdenCompra().isPorCantidad()) {
+            BigDecimal cantidad = item.getCantidad().multiply(porcentaje).divide(new BigDecimal("100"), 6, RoundingMode.HALF_UP);
+            return cantidad.multiply(item.getPrecioUnitario()).setScale(2, RoundingMode.HALF_UP);
+        }
+        return calcularMonto(item.getImporte(), porcentaje);
     }
 
     public BigDecimal calcularMonto(BigDecimal importe, BigDecimal porcentaje) {
@@ -144,7 +156,7 @@ public class CertificacionCalculoService {
                     BigDecimal acumulado = esItemCertificable(item)
                             ? acumuladosPorItem.getOrDefault(item.getId(), BigDecimal.ZERO)
                             : BigDecimal.ZERO;
-                    BigDecimal montoAcumulado = calcularMonto(item.getImporte(), acumulado);
+                    BigDecimal montoAcumulado = calcularMontoAcumulado(item, acumulado);
                     BigDecimal saldoPendiente = importeSeguro(item).subtract(montoAcumulado).max(BigDecimal.ZERO);
                     return new ItemOrdenCompraResumen(item, acumulado, montoAcumulado, saldoPendiente, calcularEstado(acumulado));
                 })
@@ -169,17 +181,33 @@ public class CertificacionCalculoService {
                     anterior,
                     actual,
                     acumulado,
-                    calcularMonto(item.getItemOrdenCompra().getImporte(), actual)
+                    item.getMontoActual()
             ));
         }
         return resultado;
     }
 
     @Transactional(readOnly = true)
-    public ResumenCertificacion calcularResumen(Long ordenCompraId,
+    public ResumenCertificacion calcularResumenHasta(Certificacion certificacion,
                                                 List<ItemOrdenCompra> itemsOrdenCompra,
                                                 List<ItemCertificacionCalculado> itemsCertificado) {
-        return calcularResumen(itemsOrdenCompra, itemsCertificado, porcentajesAcumuladosPorItem(ordenCompraId));
+        Map<Long, BigDecimal> acumulados = new HashMap<>();
+        for (ItemCertificacion item : historialOrden(certificacion.getOrdenCompra().getId())) {
+            var origen = item.getCertificacion();
+            int fecha = origen.getFecha().compareTo(certificacion.getFecha());
+            if (fecha > 0 || (fecha == 0 && origen.getId().compareTo(certificacion.getId()) > 0)) break;
+            acumulados.merge(item.getItemOrdenCompra().getId(), porcentajeSeguro(item), BigDecimal::add);
+        }
+        var resumen = calcularResumen(itemsOrdenCompra, itemsCertificado, acumulados);
+        var historia = historialOrden(certificacion.getOrdenCompra().getId());
+        if (historia.stream().noneMatch(i -> i.getCantidadActual() != null)) return resumen;
+        BigDecimal monto = historia.stream()
+                .filter(i -> esItemCertificable(i.getItemOrdenCompra()))
+                .filter(i -> i.getCertificacion().getFecha().isBefore(certificacion.getFecha())
+                    || (i.getCertificacion().getFecha().equals(certificacion.getFecha()) && i.getCertificacion().getId() <= certificacion.getId()))
+                .map(ItemCertificacion::getMontoActual).reduce(BigDecimal.ZERO, BigDecimal::add);
+        return new ResumenCertificacion(resumen.totalContratado(), resumen.totalActual(), monto,
+                resumen.totalContratado().subtract(monto).max(BigDecimal.ZERO), resumen.cantidadItemsCertificados());
     }
 
     public ResumenCertificacion calcularResumen(List<ItemOrdenCompra> itemsOrdenCompra,
@@ -227,7 +255,7 @@ public class CertificacionCalculoService {
         if (porcentajeAcumulado.compareTo(BigDecimal.ZERO) <= 0) {
             return EstadoItemCertificacion.PENDIENTE;
         }
-        if (porcentajeAcumulado.compareTo(BigDecimal.valueOf(100)) >= 0) {
+        if (porcentajeAcumulado.setScale(10, RoundingMode.HALF_UP).compareTo(BigDecimal.valueOf(100)) >= 0) {
             return EstadoItemCertificacion.TERMINADO;
         }
         return EstadoItemCertificacion.EN_EJECUCION;

@@ -67,6 +67,14 @@
                 </select>
                 <div class="form-text">Define si se certifica, se controla por entregas/viajes o queda solo como registro.</div>
             </div>
+            <div class="col-md-4">
+                <label class="form-label">Certificar por</label>
+                <select class="form-select" th:field="*{certificacionPorCantidad}">
+                    <option value="false">Porcentaje de avance (%)</option>
+                    <option value="true">Cantidad ejecutada (unidades, m², metros…)</option>
+                </select>
+                <div class="form-text">Se aplica a nuevos certificados. Los existentes conservan su modalidad.</div>
+            </div>
             <div class="col-md-8"><label class="form-label">Observacion</label><textarea class="form-control" rows="2" th:field="*{observacion}"></textarea></div>
         </div>
         <div class="d-flex justify-content-between align-items-center mb-2"><h2 class="h4">Items</h2><button class="btn btn-outline-primary" type="button" onclick="agregarItem()">Agregar item</button></div>

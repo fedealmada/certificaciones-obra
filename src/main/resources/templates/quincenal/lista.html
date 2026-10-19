@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Certificados quincenales · ObraControl</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script th:src="@{/js/design-system.js(v='20260802-oc-table-readable-flow')}" defer></script>
+    <link th:href="@{/css/app.css(v='20260730-dark2')}" rel="stylesheet">
+    <link th:href="@{/css/theme.css(v='20260731-night-reset')}" rel="stylesheet">
+    <link th:href="@{/css/design-system.css(v='20260802-oc-table-readable-flow')}" rel="stylesheet">
+    <link th:href="@{/css/quincenales.css(v='20261018-etiquetas')}" rel="stylesheet">
+</head>
+<body>
+<div th:replace="~{fragments/layout :: navbar}"></div>
+<main class="container quincenal-page" th:data-quincenas-url="@{/certificados-quincenales(mes=${mes},proveedorId=${proveedorId},quincena=${quincena})}">
+    <div class="page-navigation mb-3 no-print"><a th:href="@{/}"><i class="bi bi-house"></i> Inicio</a><i class="bi bi-chevron-right"></i><span>Certificados quincenales</span></div>
+    <header class="page-hero mb-3">
+        <div>
+            <div class="document-kicker">Mano de obra y servicios certificables</div>
+            <h1>Certificados quincenales</h1>
+            <p class="text-muted mb-0">Todo el avance del mes, de cada contratista a cada tarea.</p>
+        </div>
+        <div class="d-flex gap-2 flex-wrap no-print">
+            <a class="btn btn-outline-secondary" th:href="@{/certificados-quincenales/exportar(mes=${mes},proveedorId=${proveedorId},quincena=${quincena})}"><i class="bi bi-download"></i> Exportar CSV</a>
+            <button type="button" class="btn btn-outline-secondary" id="print-quincenal"><i class="bi bi-printer"></i> Imprimir</button>
+            <a class="btn btn-primary" th:if="${configuracion.activo('modulo.tableroCertificados')}" th:href="@{/tablero-certificados}"><i class="bi bi-table"></i> Certificado general</a>
+        </div>
+    </header>
+
+    <section class="panel-section mb-3 no-print" aria-label="Elegir periodo y contratista">
+        <form method="get" th:action="@{/certificados-quincenales}" class="row g-3 align-items-end" id="quincenal-filters">
+            <div class="col-md-3">
+                <label class="form-label" for="mes">Mes de trabajo</label>
+                <input class="form-control" type="month" id="mes" name="mes" th:value="${mes}" min="1900-01" max="9998-12" required>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label" for="proveedor">Contratista / proveedor</label>
+                <input class="form-control mb-2" type="search" id="q-provider-search" placeholder="Buscar nombre en la lista…" aria-label="Buscar contratista o proveedor en la lista" autocomplete="off" aria-controls="proveedor">
+                <select class="form-select" id="proveedor" name="proveedorId">
+                    <option value="">Todos los contratistas</option>
+                    <option th:each="p : ${resumen.opcionesProveedores}" th:value="${p.id}" th:text="${p.nombre}" th:selected="${p.id == proveedorId}"></option>
+                    <option th:if="${proveedorAusente}" th:value="${proveedorId}" selected>Contratista sin certificados este mes</option>
+                </select>
+                <small class="text-muted" id="q-provider-search-status" role="status" aria-live="polite"></small>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label" for="quincena">Detalle a mostrar</label>
+                <select class="form-select" id="quincena" name="quincena">
+                    <option value="0" th:selected="${quincena == 0}">Mes completo</option>
+                    <option value="1" th:selected="${quincena == 1}">Primera quincena</option>
+                    <option value="2" th:selected="${quincena == 2}">Segunda quincena</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-flex gap-2">
+                <button class="btn btn-primary flex-grow-1" type="submit">Ver resumen</button>
+                <a class="btn btn-outline-secondary" th:href="@{/certificados-quincenales(mes=${mes})}" title="Limpiar filtros" aria-label="Limpiar filtros"><i class="bi bi-x-lg"></i></a>
+            </div>
+        </form>
+    </section>
+
+    <div class="q-period-heading">
+        <div><div class="document-kicker" th:text="${obraActiva.nombre}">Obra</div><h2 class="q-month" th:text="${mesTitulo}">Octubre 2026</h2></div>
+        <div class="d-flex gap-2 align-items-center no-print">
+            <a class="btn btn-sm btn-outline-secondary" th:href="@{/certificados-quincenales(mes=${mesAnterior},proveedorId=${proveedorId},quincena=${quincena})}" aria-label="Mes anterior"><i class="bi bi-chevron-left"></i></a>
+            <select class="form-select form-select-sm q-history" id="q-history" aria-label="Ir a un mes con certificados" th:if="${!meses.isEmpty()}">
+                <option value="">Meses con certificados</option>
+                <option th:each="m : ${meses}" th:value="${m.valor}" th:text="${m.etiqueta}"></option>
+            </select>
+            <a class="btn btn-sm btn-outline-secondary" th:href="@{/certificados-quincenales(mes=${mesSiguiente},proveedorId=${proveedorId},quincena=${quincena})}" aria-label="Mes siguiente"><i class="bi bi-chevron-right"></i></a>
+        </div>
+    </div>
+
+    <div class="q-cards">
+        <section class="panel-section q-card">
+            <span class="q-card-icon"><i class="bi bi-calendar2-week"></i></span>
+            <div class="q-card-label">Primera quincena · Neto <span>1–15</span></div>
+            <strong class="q-money" th:text="${'$ ' + #numbers.formatDecimal(resumen.primera, 1, 'POINT', 2, 'COMMA')}">$ 0,00</strong>
+            <small class="text-muted">Emisiones: <span th:text="${#temporals.format(emisionDesde, 'dd/MM') + ' al ' + #temporals.format(emisionPrimeraHasta, 'dd/MM')}"></span> · Margen de 5 días</small>
+        </section>
+        <section class="panel-section q-card">
+            <span class="q-card-icon q-card-icon-second"><i class="bi bi-calendar2-check"></i></span>
+            <div class="q-card-label">Segunda quincena · Neto <span th:text="${'16–' + ultimoDia}">16–31</span></div>
+            <strong class="q-money" th:text="${'$ ' + #numbers.formatDecimal(resumen.segunda, 1, 'POINT', 2, 'COMMA')}">$ 0,00</strong>
+            <small class="text-muted">Emisiones: <span th:text="${#temporals.format(emisionSegundaDesde, 'dd/MM') + ' al ' + #temporals.format(emisionHasta, 'dd/MM')}"></span> · Margen de 5 días</small>
+        </section>
+        <section class="panel-section q-card q-card-total">
+            <span class="q-card-icon"><i class="bi bi-receipt-cutoff"></i></span>
+            <div class="q-card-label">Neto a pagar del mes</div>
+            <strong class="q-money" th:text="${'$ ' + #numbers.formatDecimal(resumen.totalMes, 1, 'POINT', 2, 'COMMA')}">$ 0,00</strong>
+            <small class="text-muted">Certificados: <span th:text="${resumen.cantidadMes}">0</span> · Contratistas: <span th:text="${resumen.proveedoresMes}">0</span></small>
+        </section>
+    </div>
+
+    <section class="panel-section mb-3"><div class="row g-3"><div class="col-md-4"><small class="text-muted">Bruto de trabajos del mes</small><div class="h5 q-numeric" th:text="${'$ ' + #numbers.formatDecimal(resumen.totalesMes.bruto, 1, 'POINT', 2, 'COMMA')}"></div></div><div class="col-md-4"><small class="text-muted">Fondo de reparo retenido del mes</small><div class="h5 q-numeric" th:text="${'− $ ' + #numbers.formatDecimal(resumen.totalesMes.retencion, 1, 'POINT', 2, 'COMMA')}"></div></div><div class="col-md-4"><small class="text-muted">Ajuste CAC del mes</small><div class="h5 q-numeric" th:text="${'$ ' + #numbers.formatDecimal(resumen.totalesMes.cac, 1, 'POINT', 2, 'COMMA')}"></div></div></div><p class="small text-muted mb-0">Neto = trabajos certificados − fondo de reparo + CAC. La retención se calcula sobre los trabajos, sin CAC.</p></section>
+    <div class="alert alert-warning" th:if="${resumen.totalesMes.pendientes > 0}" th:text="${resumen.totalesMes.pendientes + ' certificados tienen CAC pendiente. Los netos del mes son provisionales hasta completar los ajustes.'}"></div>
+    <div class="q-rule mb-3"><i class="bi bi-info-circle"></i><div><strong>Agrupación con margen de 5 días.</strong> Este mes incluye emisiones entre el <span th:text="${#temporals.format(emisionDesde, 'dd/MM/yyyy')}"></span> y el <span th:text="${#temporals.format(emisionHasta, 'dd/MM/yyyy')}"></span>, sin cambiar las fechas originales. Se incluye mano de obra y servicios certificables, con sus retenciones y CAC. Se excluyen materiales, servicios de solo registro o entregas y márgenes del certificado general.</div></div>
+
+    <section class="panel-section mb-3">
+        <div class="section-title-row"><div><h2 class="h5 mb-1">Resumen por contratista</h2><small class="text-muted">Comparación de ambas quincenas del mes<span th:if="${proveedorId != null}"> · Contratista seleccionado</span></small></div><span class="section-total-pill" th:text="${resumen.proveedores.size() + (resumen.proveedores.size() == 1 ? ' contratista' : ' contratistas')}"></span></div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle q-summary">
+                <thead><tr><th>Contratista / proveedor</th><th class="text-center">Cert.</th><th class="text-end">Bruto</th><th class="text-end">Fondo de reparo</th><th class="text-end">CAC</th><th class="text-end">1.ª · Neto</th><th class="text-end">2.ª · Neto</th><th class="text-end">Neto mensual</th></tr></thead>
+                <tbody>
+                <tr th:each="p : ${resumen.proveedores}">
+                    <td><a class="q-provider-link" th:href="@{/certificados-quincenales(mes=${mes},proveedorId=${p.id},quincena=${quincena})}" th:text="${p.nombre}">Muriel</a></td>
+                    <td class="text-center" th:text="${p.cantidad}">2</td>
+                    <td class="text-end q-numeric" th:text="${'$ ' + #numbers.formatDecimal(p.totales.bruto, 1, 'POINT', 2, 'COMMA')}"></td>
+                    <td class="text-end q-numeric" th:text="${'− $ ' + #numbers.formatDecimal(p.totales.retencion, 1, 'POINT', 2, 'COMMA')}"></td>
+                    <td class="text-end q-numeric" th:text="${'$ ' + #numbers.formatDecimal(p.totales.cac, 1, 'POINT', 2, 'COMMA')}"></td>
+                    <td class="text-end q-numeric" th:text="${'$ ' + #numbers.formatDecimal(p.primera, 1, 'POINT', 2, 'COMMA')}"></td>
+                    <td class="text-end q-numeric" th:text="${'$ ' + #numbers.formatDecimal(p.segunda, 1, 'POINT', 2, 'COMMA')}"></td>
+                    <td class="text-end q-numeric"><strong th:text="${'$ ' + #numbers.formatDecimal(p.total, 1, 'POINT', 2, 'COMMA')}"></strong></td>
+                </tr>
+                <tr th:if="${resumen.proveedores.isEmpty()}"><td colspan="8" class="text-center py-5 text-muted"><i class="bi bi-calendar2-x d-block fs-3 mb-2"></i>No hay certificados de mano de obra o servicios certificables para este mes y contratista.<br><small>Probá otro mes o seleccioná todos los contratistas.</small></td></tr>
+                </tbody>
+                <tfoot th:if="${!resumen.proveedores.isEmpty()}"><tr><th>Total mensual</th><th class="text-center" th:text="${resumen.cantidadMes}"></th><th class="text-end q-numeric" th:text="${'$ ' + #numbers.formatDecimal(resumen.totalesMes.bruto, 1, 'POINT', 2, 'COMMA')}"></th><th class="text-end q-numeric" th:text="${'− $ ' + #numbers.formatDecimal(resumen.totalesMes.retencion, 1, 'POINT', 2, 'COMMA')}"></th><th class="text-end q-numeric" th:text="${'$ ' + #numbers.formatDecimal(resumen.totalesMes.cac, 1, 'POINT', 2, 'COMMA')}"></th><th class="text-end q-numeric" th:text="${'$ ' + #numbers.formatDecimal(resumen.primera, 1, 'POINT', 2, 'COMMA')}"></th><th class="text-end q-numeric" th:text="${'$ ' + #numbers.formatDecimal(resumen.segunda, 1, 'POINT', 2, 'COMMA')}"></th><th class="text-end q-numeric" th:text="${'$ ' + #numbers.formatDecimal(resumen.totalMes, 1, 'POINT', 2, 'COMMA')}"></th></tr></tfoot>
+            </table>
+        </div>
+    </section>
+
+    <section class="panel-section">
+        <div class="section-title-row flex-wrap gap-2">
+            <div><h2 class="h5 mb-1">Detalle de certificados <span th:if="${quincena != 0}" th:text="${'· ' + quincena + '.ª quincena'}"></span></h2><small class="text-muted">Desplegá un certificado para consultar sus tareas y valores.</small></div>
+            <div class="d-flex align-items-center gap-3 flex-wrap"><strong class="q-numeric" th:text="${'$ ' + #numbers.formatDecimal(resumen.totalVisible, 1, 'POINT', 2, 'COMMA')}"></strong><span class="section-total-pill" th:text="${resumen.certificados.size() + (resumen.certificados.size() == 1 ? ' certificado' : ' certificados')}"></span><button class="btn btn-sm btn-outline-secondary no-print" type="button" id="q-expand" aria-expanded="false">Ver todas las tareas</button></div>
+        </div>
+        <details class="q-certificate" th:each="c : ${resumen.certificados}" th:data-certificado-id="${c.id}">
+            <summary>
+                <i class="bi bi-chevron-right q-disclosure"></i>
+                <div class="q-cert-main">
+                    <div class="q-contractor-heading">
+                        <strong th:text="${c.proveedor}"></strong>
+                        <span class="q-adjustment-badge q-badge-fr" th:if="${c.liquidacion.retencion.signum() > 0}" th:title="${'Fondo de reparo: retención del ' + #numbers.formatDecimal(c.liquidacion.porcentajeFondo, 1, 'POINT', 2, 'COMMA') + ' %'}" aria-label="Fondo de reparo retenido">FR</span>
+                        <span class="q-adjustment-badge q-badge-cac" th:if="${c.liquidacion.cac.signum() != 0}" title="Este certificado tiene ajuste CAC aplicado" aria-label="CAC aplicado">CAC</span>
+                        <span class="q-adjustment-badge q-badge-cac-pending" th:if="${c.liquidacion.pendiente}" th:title="${c.liquidacion.estadoCac}">CAC pendiente</span>
+                        <span class="q-adjustment-badge q-badge-cac-expired" th:if="${c.liquidacion.estadoCac == 'Plazo vencido' || c.liquidacion.estadoCac == 'Fuera de vigencia'}" th:title="${c.liquidacion.estadoCac + ': no se suma ajuste CAC'}">CAC vencido</span>
+                    </div>
+                    <small class="text-muted"><span th:text="${'OC ' + c.ordenNumero}"></span> · <span th:text="${'Certificado n.º ' + c.numero}"></span> · <span th:text="${c.tareas.size() + (c.tareas.size() == 1 ? ' tarea' : ' tareas')}"></span> · <span th:text="${c.tipo}"></span></small>
+                </div>
+                <span class="q-half" th:classappend="${c.quincena == 2 ? 'q-half-second' : ''}" th:text="${c.quincena + '.ª quincena'}"></span>
+                <div class="q-cert-date"><small class="text-muted">Emisión</small><span th:text="${#temporals.format(c.fecha, 'dd/MM/yyyy')}"></span></div>
+                <strong class="q-numeric q-cert-amount" th:text="${'$ ' + #numbers.formatDecimal(c.importe, 1, 'POINT', 2, 'COMMA')}"></strong>
+            </summary>
+            <div class="q-cert-content">
+                <div class="row g-3 mb-3"><div class="col-md-3"><small class="text-muted">Bruto</small><strong class="d-block q-numeric" th:text="${'$ ' + #numbers.formatDecimal(c.liquidacion.bruto, 1, 'POINT', 2, 'COMMA')}"></strong></div><div class="col-md-3"><small class="text-muted" th:text="${'Fondo de reparo (' + #numbers.formatDecimal(c.liquidacion.porcentajeFondo, 1, 'POINT', 2, 'COMMA') + ' %)'}"></small><strong class="d-block q-numeric" th:text="${'− $ ' + #numbers.formatDecimal(c.liquidacion.retencion, 1, 'POINT', 2, 'COMMA')}"></strong></div><div class="col-md-3"><small class="text-muted">CAC</small><strong class="d-block q-numeric" th:text="${'$ ' + #numbers.formatDecimal(c.liquidacion.cac, 1, 'POINT', 2, 'COMMA')}"></strong><small th:text="${c.liquidacion.estadoCac}"></small></div><div class="col-md-3"><small class="text-muted" th:text="${c.liquidacion.pendiente ? 'Neto provisional' : 'Neto a pagar'}"></small><strong class="d-block q-numeric" th:text="${'$ ' + #numbers.formatDecimal(c.importe, 1, 'POINT', 2, 'COMMA')}"></strong></div></div>
+                <div class="table-responsive"><table class="table table-sm align-middle mb-2">
+                    <thead><tr><th>Código</th><th>Tarea</th><th>Tipo</th><th>Unidad</th><th class="text-end">Avance actual</th><th class="text-end">Importe certificado</th></tr></thead>
+                    <tbody><tr th:each="t : ${c.tareas}"><td th:text="${t.codigo}"></td><td class="q-task-description" th:text="${t.descripcion}"></td><td th:text="${t.tipo}"></td><td th:text="${t.unidad}"></td><td class="text-end q-numeric" th:text="${t.cantidad != null ? #numbers.formatDecimal(t.cantidad,1,'POINT',2,'COMMA') + ' ' + t.unidad : #numbers.formatDecimal(t.porcentaje, 1, 'POINT', 2, 'COMMA') + ' %'}"></td><td class="text-end q-numeric" th:text="${'$ ' + #numbers.formatDecimal(t.importe, 1, 'POINT', 2, 'COMMA')}"></td></tr></tbody>
+                </table></div>
+                <a class="btn btn-sm btn-outline-primary no-print" th:href="@{/oc/{ocId}/certificaciones/{id}(ocId=${c.ordenId},id=${c.id})}"><i class="bi bi-box-arrow-up-right"></i> Abrir certificado original</a>
+                <a class="btn btn-sm btn-outline-secondary no-print" th:href="@{/oc/{ocId}/certificaciones/{id}/ajustes(ocId=${c.ordenId},id=${c.id})}">Editar fondo de reparo y CAC</a>
+            </div>
+        </details>
+        <p class="text-center text-muted py-4 mb-0" th:if="${resumen.certificados.isEmpty()}">No hay certificados para el detalle seleccionado.</p>
+    </section>
+    <p class="text-muted small mt-3 q-footnote">Resumen automático de los certificados registrados en la obra activa. Una quincena sin registros indica que no se encontraron certificados, no que el período esté cerrado o pagado. Exportación e impresión respetan el mes, el contratista y el detalle seleccionados.</p>
+</main>
+<script>
+const certificates = Array.from(document.querySelectorAll('.q-certificate'));
+const providerSelect = document.querySelector('#proveedor');
+const providerOptions = Array.from(providerSelect.options).map(option => option.cloneNode(true));
+const normalizeProvider = text => text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('es').trim();
+document.querySelector('#q-provider-search').addEventListener('input', event => {
+    const search = normalizeProvider(event.target.value);
+    const selected = providerSelect.value;
+    const matches = providerOptions.filter(option => option.value && search.split(/\s+/).every(word => normalizeProvider(option.textContent).includes(word)));
+    // Conservar la seleccion vigente mientras se busca otra, sin aplicar filtros por escribir.
+    const visible = providerOptions.filter(option => !option.value || option.value === selected || matches.includes(option));
+    providerSelect.replaceChildren(...visible.map(option => option.cloneNode(true)));
+    providerSelect.value = selected;
+    document.querySelector('#q-provider-search-status').textContent = search
+        ? (matches.length ? matches.length + ' coincidencias. Seleccioná un nombre y pulsá Ver resumen.' : 'Sin coincidencias en este mes. Probá otro nombre o mes.') : '';
+});
+document.querySelector('#q-expand').addEventListener('click', event => {
+    const open = certificates.some(c => !c.open);
+    certificates.forEach(c => { c.open = open; });
+    event.currentTarget.textContent = open ? 'Ocultar tareas' : 'Ver todas las tareas';
+    event.currentTarget.setAttribute('aria-expanded', String(open));
+});
+document.querySelector('#q-history')?.addEventListener('change', event => {
+    if (!event.target.value) return;
+    document.querySelector('#mes').value = event.target.value;
+    document.querySelector('#quincenal-filters').requestSubmit();
+});
+let previousOpen = [];
+window.addEventListener('beforeprint', () => {
+    previousOpen = certificates.map(c => c.open);
+    certificates.forEach(c => { c.open = true; });
+});
+window.addEventListener('afterprint', () => certificates.forEach((c, i) => { c.open = previousOpen[i]; }));
+document.querySelector('#print-quincenal').addEventListener('click', () => window.print());
+</script>
+</body>
+</html>

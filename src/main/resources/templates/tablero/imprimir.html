@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title th:text="${tablero.nombre}"></title><link th:href="@{/css/certificado-presentacion.css(v='20261019-1')}" rel="stylesheet"></head>
+<body>
+<nav class="print-actions"><a th:href="@{/tablero-certificados/{id}(id=${tablero.id})}">← Volver al certificado</a><form method="get"><label><input type="checkbox" name="completo" value="true" th:checked="${completo}" onchange="this.form.submit()"> Incluir tareas sin movimiento</label></form><button type="button" onclick="window.print()">Imprimir / guardar PDF</button><span>A4 horizontal · escala 100 % · sin encabezados del navegador</span></nav>
+<main class="certificate-sheet">
+<table class="certificate-table">
+<colgroup><col class="col-id"><col class="col-task"><col class="col-unit"><col class="col-qty"><col class="col-budget"><col class="col-extra"><col class="col-percent"><col class="col-percent"><col class="col-percent"><col class="col-money"><col class="col-money"><col class="col-money"></colgroup>
+<thead>
+<tr class="brand-row"><th colspan="2" class="brand"><strong th:text="${tablero.empresa ?: 'CONSTRUCTORA'}"></strong><span>CONSTRUCTORA</span></th><th colspan="3" class="project"><div th:text="${'OBRA: ' + obra.nombre}"></div><div th:text="${'CLIENTE: ' + (tablero.cliente ?: '—')}"></div></th><th colspan="7" class="certificate-title"><span th:text="${'CERTIFICADO N.º ' + (tablero.numero ?: '—') + ' - ' + (tablero.empresa ?: 'CONSTRUCTORA')}"></span><small th:unless="${tablero.cerrado}">BORRADOR</small></th></tr>
+<tr class="period-row"><th rowspan="2">ID</th><th rowspan="2">DESCRIPCIÓN TAREA</th><th rowspan="2">UNIDAD</th><th rowspan="2">CANTIDAD</th><th rowspan="2">TOTAL TAREA</th><th colspan="7" class="period" th:text="${'AVANCE DE OBRA · ' + #temporals.format(tablero.fechaDesde,'dd/MM/yyyy') + ' AL ' + #temporals.format(tablero.fechaHasta,'dd/MM/yyyy')}"></th></tr>
+<tr class="column-row"><th>MAT. ADIC. ETAPA</th><th>ANTERIOR (%)</th><th>ACTUAL (%)</th><th>ACUM. (%)</th><th>ANTERIOR ($)</th><th>ACTUAL ($)</th><th>ACUM. ($)</th></tr>
+</thead>
+<tbody>
+<tr th:each="i : ${filasPresentacion}">
+<td class="task-id" th:text="${i.recurrente ? '—' : (i.itemCodigo ?: '—')}"></td><td class="task-description" th:text="${i.descripcionTarea}"></td><td class="unit" th:text="${i.unidad ?: '—'}"></td><td th:text="${#numbers.formatDecimal(i.cantidad ?: 0,1,'POINT',2,'COMMA')}"></td>
+<td th:text="${i.recurrente ? 'ANEXO MENSUAL' : '$ ' + #numbers.formatDecimal(i.totalTarea(),1,'POINT',2,'COMMA')}"></td><td class="extra" th:text="${#numbers.formatDecimal(i.materialesAdicionalesEtapa ?: 0,1,'POINT',2,'COMMA')}"></td>
+<td th:text="${#numbers.formatDecimal(i.avanceAnteriorPorcentaje ?: 0,1,'POINT',2,'COMMA') + '%'}"></td><td th:text="${#numbers.formatDecimal(i.avanceCertificadoPorcentaje ?: 0,1,'POINT',2,'COMMA') + '%'}"></td><td th:text="${#numbers.formatDecimal(i.avanceAcumuladoPorcentaje(),1,'POINT',2,'COMMA') + '%'}"></td>
+<td th:text="${'$ ' + #numbers.formatDecimal(i.montoAnterior(),1,'POINT',2,'COMMA')}"></td><td class="current" th:text="${'$ ' + #numbers.formatDecimal(i.montoCertificado(),1,'POINT',2,'COMMA')}"></td><td th:text="${'$ ' + #numbers.formatDecimal(i.montoAcumulado(),1,'POINT',2,'COMMA')}"></td>
+</tr>
+<tr class="carry-row" th:if="${saldoAnteriorNoVisible.signum()!=0 or ajusteActualPresentacion.signum()!=0 or saldoAcumuladoNoVisible.signum()!=0}"><td colspan="9" class="task-description">Saldos de tareas sin movimiento y conciliaciones de la planilla</td><td th:text="${'$ ' + #numbers.formatDecimal(saldoAnteriorNoVisible,1,'POINT',2,'COMMA')}"></td><td th:text="${'$ ' + #numbers.formatDecimal(ajusteActualPresentacion,1,'POINT',2,'COMMA')}"></td><td th:text="${'$ ' + #numbers.formatDecimal(saldoAcumuladoNoVisible,1,'POINT',2,'COMMA')}"></td></tr>
+<tr class="total-row"><th colspan="4">TOTAL TAREAS ($)</th><td th:text="${'$ ' + #numbers.formatDecimal(presupuestoPresentado,1,'POINT',2,'COMMA')}"></td><td colspan="4"></td><td th:text="${'$ ' + #numbers.formatDecimal(totales.anterior,1,'POINT',2,'COMMA')}"></td><td th:text="${'$ ' + #numbers.formatDecimal(totales.certificado,1,'POINT',2,'COMMA')}"></td><td th:text="${'$ ' + #numbers.formatDecimal(totales.acumulado,1,'POINT',2,'COMMA')}"></td></tr>
+</tbody></table>
+<section class="settlement"><div class="subtotal"><b>SUBTOTALES</b><span th:text="${'$ ' + #numbers.formatDecimal(totales.anterior,1,'POINT',2,'COMMA')}"></span><span th:text="${'$ ' + #numbers.formatDecimal(totales.certificado,1,'POINT',2,'COMMA')}"></span><span th:text="${'$ ' + #numbers.formatDecimal(totales.acumulado,1,'POINT',2,'COMMA')}"></span></div><div class="pay"><b>TOTAL PRESENTE CERTIFICADO</b><strong th:text="${'$ ' + #numbers.formatDecimal(totales.certificado,1,'POINT',2,'COMMA')}"></strong></div></section>
+<p class="note" th:if="${tablero.observacion != null and tablero.origenImportacion == null}" th:text="${tablero.observacion}"></p>
+<p class="note" th:if="${filasPresentacion.isEmpty()}">Este certificado no tiene tareas con importe actual. Activá “Incluir tareas sin movimiento” para ver el presupuesto.</p>
+</main></body></html>

@@ -40,8 +40,19 @@ public class OrdenCompra {
     private LocalDate fecha;
     private LocalDate fechaVigencia;
     private String observacion;
+    @jakarta.persistence.Column(precision = 7, scale = 4)
+    private BigDecimal fondoReparoPorcentaje = BigDecimal.ZERO;
+    private Boolean cacHabilitado = false;
+    private String cacMesBase;
+    @jakarta.persistence.Column(precision = 19, scale = 6)
+    private BigDecimal cacIndiceBase;
+    private Integer cacDuracionMeses;
     @Enumerated(EnumType.STRING)
     private ModoSeguimientoOrden modoSeguimiento;
+
+    private Boolean certificacionPorCantidad = false;
+
+    public boolean isPorCantidad() { return Boolean.TRUE.equals(certificacionPorCantidad); }
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Proveedor proveedorEntidad;

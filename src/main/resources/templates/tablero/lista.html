@@ -1,84 +1,23 @@
 <!doctype html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Tablero de certificados</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script th:src="@{/js/design-system.js(v='20260801-doc-folder-page')}" defer></script>
-    <link th:href="@{/css/app.css(v='20260730-dark2')}" rel="stylesheet">
-    <link th:href="@{/css/theme.css(v='20260731-night-reset')}" rel="stylesheet">
-    <link th:href="@{/css/design-system.css(v='20260801-doc-folder-page')}" rel="stylesheet">
-</head>
-<body>
-<div th:replace="~{fragments/layout :: navbar}"></div>
-<main class="container">
-    <div class="page-navigation mb-3">
-        <a th:href="@{/}"><i class="bi bi-house"></i> Inicio</a>
-        <i class="bi bi-chevron-right"></i>
-        <span>Tablero certificados</span>
-    </div>
-
-    <div class="document-header mb-4">
-        <div>
-            <div class="document-kicker">Gerencial / financiero</div>
-            <h1>Tablero de certificados</h1>
-            <div class="text-muted">Certificacion general por periodo, costos, estructura, beneficio y avance financiero para presentar al cliente.</div>
-        </div>
-    </div>
-
-    <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
-
-    <section class="panel-section mb-3">
-        <div class="section-title-row">
-            <h2 class="h5 mb-0"><i class="bi bi-plus-circle"></i> Crear tablero</h2>
-        </div>
-        <form class="row g-2 align-items-end" method="post" th:action="@{/tablero-certificados}">
-            <div class="col-md-5">
-                <label class="form-label">Nombre</label>
-                <input class="form-control" name="nombre" placeholder="Ej: Certificado general Julio 2026">
-            </div>
-            <div class="col-md-3">
-                <label class="form-label">Desde</label>
-                <input class="form-control" type="date" name="fechaDesde">
-            </div>
-            <div class="col-md-3">
-                <label class="form-label">Hasta</label>
-                <input class="form-control" type="date" name="fechaHasta">
-            </div>
-            <div class="col-md-1">
-                <button class="btn btn-primary w-100" type="submit"><i class="bi bi-plus-lg"></i></button>
-            </div>
-        </form>
-    </section>
-
-    <section class="panel-section">
-        <div class="section-title-row">
-            <h2 class="h5 mb-0"><i class="bi bi-table"></i> Tableros cargados</h2>
-            <span class="section-total-pill" th:text="${tableros.size()} + ' tableros'">0 tableros</span>
-        </div>
-        <div class="table-responsive">
-            <table class="table table-hover align-middle document-table">
-                <thead><tr><th>Nombre</th><th>Periodo</th><th class="text-end">Items</th><th class="text-end">Total tarea</th><th class="text-end">Certificado</th><th class="text-end">Acciones</th></tr></thead>
-                <tbody>
-                <tr th:each="tablero : ${tableros}">
-                    <td><strong th:text="${tablero.nombre}">Tablero</strong></td>
-                    <td th:text="${#temporals.format(tablero.fechaDesde, 'dd/MM/yyyy') + ' - ' + #temporals.format(tablero.fechaHasta, 'dd/MM/yyyy')}">Periodo</td>
-                    <td class="text-end" th:text="${tablero.items.size()}">0</td>
-                    <td class="text-end" th:text="${#numbers.formatDecimal(tablero.totalTarea(), 1, 'POINT', 2, 'COMMA')}">0,00</td>
-                    <td class="text-end" th:text="${#numbers.formatDecimal(tablero.montoCertificado(), 1, 'POINT', 2, 'COMMA')}">0,00</td>
-                    <td class="text-end action-cell">
-                        <a class="btn btn-sm btn-outline-primary table-icon-action" th:href="@{/tablero-certificados/{id}(id=${tablero.id})}" title="Abrir tablero" aria-label="Abrir tablero"><i class="bi bi-box-arrow-up-right"></i></a>
-                        <form method="post" th:action="@{/tablero-certificados/{id}/eliminar(id=${tablero.id})}" onsubmit="return confirm('Eliminar este tablero de certificados?');">
-                            <button class="btn btn-sm btn-outline-danger table-icon-action" type="submit" title="Eliminar tablero" aria-label="Eliminar tablero"><i class="bi bi-trash"></i></button>
-                        </form>
-                    </td>
-                </tr>
-                <tr th:if="${tableros.isEmpty()}"><td colspan="6" class="text-center text-muted py-4">Todavia no hay tableros creados.</td></tr>
-                </tbody>
-            </table>
-        </div>
-    </section>
-</main>
-</body>
-</html>
-
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Certificados generales · ObraControl</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<script th:src="@{/js/design-system.js(v='20260801-doc-folder-page')}" defer></script>
+<link th:href="@{/css/app.css(v='20260730-dark2')}" rel="stylesheet"><link th:href="@{/css/theme.css(v='20260731-night-reset')}" rel="stylesheet"><link th:href="@{/css/design-system.css(v='20260801-doc-folder-page')}" rel="stylesheet">
+<link th:href="@{/css/tablero-certificados.css(v='20261019-compacto')}" rel="stylesheet"><script th:src="@{/js/tablero-certificados.js(v='20261019')}" defer></script>
+</head><body><div th:replace="~{fragments/layout :: navbar}"></div>
+<main class="cg-page container-fluid">
+<header class="cg-header"><div><div class="cg-eyebrow">CERTIFICACIÓN AL CLIENTE</div><h1>Tablero de certificados</h1><p>Armá cada período de cobro con tus tareas, costos y avances.</p></div><a class="btn btn-outline-primary" th:href="@{/tablero-certificados/historial}"><i class="bi bi-layout-three-columns"></i> Comparar certificados</a></header>
+<div class="alert alert-success" role="status" th:if="${success}" th:text="${success}"></div><div class="alert alert-danger" role="alert" th:if="${error}" th:text="${error}"></div>
+<div class="cg-guide"><span>1 <b>Prepará las tareas</b></span><i class="bi bi-chevron-right"></i><span>2 <b>Definí cuánto certificar</b></span><i class="bi bi-chevron-right"></i><span>3 <b>Cerrá y continuá al próximo período</b></span></div>
+<details class="cg-panel cg-new" th:open="${tableros.isEmpty()}"><summary><i class="bi bi-plus-circle"></i> Nuevo certificado desde cero</summary>
+<p class="cg-muted">Para continuar un certificado existente, abrilo y usá «Crear siguiente período».</p>
+<form class="cg-fields" method="post" th:action="@{/tablero-certificados}"><label class="cg-wide">Nombre<input name="nombre" class="form-control" placeholder="Ej.: Certificado general · Octubre 2026"></label><label>Desde<input class="form-control" type="date" name="fechaDesde" required></label><label>Hasta<input class="form-control" type="date" name="fechaHasta" required></label><button class="btn btn-primary" type="submit">Crear borrador</button></form></details>
+<div class="cg-section-heading"><h2>Certificados de la obra</h2><span th:text="${tableros.size()} + ' certificados'"></span></div>
+<div class="cg-cards"><article class="cg-certificate-card" th:each="t : ${tableros}"><div class="cg-card-top"><span class="cg-number" th:text="${t.numero != null ? 'N.º ' + t.numero : 'Histórico'}"></span><span class="cg-status" th:classappend="${t.cerrado ? ' is-closed' : ''}" th:text="${t.cerrado ? 'Cerrado' : 'Borrador'}"></span></div>
+<h2><a th:href="@{/tablero-certificados/{id}(id=${t.id})}" th:text="${t.nombre}"></a></h2><p class="cg-muted" th:text="${#temporals.format(t.fechaDesde,'dd/MM/yyyy') + ' — ' + #temporals.format(t.fechaHasta,'dd/MM/yyyy')}"></p>
+<span class="cg-muted">Importe de este certificado</span><strong class="cg-card-amount" th:text="${'$ ' + #numbers.formatDecimal(t.montoCertificado(),1,'POINT',2,'COMMA')}"></strong>
+<div class="cg-card-footer"><span th:text="${t.items.size()} + ' tareas'"></span><a class="btn btn-sm btn-outline-primary" th:href="@{/tablero-certificados/{id}(id=${t.id})}">Abrir certificado <i class="bi bi-arrow-right"></i></a></div></article></div>
+<div class="cg-empty cg-panel" th:if="${tableros.isEmpty()}"><i class="bi bi-journal-plus"></i><h2>Tu primer certificado general</h2><p>Podés empezar con tareas manuales, incorporar ítems de OC y certificar el porcentaje acordado con el cliente.</p></div>
+</main></body></html>

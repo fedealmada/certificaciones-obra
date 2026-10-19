@@ -1,186 +1,37 @@
 <!doctype html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-    <title th:text="${tablero.nombre}">Tablero certificado</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script th:src="@{/js/design-system.js(v='20260801-doc-folder-page')}" defer></script>
-    <link th:href="@{/css/app.css(v='20260730-dark2')}" rel="stylesheet">
-    <link th:href="@{/css/theme.css(v='20260731-night-reset')}" rel="stylesheet">
-    <link th:href="@{/css/design-system.css(v='20260801-doc-folder-page')}" rel="stylesheet">
-</head>
-<body>
-<div th:replace="~{fragments/layout :: navbar}"></div>
-<main class="container-fluid tablero-page">
-    <div class="page-navigation mb-3">
-        <a th:href="@{/}"><i class="bi bi-house"></i> Inicio</a>
-        <i class="bi bi-chevron-right"></i>
-        <a th:href="@{/tablero-certificados}">Tablero certificados</a>
-        <i class="bi bi-chevron-right"></i>
-        <span th:text="${tablero.nombre}">Tablero</span>
-    </div>
-
-    <div class="document-header mb-3">
-        <div>
-            <div class="document-kicker">Certificado general de obra</div>
-            <h1 th:text="${tablero.nombre}">Tablero</h1>
-            <div class="text-muted" th:text="${#temporals.format(tablero.fechaDesde, 'dd/MM/yyyy') + ' - ' + #temporals.format(tablero.fechaHasta, 'dd/MM/yyyy')}">Periodo</div>
-        </div>
-        <div class="document-actions">
-            <form method="post" th:action="@{/tablero-certificados/{id}/importar-items(id=${tablero.id})}">
-                <button class="btn btn-outline-primary" type="submit"><i class="bi bi-download"></i> Traer items del periodo</button>
-            </form>
-            <form method="post" th:action="@{/tablero-certificados/{id}/items/manual(id=${tablero.id})}">
-                <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-plus-lg"></i> Item manual</button>
-            </form>
-            <form method="post" th:action="@{/tablero-certificados/{id}/eliminar(id=${tablero.id})}" onsubmit="return confirm('Eliminar este tablero de certificados?');">
-                <button class="btn btn-outline-danger" type="submit"><i class="bi bi-trash"></i> Eliminar</button>
-            </form>
-        </div>
-    </div>
-
-    <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
-
-    <div class="dashboard-metric-grid mb-3">
-        <div class="metric-card"><div class="metric-head"><div class="metric-label">Items</div><i class="bi bi-list-task"></i></div><div class="metric-value" th:text="${totales.cantidadItems()}">0</div><small>Filas del tablero</small></div>
-        <div class="metric-card"><div class="metric-head"><div class="metric-label">Subtotal</div><i class="bi bi-calculator"></i></div><div class="metric-value metric-value-sm" th:text="${#numbers.formatDecimal(totales.subtotal(), 1, 'POINT', 2, 'COMMA')}">0,00</div><small>MO + materiales + servicios</small></div>
-        <div class="metric-card"><div class="metric-head"><div class="metric-label">Total tarea</div><i class="bi bi-cash-stack"></i></div><div class="metric-value metric-value-sm" th:text="${#numbers.formatDecimal(totales.total(), 1, 'POINT', 2, 'COMMA')}">0,00</div><small>Subtotal + estructura + beneficio</small></div>
-        <div class="metric-card"><div class="metric-head"><div class="metric-label">Certificado</div><i class="bi bi-clipboard-check"></i></div><div class="metric-value metric-value-sm" th:text="${#numbers.formatDecimal(totales.certificado(), 1, 'POINT', 2, 'COMMA')}">0,00</div><small>Segun avance cargado</small></div>
-    </div>
-
-    <section class="panel-section mb-3">
-        <div class="section-title-row">
-            <h2 class="h5 mb-0"><i class="bi bi-sliders"></i> Datos del tablero</h2>
-        </div>
-        <form class="row g-2 align-items-end" method="post" th:action="@{/tablero-certificados/{id}(id=${tablero.id})}" th:object="${tablero}">
-            <div class="col-md-4">
-                <label class="form-label">Nombre</label>
-                <input class="form-control" th:field="*{nombre}">
-            </div>
-            <div class="col-md-2">
-                <label class="form-label">Desde</label>
-                <input class="form-control" type="date" th:field="*{fechaDesde}">
-            </div>
-            <div class="col-md-2">
-                <label class="form-label">Hasta</label>
-                <input class="form-control" type="date" th:field="*{fechaHasta}">
-            </div>
-            <div class="col-md-3">
-                <label class="form-label">Observacion</label>
-                <input class="form-control" th:field="*{observacion}">
-            </div>
-            <div class="col-md-1">
-                <button class="btn btn-primary w-100" type="submit"><i class="bi bi-save"></i></button>
-            </div>
-        </form>
-    </section>
-
-    <section class="panel-section mb-3">
-        <div class="section-title-row">
-            <h2 class="h5 mb-0"><i class="bi bi-folder-plus"></i> Agrupacion manual</h2>
-        </div>
-        <form class="row g-2 align-items-end" method="post" th:action="@{/tablero-certificados/{id}/grupos(id=${tablero.id})}">
-            <div class="col-md-10">
-                <label class="form-label">Nombre del grupo</label>
-                <input class="form-control" name="nombreGrupo" placeholder="Ej: Albanileria banios PB">
-            </div>
-            <div class="col-md-2">
-                <button class="btn btn-outline-primary w-100" type="submit"><i class="bi bi-plus-lg"></i> Grupo</button>
-            </div>
-        </form>
-    </section>
-
-    <section class="panel-section tablero-table-panel">
-        <div class="section-title-row">
-            <h2 class="h5 mb-0"><i class="bi bi-table"></i> Items del certificado</h2>
-            <div class="d-flex gap-2 align-items-center">
-                <span class="section-total-pill" th:text="${tablero.items.size()} + ' filas'">0 filas</span>
-            </div>
-        </div>
-        <div class="text-muted small mb-2">La importacion toma solo items de mano de obra detectados dentro del periodo. El avance del tablero general es propio de este certificado y no comparte historial con las certificaciones de OC.</div>
-        <div class="table-responsive tablero-table-scroll">
-            <table class="table table-hover align-middle document-table tablero-cert-table">
-                <thead>
-                <tr>
-                    <th rowspan="2" class="tablero-sticky-code">Codigo</th>
-                    <th rowspan="2" class="tablero-description-head tablero-sticky-desc">Descripcion tarea</th>
-                    <th rowspan="2">Unidad</th>
-                    <th rowspan="2">Cantidad</th>
-                    <th rowspan="2">Precio unitario</th>
-                    <th rowspan="2">Costo M.O</th>
-                    <th rowspan="2">Materiales asignados</th>
-                    <th rowspan="2">Servicios</th>
-                    <th rowspan="2">Mat. sum. empresa</th>
-                    <th rowspan="2">Costo subtotal</th>
-                    <th rowspan="2">Costo estruc. (%)</th>
-                    <th rowspan="2">Costo estruc. ($)</th>
-                    <th rowspan="2">Benef. empresarial (%)</th>
-                    <th rowspan="2">Benef. empresarial ($)</th>
-                    <th rowspan="2">Estruc. + benef.</th>
-                    <th rowspan="2">Total tarea</th>
-                    <th rowspan="2">Mat. adic. etapa</th>
-                    <th class="tablero-cert-group" colspan="6" th:text="${tablero.nombre + ' - avance de obra'}">Certificado - avance de obra</th>
-                    <th rowspan="2">Acciones</th>
-                </tr>
-                <tr>
-                    <th>Anterior (%)</th>
-                    <th>Actual (%)</th>
-                    <th>Acum (%)</th>
-                    <th>Anterior ($)</th>
-                    <th>Actual ($)</th>
-                    <th>Acum ($)</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="fila : ${tablero.items}" th:classappend="${fila.grupo ? ' tablero-group-row' : ''}">
-                    <td class="tablero-sticky-code"><input class="form-control form-control-sm tablero-code-input" name="itemCodigo" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.grupo ? 'GRUPO' : fila.itemCodigo}" th:readonly="${fila.grupo}"></td>
-                    <td class="tablero-sticky-desc"><textarea class="form-control form-control-sm tablero-description-input" rows="1" name="descripcionTarea" th:attr="form=${'tablero-item-form-' + fila.id}" th:text="${fila.descripcionTarea}"></textarea></td>
-                    <td><input class="form-control form-control-sm tablero-unit-input" name="unidad" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.unidad}"></td>
-                    <td><input class="form-control form-control-sm tablero-number-input" type="number" step="0.01" name="cantidad" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.cantidad}"></td>
-                    <td><input class="form-control form-control-sm tablero-money-input" type="number" step="0.01" name="precioUnitario" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.precioUnitario}"></td>
-                    <td><input class="form-control form-control-sm tablero-money-input" type="number" step="0.01" name="costoManoObra" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.costoManoObra}"></td>
-                    <td><input class="form-control form-control-sm tablero-money-input" type="number" step="0.01" name="materialesAsignados" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.materialesAsignados}"></td>
-                    <td><input class="form-control form-control-sm tablero-money-input" type="number" step="0.01" name="servicios" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.servicios}"></td>
-                    <td><input class="form-control form-control-sm tablero-money-input" type="number" step="0.01" name="materialesSuministradosEmpresa" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.materialesSuministradosEmpresa}"></td>
-                    <td class="text-end fw-semibold" th:text="${#numbers.formatDecimal(fila.costoSubtotal(), 1, 'POINT', 2, 'COMMA')}">0,00</td>
-                    <td><input class="form-control form-control-sm tablero-percent-input" type="number" step="0.01" name="costoEstructuralPorcentaje" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.costoEstructuralPorcentaje}"></td>
-                    <td class="text-end" th:text="${#numbers.formatDecimal(fila.costoEstructuralMonto(), 1, 'POINT', 2, 'COMMA')}">0,00</td>
-                    <td><input class="form-control form-control-sm tablero-percent-input" type="number" step="0.01" name="beneficioEmpresarialPorcentaje" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.beneficioEmpresarialPorcentaje}"></td>
-                    <td class="text-end" th:text="${#numbers.formatDecimal(fila.beneficioEmpresarialMonto(), 1, 'POINT', 2, 'COMMA')}">0,00</td>
-                    <td class="text-end" th:text="${#numbers.formatDecimal(fila.estructuraMasBeneficio(), 1, 'POINT', 2, 'COMMA')}">0,00</td>
-                    <td class="text-end fw-bold" th:text="${#numbers.formatDecimal(fila.totalTarea(), 1, 'POINT', 2, 'COMMA')}">0,00</td>
-                    <td><input class="form-control form-control-sm tablero-number-input" type="number" step="0.01" name="materialesAdicionalesEtapa" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.materialesAdicionalesEtapa}"></td>
-                    <td><input class="form-control form-control-sm tablero-percent-input" type="number" step="0.01" name="avanceAnteriorPorcentaje" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.avanceAnteriorPorcentaje}" readonly></td>
-                    <td><input class="form-control form-control-sm tablero-percent-input" type="number" step="0.01" name="avanceCertificadoPorcentaje" th:attr="form=${'tablero-item-form-' + fila.id}" th:value="${fila.avanceCertificadoPorcentaje}"></td>
-                    <td class="text-end" th:text="${#numbers.formatDecimal(fila.avanceAcumuladoPorcentaje(), 1, 'POINT', 2, 'COMMA') + '%'}">0,00%</td>
-                    <td class="text-end" th:text="${#numbers.formatDecimal(fila.montoAnterior(), 1, 'POINT', 2, 'COMMA')}">0,00</td>
-                    <td class="text-end fw-bold" th:text="${#numbers.formatDecimal(fila.montoCertificado(), 1, 'POINT', 2, 'COMMA')}">0,00</td>
-                    <td class="text-end fw-bold" th:text="${#numbers.formatDecimal(fila.montoAcumulado(), 1, 'POINT', 2, 'COMMA')}">0,00</td>
-                    <td class="tablero-actions-cell">
-                        <form method="post" th:id="${'tablero-item-form-' + fila.id}" th:action="@{/tablero-certificados/{id}/items/{itemId}(id=${tablero.id},itemId=${fila.id})}"></form>
-                        <button class="btn btn-sm btn-primary table-icon-action" th:attr="form=${'tablero-item-form-' + fila.id}" type="submit" title="Guardar fila" aria-label="Guardar fila"><i class="bi bi-save"></i></button>
-                        <form method="post" th:action="@{/tablero-certificados/{id}/items/{itemId}/eliminar(id=${tablero.id},itemId=${fila.id})}" onsubmit="return confirm('Eliminar esta fila del tablero?');">
-                            <button class="btn btn-sm btn-outline-danger table-icon-action" type="submit" title="Eliminar fila" aria-label="Eliminar fila"><i class="bi bi-trash"></i></button>
-                        </form>
-                    </td>
-                </tr>
-                <tr th:if="${tablero.items.isEmpty()}"><td colspan="24" class="text-center text-muted py-4">Importa items certificados del periodo o agrega un item manual para comenzar.</td></tr>
-                </tbody>
-                <tfoot th:if="${!tablero.items.isEmpty()}">
-                <tr>
-                    <td class="tablero-sticky-code"></td>
-                    <td class="tablero-sticky-desc fw-bold">Total tareas ($)</td>
-                    <td colspan="13"></td>
-                    <td class="text-end fw-bold" th:text="${#numbers.formatDecimal(totales.total(), 1, 'POINT', 2, 'COMMA')}">0,00</td>
-                    <td colspan="5"></td>
-                    <td class="text-end fw-bold" th:text="${#numbers.formatDecimal(totales.certificado(), 1, 'POINT', 2, 'COMMA')}">0,00</td>
-                    <td colspan="2"></td>
-                </tr>
-                </tfoot>
-            </table>
-        </div>
-    </section>
-</main>
-</body>
-</html>
-
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Certificados generales · ObraControl</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<script th:src="@{/js/design-system.js(v='20260801-doc-folder-page')}" defer></script>
+<link th:href="@{/css/app.css(v='20260730-dark2')}" rel="stylesheet"><link th:href="@{/css/theme.css(v='20260731-night-reset')}" rel="stylesheet"><link th:href="@{/css/design-system.css(v='20260801-doc-folder-page')}" rel="stylesheet">
+<link th:href="@{/css/tablero-certificados.css(v='20261019-compacto')}" rel="stylesheet"><script th:src="@{/js/tablero-certificados.js(v='20261019')}" defer></script>
+</head><body><div th:replace="~{fragments/layout :: navbar}"></div>
+<main class="cg-page container-fluid" th:with="lectura=${tablero.cerrado or tieneSiguiente}">
+<a class="cg-back" th:href="@{/tablero-certificados}"><i class="bi bi-arrow-left"></i> Todos los certificados</a>
+<header class="cg-header"><div><div class="cg-eyebrow" th:text="${tablero.numero != null ? 'CERTIFICADO GENERAL N.º ' + tablero.numero : 'CERTIFICADO GENERAL'}"></div><h1 th:text="${tablero.nombre}"></h1><p th:text="${#temporals.format(tablero.fechaDesde,'dd/MM/yyyy') + ' — ' + #temporals.format(tablero.fechaHasta,'dd/MM/yyyy')}"></p></div><span class="cg-status" th:classappend="${lectura ? ' is-closed' : ''}" th:text="${lectura ? 'Cerrado · historial conservado' : 'Borrador · editable'}"></span></header>
+<div class="alert alert-success" role="status" th:if="${success}" th:text="${success}"></div><div class="alert alert-danger" role="alert" th:if="${error}" th:text="${error}"></div>
+<div class="cg-toolbar"><a class="btn btn-outline-primary" th:href="@{/tablero-certificados/{id}/imprimir(id=${tablero.id})}" target="_blank" rel="noopener"><i class="bi bi-printer"></i> Vista para presentar / PDF</a><a class="btn btn-outline-secondary" th:href="@{/tablero-certificados/{id}/exportar(id=${tablero.id})}"><i class="bi bi-file-earmark-spreadsheet"></i> Exportar CSV</a><a class="btn btn-outline-secondary" th:href="@{/tablero-certificados/historial}">Historial comparativo</a>
+<form th:if="${!lectura}" method="post" th:action="@{/tablero-certificados/{id}/cerrar(id=${tablero.id})}" data-confirm="Se cerrará este certificado con los importes guardados. Podrás reabrirlo mientras no tenga un período siguiente."><button class="btn btn-primary">Cerrar certificado</button></form>
+<form th:if="${tablero.cerrado and !tieneSiguiente}" method="post" th:action="@{/tablero-certificados/{id}/continuar(id=${tablero.id})}"><button class="btn btn-primary"><i class="bi bi-arrow-right-circle"></i> Crear siguiente período</button></form>
+<form th:if="${tablero.cerrado and !tieneSiguiente}" method="post" th:action="@{/tablero-certificados/{id}/reabrir(id=${tablero.id})}"><button class="btn btn-outline-secondary">Reabrir borrador</button></form></div>
+<div class="cg-notice">El avance que cargás aquí es el que vas a cobrar al cliente. Podés certificar una tarea al 100 % aunque su avance en las OC sea distinto. Los cambios no modifican los certificados de los contratistas.</div>
+<a class="cg-back" th:if="${tablero.anteriorId != null}" th:href="@{/tablero-certificados/{id}(id=${tablero.anteriorId})}"><i class="bi bi-clock-history"></i> Ver certificado anterior</a>
+<section class="cg-metrics"><article><span>Certificado anteriormente</span><strong th:text="${'$ ' + #numbers.formatDecimal(totales.anterior,1,'POINT',2,'COMMA')}"></strong><small>Importes conservados del historial</small></article><article class="cg-metric-current"><span>Este certificado</span><strong id="cg-total-current" th:attr="data-ajuste=${tablero.ajusteActual ?: 0}" th:text="${'$ ' + #numbers.formatDecimal(totales.certificado,1,'POINT',2,'COMMA')}"></strong><small id="cg-total-caption">Importe actual guardado</small></article><article><span>Acumulado al período</span><strong id="cg-total-acc" th:attr="data-anterior=${totales.anterior},data-ajuste=${tablero.ajusteAcumulado ?: 0}" th:text="${'$ ' + #numbers.formatDecimal(totales.acumulado,1,'POINT',2,'COMMA')}"></strong><small>Anterior + actual</small></article><article><span>Presupuesto de tareas</span><strong th:text="${'$ ' + #numbers.formatDecimal(totales.total,1,'POINT',2,'COMMA')}"></strong><small th:text="${totales.cantidadItems} + ' tareas · costos + estructura + beneficio'"></small></article></section>
+<details class="cg-panel cg-meta" th:if="${tablero.origenImportacion != null}"><summary>Planilla original y conciliaciones</summary><p class="cg-muted">Se conservan los porcentajes y los importes documentales. Guardar un avance sin cambiarlo mantiene su importe original; al modificar un porcentaje o los costos se vuelve a calcular.</p><p th:if="${tablero.tieneConciliacion()}" th:text="${'Conciliación de centavos con el total impreso: anterior $ ' + #numbers.formatDecimal(tablero.ajusteAnterior,1,'POINT',2,'COMMA') + ' / actual $ ' + #numbers.formatDecimal(tablero.ajusteActual,1,'POINT',2,'COMMA') + ' / acumulado $ ' + #numbers.formatDecimal(tablero.ajusteAcumulado,1,'POINT',2,'COMMA')}"></p><p th:if="${tablero.presupuestoFuente != null}" th:text="${'Presupuesto impreso en fuente: $ ' + #numbers.formatDecimal(tablero.presupuestoFuente,1,'POINT',2,'COMMA') + '. La suma de las tareas importadas es $ ' + #numbers.formatDecimal(tablero.totalTarea(),1,'POINT',2,'COMMA') + '; la fuente deja fuera de su total el estudio de gammagrafía y tiene diferencias de centavos.'}"></p><p class="cg-muted">Logística y Seguridad e Higiene son anexos mensuales: su avance puede ser 100 % en cada período, mientras su importe anterior se acumula. No forman parte del presupuesto general de tareas.</p></details>
+<details class="cg-panel cg-meta"><summary>Datos del certificado <span class="cg-muted" th:text="${tablero.cliente ?: 'Cliente y constructora'}"></span></summary><form method="post" th:action="@{/tablero-certificados/{id}(id=${tablero.id})}"><fieldset th:disabled="${lectura}"><div class="cg-fields"><label>Número<input class="form-control" type="number" name="numero" min="1" th:value="${tablero.numero}"></label><label class="cg-wide">Nombre<input class="form-control" name="nombre" th:value="${tablero.nombre}" required></label><label>Cliente<input class="form-control" name="cliente" th:value="${tablero.cliente}"></label><label>Constructora<input class="form-control" name="empresa" th:value="${tablero.empresa}"></label><label>Desde<input class="form-control" type="date" name="fechaDesde" th:value="${tablero.fechaDesde}" required></label><label>Hasta<input class="form-control" type="date" name="fechaHasta" th:value="${tablero.fechaHasta}" required></label><label class="cg-wide">Observaciones<textarea class="form-control" name="observacion" th:text="${tablero.observacion}"></textarea></label><button class="btn btn-outline-primary" type="submit" th:if="${!lectura}">Guardar datos</button></div></fieldset></form></details>
+<section class="cg-panel cg-ledger"><div class="cg-section-heading"><div><h2>Tareas y avance a certificar</h2><p class="cg-muted">Cargá el porcentaje actual de cada tarea y guardá todos los avances juntos.</p></div><div class="cg-toolbar" th:if="${!lectura}"><a class="btn btn-outline-primary" th:href="@{/tablero-certificados/{id}/agregar-oc(id=${tablero.id})}"><i class="bi bi-plus-lg"></i> Elegir de una OC</a><form method="post" th:action="@{/tablero-certificados/{id}/items/manual(id=${tablero.id})}"><button class="btn btn-primary"><i class="bi bi-plus-lg"></i> Tarea manual</button></form></div></div>
+<div class="cg-ledger-controls"><input class="form-control" type="search" id="cg-search" placeholder="Buscar tarea, código, contratista o rubro…" aria-label="Buscar tareas"><label class="cg-check"><input type="checkbox" id="cg-pending"> Solo tareas con saldo</label><span class="cg-muted" id="cg-visible-count"></span></div>
+<form id="cg-advances-form" method="post" th:action="@{/tablero-certificados/{id}/avances(id=${tablero.id})}"></form>
+<div class="cg-table-wrap"><table class="cg-table" id="cg-ledger"><thead><tr><th>Tarea / origen</th><th>Presupuesto total</th><th>Anterior</th><th>Actual a certificar</th><th>Acumulado</th><th th:if="${!lectura}">Editar</th></tr></thead><tbody>
+<tr th:each="fila,st : ${tablero.items}" th:id="${'fila-' + fila.id}" th:attr="data-search=${(fila.itemCodigo ?: '') + ' ' + fila.descripcionTarea + ' ' + (fila.contratista ?: '') + ' ' + (fila.rubro ?: '')},data-pendiente=${fila.porcentajeDisponible()},data-total=${fila.totalTarea()},data-extra=${fila.materialesAdicionalesEtapa},data-previo=${fila.montoAnterior()},data-prevpct=${fila.avanceAnteriorPorcentaje},data-guardado=${fila.avanceCertificadoPorcentaje},data-importe-guardado=${fila.montoCertificado()},data-acumulado-guardado=${fila.montoAcumulado()},data-recurrente=${fila.recurrente}">
+<td><div class="cg-task-top"><span class="cg-code" th:text="${fila.itemCodigo ?: 'Manual'}"></span><span class="cg-origin" th:text="${fila.recurrente ? 'Servicio mensual' : (fila.itemOrdenCompra != null ? 'Origen OC' : 'Tarea propia')}"></span></div><strong class="cg-task-desc" th:text="${fila.descripcionTarea}"></strong><small class="cg-muted" th:text="${(fila.contratista ?: '') + (fila.rubro != null ? ' · ' + fila.rubro : '')}"></small><small class="cg-muted" th:if="${fila.observacion}" th:text="${fila.observacion}"></small></td>
+<td class="cg-numeric"><strong th:text="${'$ ' + #numbers.formatDecimal(fila.totalTarea(),1,'POINT',2,'COMMA')}"></strong><small th:text="${#numbers.formatDecimal(fila.cantidad,1,'POINT',2,'COMMA') + ' ' + (fila.unidad ?: '')}"></small></td>
+<td class="cg-numeric"><strong th:text="${#numbers.formatDecimal(fila.avanceAnteriorPorcentaje,1,'POINT',2,'COMMA') + ' %'}"></strong><small th:text="${'$ ' + #numbers.formatDecimal(fila.montoAnterior(),1,'POINT',2,'COMMA')}"></small></td>
+<td class="cg-current-cell"><div class="cg-percent-entry" th:if="${!lectura}"><input type="hidden" form="cg-advances-form" th:name="${'filas[' + st.index + '].id'}" th:value="${fila.id}"><input class="form-control cg-percent" form="cg-advances-form" type="number" step="0.01" min="0" th:max="${fila.porcentajeDisponible()}" th:name="${'filas[' + st.index + '].porcentaje'}" th:value="${avancesActuales.getOrDefault(fila.id,fila.avanceCertificadoPorcentaje)}" th:aria-label="${'Porcentaje actual de ' + fila.descripcionTarea}" required><span>%</span><button type="button" class="cg-fill" title="Certificar el saldo disponible" th:disabled="${fila.porcentajeDisponible() == 0}">Saldo</button></div><strong th:if="${lectura}" th:text="${#numbers.formatDecimal(fila.avanceCertificadoPorcentaje,1,'POINT',2,'COMMA') + ' %'}"></strong><small class="cg-row-current" th:text="${'$ ' + #numbers.formatDecimal(fila.montoCertificado(),1,'POINT',2,'COMMA')}"></small><small class="cg-muted" th:if="${fila.materialesAdicionalesEtapa != 0}" th:text="${'Incluye adicional: $ ' + #numbers.formatDecimal(fila.materialesAdicionalesEtapa,1,'POINT',2,'COMMA')}"></small></td>
+<td class="cg-numeric"><strong class="cg-row-accpct" th:text="${#numbers.formatDecimal(fila.avanceAcumuladoPorcentaje(),1,'POINT',2,'COMMA') + ' %'}"></strong><small class="cg-row-acc" th:text="${'$ ' + #numbers.formatDecimal(fila.montoAcumulado(),1,'POINT',2,'COMMA')}"></small><span class="cg-completed" th:if="${!fila.recurrente and fila.avanceAcumuladoPorcentaje() == 100}">Completada</span></td>
+<td th:if="${!lectura}"><a class="cg-edit-link" th:href="@{/tablero-certificados/{id}/items/{itemId}/editar(id=${tablero.id},itemId=${fila.id})}" th:aria-label="${'Editar costos de ' + fila.descripcionTarea}"><i class="bi bi-pencil"></i> Costos</a></td></tr>
+</tbody></table></div><div class="cg-empty" th:if="${tablero.items.isEmpty()}"><i class="bi bi-list-task"></i><h3>Incorporá las tareas que vas a cobrar</h3><p>Elegí ítems de una OC o creá una tarea propia, sin necesidad de una orden de compra.</p></div><div class="cg-empty" id="cg-no-results" hidden>No hay tareas que coincidan con los filtros.</div>
+<div class="cg-save-bar" th:if="${!lectura and !tablero.items.isEmpty()}"><span id="cg-save-state">Todos los avances guardados</span><button type="submit" form="cg-advances-form" class="btn btn-primary"><i class="bi bi-check2-all"></i> Guardar avances</button></div></section>
+<details class="cg-panel cg-secondary-tools" th:if="${!lectura}"><summary>Más opciones</summary><div class="cg-toolbar"><form method="post" th:action="@{/tablero-certificados/{id}/importar-items(id=${tablero.id})}"><button class="btn btn-outline-secondary">Detectar tareas con certificados en el período</button></form><form method="post" th:action="@{/tablero-certificados/{id}/grupos(id=${tablero.id})}"><input name="nombreGrupo" type="hidden" value="Partida global"><button class="btn btn-outline-secondary">Agregar partida de costo global</button></form><form method="post" th:action="@{/tablero-certificados/{id}/eliminar(id=${tablero.id})}" data-confirm="¿Eliminar este borrador completo?"><button class="btn btn-outline-danger">Eliminar borrador</button></form></div><p class="cg-muted">La detección incorpora tareas como referencia de costo. Sus avances actuales empiezan en cero.</p></details>
+</main></body></html>
