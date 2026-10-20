@@ -65,6 +65,7 @@ class TableroGeneralTest {
         service.agregarItemsOc(t.getId(),List.of(oc.getItems().getFirst().getId()));
         var i=t.getItems().getFirst(); assertThat(i.getServicios()).isEqualByComparingTo("1000"); assertThat(i.getAvanceCertificadoPorcentaje()).isZero();
         assertThat(service.candidatos(t.getId())).isEmpty();
+        i.setMaterialesConfirmados(true);
         avances(t,i,"100"); assertThat(i.montoCertificado()).isEqualByComparingTo("1450");
     }
     @Test void mismaReferenciaManualNoMezclaDosTareasAlContinuar() {
@@ -130,13 +131,83 @@ class TableroGeneralTest {
         assertThat((BigDecimal)modelo.get("saldoAnteriorNoVisible")).isEqualByComparingTo("80");
         assertThat((BigDecimal)modelo.get("saldoAcumuladoNoVisible")).isEqualByComparingTo("80");
         assertThat(resultado.getResponse().getContentAsString()).contains("TOTAL PRESENTE CERTIFICADO","DESCRIPCI");
+        var html=resultado.getResponse().getContentAsString(java.nio.charset.StandardCharsets.UTF_8);
+        assertThat(html).contains("Monto del certificado anterior");
+        assertThat(html).doesNotContain("carry-row", "Saldos de tareas sin movimiento");
+        var totalFila=java.util.regex.Pattern.compile("<tr class=\"total-row\">(.*?)</tr>",java.util.regex.Pattern.DOTALL).matcher(html);
+        assertThat(totalFila.find()).isTrue();
+        assertThat(totalFila.group(1)).doesNotContain("80,00");
         var completo=mvc.perform(get("/tablero-certificados/{id}/imprimir",t.getId()).param("completo","true").session(session(t.getObra()))).andExpect(status().isOk()).andReturn();
         assertThat((java.util.List<?>)completo.getModelAndView().getModel().get("filasPresentacion")).hasSize(2);
     }
 
     private TableroCertificado tablero() { return service.crear(obra("Obra de prueba"),"Octubre 2026",LocalDate.of(2026,10,1),LocalDate.of(2026,10,31)); }
     private Obra obra(String nombre) { var o=new Obra();o.setNombre(nombre);o.setActiva(true);o.setCliente("BAPRISUD");em.persist(o);return o; }
-    private TableroCertificadoItem tarea(TableroCertificado t,String nombre,String costo) { var i=service.crearItemManual(t.getId()); i.setDescripcionTarea(nombre);i.setCostoManoObra(new BigDecimal(costo));em.flush();return i; }
+    @org.junit.jupiter.api.Test
+    void materialesSePreparanAntesDelAvanceYNoSeReabrenAlVolverACero() {
+        var t=tablero(); var i=tarea(t,"Nueva tarea","100");
+        i.setMaterialesConfirmados(false);
+        assertThatThrownBy(()->service.guardarAvances(t.getId(),form(i,"10"))).hasMessageContaining("confirmá los materiales");
+        i.setMaterialesConfirmados(true);
+        service.guardarAvances(t.getId(),form(i,"10"));
+        service.guardarAvances(t.getId(),form(i,"0"));
+        var datos=new TableroCertificadoItem();
+        org.springframework.beans.BeanUtils.copyProperties(i,datos);
+        datos.setMaterialesAsignados(new BigDecimal("50"));
+        assertThatThrownBy(()->service.guardarItem(t.getId(),i.getId(),datos)).hasMessageContaining("bloqueados");
+    }
+
+    @Test void comprasApiFiltraFechaYPaginaSinSalirDelEditor() throws Exception {
+        var t=tablero();var tarea=tarea(t,"Tarea","100");
+        var compra=oc(t.getObra(),CategoriaItem.MATERIAL);compra.setFecha(t.getFechaDesde());
+        var fuera=oc(t.getObra(),CategoriaItem.MATERIAL);fuera.setFecha(t.getFechaDesde().minusDays(1));
+        em.flush();
+        var session=new MockHttpSession();session.setAttribute("obraActivaId",t.getObra().getId());
+        mvc.perform(get("/tablero-certificados/{id}/items/{item}/materiales",t.getId(),tarea.getId()).session(session))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.cantidad").value(1))
+                .andExpect(jsonPath("$.compras[0].id").value(compra.getItems().getFirst().getId()))
+                .andExpect(jsonPath("$.bloqueado").value(false));
+        mvc.perform(post("/tablero-certificados/{id}/items/{item}",t.getId(),tarea.getId()).session(session)
+                .param("descripcionTarea","Tarea con materiales").param("materialSelectionPresent","true")
+                .param("materialIds",compra.getItems().getFirst().getId().toString()).param("materialImportes","125.50"))
+                .andExpect(status().is3xxRedirection());
+        assertThat(tarea.getMaterialesAsignados()).isEqualByComparingTo("125.50");
+        assertThat(tarea.materialesPreparados()).isTrue();
+    }
+
+    @Test void comprasPorPeriodoAsignacionesParcialesYContinuidad() {
+        var t=tablero(); var a=tarea(t,"Tarea A","100"); var b=tarea(t,"Tarea B","100");
+        var compra=oc(t.getObra(),CategoriaItem.MATERIAL); compra.setFecha(t.getFechaDesde());
+        var material=compra.getItems().getFirst();em.flush();
+        var listado=service.comprasMateriales(t.getId(),a.getId(),null,null,"",null,0);
+        assertThat(listado.compras()).extracting(TableroCertificadoService.MaterialCompra::id).contains(material.getId());
+        service.asignarMateriales(t.getId(),a.getId(),List.of(new TableroCertificadoService.AsignacionMaterial(material.getId(),new BigDecimal("600"))));
+        assertThat(a.getMaterialesAsignados()).isEqualByComparingTo("600");
+        em.flush();
+        assertThat(service.comprasMateriales(t.getId(),b.getId(),null,null,"",null,0).compras().getFirst().disponible()).isEqualByComparingTo("400");
+        assertThatThrownBy(()->service.asignarMateriales(t.getId(),b.getId(),List.of(new TableroCertificadoService.AsignacionMaterial(material.getId(),new BigDecimal("401")))))
+                .hasMessageContaining("supera el disponible");
+        avances(t,a,"10");service.cerrar(t.getId());var siguiente=service.continuar(t.getId());
+        var copia=siguiente.getItems().stream().filter(i->i.claveHistorial().equals(a.claveHistorial())).findFirst().orElseThrow();
+        assertThat(service.comprasMateriales(siguiente.getId(),copia.getId(),null,null,"",null,0).seleccionados()).hasSize(1);
+        assertThatThrownBy(()->service.asignarMateriales(siguiente.getId(),copia.getId(),List.of())).hasMessageContaining("bloqueados");
+    }
+
+    @Test void comprasFueraDeObraNoSePuedenAsignarYGuardarEsAtomico() {
+        var t=tablero();var a=tarea(t,"Tarea","100");
+        var ajena=oc(obra("Otra obra"),CategoriaItem.MATERIAL).getItems().getFirst();
+        assertThatThrownBy(()->service.asignarMateriales(t.getId(),a.getId(),List.of(new TableroCertificadoService.AsignacionMaterial(ajena.getId(),BigDecimal.ONE))))
+                .hasMessageContaining("no pertenece");
+        var compra=oc(t.getObra(),CategoriaItem.MATERIAL);compra.setFecha(t.getFechaDesde());em.flush();
+        var datos=new TableroCertificadoItem();org.springframework.beans.BeanUtils.copyProperties(a,datos);
+        service.guardarItemConCompras(t.getId(),a.getId(),datos,List.of(compra.getItems().getFirst().getId()),List.of(new BigDecimal("250.50")));
+        assertThat(a.getMaterialesAsignados()).isEqualByComparingTo("250.50");
+        service.guardarItemConCompras(t.getId(),a.getId(),datos,List.of(),List.of());em.flush();
+        assertThat(a.getMaterialesAsignados()).isZero();
+        assertThat(service.comprasMateriales(t.getId(),a.getId(),null,null,"",null,0).seleccionados()).isEmpty();
+    }
+
+    private TableroCertificadoItem tarea(TableroCertificado t,String nombre,String costo) { var i=service.crearItemManual(t.getId()); i.setDescripcionTarea(nombre);i.setCostoManoObra(new BigDecimal(costo));i.setMaterialesConfirmados(true);em.flush();return i; }
     private AvancesTableroForm form(TableroCertificadoItem i,String p) { var f=new AvancesTableroForm();var fila=new AvancesTableroForm.Fila();fila.setId(i.getId());fila.setPorcentaje(new BigDecimal(p));f.getFilas().add(fila);return f; }
     private void avances(TableroCertificado t,TableroCertificadoItem i,String p) { service.guardarAvances(t.getId(),form(i,p)); }
     private MockHttpSession session(Obra o) { var s=new MockHttpSession();s.setAttribute("obraActivaId",o.getId());return s; }

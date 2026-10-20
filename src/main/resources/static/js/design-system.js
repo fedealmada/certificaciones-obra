@@ -429,7 +429,9 @@
     }
 
     function initMobileTables() {
+        if (!window.matchMedia('(max-width: 640px)').matches) return;
         document.querySelectorAll('table.table').forEach(table => {
+            if (table.classList.contains('mobile-record-table')) return;
             if (table.closest('form') || table.matches('.itemizado-excel, .control-rubro-excel') ||
                 table.querySelector('input, select, textarea') || table.tHead?.rows.length !== 1) return;
             const headers = Array.from(table.tHead.rows[0].cells);
@@ -473,7 +475,10 @@
         setTheme
     };
 
-    initTheme();
+    const mobileViewport = window.matchMedia('(max-width: 640px)');
+    mobileViewport.addEventListener('change', event => {
+        if (event.matches) initMobileTables();
+    });
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init, { once: true });
     } else {

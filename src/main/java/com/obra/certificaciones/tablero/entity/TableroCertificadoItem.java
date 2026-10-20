@@ -31,6 +31,19 @@ public class TableroCertificadoItem {
 
     private String claveContinuidad;
     private boolean recurrente;
+    private Boolean materialesConfirmados;
+    private Boolean materialesBloqueados;
+
+    public boolean materialesCerrados() {
+        return Boolean.TRUE.equals(materialesBloqueados)
+                || valor(avanceAnteriorPorcentaje).signum() > 0
+                || valor(avanceCertificadoPorcentaje).signum() > 0
+                || montoAnterior().signum() != 0 || montoCertificado().signum() != 0;
+    }
+
+    public boolean materialesPreparados() {
+        return Boolean.TRUE.equals(materialesConfirmados) || materialesCerrados();
+    }
     @Column(precision = 19, scale = 2)
     private BigDecimal totalTareaInformado;
     @Column(precision = 19, scale = 2)

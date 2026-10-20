@@ -14,6 +14,24 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ItemOrdenCompraRepository extends JpaRepository<ItemOrdenCompra, Long> {
+    @EntityGraph(attributePaths={"ordenCompra","ordenCompra.proveedorEntidad","categoriaEntidad"})
+    @Query("""
+        select i from ItemOrdenCompra i join i.ordenCompra oc
+        left join i.categoriaEntidad cat left join oc.proveedorEntidad p
+        where oc.obra.id=:obra and oc.fecha between :desde and :hasta
+        and coalesce(cat.tipo,i.categoria)=com.obra.certificaciones.oc.entity.CategoriaItem.MATERIAL
+        and (:ocId is null or oc.id=:ocId)
+        and (:q='' or lower(i.detalle) like lower(concat('%',:q,'%'))
+          or lower(i.item) like lower(concat('%',:q,'%')) or lower(oc.numero) like lower(concat('%',:q,'%'))
+          or lower(p.nombre) like lower(concat('%',:q,'%')))
+        order by oc.fecha desc,oc.id desc,i.id asc
+        """)
+    Page<ItemOrdenCompra> materialesPeriodo(@Param("obra") Long obra,@Param("desde") java.time.LocalDate desde,
+        @Param("hasta") java.time.LocalDate hasta,@Param("q") String q,@Param("ocId") Long ocId,Pageable pageable);
+
+    @org.springframework.data.jpa.repository.Lock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
+    @Query("select i from ItemOrdenCompra i where i.id in :ids order by i.id")
+    List<ItemOrdenCompra> bloquearMateriales(@Param("ids") List<Long> ids);
     @EntityGraph(attributePaths = {"ordenCompra", "ordenCompra.proveedorEntidad", "ordenCompra.obra", "rubroEntidad", "categoriaEntidad"})
     List<ItemOrdenCompra> findByOrdenCompraObraIdOrderByIdAsc(Long obraId);
 

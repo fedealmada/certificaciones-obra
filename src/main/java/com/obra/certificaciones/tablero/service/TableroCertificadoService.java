@@ -24,6 +24,80 @@ public class TableroCertificadoService {
     private final TableroCertificadoItemRepository itemRepository;
     private final ItemCertificacionRepository itemCertificacionRepository;
     private final ItemOrdenCompraRepository ordenItems;
+    private final MaterialAsignadoTableroRepository materialesRepository;
+
+    public record MaterialCompra(Long id,Long ocId,String oc,LocalDate fecha,String proveedor,String item,
+            String detalle,String unidad,BigDecimal cantidad,BigDecimal precio,BigDecimal importe,
+            BigDecimal usado,BigDecimal disponible) {}
+    public record AsignacionMaterial(Long materialId,BigDecimal importe) {}
+    public record MaterialSeleccionado(Long materialId,String oc,String item,String detalle,BigDecimal importe) {}
+    public record ComprasMateriales(List<MaterialCompra> compras,List<MaterialSeleccionado> seleccionados,
+            int pagina,int paginas,long cantidad,LocalDate desde,LocalDate hasta,boolean bloqueado) {}
+
+    public ComprasMateriales comprasMateriales(Long id,Long itemId,LocalDate desde,LocalDate hasta,String q,Long ocId,int pagina) {
+        var t=obtener(id); var tarea=obtenerItem(id,itemId);
+        var inicio=desde==null?t.getFechaDesde():desde; var fin=hasta==null?t.getFechaHasta():hasta;
+        validarFechas(inicio,fin);
+        var resultado=ordenItems.materialesPeriodo(t.getObra().getId(),inicio,fin,q==null?"":q.trim(),ocId,
+                org.springframework.data.domain.PageRequest.of(Math.max(0,pagina),25));
+        var usados=new HashMap<Long,BigDecimal>();
+        var ids=resultado.getContent().stream().map(ItemOrdenCompra::getId).toList();
+        if(!ids.isEmpty()) materialesRepository.usados(t.getObra().getId(),tarea.claveHistorial(),ids)
+                .forEach(u->usados.put(u.getMaterialId(),u.getImporte()));
+        var compras=resultado.getContent().stream().map(i->{
+            var oc=i.getOrdenCompra(); var usado=usados.getOrDefault(i.getId(),BigDecimal.ZERO);
+            return new MaterialCompra(i.getId(),oc.getId(),oc.getNumero(),oc.getFecha(),
+                    oc.getProveedorEntidad()==null?"Sin proveedor":oc.getProveedorEntidad().getNombre(),i.getItem(),
+                    i.getDetalle(),i.getUnidad(),i.getCantidad(),i.getPrecioUnitario(),i.getImporte(),usado,
+                    valor(i.getImporte()).subtract(usado).max(BigDecimal.ZERO));
+        }).toList();
+        var seleccionados=materialesRepository.findByObraIdAndClaveTarea(t.getObra().getId(),tarea.claveHistorial()).stream()
+                .map(a->new MaterialSeleccionado(a.getMaterial().getId(),a.getMaterial().getOrdenCompra().getNumero(),
+                        a.getMaterial().getItem(),a.getMaterial().getDetalle(),a.getImporte())).toList();
+        return new ComprasMateriales(compras,seleccionados,resultado.getNumber(),resultado.getTotalPages(),
+                resultado.getTotalElements(),inicio,fin,tarea.materialesCerrados()||t.isCerrado()||tieneSiguiente(id));
+    }
+
+    @Transactional
+    public BigDecimal asignarMateriales(Long id,Long itemId,List<AsignacionMaterial> datos) {
+        var t=editable(id); var tarea=obtenerItem(id,itemId);
+        if(tarea.materialesCerrados()) throw new IllegalArgumentException("Los materiales están bloqueados porque la tarea ya fue certificada.");
+        if(datos==null || datos.size()>1000) throw new IllegalArgumentException("La selección de materiales es inválida.");
+        var importes=new TreeMap<Long,BigDecimal>();
+        for(var d:datos) {
+            if(d.materialId()==null || d.importe()==null || d.importe().signum()<=0 || d.importe().stripTrailingZeros().scale()>2
+                    || importes.putIfAbsent(d.materialId(),d.importe())!=null)
+                throw new IllegalArgumentException("Revisá los importes: deben ser positivos, con hasta dos decimales y sin ítems repetidos.");
+        }
+        var actuales=materialesRepository.findByObraIdAndClaveTarea(t.getObra().getId(),tarea.claveHistorial());
+        var ids=new TreeSet<>(importes.keySet()); actuales.forEach(a->ids.add(a.getMaterial().getId()));
+        var materiales=ids.isEmpty()?List.<ItemOrdenCompra>of():ordenItems.bloquearMateriales(new ArrayList<>(ids));
+        var usados=new HashMap<Long,BigDecimal>();
+        if(!ids.isEmpty()) materialesRepository.bloquearUsados(t.getObra().getId(),tarea.claveHistorial(),new ArrayList<>(ids))
+                .forEach(a->usados.merge(a.getMaterial().getId(),a.getImporte(),BigDecimal::add));
+        var encontrados=new HashMap<Long,ItemOrdenCompra>(); materiales.forEach(i->encontrados.put(i.getId(),i));
+        for(var entry:importes.entrySet()) {
+            var material=encontrados.get(entry.getKey());
+            if(material==null || !material.getOrdenCompra().getObra().getId().equals(t.getObra().getId()) || tipo(material)!=CategoriaItem.MATERIAL)
+                throw new IllegalArgumentException("Un material no pertenece a esta obra o no es una compra de materiales.");
+            var disponible=valor(material.getImporte()).subtract(usados.getOrDefault(material.getId(),BigDecimal.ZERO));
+            if(entry.getValue().compareTo(disponible)>0)
+                throw new IllegalArgumentException("El importe de "+material.getItem()+" supera el disponible para asignar ($ "+disponible+").");
+        }
+        var pendientes=new TreeMap<>(importes);
+        for(var a:actuales) {
+            var importe=pendientes.remove(a.getMaterial().getId());
+            if(importe==null) materialesRepository.delete(a); else a.setImporte(importe);
+        }
+        pendientes.forEach((materialId,importe)->{
+            var a=new MaterialAsignadoTablero(); a.setObraId(t.getObra().getId()); a.setClaveTarea(tarea.claveHistorial());
+            a.setMaterial(encontrados.get(materialId)); a.setImporte(importe); materialesRepository.save(a);
+        });
+        var total=importes.values().stream().reduce(BigDecimal.ZERO,BigDecimal::add);
+        tarea.setMaterialesAsignados(total); tarea.setMaterialesConfirmados(true);
+        tarea.setTotalTareaInformado(null); tarea.setMontoActualInformado(null); tarea.setMontoAcumuladoInformado(null);
+        return total;
+    }
 
     public List<TableroCertificado> listar(Obra obra) { return tableroRepository.findByObraIdOrderByFechaHastaDescIdDesc(obra.getId()); }
     public TableroCertificado obtener(Long id) { return tableroRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("No existe el certificado general.")); }
@@ -105,6 +179,16 @@ public class TableroCertificadoService {
     @Transactional
     public TableroCertificadoItem guardarItem(Long id,Long itemId,TableroCertificadoItem d) {
         editable(id); var i=obtenerItem(id,itemId);
+        var asignados=materialesRepository.findByObraIdAndClaveTarea(i.getTablero().getObra().getId(),i.claveHistorial());
+        if(!asignados.isEmpty() && !igual(d.getMaterialesAsignados(),asignados.stream().map(MaterialAsignadoTablero::getImporte).reduce(BigDecimal.ZERO,BigDecimal::add)))
+            throw new IllegalArgumentException("Modificá el importe de materiales desde la selección de compras para conservar sus vínculos.");
+        if (i.materialesCerrados() && (!igual(i.getMaterialesAsignados(),d.getMaterialesAsignados())
+                || !igual(i.getMaterialesSuministradosEmpresa(),d.getMaterialesSuministradosEmpresa())
+                || !igual(i.getMaterialesAdicionalesEtapa(),d.getMaterialesAdicionalesEtapa())
+                || !igual(i.getSubtotalManual(),d.getSubtotalManual())))
+            throw new IllegalArgumentException("Esta tarea ya fue certificada. Sus materiales y costo base informado están bloqueados.");
+        if (i.materialesCerrados()) i.setMaterialesBloqueados(true);
+        else i.setMaterialesConfirmados(Boolean.TRUE.equals(d.getMaterialesConfirmados()));
         if (!StringUtils.hasText(d.getDescripcionTarea())) throw new IllegalArgumentException("La descripción de la tarea es obligatoria.");
         // Los avances anteriores y el vínculo de origen nunca se toman del formulario.
         if (i.getMontoAnteriorFijo()==null) i.setMontoAnteriorFijo(i.montoAnterior());
@@ -119,15 +203,32 @@ public class TableroCertificadoService {
         i.setObservacion(d.getObservacion()); validarFila(i); return i;
     }
     @Transactional
+    public TableroCertificadoItem guardarItemConCompras(Long id,Long itemId,TableroCertificadoItem datos,
+            List<Long> ids,List<BigDecimal> importes) {
+        var seleccion=ids==null?List.<Long>of():ids;
+        var montos=importes==null?List.<BigDecimal>of():importes;
+        if(seleccion.size()!=montos.size())throw new IllegalArgumentException("La selección de compras está incompleta.");
+        var filas=new ArrayList<AsignacionMaterial>();
+        for(int n=0;n<seleccion.size();n++)filas.add(new AsignacionMaterial(seleccion.get(n),montos.get(n)));
+        datos.setMaterialesAsignados(asignarMateriales(id,itemId,filas));
+        materialesRepository.flush();
+        datos.setMaterialesConfirmados(true);
+        return guardarItem(id,itemId,datos);
+    }
+
+    @Transactional
     public void guardarAvances(Long id,AvancesTableroForm f) {
         var t=editable(id); Map<Long,TableroCertificadoItem> filas=new HashMap<>(); t.getItems().forEach(i->filas.put(i.getId(),i));
         var vistos=new HashSet<Long>();
         for (var fila:f.getFilas()) {
             var i=filas.get(fila.getId()); if (i==null || !vistos.add(fila.getId())) throw new IllegalArgumentException("Hay una tarea inválida o repetida en la carga.");
             validarAvance(i,fila.getPorcentaje());
+            if (valor(fila.getPorcentaje()).signum()>0 && !i.materialesPreparados())
+                throw new IllegalArgumentException("Revisá y confirmá los materiales de la tarea " + i.getDescripcionTarea() + " antes de certificarla.");
         }
         for (var fila:f.getFilas()) {
             var i=filas.get(fila.getId());
+            if (i.materialesCerrados() || valor(fila.getPorcentaje()).signum()>0) i.setMaterialesBloqueados(true);
             if(!igual(i.getAvanceCertificadoPorcentaje(),fila.getPorcentaje())) { i.setMontoActualInformado(null); i.setMontoAcumuladoInformado(null); }
             i.setAvanceCertificadoPorcentaje(valor(fila.getPorcentaje()));
         }
@@ -137,10 +238,16 @@ public class TableroCertificadoService {
         var t=editable(id); var i=obtenerItem(id,itemId);
         if (valor(i.getAvanceAnteriorPorcentaje()).signum()>0 || i.montoAnterior().signum()!=0)
             throw new IllegalArgumentException("Esta tarea tiene importes anteriores. Dejala con avance actual cero para conservar el acumulado.");
+        liberarMaterialesSiUltima(t,i);
         t.getItems().remove(i);
     }
     @Transactional
-    public void eliminarTablero(Long id) { var t=editable(id); if(tieneSiguiente(id)) throw new IllegalArgumentException("El certificado tiene un período siguiente."); tableroRepository.delete(t); }
+    public void eliminarTablero(Long id) { var t=editable(id); if(tieneSiguiente(id)) throw new IllegalArgumentException("El certificado tiene un período siguiente."); t.getItems().forEach(i->liberarMaterialesSiUltima(t,i)); tableroRepository.delete(t); }
+
+    private void liberarMaterialesSiUltima(TableroCertificado t,TableroCertificadoItem i) {
+        if(itemRepository.countByTableroObraIdAndClaveContinuidad(t.getObra().getId(),i.claveHistorial())<=1)
+            materialesRepository.deleteAll(materialesRepository.findByObraIdAndClaveTarea(t.getObra().getId(),i.claveHistorial()));
+    }
 
     public List<ItemOrdenCompra> candidatos(Long id) {
         var t=obtener(id); Set<Long> incluidos=new HashSet<>(); t.getItems().stream().filter(i->i.getItemOrdenCompra()!=null).forEach(i->incluidos.add(i.getItemOrdenCompra().getId()));

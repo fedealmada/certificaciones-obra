@@ -84,6 +84,7 @@ class AjustesCertificacionTest {
 
     @Test void pantallasQuincenasYExportacionesMuestranLaMismaLiquidacion() throws Exception {
         var c = persistir("2025-08-14", "1638000"); var oc = c.getOrdenCompra(); activarCac(oc);
+        c.setPorCantidad(null); // Certificados antiguos sin modalidad definida.
         c.setBrutoInformado(new BigDecimal("1574300")); c.setCacMontoManual(new BigDecimal("62530.86")); em.flush();
         var session = new MockHttpSession(); session.setAttribute("obraActivaId", oc.getObra().getId());
         mvc.perform(get("/oc/{id}/ajustes", oc.getId()).session(session)).andExpect(status().isOk())

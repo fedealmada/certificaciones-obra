@@ -52,8 +52,19 @@ public class TableroCertificadoController {
     @PostMapping("/{id}/items/manual") public String manual(@PathVariable Long id) { return red(id)+"/items/"+service.crearItemManual(id).getId()+"/editar"; }
     @PostMapping("/{id}/grupos") public String grupo(@PathVariable Long id,@RequestParam(required=false) String nombreGrupo) { return red(id)+"/items/"+service.crearGrupo(id,nombreGrupo).getId()+"/editar"; }
     @GetMapping("/{id}/items/{itemId}/editar") public String editar(@PathVariable Long id,@PathVariable Long itemId,Model m) { m.addAttribute("tablero",service.obtener(id)); m.addAttribute("fila",service.obtenerItem(id,itemId)); return "tablero/item"; }
-    @PostMapping("/{id}/items/{itemId}") public String item(@PathVariable Long id,@PathVariable Long itemId,@ModelAttribute TableroCertificadoItem datos,Model m,RedirectAttributes r) {
-        try { service.guardarItem(id,itemId,datos); r.addFlashAttribute("success","Tarea y costos guardados."); return red(id)+"#fila-"+itemId; }
+    @GetMapping("/{id}/items/{itemId}/materiales") @ResponseBody
+    public ResponseEntity<?> materiales(@PathVariable Long id,@PathVariable Long itemId,
+            @RequestParam(required=false) @DateTimeFormat(iso=DateTimeFormat.ISO.DATE) LocalDate desde,
+            @RequestParam(required=false) @DateTimeFormat(iso=DateTimeFormat.ISO.DATE) LocalDate hasta,
+            @RequestParam(defaultValue="") String q,@RequestParam(required=false) Long ocId,@RequestParam(defaultValue="0") int pagina) {
+        try { return ResponseEntity.ok(service.comprasMateriales(id,itemId,desde,hasta,q,ocId,pagina)); }
+        catch(IllegalArgumentException e) { return ResponseEntity.badRequest().body(Map.of("error",e.getMessage())); }
+    }
+
+    @PostMapping("/{id}/items/{itemId}") public String item(@PathVariable Long id,@PathVariable Long itemId,@ModelAttribute TableroCertificadoItem datos,Model m,RedirectAttributes r,
+            @RequestParam(defaultValue="false") boolean materialSelectionPresent,
+            @RequestParam(required=false) List<Long> materialIds,@RequestParam(required=false) List<BigDecimal> materialImportes) {
+        try { if(materialSelectionPresent) service.guardarItemConCompras(id,itemId,datos,materialIds,materialImportes); else service.guardarItem(id,itemId,datos); r.addFlashAttribute("success","Tarea y costos guardados."); return red(id)+"#fila-"+itemId; }
         catch(IllegalArgumentException e) { datos.setId(itemId); var original=service.obtenerItem(id,itemId); datos.setAvanceAnteriorPorcentaje(original.getAvanceAnteriorPorcentaje()); datos.setAvanceCertificadoPorcentaje(original.getAvanceCertificadoPorcentaje()); datos.setMontoAnteriorFijo(original.getMontoAnteriorFijo()); datos.setItemOrdenCompra(original.getItemOrdenCompra()); m.addAttribute("tablero",service.obtener(id)); m.addAttribute("fila",datos); m.addAttribute("error",e.getMessage()); return "tablero/item"; }
     }
     @PostMapping("/{id}/items/{itemId}/eliminar") public String quitar(@PathVariable Long id,@PathVariable Long itemId,RedirectAttributes r) { service.eliminarItem(id,itemId); r.addFlashAttribute("success","Tarea quitada del borrador."); return red(id); }

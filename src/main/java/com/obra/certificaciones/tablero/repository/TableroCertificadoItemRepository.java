@@ -11,4 +11,5 @@ public interface TableroCertificadoItemRepository extends JpaRepository<TableroC
     List<TableroCertificadoItem> findByTableroIdOrderByOrdenFilaAscIdAsc(Long tableroId);
 
     boolean existsByTableroIdAndItemOrdenCompraId(Long tableroId, Long itemOrdenCompraId);
+    long countByTableroObraIdAndClaveContinuidad(Long obraId,String claveContinuidad);
 }
