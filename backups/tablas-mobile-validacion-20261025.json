@@ -1,0 +1,438 @@
+{
+  "inventario": [
+    {
+      "plantilla": "asistencia\\lista.html",
+      "tablas": 2,
+      "impresion": false
+    },
+    {
+      "plantilla": "calendario\\index.html",
+      "tablas": 1,
+      "impresion": false
+    },
+    {
+      "plantilla": "categoria\\lista.html",
+      "tablas": 1,
+      "impresion": false
+    },
+    {
+      "plantilla": "certificacion\\condiciones-oc.html",
+      "tablas": 1,
+      "impresion": false
+    },
+    {
+      "plantilla": "certificacion\\form.html",
+      "tablas": 1,
+      "impresion": false
+    },
+    {
+      "plantilla": "certificacion\\importar.html",
+      "tablas": 1,
+      "impresion": false
+    },
+    {
+      "plantilla": "control-rubro\\index.html",
+      "tablas": 1,
+      "impresion": false
+    },
+    {
+      "plantilla": "dashboard\\index.html",
+      "tablas": 1,
+      "impresion": false
+    },
+    {
+      "plantilla": "deposito\\lista.html",
+      "tablas": 3,
+      "impresion": false
+    },
+    {
+      "plantilla": "deposito\\movimiento.html",
+      "tablas": 1,
+      "impresion": false
+    },
+    {
+      "plantilla": "deposito\\personas.html",
+      "tablas": 1,
+      "impresion": false
+    },
+    {
+      "plantilla": "item\\lista.html",
+      "tablas": 1,
+      "impresion": false
+    },
+    {
+      "plantilla": "itemizado\\arbol.html",
+      "tablas": 1,
+      "impresion": false
+    },
+    {
+      "plantilla": "material\\detalle.html",
+      "tablas": 2,
+      "impresion": false
+    },
+    {
+      "plantilla": "material\\form.html",
+      "tablas": 1,
+      "impresion": false
+    },
+    {
+      "plantilla": "material\\lista.html",
+      "tablas": 1,
+      "impresion": false
+    },
+    {
+      "plantilla": "notas-pedido\\detalle.html",
+      "tablas": 1,
+      "impresion": false
+    },
+    {
+      "plantilla": "notas-pedido\\form.html",
+      "tablas": 1,
+      "impresion": false
+    },
+    {
+      "plantilla": "notas-pedido\\lista.html",
+      "tablas": 1,
+      "impresion": false
+    },
+    {
+      "plantilla": "obra\\lista.html",
+      "tablas": 1,
+      "impresion": false
+    },
+    {
+      "plantilla": "oc\\detalle.html",
+      "tablas": 3,
+      "impresion": false
+    },
+    {
+      "plantilla": "oc\\form.html",
+      "tablas": 1,
+      "impresion": false
+    },
+    {
+      "plantilla": "oc\\importar.html",
+      "tablas": 1,
+      "impresion": false
+    },
+    {
+      "plantilla": "oc\\item-detalle.html",
+      "tablas": 1,
+      "impresion": false
+    },
+    {
+      "plantilla": "oc\\lista.html",
+      "tablas": 1,
+      "impresion": false
+    },
+    {
+      "plantilla": "proveedor\\detalle.html",
+      "tablas": 1,
+      "impresion": false
+    },
+    {
+      "plantilla": "proveedor\\lista.html",
+      "tablas": 1,
+      "impresion": false
+    },
+    {
+      "plantilla": "quincenal\\lista.html",
+      "tablas": 2,
+      "impresion": false
+    },
+    {
+      "plantilla": "reportes\\index.html",
+      "tablas": 1,
+      "impresion": false
+    },
+    {
+      "plantilla": "rubro\\lista.html",
+      "tablas": 1,
+      "impresion": false
+    },
+    {
+      "plantilla": "tablero\\detalle.html",
+      "tablas": 1,
+      "impresion": false
+    },
+    {
+      "plantilla": "tablero\\historial.html",
+      "tablas": 1,
+      "impresion": false
+    },
+    {
+      "plantilla": "tablero\\imprimir.html",
+      "tablas": 1,
+      "impresion": true
+    },
+    {
+      "plantilla": "tablero\\seleccionar.html",
+      "tablas": 1,
+      "impresion": false
+    },
+    {
+      "plantilla": "tareas\\index.html",
+      "tablas": 1,
+      "impresion": false
+    },
+    {
+      "plantilla": "material\\catalogo\\lista.html",
+      "tablas": 1,
+      "impresion": false
+    }
+  ],
+  "360px": {
+    "ordenes": {
+      "width": 360,
+      "tables": 1,
+      "errors": [],
+      "pageWidth": 360
+    },
+    "oc": {
+      "width": 360,
+      "tables": 2,
+      "errors": [],
+      "pageWidth": 360
+    },
+    "certificado": {
+      "width": 360,
+      "tables": 0,
+      "errors": [],
+      "pageWidth": 360
+    },
+    "editar-oc": {
+      "width": 360,
+      "tables": 1,
+      "errors": [],
+      "pageWidth": 360
+    },
+    "nuevo-certificado": {
+      "width": 360,
+      "tables": 1,
+      "errors": [],
+      "pageWidth": 360
+    },
+    "condiciones": {
+      "width": 360,
+      "tables": 1,
+      "errors": [],
+      "pageWidth": 360
+    },
+    "quincenas": {
+      "width": 360,
+      "tables": 13,
+      "errors": [],
+      "pageWidth": 360
+    },
+    "reportes": {
+      "width": 360,
+      "tables": 1,
+      "errors": [],
+      "pageWidth": 360
+    },
+    "dashboard": {
+      "width": 360,
+      "tables": 1,
+      "errors": [],
+      "pageWidth": 360
+    },
+    "tablero": {
+      "width": 360,
+      "tables": 1,
+      "errors": [],
+      "pageWidth": 360
+    },
+    "historial": {
+      "width": 360,
+      "tables": 1,
+      "errors": [],
+      "pageWidth": 360
+    },
+    "seleccionar-oc": {
+      "width": 360,
+      "tables": 1,
+      "errors": [],
+      "pageWidth": 360
+    },
+    "items": {
+      "width": 360,
+      "tables": 1,
+      "errors": [],
+      "pageWidth": 360
+    },
+    "itemizado": {
+      "width": 360,
+      "tables": 1,
+      "errors": [],
+      "pageWidth": 360
+    },
+    "rubros-control": {
+      "width": 360,
+      "tables": 1,
+      "errors": [],
+      "pageWidth": 360
+    },
+    "deposito": {
+      "width": 360,
+      "tables": 2,
+      "errors": [],
+      "pageWidth": 360
+    },
+    "personas": {
+      "width": 360,
+      "tables": 1,
+      "errors": [],
+      "pageWidth": 360
+    },
+    "notas": {
+      "width": 360,
+      "tables": 1,
+      "errors": [],
+      "pageWidth": 360
+    },
+    "nueva-nota": {
+      "width": 360,
+      "tables": 1,
+      "errors": [],
+      "pageWidth": 360
+    },
+    "proveedores": {
+      "width": 360,
+      "tables": 1,
+      "errors": [],
+      "pageWidth": 360
+    },
+    "obras": {
+      "width": 360,
+      "tables": 1,
+      "errors": [],
+      "pageWidth": 360
+    },
+    "rubros": {
+      "width": 360,
+      "tables": 1,
+      "errors": [],
+      "pageWidth": 360
+    },
+    "categorias": {
+      "width": 360,
+      "tables": 0,
+      "errors": [],
+      "pageWidth": 360
+    },
+    "calendario": {
+      "width": 360,
+      "tables": 1,
+      "errors": [],
+      "pageWidth": 360
+    },
+    "tareas": {
+      "width": 360,
+      "tables": 1,
+      "errors": [],
+      "pageWidth": 360
+    },
+    "asistencia": {
+      "width": 360,
+      "tables": 0,
+      "errors": [],
+      "pageWidth": 360
+    },
+    "materiales": {
+      "width": 360,
+      "tables": 1,
+      "errors": [],
+      "pageWidth": 360
+    },
+    "recepcion": {
+      "width": 360,
+      "tables": 1,
+      "errors": [],
+      "pageWidth": 360
+    },
+    "importar-oc": {
+      "width": 360,
+      "tables": 0,
+      "errors": [],
+      "pageWidth": 360
+    },
+    "importar-certificados": {
+      "width": 360,
+      "tables": 0,
+      "errors": [],
+      "pageWidth": 360
+    }
+  },
+  "otros_anchos": [
+    {
+      "pagina": "ordenes",
+      "width": 320,
+      "tables": 1,
+      "errors": [],
+      "pageWidth": 305
+    },
+    {
+      "pagina": "ordenes",
+      "width": 768,
+      "tables": 1,
+      "errors": [],
+      "pageWidth": 753
+    },
+    {
+      "pagina": "editar-oc",
+      "width": 320,
+      "tables": 1,
+      "errors": [],
+      "pageWidth": 308
+    },
+    {
+      "pagina": "editar-oc",
+      "width": 768,
+      "tables": 1,
+      "errors": [],
+      "pageWidth": 768
+    },
+    {
+      "pagina": "historial",
+      "width": 320,
+      "tables": 1,
+      "errors": [],
+      "pageWidth": 305
+    },
+    {
+      "pagina": "historial",
+      "width": 768,
+      "tables": 1,
+      "errors": [],
+      "pageWidth": 753
+    },
+    {
+      "pagina": "itemizado",
+      "width": 320,
+      "tables": 1,
+      "errors": [],
+      "pageWidth": 308
+    },
+    {
+      "pagina": "itemizado",
+      "width": 768,
+      "tables": 1,
+      "errors": [],
+      "pageWidth": 756
+    },
+    {
+      "pagina": "certificado",
+      "width": 320,
+      "tables": 0,
+      "errors": [],
+      "pageWidth": 305
+    },
+    {
+      "pagina": "certificado",
+      "width": 768,
+      "tables": 0,
+      "errors": [],
+      "pageWidth": 753
+    }
+  ]
+}

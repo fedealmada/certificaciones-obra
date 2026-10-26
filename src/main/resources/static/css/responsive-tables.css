@@ -1,0 +1,54 @@
+/* Tablas pequeñas y grandes conservan siempre su estructura tabular. */
+.table-scroll-hint { display:none; }
+@media screen and (max-width:992px) {
+ html:root[data-theme] body main,
+ html:root[data-theme] body main :is(.row > *,.panel-section,.card,.card-body,.cg-panel,.dashboard-workspace,.cert-detail-table-wrap) { min-width:0!important; max-width:100%; }
+ html:root[data-theme] body main .responsive-table-viewport {
+  display:block!important; width:100%!important; min-width:0!important; max-width:100%!important;
+  overflow-x:auto!important; overscroll-behavior-x:contain; -webkit-overflow-scrolling:touch;
+  scrollbar-width:thin; border-radius:8px; isolation:isolate;
+ }
+ html:root[data-theme] body main table[data-responsive-table] {
+  display:table!important; width:100%!important; min-width:var(--responsive-table-min,640px)!important;
+  max-width:none!important; border-collapse:collapse;
+ }
+ html:root[data-theme] body main :is(table.table,table.cg-table)[data-responsive-table] { table-layout:auto!important; }
+ html:root[data-theme] body main table[data-responsive-table] > colgroup { display:table-column-group!important; }
+ html:root[data-theme] body main table[data-responsive-table] > thead { display:table-header-group!important; overflow:visible!important; }
+ html:root[data-theme] body main table[data-responsive-table] > tbody { display:table-row-group!important; }
+ html:root[data-theme] body main table[data-responsive-table] > tfoot { display:table-footer-group!important; }
+ html:root[data-theme] body main table[data-responsive-table] > :is(thead,tbody,tfoot) > tr { display:table-row!important; margin:0!important; }
+ html:root[data-theme] body main table[data-responsive-table] > :is(thead,tbody,tfoot) > tr > :is(td,th) {
+  display:table-cell!important; width:auto; min-width:84px; max-width:420px;
+  vertical-align:middle; white-space:normal; overflow-wrap:normal!important; word-break:normal!important;
+  text-align:inherit; padding:10px 12px!important;
+ }
+ html:root[data-theme] body main table[data-responsive-table] :is(td,th)::before { content:none!important; }
+ html:root[data-theme] body main table[data-responsive-table] thead th { white-space:nowrap!important; }
+ html:root[data-theme] body main table[data-responsive-table] :is(.text-end,.cg-numeric,.action-cell) { white-space:nowrap!important; }
+ html:root[data-theme] body main table[data-responsive-table] .action-cell { min-width:120px; }
+ html:root[data-theme] body main table[data-responsive-table] :is(input:not([type="checkbox"]):not([type="radio"]),select,textarea) { min-width:88px!important; width:100%; }
+ html:root[data-theme] body main table[data-responsive-table] :is(.item-detail-title,.items-master-detail,.cg-task-desc) { min-width:200px; max-width:380px; white-space:normal!important; }
+ html:root[data-theme] body main table[data-responsive-table] .cg-history-task { position:static!important; min-width:240px; }
+ html:root[data-theme] body main table[data-responsive-table] :is(td:first-child,th:first-child) { position:static!important; }
+ html:root[data-theme] body main .table-scroll-hint:not([hidden]) { display:block; margin:8px 0; color:var(--ui-muted); font:500 12px/1.5 system-ui,sans-serif; }
+ .responsive-table-viewport:focus-visible { outline:2px solid var(--ui-primary); outline-offset:3px; }
+ /* El detalle de certificado usa una grilla en lugar de una etiqueta table. */
+ html:root[data-theme] body main .cert-detail-table-wrap { overflow-x:auto!important; -webkit-overflow-scrolling:touch; }
+ html:root[data-theme] body main .cert-items-grid {
+  display:grid!important; grid-template-columns:80px minmax(260px,1.4fr) repeat(3,minmax(180px,1fr))!important;
+  min-width:980px!important; width:100%;
+ }
+ html:root[data-theme] body main .cert-items-grid > div { min-width:0; }
+}
+@media print {
+ .table-scroll-hint { display:none!important; }
+ .responsive-table-viewport { overflow:visible!important; max-height:none!important; }
+}
+
+@media screen and (max-width:992px) {
+ html:root[data-theme] body main :is(section,article,form,.row,[class*="-grid"]) { min-width:0!important; }
+ /* Mantener los filtros y las filas ocultas por los scripts de cada módulo. */
+ html:root[data-theme] body main table[data-responsive-table]:is([hidden],.d-none),
+ html:root[data-theme] body main table[data-responsive-table] :is([hidden],.d-none,[style*="display: none"],[style*="display:none"]) { display:none!important; }
+}

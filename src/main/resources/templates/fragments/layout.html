@@ -1,7 +1,9 @@
 <!doctype html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <body>
-<nav th:fragment="navbar" class="app-topbar app-sidebar" aria-label="Navegacion principal">
+<th:block th:fragment="navbar">
+<link th:href="@{/css/mobile-navigation.css(v='20261025-home')}" rel="stylesheet">
+<nav class="app-topbar app-sidebar" aria-label="Navegacion principal">
     <script th:src="@{/js/quincenas-navigation.js(v='20261018-1')}" defer></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <div class="app-nav-container">
@@ -49,6 +51,14 @@
         </div>
     </div>
 </nav>
+<nav class="mobile-dock" aria-label="Navegación principal móvil">
+    <a class="mobile-dock-link nav-link" th:href="@{/}" data-mobile-route="/"><i class="bi bi-house-door" aria-hidden="true"></i><span>Inicio</span></a>
+    <a class="mobile-dock-link nav-link" th:if="${configuracion.activo('modulo.oc')}" th:href="@{/oc}" data-mobile-route="/oc"><i class="bi bi-receipt" aria-hidden="true"></i><span>Órdenes</span></a>
+    <a class="mobile-dock-link nav-link" th:if="${configuracion.activo('modulo.certificadosQuincenales')}" th:href="@{/certificados-quincenales}" data-mobile-route="/certificados-quincenales"><i class="bi bi-calendar2-range" aria-hidden="true"></i><span>Quincenas</span></a>
+    <a class="mobile-dock-link nav-link" th:if="${configuracion.activo('modulo.deposito')}" th:href="@{/deposito}" data-mobile-route="/deposito"><i class="bi bi-box-seam" aria-hidden="true"></i><span>Depósito</span></a>
+    <a class="mobile-dock-link nav-link" th:href="@{/#modulos}"><i class="bi bi-grid" aria-hidden="true"></i><span>Menú</span></a>
+</nav>
+</th:block>
 </body>
 </html>
 

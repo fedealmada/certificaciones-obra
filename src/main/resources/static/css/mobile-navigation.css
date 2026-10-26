@@ -1,0 +1,24 @@
+/* Navegación móvil: Inicio siempre visible, cinco destinos como máximo. */
+.mobile-dock { display:none; }
+@media screen and (max-width:768px) {
+ html[data-theme] body .app-sidebar { display:none!important; }
+ html[data-theme] body { padding-left:0!important; padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))!important; }
+ html[data-theme] body .mobile-dock {
+  display:grid!important; grid-auto-flow:column; grid-auto-columns:minmax(0,1fr);
+  position:fixed; inset:auto 0 0; z-index:1040; width:100%;
+  padding:7px max(8px,env(safe-area-inset-right,0px)) calc(7px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px));
+  border-top:1px solid var(--ui-border,#dce3ed); background:var(--ui-surface,#fff);
+  box-shadow:0 -5px 24px #13213910; gap:4px;
+ }
+ html[data-theme] body .mobile-dock .mobile-dock-link {
+  display:flex!important; flex-direction:column; align-items:center; justify-content:center; gap:5px;
+  min-width:0; min-height:56px; padding:7px 2px; border-radius:12px;
+  text-decoration:none; color:var(--ui-muted,#5c6a7e)!important; font:600 10px/1.2 system-ui,sans-serif;
+  background:transparent; -webkit-tap-highlight-color:transparent;
+ }
+ html[data-theme] body .mobile-dock .mobile-dock-link i { font-size:21px; line-height:1; color:inherit!important; }
+ html[data-theme] body .mobile-dock .mobile-dock-link:is(.is-active,[aria-current="page"]) { background:var(--ui-primary-soft,#edf3ff)!important; color:var(--ui-primary,#396bc4)!important; }
+ html[data-theme] body .mobile-dock .mobile-dock-link:active { background:var(--ui-surface-muted,#f0f4fa); }
+ .mobile-dock-link:focus-visible { outline:2px solid var(--ui-primary); outline-offset:-2px; }
+}
+@media print { .mobile-dock { display:none!important; } }
