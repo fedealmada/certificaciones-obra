@@ -47,6 +47,11 @@ public class SincronizacionGithubService {
 
     public List<String> estadoGit() {
         List<String> salida = new ArrayList<>();
+        Path root = Path.of(projectRoot).toAbsolutePath().normalize();
+        if (!Files.isDirectory(root.resolve(".git"))) {
+            salida.add("Esta carpeta no tiene un repositorio Git configurado.");
+            return salida;
+        }
         ejecutarGit(salida, "status", "--short");
         return salida;
     }
@@ -59,8 +64,30 @@ public class SincronizacionGithubService {
         return switch (normalizarAccion(accion)) {
             case "TRAER_RESTAURAR" -> traerDesdeGithub(true);
             case "TRAER" -> traerDesdeGithub(false);
+            case "BACKUP_LOCAL" -> generarBackupLocal();
             default -> subirAGithub(mensajeUsuario);
         };
+    }
+
+    private SincronizacionResultado generarBackupLocal() {
+        List<String> salida = new ArrayList<>();
+        Path root = Path.of(projectRoot).toAbsolutePath().normalize();
+        Path backup = root.resolve(backupPath).normalize();
+        try {
+            generarBackup(root, backup, salida);
+            return new SincronizacionResultado(
+                    true, "BACKUP_LOCAL", true, false, false, false, false,
+                    "Backup local generado correctamente.", backup.toString(), "",
+                    LocalDateTime.now(), salida
+            );
+        } catch (Exception e) {
+            salida.add("ERROR: " + e.getMessage());
+            return new SincronizacionResultado(
+                    false, "BACKUP_LOCAL", false, false, false, false, false,
+                    "No se pudo generar el backup local. Revisa el detalle del proceso.", backup.toString(), "",
+                    LocalDateTime.now(), salida
+            );
+        }
     }
 
     private SincronizacionResultado subirAGithub(String mensajeUsuario) {
@@ -75,6 +102,24 @@ public class SincronizacionGithubService {
         try {
             generarBackup(root, backup, salida);
             backupGenerado = true;
+
+            if (!Files.isDirectory(root.resolve(".git"))) {
+                salida.add("No se encontro .git en la carpeta del proyecto; se conserva el backup local y se omite la sincronizacion.");
+                return new SincronizacionResultado(
+                        true,
+                        "BACKUP_LOCAL",
+                        true,
+                        false,
+                        false,
+                        false,
+                        false,
+                        "Backup local generado correctamente. Esta carpeta no tiene Git configurado, por lo que no se subio a GitHub.",
+                        backup.toString(),
+                        "",
+                        LocalDateTime.now(),
+                        salida
+                );
+            }
 
             ejecutarGitOk(salida, "add", "-A");
             List<String> cambios = ejecutarGit(salida, "status", "--short");
@@ -255,11 +300,10 @@ public class SincronizacionGithubService {
     }
 
     private List<String> ejecutarGit(List<String> salida, String... args) {
-        List<String> comando = new ArrayList<>();
-        comando.add("git");
-        comando.addAll(List.of(args));
+        Path root = Path.of(projectRoot).toAbsolutePath().normalize();
+        List<String> comando = comandoGit(root, args);
         try {
-            ResultadoProceso resultado = ejecutar(Path.of(projectRoot).toAbsolutePath().normalize(), comando);
+            ResultadoProceso resultado = ejecutar(root, comando);
             salida.add("$ " + String.join(" ", comando));
             salida.addAll(resultado.salida());
             return resultado.salida().stream().filter(linea -> !linea.isBlank()).toList();
@@ -270,10 +314,9 @@ public class SincronizacionGithubService {
     }
 
     private void ejecutarGitOk(List<String> salida, String... args) throws IOException, InterruptedException {
-        List<String> comando = new ArrayList<>();
-        comando.add("git");
-        comando.addAll(List.of(args));
-        ResultadoProceso resultado = ejecutar(Path.of(projectRoot).toAbsolutePath().normalize(), comando);
+        Path root = Path.of(projectRoot).toAbsolutePath().normalize();
+        List<String> comando = comandoGit(root, args);
+        ResultadoProceso resultado = ejecutar(root, comando);
         salida.add("$ " + String.join(" ", comando));
         salida.addAll(resultado.salida());
         if (resultado.exitCode() != 0) {
@@ -282,13 +325,24 @@ public class SincronizacionGithubService {
     }
 
     private String ramaActual(List<String> salida) throws IOException, InterruptedException {
-        ResultadoProceso resultado = ejecutar(Path.of(projectRoot).toAbsolutePath().normalize(), List.of("git", "branch", "--show-current"));
-        salida.add("$ git branch --show-current");
+        Path root = Path.of(projectRoot).toAbsolutePath().normalize();
+        List<String> comando = comandoGit(root, "branch", "--show-current");
+        ResultadoProceso resultado = ejecutar(root, comando);
+        salida.add("$ " + String.join(" ", comando));
         salida.addAll(resultado.salida());
         if (resultado.exitCode() != 0) {
             throw new IOException("No se pudo detectar la rama actual.");
         }
         return resultado.salida().stream().filter(linea -> !linea.isBlank()).findFirst().orElse("main");
+    }
+
+    private List<String> comandoGit(Path root, String... args) {
+        List<String> comando = new ArrayList<>();
+        comando.add("git");
+        comando.add("-c");
+        comando.add("safe.directory=" + root.toString().replace('\\', '/'));
+        comando.addAll(List.of(args));
+        return comando;
     }
 
     private ResultadoProceso ejecutar(Path directorio, List<String> comando) throws IOException, InterruptedException {

@@ -8,3 +8,4 @@ hs_err_pid*.log
 replay_pid*.log
 *.dump
 *.dumpstream
+/src/main/java/com/obra/certificaciones/oracleJdk-27/

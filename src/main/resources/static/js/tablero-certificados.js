@@ -28,16 +28,26 @@
       document.querySelector('#cg-total-acc').textContent=cash(total+cents(document.querySelector('#cg-total-acc').dataset.anterior)+cents(document.querySelector('#cg-total-acc').dataset.ajuste));
     }
   };
-  const markDirty=()=>{dirty=true; recalc(); document.querySelector('#cg-save-state').textContent='Cambios sin guardar'; document.querySelector('.cg-save-bar')?.classList.add('is-dirty'); document.querySelector('#cg-total-caption').textContent='Vista previa · pendiente de guardar';};
+  const markDirty=()=>{dirty=true; recalc(); filterRows(); document.querySelector('#cg-save-state').textContent='Cambios sin guardar'; document.querySelector('.cg-save-bar')?.classList.add('is-dirty'); document.querySelector('#cg-total-caption').textContent='Vista previa · pendiente de guardar';};
   ledger?.querySelectorAll('.cg-percent').forEach(i=>i.addEventListener('input',markDirty));
   ledger?.querySelectorAll('.cg-fill').forEach(b=>b.addEventListener('click',()=>{const row=b.closest('tr'); row.querySelector('.cg-percent').value=row.dataset.pendiente; markDirty();}));
   const filterRows=()=>{
-    const query=normalize(document.querySelector('#cg-search')?.value); const pending=document.querySelector('#cg-pending')?.checked; let visible=0;
-    ledger?.querySelectorAll('tbody tr').forEach(r=>{r.hidden= !normalize(r.dataset.search).includes(query) || (pending && Number(r.dataset.pendiente)<=0); if(!r.hidden)visible++;});
+    const query=normalize(document.querySelector('#cg-search')?.value); const pending=document.querySelector('#cg-pending')?.checked; const hideCompleted=document.querySelector('#cg-toggle-completed')?.getAttribute('aria-pressed')==='true'; let visible=0;
+    ledger?.querySelectorAll('tbody tr').forEach(r=>{
+      const input=r.querySelector('.cg-percent');
+      const completed=r.dataset.recurrente!=='true' && Number(r.dataset.prevpct||0)+Number(input ? input.value : r.dataset.guardado||0)>=100;
+      let badge=r.querySelector('.cg-completed');
+      if(completed && !badge){badge=document.createElement('span');badge.className='cg-completed';badge.textContent='Completada';r.querySelector('.cg-row-acc')?.after(badge);}
+      else if(!completed && badge)badge.remove();
+      r.hidden= !normalize(r.dataset.search).includes(query) || (pending && Number(r.dataset.pendiente)<=0) || (hideCompleted && completed);
+      if(!r.hidden)visible++;
+    });
     if(document.querySelector('#cg-visible-count'))document.querySelector('#cg-visible-count').textContent=visible+' tareas visibles';
     if(document.querySelector('#cg-no-results'))document.querySelector('#cg-no-results').hidden=visible!==0 || !ledger?.querySelector('tbody tr');
   };
-  document.querySelector('#cg-search')?.addEventListener('input',filterRows); document.querySelector('#cg-pending')?.addEventListener('change',filterRows); filterRows();
+  document.querySelector('#cg-search')?.addEventListener('input',filterRows); document.querySelector('#cg-pending')?.addEventListener('change',filterRows);
+  document.querySelector('#cg-toggle-completed')?.addEventListener('click',event=>{const button=event.currentTarget;const hidden=button.getAttribute('aria-pressed')!=='true';button.setAttribute('aria-pressed',String(hidden));button.querySelector('span').textContent=hidden?'Mostrar tareas terminadas':'Ocultar tareas terminadas';button.querySelector('i')?.classList.toggle('bi-eye-slash',!hidden);button.querySelector('i')?.classList.toggle('bi-eye',hidden);filterRows();});
+  filterRows();
   document.querySelector('#cg-advances-form')?.addEventListener('submit',()=>{dirty=false;});
   document.querySelectorAll('form').forEach(f=>f.addEventListener('submit',e=>{
     if(dirty && f.id!=='cg-advances-form') {e.preventDefault(); alert('Guardá los avances antes de realizar esta acción.');return;}

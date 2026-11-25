@@ -35,14 +35,29 @@
                 <div class="sync-action-content">
                     <span class="sync-action-kicker">Guardar</span>
                     <h2>Subir version actual</h2>
-                    <p>Genera el backup de MySQL, guarda los cambios y los sube a GitHub.</p>
+                    <p>Genera el backup de MySQL. Si Git esta configurado, tambien guarda los cambios y los sube a GitHub; si no, conserva el backup local.</p>
                 </div>
                 <form method="post" th:action="@{/sincronizacion/ejecutar}" class="sync-form">
                     <input type="hidden" name="accion" value="SUBIR">
                     <label class="form-label" for="mensaje">Mensaje del guardado</label>
                     <input class="form-control" id="mensaje" name="mensaje" value="Backup y sincronizacion" maxlength="120">
                     <button class="btn btn-primary" type="submit">
-                        <i class="bi bi-cloud-check"></i> Generar backup y subir
+                        <i class="bi bi-cloud-check"></i> Generar backup y sincronizar
+                    </button>
+                </form>
+            </article>
+
+            <article class="sync-action-card is-restore">
+                <div class="sync-action-icon"><i class="bi bi-database-check"></i></div>
+                <div class="sync-action-content">
+                    <span class="sync-action-kicker">Backup local</span>
+                    <h2>Guardar solo la base</h2>
+                    <p>Genera un archivo SQL en la carpeta backups, sin necesitar Git ni subir archivos.</p>
+                </div>
+                <form method="post" th:action="@{/sincronizacion/ejecutar}" class="sync-form">
+                    <input type="hidden" name="accion" value="BACKUP_LOCAL">
+                    <button class="btn btn-outline-primary" type="submit">
+                        <i class="bi bi-download"></i> Generar backup local
                     </button>
                 </form>
             </article>

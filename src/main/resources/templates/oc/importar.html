@@ -56,7 +56,7 @@
         </section>
 
         <section class="import-batch-list">
-            <article class="panel-section import-order-card" th:each="oc, ocSt : *{ordenes}" th:classappend="${oc.ordenExistente} ? ' is-existing' : ' is-new'">
+            <article class="panel-section import-order-card" th:each="oc, ocSt : *{ordenes}" th:classappend="${oc.ordenExistente} ? ' is-existing' : ' is-new'" th:attr="data-oc-index=${ocSt.index}">
                 <input type="hidden" th:field="*{ordenes[__${ocSt.index}__].archivoNombre}">
                 <input type="hidden" th:field="*{ordenes[__${ocSt.index}__].proveedorSugerido}">
                 <input type="hidden" th:field="*{ordenes[__${ocSt.index}__].ordenExistente}">
@@ -139,8 +139,14 @@
                 </div>
 
                 <div class="section-title-row mt-3">
-                    <h3 class="h6 mb-0"><i class="bi bi-list-check"></i> Items detectados</h3>
-                    <span class="section-total-pill" th:text="${oc.items.size()} + ' items'">0 items</span>
+                    <div>
+                        <h3 class="h6 mb-0"><i class="bi bi-list-check"></i> Items detectados</h3>
+                        <small class="text-muted">Podés editar, agregar o eliminar items antes de importar. El importe se calcula con cantidad × precio.</small>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="section-total-pill" data-import-item-count th:text="${oc.items.size()} + ' items'">0 items</span>
+                        <button class="btn btn-sm btn-outline-primary" type="button" data-add-import-item><i class="bi bi-plus-lg"></i> Agregar item</button>
+                    </div>
                 </div>
 
                 <div class="table-responsive import-preview-table-wrap">
@@ -153,20 +159,33 @@
                             <th class="text-end">Cantidad</th>
                             <th class="text-end">Precio</th>
                             <th class="text-end">Importe</th>
+                            <th class="text-center">Acción</th>
                         </tr>
                         </thead>
                         <tbody>
-                        <tr th:each="item, itemSt : *{ordenes[__${ocSt.index}__].items}">
-                            <td><input class="form-control" th:field="*{ordenes[__${ocSt.index}__].items[__${itemSt.index}__].item}"></td>
-                            <td><input class="form-control" th:field="*{ordenes[__${ocSt.index}__].items[__${itemSt.index}__].detalle}" required></td>
-                            <td><input class="form-control" th:field="*{ordenes[__${ocSt.index}__].items[__${itemSt.index}__].unidad}"></td>
-                            <td><input class="form-control text-end import-number import-cantidad" type="number" step="0.01" th:field="*{ordenes[__${ocSt.index}__].items[__${itemSt.index}__].cantidad}" oninput="actualizarImporteImportado(this)"></td>
-                            <td><input class="form-control text-end import-number import-precio" type="number" step="0.01" th:field="*{ordenes[__${ocSt.index}__].items[__${itemSt.index}__].precioUnitario}" oninput="actualizarImporteImportado(this)"></td>
-                            <td><input class="form-control text-end import-number import-importe" type="number" step="0.01" th:field="*{ordenes[__${ocSt.index}__].items[__${itemSt.index}__].importe}" oninput="actualizarTotalImportado(this)"></td>
+                        <tr th:each="item, itemSt : *{ordenes[__${ocSt.index}__].items}" data-import-item-row>
+                            <td><input class="form-control" data-item-field="item" th:field="*{ordenes[__${ocSt.index}__].items[__${itemSt.index}__].item}"></td>
+                            <td><input class="form-control" data-item-field="detalle" th:field="*{ordenes[__${ocSt.index}__].items[__${itemSt.index}__].detalle}" required></td>
+                            <td><input class="form-control" data-item-field="unidad" th:field="*{ordenes[__${ocSt.index}__].items[__${itemSt.index}__].unidad}"></td>
+                            <td><input class="form-control text-end import-number import-cantidad" data-item-field="cantidad" type="number" step="0.01" th:field="*{ordenes[__${ocSt.index}__].items[__${itemSt.index}__].cantidad}"></td>
+                            <td><input class="form-control text-end import-number import-precio" data-item-field="precioUnitario" type="number" step="0.01" th:field="*{ordenes[__${ocSt.index}__].items[__${itemSt.index}__].precioUnitario}"></td>
+                            <td><input class="form-control text-end import-number import-importe" data-item-field="importe" type="number" step="0.01" th:field="*{ordenes[__${ocSt.index}__].items[__${itemSt.index}__].importe}" readonly></td>
+                            <td class="text-center"><button class="btn btn-sm btn-outline-danger" type="button" data-remove-import-item title="Eliminar item" th:aria-label="${'Eliminar item ' + item.item}"><i class="bi bi-trash" aria-hidden="true"></i></button></td>
                         </tr>
                         </tbody>
                     </table>
                 </div>
+                <template data-import-item-template>
+                    <tr data-import-item-row>
+                        <td><input class="form-control" data-item-field="item"></td>
+                        <td><input class="form-control" data-item-field="detalle" required></td>
+                        <td><input class="form-control" data-item-field="unidad"></td>
+                        <td><input class="form-control text-end import-number import-cantidad" data-item-field="cantidad" type="number" step="0.01" value="0"></td>
+                        <td><input class="form-control text-end import-number import-precio" data-item-field="precioUnitario" type="number" step="0.01" value="0"></td>
+                        <td><input class="form-control text-end import-number import-importe" data-item-field="importe" type="number" step="0.01" value="0.00" readonly></td>
+                        <td class="text-center"><button class="btn btn-sm btn-outline-danger" type="button" data-remove-import-item title="Eliminar item" aria-label="Eliminar item"><i class="bi bi-trash" aria-hidden="true"></i></button></td>
+                    </tr>
+                </template>
 
                 <div class="oc-total-bar mt-3">
                     <span>Total importado</span>
@@ -196,12 +215,13 @@ function actualizarImporteImportado(input) {
     const row = input.closest('tr');
     const cantidad = numeroImportado(row.querySelector('.import-cantidad'));
     const precio = numeroImportado(row.querySelector('.import-precio'));
-    row.querySelector('[name$=".importe"]').value = (cantidad * precio).toFixed(2);
+    row.querySelector('.import-importe').value = (cantidad * precio).toFixed(2);
     actualizarTotalImportado(input);
 }
 
-function actualizarTotalImportado(input) {
-    const card = input ? input.closest('.import-order-card') : document;
+function actualizarTotalImportado(inputOrCard) {
+    const card = inputOrCard?.closest?.('.import-order-card')
+        || (inputOrCard?.classList?.contains('import-order-card') ? inputOrCard : document);
     const total = Array.from(card.querySelectorAll('.import-importe'))
         .map(numeroImportado)
         .reduce((acumulado, importe) => acumulado + importe, 0);
@@ -211,7 +231,67 @@ function actualizarTotalImportado(input) {
     }
 }
 
-document.querySelectorAll('.import-order-card').forEach(card => actualizarTotalImportado(card.querySelector('.import-importe')));
+function reindexarItemsImportados(card) {
+    const ordenIndex = card.dataset.ocIndex;
+    const filas = Array.from(card.querySelectorAll('[data-import-item-row]'));
+    filas.forEach((fila, itemIndex) => {
+        fila.querySelectorAll('[data-item-field]').forEach(campo => {
+            const propiedad = campo.dataset.itemField;
+            campo.name = `ordenes[${ordenIndex}].items[${itemIndex}].${propiedad}`;
+            campo.id = `ordenes${ordenIndex}-items${itemIndex}-${propiedad}`;
+        });
+    });
+    const contador = card.querySelector('[data-import-item-count]');
+    if (contador) contador.textContent = `${filas.length} items`;
+}
+
+function inicializarEdicionItemsImportados() {
+    document.querySelectorAll('.import-order-card').forEach(card => {
+        const tbody = card.querySelector('.import-preview-table tbody');
+        const plantilla = card.querySelector('[data-import-item-template]');
+        reindexarItemsImportados(card);
+        actualizarTotalImportado(card);
+
+        card.addEventListener('click', event => {
+            const agregar = event.target.closest('[data-add-import-item]');
+            if (agregar) {
+                const fila = plantilla.content.firstElementChild.cloneNode(true);
+                tbody.appendChild(fila);
+                reindexarItemsImportados(card);
+                actualizarTotalImportado(card);
+                fila.querySelector('[data-item-field="detalle"]')?.focus();
+                return;
+            }
+            const eliminar = event.target.closest('[data-remove-import-item]');
+            if (eliminar) {
+                eliminar.closest('[data-import-item-row]').remove();
+                reindexarItemsImportados(card);
+                actualizarTotalImportado(card);
+            }
+        });
+
+        card.addEventListener('input', event => {
+            const campo = event.target;
+            if (campo.matches('.import-cantidad, .import-precio')) {
+                actualizarImporteImportado(campo);
+            } else if (campo.matches('.import-importe')) actualizarTotalImportado(campo);
+        });
+    });
+}
+
+inicializarEdicionItemsImportados();
+
+document.querySelector('.import-batch-list')?.closest('form')?.addEventListener('submit', event => {
+    const vacia = Array.from(document.querySelectorAll('.import-order-card')).find(card =>
+        card.querySelector('.import-select-check input')?.checked
+        && card.querySelectorAll('[data-import-item-row]').length === 0
+    );
+    if (vacia) {
+        event.preventDefault();
+        alert('Cada OC seleccionada necesita al menos un item. Agregá uno o desmarcá esa OC.');
+        vacia.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+});
 
 function inicializarBuscadoresProveedor() {
     document.querySelectorAll('[data-provider-select]').forEach(select => {
