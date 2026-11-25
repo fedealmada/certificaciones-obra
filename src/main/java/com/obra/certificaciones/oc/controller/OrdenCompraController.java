@@ -76,6 +76,9 @@ public class OrdenCompraController {
         model.addAttribute("certificadosPorOrden", certificacionService.contarPorOrdenes(ordenes.stream()
                 .map(OrdenCompra::getId)
                 .toList()));
+        model.addAttribute("ultimosCertificadosPorOrden", certificacionService.ultimosPorOrdenes(ordenes.stream()
+                .map(OrdenCompra::getId)
+                .toList()));
         Map<Long, BigDecimal> avancesPorOrden = calcularAvancesOrdenes(ordenes);
         Map<Long, Boolean> ordenesMateriales = calcularOrdenesConEntregas(ordenes);
         model.addAttribute("avancesPorOrden", avancesPorOrden);

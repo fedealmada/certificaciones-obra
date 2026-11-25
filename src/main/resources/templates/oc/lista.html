@@ -8,7 +8,7 @@
     <link th:href="@{/css/app.css(v='20260730-dark2')}" rel="stylesheet">
     <link th:href="@{/css/theme.css(v='20260731-night-reset')}" rel="stylesheet">
     <link th:href="@{/css/design-system.css(v='20260802-oc-table-readable-flow')}" rel="stylesheet">
-    <link th:href="@{/css/oc-labels.css(v='20261018')}" rel="stylesheet">
+    <link th:href="@{/css/oc-labels.css(v='20261125')}" rel="stylesheet">
 <link th:href="@{/css/night.css(v='20261025-2')}" rel="stylesheet">
 <link th:href="@{/css/responsive-tables.css(v='20261025-1')}" rel="stylesheet">
 </head>
@@ -36,8 +36,8 @@
     <section class="panel-section mb-3">
         <form class="row g-2 align-items-end" id="oc-filter-form" method="get" th:action="@{/oc}">
             <div class="col-md-4">
-                <label class="form-label">Buscar OC o proveedor</label>
-                <input class="form-control live-filter" id="oc-search" name="proveedor" data-filter="busqueda" th:value="${proveedor}" placeholder="Ej: 450, Fedan, Sanitarios">
+                <label class="form-label">Buscar OC, proveedor o detalle</label>
+                <input class="form-control live-filter" id="oc-search" name="proveedor" data-filter="busqueda" th:value="${proveedor}" placeholder="Ej: 450, Fedan, colocación de cerámicos">
             </div>
             <div class="col-md-3">
                 <label class="form-label">Categoria</label>
@@ -69,6 +69,7 @@
                 <colgroup>
                     <col class="oc-col-numero">
                     <col class="oc-col-fecha">
+                    <col class="oc-col-ultimo-certificado">
                     <col class="oc-col-proveedor">
                     <col class="oc-col-categorias">
                     <col class="oc-col-rubros">
@@ -82,6 +83,7 @@
                 <tr>
                     <th><button class="table-sort-button" type="button" data-sort="numero" data-type="number">OC <i class="bi bi-arrow-down-up"></i></button></th>
                     <th><button class="table-sort-button" type="button" data-sort="fecha" data-type="date">Fecha <i class="bi bi-arrow-down-up"></i></button></th>
+                    <th><button class="table-sort-button" type="button" data-sort="ultimoCertificado" data-type="date">Último certificado <i class="bi bi-arrow-down-up"></i></button></th>
                     <th><button class="table-sort-button" type="button" data-sort="proveedor" data-type="text">Proveedor <i class="bi bi-arrow-down-up"></i></button></th>
                     <th><button class="table-sort-button" type="button" data-sort="categorias" data-type="text">Categorias <i class="bi bi-arrow-down-up"></i></button></th>
                     <th><button class="table-sort-button" type="button" data-sort="rubros" data-type="text">Rubros <i class="bi bi-arrow-down-up"></i></button></th>
@@ -99,7 +101,9 @@
                     th:data-href="@{/oc/{id}(id=${orden.id})}"
                     th:data-numero="${orden.numero}"
                     th:data-fecha="${orden.fecha}"
+                    th:data-ultimo-certificado="${ultimosCertificadosPorOrden.get(orden.id) != null ? ultimosCertificadosPorOrden.get(orden.id).fecha : ''}"
                     th:data-proveedor="${orden.proveedorEntidad?.nombre ?: '-'}"
+                    th:data-detalle="${#strings.listJoin(orden.items.![detalle], ' ')}"
                     th:data-categorias="${#strings.listJoin(orden.items.![categoriaEntidad != null ? categoriaEntidad.nombre : categoria.descripcion], ' ')}"
                     th:data-rubros="${#strings.listJoin(orden.items.![rubroEntidad != null ? rubroEntidad.nombreCompleto : ''], ' ')}"
                     th:data-items="${orden.items.size()}"
@@ -113,6 +117,14 @@
                     th:data-certificados="${ordenesSoloRegistro.getOrDefault(orden.id, false) ? 0 : (ordenesMateriales.getOrDefault(orden.id, false) ? viajesPorOrden.getOrDefault(orden.id, 0) : certificadosPorOrden.getOrDefault(orden.id, 0))}">
                     <td><span class="item-code-pill" th:text="${orden.numero}"></span></td>
                     <td th:text="${#temporals.format(orden.fecha, 'dd/MM/yyyy')}"></td>
+                    <td th:with="ultimoCertificado=${ultimosCertificadosPorOrden.get(orden.id)}"
+                        th:attr="data-sort-value=${ultimoCertificado == null ? '' : ultimoCertificado.fecha}">
+                        <div th:if="${ultimoCertificado != null}" class="oc-last-certificate">
+                            <strong th:text="${'N.º ' + ultimoCertificado.numero}"></strong>
+                            <small th:text="${#temporals.format(ultimoCertificado.fecha, 'dd/MM/yyyy')}"></small>
+                        </div>
+                        <span th:if="${ultimoCertificado == null}" class="text-muted">—</span>
+                    </td>
                     <td th:text="${orden.proveedorEntidad?.nombre ?: '-'}"></td>
                     <td>
                         <div class="oc-category-labels">
@@ -164,8 +176,8 @@
                         </form>
                     </td>
                 </tr>
-                <tr th:if="${ordenes.isEmpty()}"><td colspan="10" class="text-center text-muted py-4">No hay ordenes cargadas.</td></tr>
-                <tr class="oc-empty-filter-row d-none"><td colspan="10" class="text-center text-muted py-4">No hay ordenes que coincidan con la busqueda.</td></tr>
+                <tr th:if="${ordenes.isEmpty()}"><td colspan="11" class="text-center text-muted py-4">No hay ordenes cargadas.</td></tr>
+                <tr class="oc-empty-filter-row d-none"><td colspan="11" class="text-center text-muted py-4">No hay ordenes que coincidan con la busqueda.</td></tr>
                 </tbody>
             </table>
         </div>
@@ -353,7 +365,8 @@ function applyFilters() {
     ocRows.forEach(row => {
         const matchesBusqueda = !busqueda
             || normalizeText(row.dataset.numero).includes(busqueda)
-            || normalizeText(row.dataset.proveedor).includes(busqueda);
+            || normalizeText(row.dataset.proveedor).includes(busqueda)
+            || normalizeText(row.dataset.detalle).includes(busqueda);
         const matchesRubro = normalizeText(row.dataset.rubros).includes(rubro);
         const matchesCategoria = !filtraCategoria || normalizeText(row.dataset.categorias).includes(categoria);
         const visible = matchesBusqueda && matchesRubro && matchesCategoria;

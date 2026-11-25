@@ -29,7 +29,10 @@ public interface OrdenCompraRepository extends JpaRepository<OrdenCompra, Long> 
             left join item.rubroEntidad rubroEntidad
             left join oc.proveedorEntidad proveedorEntidad
             where oc.obra.id = :obraId
-              and (:proveedor is null or lower(proveedorEntidad.nombre) like lower(concat('%', :proveedor, '%')))
+              and (:proveedor is null
+                   or lower(proveedorEntidad.nombre) like lower(concat('%', :proveedor, '%'))
+                   or lower(oc.numero) like lower(concat('%', :proveedor, '%'))
+                   or lower(item.detalle) like lower(concat('%', :proveedor, '%')))
               and (:categoriaId is null or item.categoriaEntidad.id = :categoriaId)
               and (:rubro is null
                    or lower(rubroEntidad.nombre) like lower(concat('%', :rubro, '%'))
@@ -47,7 +50,12 @@ public interface OrdenCompraRepository extends JpaRepository<OrdenCompra, Long> 
             where oc.obra.id = :obraId
               and (:proveedor is null
                    or lower(proveedorEntidad.nombre) like lower(concat('%', :proveedor, '%'))
-                   or lower(oc.numero) like lower(concat('%', :proveedor, '%')))
+                   or lower(oc.numero) like lower(concat('%', :proveedor, '%'))
+                   or exists (
+                       select 1 from ItemOrdenCompra itemBusqueda
+                       where itemBusqueda.ordenCompra = oc
+                         and lower(itemBusqueda.detalle) like lower(concat('%', :proveedor, '%'))
+                   ))
               and (:categoriaId is null
                    or exists (
                        select 1 from ItemOrdenCompra itemCategoria
@@ -70,7 +78,12 @@ public interface OrdenCompraRepository extends JpaRepository<OrdenCompra, Long> 
             where oc.obra.id = :obraId
               and (:proveedor is null
                    or lower(proveedorEntidad.nombre) like lower(concat('%', :proveedor, '%'))
-                   or lower(oc.numero) like lower(concat('%', :proveedor, '%')))
+                   or lower(oc.numero) like lower(concat('%', :proveedor, '%'))
+                   or exists (
+                       select 1 from ItemOrdenCompra itemBusqueda
+                       where itemBusqueda.ordenCompra = oc
+                         and lower(itemBusqueda.detalle) like lower(concat('%', :proveedor, '%'))
+                   ))
               and (:categoriaId is null
                    or exists (
                        select 1 from ItemOrdenCompra itemCategoria

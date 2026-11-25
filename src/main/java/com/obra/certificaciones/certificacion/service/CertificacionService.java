@@ -2,6 +2,7 @@ package com.obra.certificaciones.certificacion.service;
 
 import com.obra.certificaciones.certificacion.dto.ItemNuevaCertificacionForm;
 import com.obra.certificaciones.certificacion.dto.NuevaCertificacionForm;
+import com.obra.certificaciones.certificacion.dto.UltimoCertificadoOrden;
 import com.obra.certificaciones.certificacion.entity.Certificacion;
 import com.obra.certificaciones.certificacion.entity.ItemCertificacion;
 import com.obra.certificaciones.certificacion.repository.CertificacionRepository;
@@ -31,6 +32,15 @@ public class CertificacionService {
     @Transactional(readOnly = true)
     public List<Certificacion> listarPorOrdenCompra(Long ordenCompraId) {
         return certificacionRepository.findByOrdenCompraIdOrderByFechaAscIdAsc(ordenCompraId);
+    }
+
+    @Transactional(readOnly = true)
+    public Map<Long, UltimoCertificadoOrden> ultimosPorOrdenes(List<Long> ordenCompraIds) {
+        if (ordenCompraIds == null || ordenCompraIds.isEmpty()) {
+            return Map.of();
+        }
+        return certificacionRepository.ultimosPorOrdenCompraIds(ordenCompraIds).stream()
+                .collect(Collectors.toMap(UltimoCertificadoOrden::getOrdenCompraId, Function.identity()));
     }
 
     @Transactional(readOnly = true)

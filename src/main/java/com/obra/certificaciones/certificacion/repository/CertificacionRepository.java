@@ -1,6 +1,7 @@
 package com.obra.certificaciones.certificacion.repository;
 
 import com.obra.certificaciones.certificacion.entity.Certificacion;
+import com.obra.certificaciones.certificacion.dto.UltimoCertificadoOrden;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -27,4 +28,18 @@ public interface CertificacionRepository extends JpaRepository<Certificacion, Lo
             group by c.ordenCompra.id
             """)
     List<Object[]> countByOrdenCompraIds(@Param("ordenCompraIds") List<Long> ordenCompraIds);
+
+    @Query("""
+            select new com.obra.certificaciones.certificacion.dto.UltimoCertificadoOrden(c.ordenCompra.id, c.numero, c.fecha)
+            from Certificacion c
+            where c.ordenCompra.id in :ordenCompraIds
+              and c.fecha is not null
+              and not exists (
+                  select c2.id from Certificacion c2
+                  where c2.ordenCompra.id = c.ordenCompra.id
+                    and c2.fecha is not null
+                    and (c2.fecha > c.fecha or (c2.fecha = c.fecha and c2.id > c.id))
+              )
+            """)
+    List<UltimoCertificadoOrden> ultimosPorOrdenCompraIds(@Param("ordenCompraIds") List<Long> ordenCompraIds);
 }
