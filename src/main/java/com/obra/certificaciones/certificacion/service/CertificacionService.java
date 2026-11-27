@@ -9,6 +9,7 @@ import com.obra.certificaciones.certificacion.repository.CertificacionRepository
 import com.obra.certificaciones.oc.entity.ItemOrdenCompra;
 import com.obra.certificaciones.oc.entity.OrdenCompra;
 import com.obra.certificaciones.oc.service.OrdenCompraService;
+import com.obra.certificaciones.oc.util.ItemOrdenCompraComparators;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -52,6 +54,14 @@ public class CertificacionService {
         certificacionRepository.countByOrdenCompraIds(ordenCompraIds).forEach(fila ->
                 conteos.put((Long) fila[0], (Long) fila[1]));
         return conteos;
+    }
+
+    @Transactional(readOnly = true)
+    public Set<Long> ordenesConCertificadoModificadoEnPeriodo(List<Long> ordenCompraIds, LocalDate desde, LocalDate hasta) {
+        if (ordenCompraIds == null || ordenCompraIds.isEmpty()) {
+            return Set.of();
+        }
+        return Set.copyOf(certificacionRepository.ordenesConCertificadosModificadosEnPeriodo(ordenCompraIds, desde, hasta));
     }
 
     @Transactional(readOnly = true)
@@ -285,6 +295,7 @@ public class CertificacionService {
     private List<ItemOrdenCompra> itemsCertificables(OrdenCompra ordenCompra) {
         return ordenCompra.getItems().stream()
                 .filter(calculoService::esItemCertificable)
+                .sorted(ItemOrdenCompraComparators.POR_CODIGO_NATURAL)
                 .toList();
     }
 

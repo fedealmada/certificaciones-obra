@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,4 +43,15 @@ public interface CertificacionRepository extends JpaRepository<Certificacion, Lo
               )
             """)
     List<UltimoCertificadoOrden> ultimosPorOrdenCompraIds(@Param("ordenCompraIds") List<Long> ordenCompraIds);
+
+    @Query("""
+            select distinct c.ordenCompra.id
+            from Certificacion c
+            where c.ordenCompra.id in :ordenCompraIds
+              and (c.fechaUltimaModificacion between :desde and :hasta
+                   or (c.fechaUltimaModificacion is null and c.fecha between :desde and :hasta))
+            """)
+    List<Long> ordenesConCertificadosModificadosEnPeriodo(@Param("ordenCompraIds") List<Long> ordenCompraIds,
+                                                           @Param("desde") LocalDate desde,
+                                                           @Param("hasta") LocalDate hasta);
 }

@@ -10,6 +10,7 @@ import com.obra.certificaciones.oc.entity.CategoriaItem;
 import com.obra.certificaciones.oc.entity.ItemOrdenCompra;
 import com.obra.certificaciones.oc.entity.ModoSeguimientoOrden;
 import com.obra.certificaciones.oc.entity.OrdenCompra;
+import com.obra.certificaciones.oc.util.ItemOrdenCompraComparators;
 import com.obra.certificaciones.oc.repository.ItemOrdenCompraRepository;
 import com.obra.certificaciones.oc.repository.OrdenCompraRepository;
 import com.obra.certificaciones.obra.entity.Obra;
@@ -147,13 +148,16 @@ public class OrdenCompraService {
         form.setCertificacionPorCantidad(ordenCompra.isPorCantidad());
         form.setProveedorId(ordenCompra.getProveedorEntidad() == null ? null : ordenCompra.getProveedorEntidad().getId());
         form.setObservacion(ordenCompra.getObservacion());
-        ordenCompra.getItems().forEach(item -> {
+        List<ItemOrdenCompra> itemsOrdenados = ordenCompra.getItems().stream()
+                .sorted(ItemOrdenCompraComparators.POR_CODIGO_NATURAL)
+                .toList();
+        itemsOrdenados.forEach(item -> {
             item.setRubroId(item.getRubroEntidad() == null ? null : item.getRubroEntidad().getId());
             item.setItemManoObraVinculadoId(item.getItemManoObraVinculado() == null ? null : item.getItemManoObraVinculado().getId());
             item.setMaterialCatalogoId(item.getMaterialCatalogo() == null ? null : item.getMaterialCatalogo().getId());
             item.setCategoriaId(item.getCategoriaEntidad() == null ? null : item.getCategoriaEntidad().getId());
         });
-        form.setItems(ordenCompra.getItems());
+        form.setItems(itemsOrdenados);
         return form;
     }
 

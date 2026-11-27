@@ -10,6 +10,7 @@ import com.obra.certificaciones.certificacion.entity.ItemCertificacion;
 import com.obra.certificaciones.certificacion.repository.ItemCertificacionRepository;
 import com.obra.certificaciones.oc.entity.CategoriaItem;
 import com.obra.certificaciones.oc.entity.ItemOrdenCompra;
+import com.obra.certificaciones.oc.util.ItemOrdenCompraComparators;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -128,6 +130,8 @@ public class CertificacionCalculoService {
                 resultado.add(new ItemCertificacionCalculado(itemOrdenCompra, anterior, actual, acumulado, itemHistorial.getMontoActual(), montoAnterior, montoAcumulado));
             }
         }
+        resultado.sort(Comparator.comparing(ItemCertificacionCalculado::itemOrdenCompra,
+                ItemOrdenCompraComparators.POR_CODIGO_NATURAL));
         return resultado;
     }
 

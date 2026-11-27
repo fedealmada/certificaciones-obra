@@ -13,6 +13,19 @@
     root.dataset.bsTheme = theme;
     root.dataset.palette = palette;
     root.style.colorScheme = theme;
+    const aplicarTipografiaCompacta = () => {
+        if (document.getElementById('tipografia-compacta-app')) return;
+        const hoja = document.createElement('link');
+        hoja.id = 'tipografia-compacta-app';
+        hoja.rel = 'stylesheet';
+        hoja.href = '/css/tipografia-compacta.css?v=20261127-2';
+        document.head.appendChild(hoja);
+    };
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', aplicarTipografiaCompacta, { once: true });
+    } else {
+        aplicarTipografiaCompacta();
+    }
 })();
 </script>
 </head></html>

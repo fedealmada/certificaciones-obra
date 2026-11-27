@@ -9,6 +9,7 @@ import com.obra.certificaciones.certificacion.service.CertificacionService;
 import com.obra.certificaciones.oc.entity.ItemOrdenCompra;
 import com.obra.certificaciones.oc.entity.OrdenCompra;
 import com.obra.certificaciones.oc.service.OrdenCompraService;
+import com.obra.certificaciones.oc.util.ItemOrdenCompraComparators;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
@@ -92,6 +93,7 @@ public class CertificacionController {
                 : calculoService.porcentajesPosterioresPorItem(ordenCompraId, certificacionId);
         List<ItemNuevaCertificacionVista> itemsCertificables = orden.getItems().stream()
                 .filter(calculoService::esItemCertificable)
+                .sorted(ItemOrdenCompraComparators.POR_CODIGO_NATURAL)
                 .map(item -> {
                     BigDecimal actual = porcentajesActualesForm.getOrDefault(item.getId(), BigDecimal.ZERO);
                     BigDecimal anterior = anteriores.getOrDefault(item.getId(), BigDecimal.ZERO);

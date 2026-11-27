@@ -15,6 +15,7 @@ import com.obra.certificaciones.oc.entity.ModoSeguimientoOrden;
 import com.obra.certificaciones.oc.entity.OrdenCompra;
 import com.obra.certificaciones.oc.repository.ItemOrdenCompraRepository;
 import com.obra.certificaciones.oc.service.OrdenCompraService;
+import com.obra.certificaciones.oc.util.ItemOrdenCompraComparators;
 import com.obra.certificaciones.obra.service.ObraService;
 import com.obra.certificaciones.proveedor.service.ProveedorService;
 import com.obra.certificaciones.rubro.service.RubroService;
@@ -35,6 +36,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -79,6 +82,12 @@ public class OrdenCompraController {
         model.addAttribute("ultimosCertificadosPorOrden", certificacionService.ultimosPorOrdenes(ordenes.stream()
                 .map(OrdenCompra::getId)
                 .toList()));
+        LocalDate hoy = LocalDate.now(ZoneId.of("America/Argentina/Buenos_Aires"));
+        boolean primeraQuincena = hoy.getDayOfMonth() <= 15;
+        LocalDate inicioQuincena = hoy.withDayOfMonth(primeraQuincena ? 1 : 16);
+        LocalDate finQuincena = primeraQuincena ? hoy.withDayOfMonth(15) : hoy.withDayOfMonth(hoy.lengthOfMonth());
+        model.addAttribute("ordenesConCertificadoModificadoEnQuincena", certificacionService.ordenesConCertificadoModificadoEnPeriodo(
+                ordenes.stream().map(OrdenCompra::getId).toList(), inicioQuincena, finQuincena));
         Map<Long, BigDecimal> avancesPorOrden = calcularAvancesOrdenes(ordenes);
         Map<Long, Boolean> ordenesMateriales = calcularOrdenesConEntregas(ordenes);
         model.addAttribute("avancesPorOrden", avancesPorOrden);
@@ -157,7 +166,10 @@ public class OrdenCompraController {
     public String detalle(@PathVariable Long id, Model model) {
         OrdenCompra ordenCompra = ordenCompraService.obtener(id);
         Map<Long, BigDecimal> acumuladosPorItem = calculoService.porcentajesAcumuladosPorItem(id);
-        var itemsResumen = calculoService.calcularResumenItems(ordenCompra.getItems(), acumuladosPorItem);
+        var itemsOrdenados = ordenCompra.getItems().stream()
+                .sorted(ItemOrdenCompraComparators.POR_CODIGO_NATURAL)
+                .toList();
+        var itemsResumen = calculoService.calcularResumenItems(itemsOrdenados, acumuladosPorItem);
         var certificadosResumen = certificacionService.listarPorOrdenCompra(id).stream()
                 .map(certificacion -> {
                     var detalleCertificacion = calculoService.calcularDetalle(certificacion);
@@ -262,7 +274,8 @@ public class OrdenCompraController {
         Map<Long, String> previews = new HashMap<>();
         for (OrdenCompra orden : ordenes) {
             List<String> lineas = new ArrayList<>();
-            for (ItemOrdenCompra item : orden.getItems()) {
+            for (ItemOrdenCompra item : orden.getItems().stream()
+                    .sorted(ItemOrdenCompraComparators.POR_CODIGO_NATURAL).toList()) {
                 if (soloRecepcionables && item.getCategoria() == CategoriaItem.MANO_OBRA) {
                     continue;
                 }

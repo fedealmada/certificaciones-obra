@@ -8,7 +8,7 @@
     <link th:href="@{/css/app.css(v='20260730-dark2')}" rel="stylesheet">
     <link th:href="@{/css/theme.css(v='20260731-night-reset')}" rel="stylesheet">
     <link th:href="@{/css/design-system.css(v='20260802-oc-table-readable-flow')}" rel="stylesheet">
-    <link th:href="@{/css/oc-labels.css(v='20261125')}" rel="stylesheet">
+    <link th:href="@{/css/oc-labels.css(v='20261127-progress-status')}" rel="stylesheet">
 <link th:href="@{/css/night.css(v='20261025-2')}" rel="stylesheet">
 <link th:href="@{/css/responsive-tables.css(v='20261025-1')}" rel="stylesheet">
 </head>
@@ -58,7 +58,14 @@
 
     <section class="panel-section oc-list-panel">
         <div class="section-title-row">
-            <h2 class="h5 mb-0"><i class="bi bi-receipt"></i> Ordenes cargadas</h2>
+            <div class="oc-list-heading">
+                <h2 class="h5 mb-0"><i class="bi bi-receipt"></i> Ordenes cargadas</h2>
+                <div class="oc-progress-legend" aria-label="Referencias de color del avance">
+                    <span><i class="is-current-fortnight"></i> Modificado esta quincena</span>
+                    <span><i class="is-pending"></i> Con saldo pendiente</span>
+                    <span><i class="is-complete"></i> Completo</span>
+                </div>
+            </div>
             <div class="section-title-actions">
                 <span th:class="${(proveedor != null && !#strings.isEmpty(proveedor)) || categoriaSeleccionada != null || (rubro != null && !#strings.isEmpty(rubro)) ? 'filter-active-pill' : 'filter-active-pill d-none'}" id="oc-filter-indicator"><i class="bi bi-funnel-fill"></i> Filtro activo</span>
                 <span class="section-total-pill"><span id="oc-visible-count" th:text="${ordenesPage.totalElements}">0</span> <span>ordenes</span></span>
@@ -145,7 +152,10 @@
                         <div th:if="${ordenesCertificables.getOrDefault(orden.id, false)}" class="oc-progress-cell">
                             <span th:text="${#numbers.formatDecimal(avancesPorOrden.get(orden.id), 1, 'POINT', 2, 'COMMA') + '%'}">0,00%</span>
                             <div class="progress oc-progress" role="progressbar" aria-label="Avance de certificados" aria-valuemin="0" aria-valuemax="100">
-                                <div class="progress-bar" th:data-progress="${avancesPorOrden.get(orden.id)}"></div>
+                                <div class="progress-bar"
+                                     th:data-progress="${avancesPorOrden.get(orden.id)}"
+                                     th:classappend="${ordenesConCertificadoModificadoEnQuincena.contains(orden.id) ? ' is-current-fortnight' : (ordenesCerradas.getOrDefault(orden.id, false) ? ' is-complete' : (avancesPorOrden.get(orden.id) > 0 ? ' is-pending' : ' is-empty'))}"
+                                     th:title="${ordenesConCertificadoModificadoEnQuincena.contains(orden.id) ? 'Certificado modificado en la quincena actual' : (ordenesCerradas.getOrDefault(orden.id, false) ? 'Certificado completo' : (avancesPorOrden.get(orden.id) > 0 ? 'Certificado con saldo pendiente' : 'Sin avance certificado'))}"></div>
                             </div>
                         </div>
                         <span th:unless="${ordenesCertificables.getOrDefault(orden.id, false)}" class="text-muted">-</span>

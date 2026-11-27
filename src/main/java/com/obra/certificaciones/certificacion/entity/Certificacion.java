@@ -9,10 +9,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +49,7 @@ public class Certificacion {
     private BigDecimal cacIndiceActual;
     @jakarta.persistence.Column(precision = 19, scale = 2)
     private BigDecimal cacMontoManual;
+    private LocalDate fechaUltimaModificacion;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private OrdenCompra ordenCompra;
@@ -56,5 +60,11 @@ public class Certificacion {
     public void agregarItem(ItemCertificacion item) {
         item.setCertificacion(this);
         items.add(item);
+    }
+
+    @PrePersist
+    @PreUpdate
+    private void registrarModificacion() {
+        fechaUltimaModificacion = LocalDate.now(ZoneId.of("America/Argentina/Buenos_Aires"));
     }
 }
